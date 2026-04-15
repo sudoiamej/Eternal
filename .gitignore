@@ -1,0 +1,33 @@
+## Visual Studio
+.vs/
+[Bb]in/
+[Oo]bj/
+[Tt]est[Rr]esults/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Obfuscar Outputs
+Obfuscated/
+Mapping.log
+
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## OS Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+## Releases
+dist/

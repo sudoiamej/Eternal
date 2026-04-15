@@ -1,0 +1,70 @@
+================================================================================
+ETERNAL SYSTEM INTELLIGENCE - APPLICATION SUMMARY
+================================================================================
+
+1. APPLICATION USE & PURPOSE
+----------------------------
+Eternal is a high-performance system intelligence and maintenance suite 
+designed for the modern Windows ecosystem. Its primary goal is to provide 
+deep-level telemetry and system repair capabilities through a unified, 
+professionally branded interface. 
+
+The application serves as a central hub for:
+- Deep Process Intelligence: Beyond standard task managers, it analyzes 
+  process headers and dependencies.
+- Hardware Health: Real-time, direct-from-sensor thermal and load monitoring.
+- System Repair: One-click restoration for critical OS components (Network, 
+  SFC, DISM).
+- Security Auditing: Real-time trust scoring based on active system state.
+
+2. SIGNIFICANCE TO NEW USERS
+----------------------------
+For the "non-techy" user, Eternal acts as a "System Physician." 
+- Visual Health: Uses a "Healthy" status bar and a "Trust Score" (0-100) 
+  to provide immediate peace of mind without needing to understand raw data.
+- Safe Repair: Simplifies complex command-line repairs (SFC, DISM) into 
+  safe, single-button actions.
+- Proactive Exit: The "Clean Shutdown" feature ensures the user knows the 
+  app is safely finalizing its work, preventing confusion or fear of 
+  system hangs.
+
+3. SIGNIFICANCE TO TECHY USERS
+------------------------------
+For the intermediate enthusiast, Eternal is a "Power Dashboard."
+- Advanced Telemetry: Provides direct CPU Package thermals and detailed 
+  BIOS/UEFI firmware data that standard Windows tools often obscure.
+- Process Grouping: Makes managing complex browser instances or multi-process 
+  apps (like Chrome or Edge) significantly easier by grouping their impact.
+- Customization: Offers real-time UI scaling and persistent settings for 
+  a tailored monitoring experience.
+
+4. SIGNIFICANCE TO EXPERTS
+--------------------------
+For system administrators and developers, Eternal is a "Forensic Utility."
+- Static Analysis: The Process Intelligence engine performs lightweight PE 
+  header parsing to identify static imports (DLLs) used by running apps.
+- Win32 API Accuracy: Bypasses WMI wrappers for critical tasks (Firmware detection, 
+  Hardware hooks) to ensure bare-metal accuracy.
+- Log Integration: Provides direct access to Windows Event Logs (System/Application) 
+  within a modernized UI, filtered and sorted for rapid debugging.
+- Industrial Integrity: Features robust error handling, unhandled exception 
+  traps, and a clean resource release pipeline.
+
+================================================================================
+VERSION: 2.0.0 "CREATOR PLUS" | © 2026 ETERNAL ANALYTICS
+================================================================================
+
+5. NEW FEATURES (CREATOR PLUS UPDATE)
+-------------------------------------
+- Guardian Tuning (Debloater): A powerful optimization suite allowing users to 
+  disable Telemetry, Bing Search, and Cortana via categorized registry tweaks. 
+  Includes mandatory System Restore Point integration for safety.
+- Eternal Console: An integrated PowerShell/CMD environment with "Macro Blocks" 
+  for one-click execution of complex diagnostic commands (Network status, 
+  Process trees, etc.).
+- Headless CLI: Advanced users can now run Eternal via command line (e.g., 
+  --report, --debloat) for automated system maintenance and forensic gathering 
+  without a GUI.
+  - Boot Architecture: Forensic-level enumeration of Windows Boot Configuration 
+  Data (BCD) records, displaying identifiers, devices, and paths for boot 
+  managers and loaders.

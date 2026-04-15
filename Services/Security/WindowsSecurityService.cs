@@ -1,0 +1,291 @@
+using System;
+using System.Collections.Generic;
+using System.Management;
+using System.Threading.Tasks;
+using Microsoft.Win32;
+using System.Linq;
+using System.Diagnostics;
+
+namespace Eternal.Services.Security
+{
+    public class WindowsSecurityService : ISecurityService
+    {
+        public Task<List<StartupProgram>> GetStartupProgramsAsync()
+        {
+            return Task.Run(() =>
+            {
+                var programs = new List<StartupProgram>();
+                
+                // Check Registry HKLM Run
+                ReadRegistryRun(Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", programs, "HKLM Run");
+                // Check Registry HKCU Run
+                ReadRegistryRun(Registry.CurrentUser, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", programs, "HKCU Run");
+
+                return programs;
+            });
+        }
+
+        private void ReadRegistryRun(RegistryKey root, string keyPath, List<StartupProgram> list, string location)
+        {
+            try
+            {
+                using (var key = root.OpenSubKey(keyPath))
+                {
+                    if (key != null)
+                    {
+                        foreach (var name in key.GetValueNames())
+                        {
+                            list.Add(new StartupProgram(name, key.GetValue(name)?.ToString() ?? "", location));
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        public Task<DefenderStatus> GetDefenderStatusAsync()
+        {
+            return Task.Run(() =>
+            {
+                bool realTime = false;
+                bool avEnabled = false;
+
+                try
+                {
+                    using var searcher = new ManagementObjectSearcher(@"Root\Microsoft\Windows\Defender", "select * from MSFT_MpComputerStatus");
+                    foreach (var obj in searcher.Get())
+                    {
+                        realTime = global::System.Convert.ToBoolean(obj["RealTimeProtectionEnabled"] ?? false);
+                        avEnabled = global::System.Convert.ToBoolean(obj["AntivirusEnabled"] ?? false);
+                        break;
+                    }
+                }
+                catch { }
+
+                return new DefenderStatus(realTime, avEnabled);
+            });
+        }
+
+        public Task<List<ServiceInfo>> GetRunningServicesAsync()
+        {
+            return Task.Run(() =>
+            {
+                var services = new List<ServiceInfo>();
+                try
+                {
+                    using var searcher = new ManagementObjectSearcher("select Name, DisplayName, State, StartMode from Win32_Service");
+                    foreach (var obj in searcher.Get())
+                    {
+                        services.Add(new ServiceInfo(
+                            obj["Name"]?.ToString() ?? "",
+                            obj["DisplayName"]?.ToString() ?? "",
+                            obj["State"]?.ToString() ?? "",
+                            obj["StartMode"]?.ToString() ?? ""
+                        ));
+                    }
+                }
+                catch { }
+                return services;
+            });
+        }
+
+        public Task<List<SoftwareInfo>> GetInstalledSoftwareAsync()
+        {
+            return Task.Run(() =>
+            {
+                var software = new List<SoftwareInfo>();
+                string[] keys = { @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall" };
+                
+                foreach (var keyPath in keys)
+                {
+                    try
+                    {
+                        using var root = Registry.LocalMachine.OpenSubKey(keyPath);
+                        if (root != null)
+                        {
+                            foreach (var name in root.GetSubKeyNames())
+                            {
+                                using var subkey = root.OpenSubKey(name);
+                                string appName = subkey?.GetValue("DisplayName")?.ToString();
+                                if (!string.IsNullOrEmpty(appName))
+                                {
+                                    software.Add(new SoftwareInfo(
+                                        appName,
+                                        subkey?.GetValue("DisplayVersion")?.ToString() ?? "N/A",
+                                        subkey?.GetValue("Publisher")?.ToString() ?? "Unknown"
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+                return software.OrderBy(s => s.Name).ToList();
+            });
+        }
+
+        public Task<List<DriverSignatureInfo>> GetDriverSignaturesAsync()
+        {
+            return Task.Run(() =>
+            {
+                var drivers = new List<DriverSignatureInfo>();
+                try
+                {
+                    using var searcher = new ManagementObjectSearcher("select DeviceName, IsSigned, Manufacturer from Win32_PnPSignedDriver");
+                    foreach (var obj in searcher.Get())
+                    {
+                        drivers.Add(new DriverSignatureInfo(
+                            obj["DeviceName"]?.ToString() ?? "Unknown Device",
+                            global::System.Convert.ToBoolean(obj["IsSigned"] ?? false),
+                            obj["Manufacturer"]?.ToString() ?? "Unknown"
+                        ));
+                    }
+                }
+                catch { }
+                return drivers;
+            });
+        }
+
+        public Task<REAgentStatus> GetREAgentStatusAsync()
+        {
+            return Task.Run(() =>
+            {
+                bool enabled = false;
+                string winLoc = "Unknown";
+                string id = "Unknown";
+                string imgLoc = "Unknown";
+
+                try
+                {
+                    ProcessStartInfo psi = new ProcessStartInfo("reagentc.exe", "/info")
+                    {
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    };
+                    using var process = Process.Start(psi);
+                    string output = process?.StandardOutput.ReadToEnd() ?? "";
+                    
+                    enabled = output.Contains("Enabled") || output.Contains("1");
+                    
+                    var lines = output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var line in lines)
+                    {
+                        if (line.Contains("Windows RE location:")) winLoc = line.Split(':').Last().Trim();
+                        if (line.Contains("Boot Configuration Data (BCD) identifier:")) id = line.Split(':').Last().Trim();
+                        if (line.Contains("Recovery image location:")) imgLoc = line.Split(':').Last().Trim();
+                    }
+                }
+                catch { }
+
+                return new REAgentStatus(enabled, winLoc, id, imgLoc);
+            });
+        }
+
+        public Task<List<BitLockerStatus>> GetBitLockerStatusAsync()
+        {
+            return Task.Run(() =>
+            {
+                var list = new List<BitLockerStatus>();
+                try
+                {
+                    var scope = new ManagementScope(@"Root\CIMV2\Security\MicrosoftVolumeEncryption");
+                    scope.Connect();
+                    using var searcher = new ManagementObjectSearcher(scope, new ObjectQuery("select * from Win32_EncryptableVolume"));
+                    
+                    foreach (ManagementObject obj in searcher.Get())
+                    {
+                        string drive = obj["DriveLetter"]?.ToString() ?? "System Reserved";
+                        uint protection = global::System.Convert.ToUInt32(obj["ProtectionStatus"] ?? 0);
+                        uint encryption = global::System.Convert.ToUInt32(obj["EncryptionMethod"] ?? 0);
+                        uint conversion = global::System.Convert.ToUInt32(obj["ConversionStatus"] ?? 0);
+
+                        string protStr = protection == 1 ? "On" : "Off";
+                        string method = GetEncryptionMethod(encryption);
+                        string lockStr = GetLockStatus(conversion);
+                        
+                        // Get Key Protectors
+                        string protectors = "None";
+                        try
+                        {
+                            var invokeRes = (ManagementBaseObject)obj.InvokeMethod("GetKeyProtectors", new object[] { });
+                            if (invokeRes != null && (uint)invokeRes["ReturnValue"] == 0)
+                            {
+                                var protectorIds = (string[])invokeRes["VolumeKeyProtectorID"];
+                                if (protectorIds != null && protectorIds.Length > 0)
+                                {
+                                    var types = new List<string>();
+                                    foreach (var pid in protectorIds)
+                                    {
+                                        var pObjParams = obj.GetMethodParameters("GetKeyProtectorType");
+                                        pObjParams["VolumeKeyProtectorID"] = pid;
+                                        var pObj = obj.InvokeMethod("GetKeyProtectorType", pObjParams, null);
+                                        if (pObj != null && (uint)pObj["ReturnValue"] == 0)
+                                        {
+                                            types.Add(GetKeyProtectorType((uint)pObj["KeyProtectorType"]));
+                                        }
+                                    }
+                                    protectors = string.Join(", ", types.Distinct());
+                                }
+                            }
+                        }
+                        catch { }
+
+                        list.Add(new BitLockerStatus(drive, protStr, method, lockStr, protectors));
+                    }
+                }
+                catch { }
+                return list;
+            });
+        }
+
+        private string GetEncryptionMethod(uint code)
+        {
+            return code switch
+            {
+                0 => "None",
+                1 => "AES 128-bit Diffuser",
+                2 => "AES 256-bit Diffuser",
+                3 => "AES 128",
+                4 => "AES 256",
+                5 => "Hardware Encryption",
+                6 => "XTS-AES 128",
+                7 => "XTS-AES 256",
+                _ => "Unknown"
+            };
+        }
+
+        private string GetLockStatus(uint code)
+        {
+            return code switch
+            {
+                0 => "Fully Decrypted",
+                1 => "Fully Encrypted",
+                2 => "Encryption In Progress",
+                3 => "Decryption In Progress",
+                4 => "Encryption Paused",
+                5 => "Decryption Paused",
+                _ => "Unknown"
+            };
+        }
+
+        private string GetKeyProtectorType(uint code)
+        {
+            return code switch
+            {
+                0 => "Unknown",
+                1 => "Trusted Platform Module (TPM)",
+                2 => "External Key",
+                3 => "Numerical Password",
+                4 => "TPM + PIN",
+                5 => "TPM + Startup Key",
+                6 => "TPM + PIN + Startup Key",
+                7 => "Public Key",
+                8 => "Passphrase",
+                9 => "TPM (Virtual Smart Card)",
+                10 => "AD Account Holder",
+                _ => "Other"
+            };
+        }
+    }
+}

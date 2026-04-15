@@ -1,0 +1,360 @@
+You are an expert Windows systems engineer, reverse engineering specialist, and C#/.NET desktop architect.
+
+Build a Windows system utility application compatible with Windows 10 and Windows 11 ONLY.
+
+## 🔧 CORE GOAL
+Create a portable, standalone, offline system diagnostic + security + hardware intelligence suite that:
+- Reads hardware data from real system sources (WMI, Win32 API, ACPI where safe, performance counters)
+- Reads system state from Windows Registry (read-only unless explicitly enabled)
+- Provides deep system analysis, monitoring, security auditing, and reporting
+- Runs WITHOUT installation (portable EXE)
+- Must be capable of running in Windows PE / Windows RE (limited mode supported)
+- Must be modular and extensible
+
+---
+
+# 🧠 CORE MODULES (FULL SPEC)
+
+## 1. Hardware Information Module
+- CPU (name, cores, threads, architecture, frequency)
+- GPU (driver version, VRAM, utilization)
+- RAM (capacity, usage, speed, slots if possible)
+- Storage devices (health, partitions, SMART data if available)
+- Motherboard (model, manufacturer)
+- Network adapters (MAC, IP, speed)
+
+---
+
+## 2. BIOS / UEFI INFORMATION + CONFIG REVIEWER (IMPORTANT)
+- BIOS version, vendor, release date
+- UEFI vs Legacy mode detection
+- Secure Boot status
+- TPM status (if available)
+
+### BIOS/UEFI CONFIG REVIEWER (READ-ONLY)
+- Detect and display available firmware configuration flags if exposed by system interfaces
+- Show boot configuration state (boot order if accessible via safe APIs)
+- Display firmware capability summary (not modification)
+- NO writing or modifying BIOS/UEFI settings
+- Graceful fallback when access is restricted
+
+---
+
+## 3. SECURITY & SYSTEM INTEGRITY MODULE (DEEP SCAN)
+- Registry scan (read-only)
+- Startup programs analysis
+- Running services overview
+- Installed software inventory
+- Windows Defender status (if accessible)
+- System file integrity metadata checks (non-invasive)
+- Driver signature verification status (signed vs unsigned detection)
+- Suspicious startup heuristics (rule-based detection only)
+
+---
+
+## 4. SYSTEM PERFORMANCE HISTORY MODULE
+- CPU usage history (time series)
+- RAM usage history
+- Disk usage spikes tracking
+- Network usage history
+- Uptime tracking with restart detection
+
+---
+
+## 5. HARDWARE FINGERPRINT MODULE
+- Generate unique system identifier using:
+  - CPU ID
+  - Motherboard serial
+  - BIOS UUID
+  - Disk serial hashes
+- Output as hashed fingerprint (offline-safe)
+
+---
+
+## 6. DRIVER INSPECTOR MODULE
+- List all installed drivers
+- Version tracking
+- Signed vs unsigned classification
+- Outdated driver detection
+- Kernel driver visibility
+
+---
+
+## 7. DISK HEALTH ANALYZER (SMART++)
+- SMART attributes interpretation
+- SSD wear level estimation
+- Failure risk scoring
+- Bad sector detection (if available)
+
+---
+
+## 8. NETWORK ANALYZER MODULE
+- Active connections (local + remote)
+- Port usage mapping
+- Bandwidth per process
+- DNS configuration
+- Latency monitoring to gateway
+- Suspicious connection detection (rule-based only)
+
+---
+
+## 9. SYSTEM REPAIR TOOLKIT (SAFE MODE ONLY)
+- Flush DNS
+- Reset network stack (optional user confirm)
+- Clear temporary files
+- Rebuild icon cache
+- System cleanup suggestions
+
+⚠ Must be fully user-controlled, no silent execution.
+
+---
+
+## 10. EXPORT & REPORTING SYSTEM
+- Export full system snapshot:
+  - JSON
+  - HTML report
+  - PDF report
+- Include:
+  - hardware snapshot
+  - security scan results
+  - performance stats
+
+---
+
+## 11. AI INSIGHT LAYER (OFFLINE RULE-BASED ONLY)
+- Detect system bottlenecks
+- Detect overheating patterns
+- Detect low RAM pressure conditions
+- Provide optimization suggestions
+- NO cloud/telemetry dependency
+
+---
+
+## 12. PE / RE EMERGENCY MODE DASHBOARD
+- Lightweight UI mode for Windows PE / RE
+- Minimal animations
+- Fast hardware detection only
+- Disk + boot diagnostics prioritized
+- Emergency system inspection view
+
+---
+
+# 🖥️ UI / UX DESIGN (VERY IMPORTANT)
+
+## UI STYLE
+- Modern Windows 11-style UI
+- Clean, minimal, professional system tool aesthetic
+- Dark mode default + light mode optional
+- Card-based layout system
+
+## LAYOUT STRUCTURE
+- Left sidebar navigation:
+  - Dashboard
+  - Hardware
+  - BIOS / UEFI
+  - Security
+  - Performance History
+  - Drivers
+  - Storage
+  - Network
+  - Reports
+  - Tools
+  - PE Mode
+
+- Main panel:
+  - Dynamic module rendering
+
+- Top status bar:
+  - CPU usage
+  - RAM usage
+  - Network activity
+  - Uptime
+
+## UI BEHAVIOR
+- Responsive scaling for all resolutions
+- DPI-aware (Per-Monitor DPI v2 preferred)
+- Smooth transitions (subtle fade/slide only)
+- No UI clipping under resizing or snapping
+- Must work correctly with Windows Snap Assist and Alt-Tab previews
+- Hardware-accelerated rendering preferred (WPF/DirectX integration)
+
+---
+
+# 🪟 DWM / WINDOW MANAGER COMPATIBILITY (CRITICAL)
+
+- Fully compatible with dwm.exe composition
+- Native window behavior on Windows 10/11
+- Proper maximize/restore behavior
+- Snap Assist support (Win + arrows)
+- DPI scaling must be handled correctly (100%–200%+)
+- No layout break under scaling or resolution change
+- Smooth resize performance with no flickering
+
+---
+
+# 📦 PORTABILITY REQUIREMENTS
+- Fully portable (single EXE or folder)
+- No installer required
+- Must run from USB
+- Must support Windows PE / RE where possible
+- Minimal external dependencies
+
+---
+
+# 🧱 TECH STACK
+- Language: C# (.NET 6 or .NET 8 preferred)
+- UI: WPF (preferred) or WinUI 3
+- Architecture: MVVM pattern
+- Async system calls required
+- Low CPU overhead design
+
+---
+
+# 📦 OUTPUT REQUIRED
+- Full Visual Studio solution structure
+- Complete source code
+- MVVM architecture breakdown
+- UI XAML layouts
+- System API access layer
+- Module structure design
+- Build instructions for portable EXE
+
+---
+
+# ⚠ CONSTRAINTS
+- No telemetry
+- No internet dependency
+- No destructive system operations without explicit user confirmation
+- Must fail gracefully if hardware data is unavailable
+- Must not assume BIOS write access
+- All security scans must be read-only unless explicitly enabled
+
+---
+
+# 🎯 FINAL GOAL
+A professional-grade Windows diagnostic, security, hardware, and system intelligence suite comparable to:
+- HWiNFO
+- Speccy
+- Task Manager (advanced)
+- System Information (msinfo32)
+- Security audit tools
+
+BUT:
+- Portable
+- Offline
+- Modular
+- Modern UI
+- PE/RE compatible
+- DWM-native compliant
+
+
+## 🖥️ UI DESIGN PHILOSOPHY (CRITICAL)
+
+The UI must feel like a professional-grade Windows system utility:
+formal, structured, modern, and trustworthy — not playful or overly stylized.
+
+### 🎯 Overall Style Direction
+- Professional system diagnostic aesthetic (like HWiNFO / Windows Task Manager / Sysinternals tools)
+- Clean, modern Windows 11 design language
+- Subtle creativity (not decorative overload)
+- Balanced visual hierarchy (important data stands out naturally)
+- NO childish UI elements, gradients, or flashy effects
+
+---
+
+### 📐 Layout Design Rules (IMPORTANT)
+
+The UI must be:
+- Symmetric in structure, but NOT rigid or “perfect-grid OCD”
+- Balanced spacing (natural human spacing, not mathematically identical everywhere)
+- Use consistent alignment, but allow slight visual variation for realism
+- Avoid overly uniform card sizing across all modules (some variation is OK and preferred)
+
+### Visual Composition:
+- Use a structured grid system, but allow:
+  - slight asymmetry in card sizing
+  - natural grouping of related modules
+- Prevent “everything looks identical” syndrome
+- Avoid overly mechanical spacing patterns
+
+---
+
+### 🧠 Information Hierarchy Rules
+- Most important metrics must visually dominate:
+  - CPU usage
+  - RAM usage
+  - system status
+- Secondary data should be visually quieter
+- Tertiary details should be collapsible or nested
+
+---
+
+### 🎨 Visual Style
+- Dark mode default (neutral charcoal / deep gray tones)
+- Light mode optional, clean Windows white theme
+- Use soft contrast, not harsh black/white
+- Minimal accent colors:
+  - one primary accent color (blue or cyan recommended)
+  - optional warning colors (yellow/red only for alerts)
+
+---
+
+### 🧩 Component Design Rules
+- Use card-based layout system
+- Cards must have:
+  - soft shadows (subtle depth)
+  - rounded corners (moderate, not extreme)
+  - consistent padding
+- Avoid over-rounding (no “mobile app cartoon look”)
+
+---
+
+### ✨ Motion & Interaction
+- Subtle animations only:
+  - fade-in on module load
+  - smooth hover elevation on cards
+  - soft transitions between pages
+- No bouncing, no flashy animations, no excessive motion
+- Must feel like a system tool, not a website
+
+---
+
+### 📊 Dashboard Layout Behavior
+- Dashboard should feel “alive” but structured:
+  - live system stats at top
+  - detailed modules below
+- Use natural grouping:
+  - hardware section grouped
+  - security section grouped
+  - performance section grouped
+
+---
+
+### 🪟 Windows Native Feel (IMPORTANT)
+- Must look like a native Windows desktop application
+- Must respect Windows DPI scaling
+- Must integrate visually with Windows 10/11 design language
+- Must not look like a web app running in a window
+
+---
+
+### 🚫 STRICT AVOIDANCES
+- No cluttered UI
+- No excessive symmetry that feels robotic
+- No neon cyberpunk styling
+- No over-designed futuristic HUD look
+- No excessive icons everywhere
+- No inconsistent spacing chaos
+
+---
+
+### 🎯 FINAL UI GOAL
+The interface should feel like:
+"A professional Windows system engineer tool that is clean, structured, slightly creative, and instantly readable under stress."
+
+Not:
+- flashy dashboard
+- gaming overlay
+- or overly artistic UI
+
+It should feel trustworthy, stable, and engineered.

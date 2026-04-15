@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<Obfuscator>
+  <Var name="InPath" value="." />
+  <Var name="OutPath" value=".\Obfuscated" />
+  <Var name="KeepPublicApi" value="true" />
+  <Var name="HidePrivateApi" value="true" />
+  <Var name="RenameProperties" value="false" />
+  <Var name="RenameEvents" value="false" />
+  <Var name="RenameFields" value="false" />
+  <Var name="EncryptStrings" value="true" />
+  <Var name="SuppressIldasm" value="true" />
+
+  <Module file="Eternal.dll">
+    <SkipNamespace name="Eternal.ViewModels*" />
+    <SkipNamespace name="Eternal.Views*" />
+  </Module>
+</Obfuscator>

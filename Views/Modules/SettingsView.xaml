@@ -1,0 +1,138 @@
+<UserControl x:Class="Eternal.Views.Modules.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="800">
+    <Border Padding="40">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="Application Settings" Style="{StaticResource H1}"/>
+
+                <!-- 1. Telemetry & Performance -->
+                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="TELEMETRY &amp; PERFORMANCE" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                        
+                        <Grid Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="Run at Windows Startup" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                                <TextBlock Text="Automatically launch Eternal when you sign in." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ToggleButton IsChecked="{Binding Settings.RunAtStartup}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="Minimize to System Tray" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                                <TextBlock Text="Keep the app running in the background when closed." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ToggleButton IsChecked="{Binding Settings.MinimizeToTray}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="Telemetry Polling Profile" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                                <TextBlock Text="Optimize sensor updates for battery or accuracy." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ComboBox SelectedValue="{Binding Settings.PollingProfile}" Width="120" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <system:String>Balanced</system:String>
+                                <system:String>High</system:String>
+                                <system:String>PowerSaver</system:String>
+                            </ComboBox>
+                        </Grid>
+
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="Refresh Frequency" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                                <TextBlock Text="Set interval for live telemetry updates (seconds)." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Slider Value="{Binding Settings.RefreshFrequency}" Minimum="1" Maximum="10" Width="100" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding Settings.RefreshFrequency, StringFormat={}{0}s}" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Width="25"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 2. Data & Privacy -->
+                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="DATA &amp; PRIVACY" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+
+                        <StackPanel Margin="0,0,0,15">
+                            <TextBlock Text="Intelligence Export Path" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                            <TextBlock Text="Default folder for saving intelligence reports (.json)." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding Settings.ExportFolderPath}" IsReadOnly="True" Background="#0DFFFFFF" BorderBrush="{StaticResource BorderBrush}" Padding="8,5" Foreground="{StaticResource TextBrush}"/>
+                                <Button Grid.Column="1" Command="{Binding SelectExportFolderCommand}" Content="Browse" Margin="8,0,0,0" Padding="15,0" Style="{StaticResource PrimaryAction}"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <Grid Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="WMI Query Timeout" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                                <TextBlock Text="Seconds to wait for low-level system responses." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Slider Value="{Binding Settings.WmiTimeoutSeconds}" Minimum="2" Maximum="30" Width="100" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding Settings.WmiTimeoutSeconds, StringFormat={}{0}s}" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Width="25"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="Verbose Session Logging" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                                <TextBlock Text="Capture detailed app actions in the 'System Logs' tab." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ToggleButton IsChecked="{Binding Settings.IsVerboseLoggingEnabled}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 3. Intelligence Mode -->
+                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="CORE INTELLIGENCE" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                        
+                        <Grid Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="Advanced Intelligence Mode" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                                <TextBlock Text="Enables deep telemetry and raw system identifiers." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ToggleButton IsChecked="{Binding Settings.IsAdvancedMode}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="Preload Data on Startup" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                                <TextBlock Text="Loads system metrics in background during app launch." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ToggleButton IsChecked="{Binding Settings.PreloadOnStartup}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- About Section -->
+                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,30">
+                    <StackPanel>
+                        <TextBlock Text="ABOUT Eternal" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                        <TextBlock Text="Version: 2.0.0P (Creator Suite)" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                        <TextBlock Text="Compatible with: Windows 10 &amp; 11 ONLY" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Reset Defaults" Command="{Binding ResetDefaultsCommand}" Style="{StaticResource IconButton}" Padding="20,10" Margin="0,0,10,0"/>
+                    <Button Content="Save Configuration" Command="{Binding SaveConfigCommand}" Style="{StaticResource PrimaryAction}" Padding="20,10"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>

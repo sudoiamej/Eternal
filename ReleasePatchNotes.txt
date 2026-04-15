@@ -1,0 +1,74 @@
+ETERNAL SYSTEM INTELLIGENCE - RELEASE NOTES
+Version: 2.0.0
+Edition: CREATOR PLUS
+Build Date: April 15, 2026
+
+--------------------------------------------------------------------------------
+OVERVIEW
+--------------------------------------------------------------------------------
+The "CREATOR PLUS" update marks a significant leap in system management and 
+security. Eternal now bridges the gap between a diagnostic suite and a full 
+power-user utility with integrated optimization, recovery specialization, 
+and advanced binary protection.
+
+--------------------------------------------------------------------------------
+NEW FEATURES & ARCHITECTURAL ENHANCEMENTS
+--------------------------------------------------------------------------------
+
+[SECURITY & PROTECTION] - NEW
+- CODE OBFUSCATION: Integrated the Obfuscar security pipeline. The application 
+  now scrambles internal logic and assembly metadata during Release builds to 
+  prevent unauthorized disassembly and reverse-engineering.
+- STRING ENCRYPTION: Sensitive literals, registry paths, and system commands 
+  are now encrypted within the binary, providing a robust layer against 
+  casual inspection via hex editors or decompilers.
+- TAMPER RESISTANCE: Internal services are now hidden from public reflection 
+  APIs while maintaining full WPF data-binding compatibility.
+
+[GUARDIAN TUNING (DEBLOATER)]
+- ONE-CLICK OPTIMIZATION: Introduced a centralized suite for Windows 
+  performance and privacy tuning.
+- TWEAK ENGINE: 
+    * Privacy: Disable OS & Edge Telemetry, block Cortana.
+    * System UI: Restore Classic Context Menus (Win11), Instant Menu Response.
+    * Performance: Disable Search Indexing, Hibernate, and Bing Start Search.
+- RESTORE POINT INTEGRATION: For safety, Guardian Tuning includes a dedicated 
+  trigger to create a System Restore Point before applying any registry changes.
+
+[ETERNAL CONSOLE]
+- INTEGRATED SHELL: A live PowerShell/CMD terminal hosted directly inside the 
+  application for expert diagnostics without leaving the branded environment.
+- COMMAND MACROS: Sidebar of pre-configured "Macro Blocks" for one-click 
+  execution of complex system audits (Network Status, IP Config, DNS Cache).
+- AUTO-SCROLL UI: The console intelligently tracks the latest output lines 
+  for a seamless "live log" experience.
+
+[RECOVERY & BOOT INTELLIGENCE]
+- ETERNAL DOCTOR: A problem-oriented diagnostic engine that maps common user 
+  complaints (No sound, slow internet, crashing apps) to automated repairs.
+- BOOT ARCHITECTURE: Forensic-level enumeration of BCD (Boot Configuration 
+  Data) records, displaying hardware identifiers and boot manager paths.
+- DYNAMIC DRIVE DETECTION: The intelligence engine now scans all physical 
+  disks to locate Windows installations, ensuring repairs work even if 
+  Windows isn't on the C: drive.
+
+[PE MODE SPECIALIZATION]
+- RECOVERY FOCUS: When running in Windows PE (Preinstallation Environment), 
+  the UI automatically streamlines to hide OS-dependent features and 
+  prioritize disk management and registry mounting tools.
+- OFFLINE REGISTRY HELPER: Capabilities added to mount the SYSTEM hive from 
+  a target disk into the PE environment for advanced forensic repair.
+
+[AUTOMATION]
+- HEADLESS CLI MODE: Advanced users can now run Eternal.exe with command-line 
+  flags (e.g., --report, --debloat) for automated maintenance without a GUI.
+
+--------------------------------------------------------------------------------
+TECHNICAL SPECIFICATIONS
+--------------------------------------------------------------------------------
+- Framework: .NET 10.0-windows
+- UI Library: WPF (CommunityToolkit.Mvvm)
+- Security: Obfuscar 2.2.40 (String Encryption & Renaming)
+- Minimum OS: Windows 10 (Build 19041+) / WinPE 10+
+
+© 2026 ETERNAL ANALYTICS. All Rights Reserved.
