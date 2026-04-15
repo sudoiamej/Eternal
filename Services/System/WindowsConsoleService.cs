@@ -15,27 +15,44 @@ namespace Eternal.Services.System
         {
             return Task.Run(() =>
             {
-                _process = new Process
+                try
                 {
-                    StartInfo = new ProcessStartInfo
+                    // Check if shell exists (important for PE mode where PowerShell might be missing)
+                    string fullPath = Path.Combine(Environment.SystemDirectory, shell == "powershell.exe" ? @"WindowsPowerShell\v1.0\powershell.exe" : shell);
+                    
+                    // Simple fallback check
+                    if (!File.Exists(fullPath) && !File.Exists(shell))
                     {
-                        FileName = shell,
-                        Arguments = "-NoExit -NoProfile",
-                        UseShellExecute = false,
-                        RedirectStandardInput = true,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        CreateNoWindow = true,
-                        StandardOutputEncoding = Encoding.UTF8
+                        OutputReceived?.Invoke(this, $"[FATAL] Shell '{shell}' not found on this system.");
+                        return;
                     }
-                };
 
-                _process.OutputDataReceived += (s, e) => { if (e.Data != null) OutputReceived?.Invoke(this, e.Data); };
-                _process.ErrorDataReceived += (s, e) => { if (e.Data != null) OutputReceived?.Invoke(this, "[ERROR] " + e.Data); };
+                    _process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = shell,
+                            Arguments = "-NoExit -NoProfile",
+                            UseShellExecute = false,
+                            RedirectStandardInput = true,
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            CreateNoWindow = true,
+                            StandardOutputEncoding = Encoding.UTF8
+                        }
+                    };
 
-                _process.Start();
-                _process.BeginOutputReadLine();
-                _process.BeginErrorReadLine();
+                    _process.OutputDataReceived += (s, e) => { if (e.Data != null) OutputReceived?.Invoke(this, e.Data); };
+                    _process.ErrorDataReceived += (s, e) => { if (e.Data != null) OutputReceived?.Invoke(this, "[ERROR] " + e.Data); };
+
+                    _process.Start();
+                    _process.BeginOutputReadLine();
+                    _process.BeginErrorReadLine();
+                }
+                catch (Exception ex)
+                {
+                    OutputReceived?.Invoke(this, $"[FATAL] Failed to initialize shell: {ex.Message}");
+                }
             });
         }
 

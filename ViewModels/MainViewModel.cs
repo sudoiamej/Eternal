@@ -134,7 +134,6 @@ namespace Eternal.ViewModels
 
                 SupportItems = new ObservableCollection<NavigationItem>
                 {
-                    new NavigationItem("Eternal Console", "Terminal", "Console"),
                     new NavigationItem("PE Mode Status", "Medkit", "PeMode")
                 };
             }

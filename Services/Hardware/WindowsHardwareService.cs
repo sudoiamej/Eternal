@@ -21,14 +21,15 @@ namespace Eternal.Services.Hardware
         {
             return Task.Run(() =>
             {
-                string name = "Unknown";
-                int cores = 0;
-                int threads = 0;
-                string arch = "Unknown";
-                string freq = "Unknown";
+                string name = "Unknown CPU";
+                int cores = Environment.ProcessorCount / 2; // Rough estimate
+                int threads = Environment.ProcessorCount;
+                string arch = Environment.Is64BitOperatingSystem ? "x64" : "x86";
+                string freq = "N/A";
 
                 try
                 {
+                    // 1. Try WMI first
                     using var searcher = new ManagementObjectSearcher("select * from Win32_Processor");
                     foreach (var obj in searcher.Get())
                     {
@@ -37,7 +38,21 @@ namespace Eternal.Services.Hardware
                         threads = global::System.Convert.ToInt32(obj["NumberOfLogicalProcessors"] ?? 0);
                         arch = GetArchitecture(global::System.Convert.ToInt32(obj["Architecture"] ?? 0));
                         freq = $"{obj["MaxClockSpeed"]} MHz";
-                        break;
+                        return new CpuInfo(name, cores, threads, arch, freq);
+                    }
+                }
+                catch { }
+
+                // 2. Fallback to Registry (Almost always works in PE)
+                try
+                {
+                    using (var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0"))
+                    {
+                        if (key != null)
+                        {
+                            name = key.GetValue("ProcessorNameString")?.ToString() ?? name;
+                            freq = $"{key.GetValue("~MHz")} MHz";
+                        }
                     }
                 }
                 catch { }
@@ -138,6 +153,13 @@ namespace Eternal.Services.Hardware
                 }
                 catch { }
 
+                // Fallback for RAM size
+                if (totalBytes == 0)
+                {
+                    // Basic fallback using GC or Environment
+                    totalBytes = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
+                }
+
                 return new RamInfo($"{totalBytes / (1024 * 1024 * 1024)} GB", "Calculating...", speed, slots, slots);
             });
         }
@@ -161,6 +183,23 @@ namespace Eternal.Services.Hardware
                     }
                 }
                 catch { }
+
+                // Critical WinPE Fallback: If no physical disks found via WMI, list partitions
+                if (disks.Count == 0)
+                {
+                    foreach (var drive in global::System.IO.DriveInfo.GetDrives())
+                    {
+                        if (drive.IsReady)
+                        {
+                            disks.Add(new DiskInfo(
+                                $"{drive.Name} [{drive.VolumeLabel}]", 
+                                $"{drive.TotalSize / (1024 * 1024 * 1024)} GB", 
+                                "Ready", 
+                                drive.DriveType.ToString()));
+                        }
+                    }
+                }
+
                 return disks;
             });
         }
@@ -169,8 +208,8 @@ namespace Eternal.Services.Hardware
         {
             return Task.Run(() =>
             {
-                string manufacturer = "Unknown";
-                string model = "Unknown";
+                string manufacturer = "Standard PC";
+                string model = "Virtual/Generic Board";
 
                 try
                 {
@@ -179,8 +218,16 @@ namespace Eternal.Services.Hardware
                     {
                         manufacturer = obj["Manufacturer"]?.ToString() ?? manufacturer;
                         model = obj["Product"]?.ToString() ?? model;
-                        break;
+                        return new MotherboardInfo(manufacturer, model);
                     }
+                }
+                catch { }
+
+                // Fallback to Registry for System Info
+                try
+                {
+                    manufacturer = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemManufacturer", manufacturer)?.ToString() ?? manufacturer;
+                    model = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemProductName", model)?.ToString() ?? model;
                 }
                 catch { }
 
