@@ -39,11 +39,13 @@ namespace Eternal.ViewModels
         private readonly IConsoleService _consoleService;
         private readonly IBootService _bootService;
         private readonly ICreatorService _creatorService;
+        private readonly IRegistryService _registryService;
         private DispatcherTimer _statusTimer;
 
         // Persistent ViewModels
         private DashboardViewModel _dashboardVm;
         private RepairCenterViewModel _repairVm;
+        private RegistryViewModel _registryVm;
         private TuningViewModel _tuningVm;
         private ConsoleViewModel _consoleVm;
         private BootViewModel _bootVm;
@@ -142,9 +144,10 @@ namespace Eternal.ViewModels
             _consoleService = new WindowsConsoleService();
             _bootService = new WindowsBootService();
             _creatorService = new WindowsCreatorService();
+            _registryService = new WindowsRegistryService();
 
             _loggingService.Log("Eternal System Intelligence Initialized.");
-            _loggingService.Log($"Creator Suite Version 2.0.0P");
+            _loggingService.Log($"Creator Suite Version 2.5.0-M1");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
             _settingsService.SettingsChanged += (s, settings) => IsAdvancedMode = settings.IsAdvancedMode;
@@ -159,6 +162,7 @@ namespace Eternal.ViewModels
                 {
                     new NavigationItem("Dashboard", "Dashboard", "Dashboard"),
                     new NavigationItem("Eternal Doctor", "Stethoscope", "Repair"),
+                    new NavigationItem("Registry", "Book", "Registry"),
                     new NavigationItem("Tools", "Wrench", "Tools")
                 };
 
@@ -187,6 +191,7 @@ namespace Eternal.ViewModels
                 {
                     new NavigationItem("Dashboard", "Dashboard", "Dashboard"),
                     new NavigationItem("Eternal Doctor", "Stethoscope", "Repair"),
+                    new NavigationItem("Registry", "Book", "Registry"),
                     new NavigationItem("Reports", "FileTextOutline", "Reports"),
                     new NavigationItem("Tools", "Wrench", "Tools"),
                     new NavigationItem("Guardian Tuning", "Gears", "Tuning")
@@ -353,6 +358,7 @@ namespace Eternal.ViewModels
         {
             _dashboardVm = new DashboardViewModel(_hardwareService, _biosService, _securityService, _intelligenceService, _toolkitService);
             _repairVm = new RepairCenterViewModel(_toolkitService, _servicesService);
+            _registryVm = new RegistryViewModel(_registryService);
             _hardwareVm = new HardwareViewModel(_hardwareService);
             _biosVm = new BiosViewModel(_biosService);
             _securityVm = new SecurityViewModel(_securityService);
@@ -426,6 +432,10 @@ namespace Eternal.ViewModels
                     break;
                 case "Repair":
                     CurrentView = _repairVm;
+                    break;
+                case "Registry":
+                    CurrentView = _registryVm;
+                    await _registryVm.LoadRegistryCommand.ExecuteAsync(null);
                     break;
                 case "Boot":
                     CurrentView = _bootVm;

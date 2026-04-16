@@ -166,7 +166,7 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <fa:ImageAwesome Icon="HddO" Width="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                                    <fa:ImageAwesome Icon="HddOutline" Width="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,15,0"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Model}" FontWeight="SemiBold"/>
                                         <TextBlock Text="{Binding Size}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11"/>

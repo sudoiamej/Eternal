@@ -17,7 +17,7 @@ namespace Eternal.ViewModels.Modules
         private readonly ILoggingService _loggingService;
 
         [ObservableProperty] private AppSettings _settings;
-        [ObservableProperty] private string _appVersion = "2.0.0P-CREATOR";
+        [ObservableProperty] private string _appVersion = "2.5.0-M1";
         [ObservableProperty] private string _lastScanTime = "N/A";
 
         public SettingsViewModel(MainViewModel main, ISettingsService settingsService)

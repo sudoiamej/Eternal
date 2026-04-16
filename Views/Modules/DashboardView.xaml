@@ -10,347 +10,307 @@
              d:DesignHeight="720" d:DesignWidth="1000">
 
     <Grid>
-        <!-- Main Content -->
+        <!-- Main Content (HCI Rule 7: Visibility of System Status) -->
         <Border Padding="40" Visibility="{Binding HasError, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/> <!-- Header & Utility -->
-                        <RowDefinition Height="Auto"/> <!-- System Pulse (Primary) -->
-                        <RowDefinition Height="*"/>    <!-- Details & Intelligence -->
+                        <RowDefinition Height="Auto"/> <!-- 1. Navigation & Header -->
+                        <RowDefinition Height="Auto"/> <!-- 2. Primary Focal Point (The Pulse) -->
+                        <RowDefinition Height="*"/>    <!-- 3. Intelligence & Platform Details -->
+                        <RowDefinition Height="Auto"/> <!-- 4. Toolkit Sections (Progressive Disclosure) -->
                     </Grid.RowDefinitions>
 
-            <!-- 1. Header & Utility Bar (HCI Rule 5: Mapping) -->
-            <Grid Grid.Row="0" Margin="0,0,0,30">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                
-                <StackPanel Grid.Column="0">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
-                        <TextBlock Text=" › " Style="{StaticResource Caption}"/>
-                        <TextBlock Text="SYSTEM OVERVIEW" Style="{StaticResource Caption}"/>
-                    </StackPanel>
-                    <TextBlock Text="Intelligence Dashboard" Style="{StaticResource H1}" Margin="0"/>
-                </StackPanel>
-
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
-                    <Button Command="{Binding RefreshSystemCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Refresh System Data">
-                        <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
-                    </Button>
-                    <Button Command="{Binding CleanTempCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Clear Temporary Files" Margin="10,0,0,0">
-                        <fa:ImageAwesome Icon="TrashO" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
-                    </Button>
-                </StackPanel>
-            </Grid>
-
-            <Button Grid.Row="1" Command="{Binding ShowTrustDetailsCommand}" Margin="0,0,0,30" Padding="0" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Stretch">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="PulseBorder" Padding="30" BorderThickness="0,0,0,4" Cursor="Hand">
-                            <Border.Style>
-                                <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
-                                    <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Warning}">
-                                            <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Critical}">
-                                            <Setter Property="BorderBrush" Value="{StaticResource CriticalBrush}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <ContentPresenter/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="PulseBorder" Property="Background" Value="#0FFFFFFF"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="SYSTEM PULSE" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
-                        <TextBlock Text="{Binding SystemStatusText}" FontSize="24" FontWeight="Bold">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.Medium}">
-                                            <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.High}">
-                                            <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.Critical}">
-                                            <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <TextBlock Text="{Binding SystemStatusExplanation}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" MaxWidth="400" TextWrapping="Wrap"/>
-                    </StackPanel>
-
-                    <Separator Grid.Column="1" Width="1" Margin="40,10" Background="{StaticResource BorderBrush}"/>
-
-                    <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <TextBlock Text="TRUST INDEX" Style="{StaticResource Caption}" HorizontalAlignment="Right" Margin="0,0,0,5"/>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <TextBlock Text="{Binding TrustScoreIndex}" FontSize="36" FontWeight="Black">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Warning}">
-                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Critical}">
-                                                <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                            <TextBlock Text="/100" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="5,0,0,8"/>
+                    <!-- 1. Header Section -->
+                    <Grid Grid.Row="0" Margin="0,0,0,30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                                <TextBlock Text=" › " Style="{StaticResource Caption}"/>
+                                <TextBlock Text="SYSTEM OVERVIEW" Style="{StaticResource Caption}"/>
+                            </StackPanel>
+                            <TextBlock Text="Intelligence Dashboard" Style="{StaticResource H1}" Margin="0"/>
                         </StackPanel>
-                        <TextBlock Text="{Binding TrustScoreExplanation}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" TextAlignment="Right" MaxWidth="200" TextWrapping="Wrap"/>
-                    </StackPanel>
-                </Grid>
-            </Button>
 
-            <!-- 3. Tiered Details (HCI Rule 11: Progressive Disclosure) -->
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="400"/>
-                </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                            <Button Command="{Binding RefreshSystemCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Refresh System Data">
+                                <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </Button>
+                            <Button Command="{Binding CleanTempCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Clear Temporary Files" Margin="10,0,0,0">
+                                <fa:ImageAwesome Icon="TrashOutline" Width="14" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
 
-                <!-- Intelligence Findings -->
-                <StackPanel Grid.Column="0" Margin="0,0,30,0">
-                    <TextBlock Text="INTELLIGENCE FINDINGS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
-                        <ItemsControl ItemsSource="{Binding RootCauses}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="{StaticResource CardBrush}" Padding="20" Margin="0,0,0,12" CornerRadius="4" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <fa:ImageAwesome Grid.Column="0" Icon="ExclamationTriangle" Width="16" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Top" Margin="0,4,15,0"/>
-                                            <StackPanel Grid.Column="1">
-                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                                    <TextBlock Text="{Binding ProcessName}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource TextBrush}"/>
-                                                    <TextBlock Text=" · " Foreground="{StaticResource TextSecondaryBrush}" Margin="5,0"/>
-                                                    <TextBlock Text="{Binding Component}" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="12"/>
-                                                </StackPanel>
-                                                <TextBlock Text="{Binding Explanation.PlainLanguage}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" FontSize="13" LineHeight="18"/>
-                                                <TextBlock Text="{Binding Explanation.TechnicalValue}" Foreground="{StaticResource WarningBrush}" FontWeight="SemiBold" FontSize="11" Margin="0,8,0,0"/>
+                    <!-- 2. Primary Focal Point: System Pulse (HCI Rule 1 & 2: Affordance & Signifiers) -->
+                    <Button Grid.Row="1" Command="{Binding ShowTrustDetailsCommand}" Margin="0,0,0,30" Padding="0" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Stretch">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="PulseBorder" Padding="30" BorderThickness="1" Cursor="Hand" CornerRadius="8">
+                                    <Border.Style>
+                                        <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
+                                            <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Warning}">
+                                                    <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Critical}">
+                                                    <Setter Property="BorderBrush" Value="{StaticResource CriticalBrush}"/>
+                                                </DataTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#0FFFFFFF"/>
+                                                    <Setter Property="BorderThickness" Value="1.5"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <ContentPresenter/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="SYSTEM PULSE" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
+                                <TextBlock Text="{Binding SystemStatusText}" FontSize="28" FontWeight="Black">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.Medium}">
+                                                    <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.High}">
+                                                    <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.Critical}">
+                                                    <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Text="{Binding SystemStatusExplanation}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" MaxWidth="450" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                            </StackPanel>
+
+                            <Separator Grid.Column="1" Width="1" Margin="40,10" Background="{StaticResource BorderBrush}"/>
+
+                            <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock Text="TRUST INDEX" Style="{StaticResource Caption}" HorizontalAlignment="Right" Margin="0,0,0,5"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <TextBlock Text="{Binding TrustScoreIndex}" FontSize="42" FontWeight="Black">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Warning}">
+                                                        <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Critical}">
+                                                        <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Text="/100" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="5,0,0,10"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding TrustScoreExplanation}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" TextAlignment="Right" MaxWidth="220" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+
+                    <!-- 3. Intelligence & Platform Details (HCI Rule 4: Mapping) -->
+                    <Grid Grid.Row="2" Margin="0,0,0,30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="380"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Intelligence Findings -->
+                        <StackPanel Grid.Column="0" Margin="0,0,30,0">
+                            <TextBlock Text="INTELLIGENCE FINDINGS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="350">
+                                <ItemsControl ItemsSource="{Binding RootCauses}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{StaticResource CardBrush}" Padding="20" Margin="0,0,0,12" CornerRadius="6" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <fa:ImageAwesome Grid.Column="0" Icon="ExclamationTriangle" Width="16" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Top" Margin="0,4,15,0"/>
+                                                    <StackPanel Grid.Column="1">
+                                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                                            <TextBlock Text="{Binding ProcessName}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                                                            <TextBlock Text=" · " Foreground="{StaticResource TextSecondaryBrush}" Margin="5,0"/>
+                                                            <TextBlock Text="{Binding Component}" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="12"/>
+                                                        </StackPanel>
+                                                        <TextBlock Text="{Binding Explanation.PlainLanguage}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" FontSize="13" LineHeight="18"/>
+                                                        <TextBlock Text="{Binding Explanation.TechnicalValue}" Foreground="{StaticResource WarningBrush}" FontWeight="SemiBold" FontSize="11" Margin="0,8,0,0"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                            <Border Background="#104CAF50" Padding="20" CornerRadius="6" 
+                                    Visibility="{Binding RootCauses.Count, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{StaticResource SuccessBrush}" Margin="0,0,15,0"/>
+                                    <TextBlock Text="Intelligence engine reports all system parameters within optimal thresholds." 
+                                               Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- System Identity Card -->
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="SYSTEM IDENTITY" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            <Border Style="{StaticResource StandardCard}" Padding="25">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,18">
+                                        <TextBlock Text="Architecture" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding CpuName}" HorizontalAlignment="Right" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="220"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,18">
+                                        <TextBlock Text="Total Memory" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding RamTotal}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                                    </Grid>
+                                    <Separator Background="{StaticResource BorderBrush}" Margin="0,5,0,18"/>
+                                    <Grid Margin="0,0,0,18">
+                                        <TextBlock Text="OS Version" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding OsVersion}" HorizontalAlignment="Right" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="220"/>
+                                    </Grid>
+                                    <Grid>
+                                        <TextBlock Text="Secure Boot" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding SecureBootStatus}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            
+                            <Button Command="{Binding ExportBriefCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" Padding="15,8" Margin="0,15,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="FileTextOutline" Width="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0"/>
+                                    <TextBlock Text="Export Brief Intelligence Report" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 4. Toolkit Sections (HCI Rule 6: Conceptual Model Clarity) -->
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Workflow & Creator Toolkit -->
+                        <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                            <TextBlock Text="CREATOR SUITE &amp; WORKFLOW" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            <Border Style="{StaticResource StandardCard}" Padding="20">
+                                <StackPanel>
+                                    <CheckBox IsChecked="{Binding DataContext.IsDevModeEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                              Command="{Binding DataContext.ToggleDevModeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              Content="Enable System Developer Mode (Long Paths/Symlinks)" 
+                                              FontSize="12" FontWeight="Medium" Foreground="{StaticResource TextBrush}" Margin="0,0,0,12"/>
+                                    
+                                    <CheckBox IsChecked="{Binding DataContext.IsDevHostEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                              Command="{Binding DataContext.ToggleDevHostCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              Content="Map dev.local to 127.0.0.1 (Hosts File)" 
+                                              FontSize="12" FontWeight="Medium" Foreground="{StaticResource TextBrush}" Margin="0,0,0,20"/>
+                                    
+                                    <Grid Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Grid.Column="0" Command="{Binding DataContext.ApplySilenceProfileCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Margin="0,0,5,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <fa:ImageAwesome Icon="VolumeOff" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Silence Profile" FontSize="11" Foreground="#FFFFFF"/>
                                             </StackPanel>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                    <TextBlock Text="All system parameters within optimal threshold." Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold"
-                               Visibility="{Binding RootCauses.Count, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" />
-                </StackPanel>
-
-                <!-- Platform Identity -->
-                <StackPanel Grid.Column="1">
-                    <TextBlock Text="SYSTEM IDENTITY" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,15" Padding="20">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,15">
-                                <TextBlock Text="Architecture" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                <TextBlock Text="{Binding CpuName}" HorizontalAlignment="Right" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="250"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,15">
-                                <TextBlock Text="Total Memory" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                <TextBlock Text="{Binding RamTotal}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
-                            </Grid>
-                            <Separator Background="{StaticResource BorderBrush}" Margin="0,5,0,15"/>
-                            <Grid Margin="0,0,0,10">
-                                <TextBlock Text="OS Version" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                <TextBlock Text="{Binding OsVersion}" HorizontalAlignment="Right" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="250"/>
-                            </Grid>
-                            <Grid>
-                                <TextBlock Text="Secure Boot" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                <TextBlock Text="{Binding SecureBootStatus}" HorizontalAlignment="Right" FontWeight="SemiBold" Foreground="{StaticResource SuccessBrush}"/>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-                    
-                    <!-- Feedback for Secondary Action (HCI Rule 2) -->
-                    <Button Command="{Binding ExportBriefCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" Padding="10,5">
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="FileTextO" Width="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,8,0"/>
-                            <TextBlock Text="Export Brief Report" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
-                        </StackPanel>
-                    </Button>
-
-                    <TextBlock Text="CREATOR SUITE EXTRAS" Style="{StaticResource Caption}" Margin="0,20,0,15"/>
-                    <Border Style="{StaticResource StandardCard}" Padding="20">
-                        <StackPanel>
-                            <CheckBox IsChecked="{Binding DataContext.IsDevModeEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                      Command="{Binding DataContext.ToggleDevModeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                      Content="Enable Dev Mode (Hidden Files/Long Paths)" FontSize="11" Foreground="{StaticResource TextBrush}" Margin="0,0,0,15"/>
-                            
-                            <Button Command="{Binding DataContext.ApplySilenceProfileCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" HorizontalAlignment="Stretch" Margin="0,0,0,15">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="VolumeOff" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Apply Absolute Silence Profile" Foreground="#FFFFFF" FontSize="11"/>
-                                </StackPanel>
-                            </Button>
-
-                            <Button Command="{Binding DataContext.ForceKillHandleCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" HorizontalAlignment="Stretch" Background="#222222" Margin="0,0,0,15">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Bomb" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Force Kill File Handle" Foreground="#FFFFFF" FontSize="11"/>
-                                </StackPanel>
-                            </Button>
-
-                            <Separator Background="{StaticResource BorderBrush}" Margin="0,5,0,15"/>
-                            <TextBlock Text="WORKFLOW ACCELERATION" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10"/>
-                            
-                            <Button Command="{Binding DataContext.ValidatePathCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" HorizontalAlignment="Stretch" Margin="0,0,0,10" Background="#2c3e50">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="CheckCircle" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Validate PATH Variables" Foreground="#FFFFFF" FontSize="11"/>
-                                </StackPanel>
-                            </Button>
-
-                            <Grid Margin="0,0,0,10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Button Grid.Column="0" Command="{Binding DataContext.PurgeRAMCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Margin="0,0,5,0" Background="#16a085">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Leaf" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
-                                        <TextBlock Text="Purge RAM" Foreground="#FFFFFF" FontSize="11"/>
-                                    </StackPanel>
-                                </Button>
-                                <Button Grid.Column="1" Command="{Binding DataContext.CreateJunctionCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Margin="5,0,0,0" Background="#d35400">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Link" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
-                                        <TextBlock Text="Symlink Studio" Foreground="#FFFFFF" FontSize="11"/>
-                                    </StackPanel>
-                                </Button>
-                            </Grid>
-
-                            <CheckBox IsChecked="{Binding DataContext.IsDevHostEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                      Command="{Binding DataContext.ToggleDevHostCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                      Content="Map dev.local to 127.0.0.1 (Hosts)" FontSize="11" Foreground="{StaticResource TextBrush}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <TextBlock Text="SECURITY HUNTER" Style="{StaticResource Caption}" Margin="0,20,0,15"/>
-                    <Border Style="{StaticResource StandardCard}" Padding="20">
-                        <StackPanel>
-                            <Button Command="{Binding DataContext.ScanMalwarePersistenceCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" HorizontalAlignment="Stretch" Margin="0,0,0,15" Background="#c0392b">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Shield" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Audit Persistence &amp; Signatures" Foreground="#FFFFFF" FontSize="11"/>
-                                </StackPanel>
-                            </Button>
-
-                            <CheckBox IsChecked="{Binding DataContext.IsRansomGuardEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                      Command="{Binding DataContext.ToggleRansomGuardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                      Content="Enable Ransom Guard (Documents)" FontSize="11" Foreground="{StaticResource TextBrush}" Margin="0,0,0,15"/>
-
-                            <TextBlock Text="SUSPICIOUS PROCESSES" FontSize="9" FontWeight="Bold" Foreground="{StaticResource CriticalBrush}" Margin="0,0,0,10"
-                                       Visibility="{Binding DataContext.UnsignedProcesses.Count, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource VisibilityConverter}}"/>
-                            
-                            <ItemsControl ItemsSource="{Binding DataContext.UnsignedProcesses, RelativeSource={RelativeSource AncestorType=Window}}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="#20F44336" Padding="10" Margin="0,0,0,8" CornerRadius="4">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel>
-                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#F44336" FontSize="11"/>
-                                                    <TextBlock Text="Unsigned / Suspicious" Foreground="{StaticResource TextSecondaryBrush}" FontSize="9"/>
-                                                </StackPanel>
-                                                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                                    <Button Command="{Binding DataContext.IsolateNetworkCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding PID}" Style="{StaticResource IconButton}" ToolTip="Isolate Network">
-                                                        <fa:ImageAwesome Icon="Globe" Width="10" Foreground="#FFFFFF"/>
-                                                    </Button>
-                                                    <Button Command="{Binding DataContext.NeutralizeProcessCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding PID}" Style="{StaticResource IconButton}" ToolTip="Neutralize (Kill)" Margin="5,0,0,0">
-                                                        <fa:ImageAwesome Icon="Times" Width="10" Foreground="#F44336"/>
-                                                    </Button>
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                            <TextBlock Text="PERSISTENCE MAP" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,10,0,10"
-                                       Visibility="{Binding DataContext.PersistenceEntries.Count, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource VisibilityConverter}}"/>
-                            
-                            <ItemsControl ItemsSource="{Binding DataContext.PersistenceEntries, RelativeSource={RelativeSource AncestorType=Window}}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="5">
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding Name}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"/>
-                                                <TextBlock Text="{Binding Location}" FontSize="8" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        </Button>
+                                        <Button Grid.Column="1" Command="{Binding DataContext.ForceKillHandleCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Background="#333333" Margin="5,0,0,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <fa:ImageAwesome Icon="Bomb" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Force Kill Handle" FontSize="11" Foreground="#FFFFFF"/>
                                             </StackPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </Border>
+                                        </Button>
+                                    </Grid>
 
-                    <TextBlock Text="PORT WARDEN (ACTIVE LISTENERS)" Style="{StaticResource Caption}" Margin="0,20,0,15"/>
-                    <Border Style="{StaticResource StandardCard}" Padding="10" MaxHeight="200">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding DataContext.ActivePorts, RelativeSource={RelativeSource AncestorType=Window}}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="5">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="50"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding Port}" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding ProcessName}" Foreground="{StaticResource TextBrush}" Margin="10,0"/>
-                                                <TextBlock Grid.Column="2" Text="{Binding PID}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10"/>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Border>
-                </StackPanel>
-            </Grid>
+                                    <Button Command="{Binding DataContext.PurgeRAMCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Background="#16a085" HorizontalAlignment="Stretch">
+                                        <StackPanel Orientation="Horizontal">
+                                            <fa:ImageAwesome Icon="Leaf" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                            <TextBlock Text="Purge Standby List &amp; RAM" FontSize="11" Foreground="#FFFFFF"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Security & Persistence Toolkit -->
+                        <StackPanel Grid.Column="1" Margin="15,0,0,0">
+                            <TextBlock Text="SECURITY &amp; THREAT HUNTER" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            <Border Style="{StaticResource StandardCard}" Padding="20">
+                                <StackPanel>
+                                    <Button Command="{Binding DataContext.ScanMalwarePersistenceCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Background="#c0392b" HorizontalAlignment="Stretch" Margin="0,0,0,20">
+                                        <StackPanel Orientation="Horizontal">
+                                            <fa:ImageAwesome Icon="Shield" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                            <TextBlock Text="Scan for Persistence &amp; Malware" FontSize="11" Foreground="#FFFFFF"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <CheckBox IsChecked="{Binding DataContext.IsRansomGuardEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                              Command="{Binding DataContext.ToggleRansomGuardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              Content="Active Ransom Guard (Protected Docs)" 
+                                              FontSize="12" FontWeight="Medium" Foreground="{StaticResource TextBrush}" Margin="0,0,0,15"/>
+                                    
+                                    <TextBlock Text="SUSPICIOUS PROCESSES" FontSize="9" FontWeight="Black" Foreground="{StaticResource CriticalBrush}" Margin="0,5,0,10"
+                                               Visibility="{Binding DataContext.UnsignedProcesses.Count, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource VisibilityConverter}}"/>
+                                    
+                                    <ItemsControl ItemsSource="{Binding DataContext.UnsignedProcesses, RelativeSource={RelativeSource AncestorType=Window}}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#15F44336" Padding="10" Margin="0,0,0,8" CornerRadius="4" BorderBrush="#30F44336" BorderThickness="1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#F44336" FontSize="11"/>
+                                                            <TextBlock Text="Unsigned Binary" Foreground="{StaticResource TextSecondaryBrush}" FontSize="9"/>
+                                                        </StackPanel>
+                                                        <Button Grid.Column="1" Command="{Binding DataContext.NeutralizeProcessCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding PID}" Style="{StaticResource IconButton}" ToolTip="Kill Process">
+                                                            <fa:ImageAwesome Icon="Times" Width="10" Foreground="#F44336"/>
+                                                        </Button>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </ScrollViewer>
         </Border>
 
-
-        <!-- Error State (HCI Rule 2: Recovery) -->
+        <!-- Error Recovery (HCI Rule 8) -->
         <helpers:ErrorCard HorizontalAlignment="Center" VerticalAlignment="Center"
                            Visibility="{Binding HasError, Converter={StaticResource VisibilityConverter}}"
                            MaxWidth="500">
@@ -359,11 +319,11 @@
             </helpers:ErrorCard.DataContext>
         </helpers:ErrorCard>
 
-        <!-- Loading Overlay (HCI Rule 5: Feedback System) -->
+        <!-- Feedback Overlay -->
         <Border Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
-                <TextBlock Text="Preparing Dashboard..." FontSize="18" Foreground="{StaticResource TextBrush}"/>
+                <TextBlock Text="Synchronizing Intelligence Engine..." FontSize="18" Foreground="{StaticResource TextBrush}"/>
             </StackPanel>
         </Border>
     </Grid>

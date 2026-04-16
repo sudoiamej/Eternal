@@ -217,19 +217,23 @@ namespace Eternal.Services.Security
                                     var types = new List<string>();
                                     foreach (var pid in protectorIds)
                                     {
-                                        var pObjParams = obj.GetMethodParameters("GetKeyProtectorType");
-                                        pObjParams["VolumeKeyProtectorID"] = pid;
-                                        var pObj = obj.InvokeMethod("GetKeyProtectorType", pObjParams, null);
-                                        if (pObj != null && (uint)pObj["ReturnValue"] == 0)
-                                        {
-                                            types.Add(GetKeyProtectorType((uint)pObj["KeyProtectorType"]));
-                                        }
+                                        try {
+                                            var pObjParams = obj.GetMethodParameters("GetKeyProtectorType");
+                                            pObjParams["VolumeKeyProtectorID"] = pid;
+                                            var pObj = obj.InvokeMethod("GetKeyProtectorType", pObjParams, null);
+                                            if (pObj != null && (uint)pObj["ReturnValue"] == 0)
+                                            {
+                                                types.Add(GetKeyProtectorType((uint)pObj["KeyProtectorType"]));
+                                            }
+                                        } catch { /* Skip single failed protector */ }
                                     }
-                                    protectors = string.Join(", ", types.Distinct());
+                                    protectors = types.Any() ? string.Join(", ", types.Distinct()) : "Unknown Type";
                                 }
+                                else { protectors = "No Protectors Found"; }
                             }
+                            else { protectors = "Access Denied / Not Supported"; }
                         }
-                        catch { }
+                        catch (Exception ex) { protectors = $"Error: {ex.Message}"; }
 
                         list.Add(new BitLockerStatus(drive, protStr, method, lockStr, protectors));
                     }

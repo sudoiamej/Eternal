@@ -84,7 +84,7 @@
                     
                     <Border Margin="0,30,0,0" Padding="20" Background="#0AFFFFFF" CornerRadius="4" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="LightbulbO" Width="16" Foreground="{StaticResource InfoBrush}" Margin="0,0,15,0"/>
+                            <fa:ImageAwesome Icon="LightbulbOutline" Width="16" Foreground="{StaticResource InfoBrush}" Margin="0,0,15,0"/>
                             <TextBlock Text="Tip: Every module has a 'Refresh' button in the top right for live updates." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
                         </StackPanel>
                     </Border>

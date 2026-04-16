@@ -8,8 +8,8 @@
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
-    <Version>2.0.0</Version>
-    <InformationalVersion>2.0.0P Creator</InformationalVersion>
+    <Version>2.5.0</Version>
+    <InformationalVersion>2.5.0 (Milestone 1)</InformationalVersion>
     <Authors>Eternal Analytics</Authors>
     <Product>Eternal System Intelligence</Product>
     <Description>System Intelligence and Diagnostics Suite</Description>

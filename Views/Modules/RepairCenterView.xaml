@@ -4,81 +4,138 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
-             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="800">
-    <Border Padding="40">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+             xmlns:helpers="clr-namespace:Eternal.Views.Helpers"
+             mc:Ignorable="d" d:DesignHeight="720" d:DesignWidth="1000">
 
-            <!-- 1. Header -->
-            <Grid Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
-                        <TextBlock Text=" › " Style="{StaticResource Caption}"/>
-                        <TextBlock Text="ETERNAL DOCTOR" Style="{StaticResource Caption}"/>
+    <Grid>
+        <Border Padding="40">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- 1. Header -->
+                    <RowDefinition Height="Auto"/> <!-- 2. Triage Description -->
+                    <RowDefinition Height="*"/>    <!-- 3. Problem Grid -->
+                    <RowDefinition Height="Auto"/> <!-- 4. Modern Status Bar -->
+                </Grid.RowDefinitions>
+
+                <!-- 1. Header (HCI Rule 7: Visibility of System Status) -->
+                <Grid Grid.Row="0" Margin="0,0,0,30">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock Text=" › " Style="{StaticResource Caption}"/>
+                            <TextBlock Text="ETERNAL DOCTOR" Style="{StaticResource Caption}"/>
+                        </StackPanel>
+                        <TextBlock Text="Problem Triage &amp; Repair" Style="{StaticResource H1}" Margin="0"/>
                     </StackPanel>
-                    <TextBlock Text="Problem Solver" Style="{StaticResource H1}" Margin="0"/>
-                </StackPanel>
-            </Grid>
-
-            <!-- 2. Intro -->
-            <TextBlock Grid.Row="1" Text="What seems to be the problem today? Select an issue below for automated diagnosis and repair." 
-                       Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,25" FontSize="13" FontStyle="Italic"/>
-
-            <!-- 3. Problem List -->
-            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Problems}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Style="{StaticResource StandardCard}" Margin="0,0,0,15" Padding="20">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <!-- Symptom Icon -->
-                                    <Border Grid.Column="0" Width="48" Height="48" CornerRadius="8" Background="#10FFFFFF" Margin="0,0,20,0">
-                                        <fa:ImageAwesome Icon="Stethoscope" Width="20" Foreground="{StaticResource InfoBrush}"/>
-                                    </Border>
-
-                                    <!-- Content -->
-                                    <StackPanel Grid.Column="1">
-                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
-                                        <TextBlock Text="{Binding Symptom}" FontSize="12" Foreground="{StaticResource AccentBrush}" Margin="0,4,0,2" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <!-- Fix Button -->
-                                    <Button Grid.Column="2" Command="{Binding FixCommand}" VerticalAlignment="Center" Width="120" Height="40" Style="{StaticResource PrimaryButton}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <fa:ImageAwesome Icon="Wrench" Width="14" Margin="0,0,10,0" Foreground="White"/>
-                                            <TextBlock Text="FIX NOW"/>
-                                        </StackPanel>
-                                    </Button>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-
-            <!-- 4. Status Bar -->
-            <Border Grid.Row="3" Background="#10FFFFFF" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="15" Margin="-40,0">
-                <Grid>
-                    <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="CircleO" Spin="{Binding IsBusy}" Width="12" Foreground="{StaticResource InfoBrush}" Margin="0,0,10,0"/>
-                        <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
-                    </StackPanel>
-                    <TextBlock HorizontalAlignment="Right" Text="V2.0.0 DIAGNOSTIC ENGINE" Foreground="{StaticResource TextSecondaryBrush}" Opacity="0.4" FontSize="9" VerticalAlignment="Center"/>
+                    
+                    <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#104CAF50" Padding="12,6" CornerRadius="4">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="CheckCircle" Width="12" Foreground="{StaticResource SuccessBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="Diagnostic Engine Active" Foreground="{StaticResource SuccessBrush}" FontSize="11" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
-            </Border>
-        </Grid>
-    </Border>
+
+                <!-- 2. Triage Description -->
+                <TextBlock Grid.Row="1" Text="Select the symptom that best describes your system's behavior. Eternal Doctor will perform a surgical diagnosis and attempt an automated recovery." 
+                           Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,35" FontSize="13" TextWrapping="Wrap" MaxWidth="800" HorizontalAlignment="Left" LineHeight="20"/>
+
+                <!-- 3. Problem Grid (UX: Chunking & Visual Hierarchy) -->
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Problems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="2" VerticalAlignment="Top"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border x:Name="RepairCard" Margin="0,0,15,15" BorderThickness="1" CornerRadius="8" Cursor="Hand">
+                                    <Border.Style>
+                                        <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
+                                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#0FFFFFFF"/>
+                                                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Border Padding="25">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                        
+                                            <!-- Symptom Meta (HCI Rule 4: Mapping) -->
+                                            <Grid Grid.Row="0" Margin="0,0,0,15">
+                                                <Border Background="#15FFFFFF" HorizontalAlignment="Left" Padding="10" CornerRadius="6">
+                                                    <fa:ImageAwesome Icon="Stethoscope" Width="18" Foreground="{StaticResource InfoBrush}"/>
+                                                </Border>
+                                                <Border HorizontalAlignment="Right" VerticalAlignment="Top" Padding="6,2" CornerRadius="2">
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="{StaticResource AccentColor}" Opacity="0.1"/>
+                                                    </Border.Background>
+                                                    <TextBlock Text="{Binding Category}" FontSize="9" FontWeight="Black" Foreground="{StaticResource AccentBrush}"/>
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- Content (UX: Progressive Disclosure) -->
+                                            <StackPanel Grid.Row="1">
+                                                <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,4"/>
+                                                <TextBlock Text="{Binding Symptom}" FontSize="12" Foreground="{StaticResource WarningBrush}" Margin="0,0,0,8" FontWeight="Medium"/>
+                                                <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                            </StackPanel>
+
+                                            <!-- Direct Action (HCI Rule 1: Affordance) -->
+                                            <Button Grid.Row="2" Command="{Binding FixCommand}" Margin="0,20,0,0" Height="42" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fa:ImageAwesome Icon="Wrench" Width="12" Margin="0,0,10,0" Foreground="White"/>
+                                                    <TextBlock Text="INITIATE REPAIR" FontWeight="Bold" FontSize="12"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- 4. Modern Status Bar (HCI Rule 3: Feedback) -->
+                <Border Grid.Row="3" Background="#0DFFFFFF" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="15,12" Margin="0,20,0,0" CornerRadius="6">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="InfoCircle" Width="12" Foreground="{StaticResource AccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center" FontSize="12" FontWeight="Medium"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <TextBlock Text="V2.5.0-M1 CORE" Foreground="{StaticResource TextSecondaryBrush}" Opacity="0.5" FontSize="9" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <fa:ImageAwesome Icon="Spinner" Spin="{Binding IsBusy}" Width="12" Foreground="{StaticResource AccentBrush}" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Global Repair Overlay (HCI Rule 6: Conceptual Model Clarity) -->
+        <Border Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="500">
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="48" Margin="0,0,0,25"/>
+                <TextBlock Text="REPAIR IN PROGRESS" FontSize="22" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                <TextBlock Text="{Binding StatusMessage}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
+                
+                <Border Margin="0,30,0,0" Background="#10FFFFFF" Padding="20" CornerRadius="6" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Shield" Width="14" Foreground="{StaticResource SuccessBrush}" Margin="0,0,15,0"/>
+                        <TextBlock Text="Safety protocol active. System integrity is being monitored during the operation." 
+                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+    </Grid>
 </UserControl>

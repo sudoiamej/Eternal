@@ -42,6 +42,7 @@
         <DataTemplate DataType="{x:Type vmm:EnvironmentViewModel}"><vmv:EnvironmentView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:VerboseLoggingViewModel}"><vmv:VerboseLoggingView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:RepairCenterViewModel}"><vmv:RepairCenterView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:RegistryViewModel}"><vmv:RegistryView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:TuningViewModel}"><vmv:TuningView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:ConsoleViewModel}"><vmv:ConsoleView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:BootViewModel}"><vmv:BootView/></DataTemplate>
@@ -193,7 +194,7 @@
                             <TextBlock Text="{Binding RamUsage}" Foreground="{StaticResource TextBrush}" FontWeight="SemiBold"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="ClockO" Foreground="{StaticResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0"/>
+                            <fa:ImageAwesome Icon="ClockOutline" Foreground="{StaticResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0"/>
                             <TextBlock Text="Uptime: " Foreground="{StaticResource TextSecondaryBrush}"/>
                             <TextBlock Text="{Binding Uptime}" Foreground="{StaticResource TextBrush}" FontWeight="SemiBold"/>
                         </StackPanel>

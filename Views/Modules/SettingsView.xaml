@@ -123,7 +123,7 @@
                 <Border Style="{StaticResource StandardCard}" Margin="0,0,0,30">
                     <StackPanel>
                         <TextBlock Text="ABOUT Eternal" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
-                        <TextBlock Text="Version: 2.0.0P (Creator Suite)" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                        <TextBlock Text="Version: 2.5.0 (Milestone 1)" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
                         <TextBlock Text="Compatible with: Windows 10 &amp; 11 ONLY" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
                     </StackPanel>
                 </Border>

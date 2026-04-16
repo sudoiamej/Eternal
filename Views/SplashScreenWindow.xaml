@@ -28,7 +28,7 @@
                 <TextBlock x:Name="StatusText" Text="Initializing Intelligence Engine..." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
             </StackPanel>
 
-            <TextBlock Text="© 2026 ETERNAL ANALYTICS v1.0.0" FontSize="8" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+            <TextBlock Text="© 2026 ETERNAL ANALYTICS v2.5.0-M1" FontSize="8" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,15"/>
         </Grid>
     </Border>
 </Window>

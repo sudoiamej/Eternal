@@ -33,7 +33,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <fa:ImageAwesome Icon="FileCodeO" Width="32" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Top" Margin="0,5,30,0"/>
+                        <fa:ImageAwesome Icon="FileCodeOutline" Width="32" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Top" Margin="0,5,30,0"/>
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="REPORT DATA MANIFEST" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
                             <TextBlock Text="The following telemetry modules will be included in the generated snapshot:" 
