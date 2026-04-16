@@ -193,7 +193,7 @@
                             <TextBlock Text="{Binding RamUsage}" Foreground="{StaticResource TextBrush}" FontWeight="SemiBold"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="ClockOutline" Foreground="{StaticResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0"/>
+                            <fa:ImageAwesome Icon="ClockO" Foreground="{StaticResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0"/>
                             <TextBlock Text="Uptime: " Foreground="{StaticResource TextSecondaryBrush}"/>
                             <TextBlock Text="{Binding Uptime}" Foreground="{StaticResource TextBrush}" FontWeight="SemiBold"/>
                         </StackPanel>

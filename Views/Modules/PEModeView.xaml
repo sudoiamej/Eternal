@@ -51,7 +51,7 @@
                             <StackPanel>
                                 <Grid Margin="0,0,0,20">
                                     <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="HddOutline" Width="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                        <fa:ImageAwesome Icon="HddO" Width="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                         <TextBlock Text="System Drive Health" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding SystemDriveStatus}" FontSize="15" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Right"/>
@@ -113,7 +113,7 @@
                                         Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalContentAlignment="Left" Padding="15" Background="#0AFFFFFF">
                                     <Grid>
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                        <fa:ImageAwesome Grid.Column="0" Icon="HddOutline" Width="16" Foreground="{StaticResource InfoBrush}" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                                        <fa:ImageAwesome Grid.Column="0" Icon="HddO" Width="16" Foreground="{StaticResource InfoBrush}" Margin="0,0,15,0" VerticalAlignment="Center"/>
                                         <StackPanel Grid.Column="1">
                                             <TextBlock Text="Check Disk (Chkdsk)" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
                                             <TextBlock Text="Scan and repair filesystem errors." FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>

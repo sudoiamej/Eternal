@@ -48,7 +48,7 @@
                                         <Grid>
                                             <fa:ImageAwesome Icon="ExternalLink" Width="16" Foreground="{StaticResource InfoBrush}" Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}}"/>
                                             <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{StaticResource SuccessBrush}" Visibility="{Binding IsCurrent, Converter={StaticResource VisibilityConverter}}"/>
-                                            <fa:ImageAwesome Icon="HddOutline" Width="16" Foreground="{StaticResource TextSecondaryBrush}" 
+                                            <fa:ImageAwesome Icon="HddO" Width="16" Foreground="{StaticResource TextSecondaryBrush}" 
                                                            Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
                                         </Grid>
                                     </Border>

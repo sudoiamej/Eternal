@@ -86,7 +86,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <fa:ImageAwesome Icon="LightbulbOutline" Width="24" Foreground="{StaticResource InfoBrush}" VerticalAlignment="Top" Margin="0,2,20,0"/>
+                        <fa:ImageAwesome Icon="LightbulbO" Width="24" Foreground="{StaticResource InfoBrush}" VerticalAlignment="Top" Margin="0,2,20,0"/>
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="ENVIRONMENTAL ANALYSIS" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
                             <TextBlock Text="{Binding ConclusionText}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" TextWrapping="Wrap" LineHeight="22"/>

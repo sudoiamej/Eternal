@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:helpers="clr-namespace:Eternal.Views.Helpers"
+             xmlns:m="clr-namespace:Eternal.Models"
              mc:Ignorable="d" 
              d:DesignHeight="720" d:DesignWidth="1000">
 
@@ -40,7 +41,7 @@
                         <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
                     </Button>
                     <Button Command="{Binding CleanTempCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Clear Temporary Files" Margin="10,0,0,0">
-                        <fa:ImageAwesome Icon="TrashOutline" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <fa:ImageAwesome Icon="TrashO" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
                     </Button>
                 </StackPanel>
             </Grid>
@@ -53,10 +54,10 @@
                                 <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
                                     <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding TrustLevel}" Value="Warning">
+                                        <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Warning}">
                                             <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding TrustLevel}" Value="Critical">
+                                        <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Critical}">
                                             <Setter Property="BorderBrush" Value="{StaticResource CriticalBrush}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -85,13 +86,13 @@
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding HighestSeverity}" Value="Medium">
+                                        <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.Medium}">
                                             <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding HighestSeverity}" Value="High">
+                                        <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.High}">
                                             <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding HighestSeverity}" Value="Critical">
+                                        <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.Critical}">
                                             <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -111,10 +112,10 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding TrustLevel}" Value="Warning">
+                                            <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Warning}">
                                                 <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding TrustLevel}" Value="Critical">
+                                            <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Critical}">
                                                 <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -196,7 +197,7 @@
                     <!-- Feedback for Secondary Action (HCI Rule 2) -->
                     <Button Command="{Binding ExportBriefCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" Padding="10,5">
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="FileTextOutline" Width="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,8,0"/>
+                            <fa:ImageAwesome Icon="FileTextO" Width="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,8,0"/>
                             <TextBlock Text="Export Brief Report" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
                         </StackPanel>
                     </Button>
@@ -217,7 +218,7 @@
 
                             <Button Command="{Binding DataContext.ForceKillHandleCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" HorizontalAlignment="Stretch" Background="#222222" Margin="0,0,0,15">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Skull" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                    <fa:ImageAwesome Icon="Bomb" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
                                     <TextBlock Text="Force Kill File Handle" Foreground="#FFFFFF" FontSize="11"/>
                                 </StackPanel>
                             </Button>

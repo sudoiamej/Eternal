@@ -37,7 +37,7 @@
                         <Button Command="{Binding ClearTempCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="TrashOutline" Width="20" Margin="0,0,15,0" Foreground="{StaticResource AccentBrush}"/>
+                                    <fa:ImageAwesome Icon="TrashO" Width="20" Margin="0,0,15,0" Foreground="{StaticResource AccentBrush}"/>
                                     <StackPanel>
                                         <TextBlock Text="Clear Temp Files" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
                                         <TextBlock Text="Deletes files in the system temp directory." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>

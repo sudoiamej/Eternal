@@ -73,7 +73,7 @@
             <Border Grid.Row="3" Background="#10FFFFFF" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="15" Margin="-40,0">
                 <Grid>
                     <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="CircleOutline" Spin="{Binding IsBusy}" Width="12" Foreground="{StaticResource InfoBrush}" Margin="0,0,10,0"/>
+                        <fa:ImageAwesome Icon="CircleO" Spin="{Binding IsBusy}" Width="12" Foreground="{StaticResource InfoBrush}" Margin="0,0,10,0"/>
                         <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
                     </StackPanel>
                     <TextBlock HorizontalAlignment="Right" Text="V2.0.0 DIAGNOSTIC ENGINE" Foreground="{StaticResource TextSecondaryBrush}" Opacity="0.4" FontSize="9" VerticalAlignment="Center"/>
