@@ -38,6 +38,7 @@ namespace Eternal.ViewModels
         private readonly ITuningService _tuningService;
         private readonly IConsoleService _consoleService;
         private readonly IBootService _bootService;
+        private readonly ICreatorService _creatorService;
         private DispatcherTimer _statusTimer;
 
         // Persistent ViewModels
@@ -65,6 +66,47 @@ namespace Eternal.ViewModels
         [ObservableProperty] private string _title = "Eternal System Intelligence";
         [ObservableProperty] private ObservableObject _currentView;
         [ObservableProperty] private bool _isAdvancedMode = false;
+        [ObservableProperty] private bool _isDevModeEnabled = false;
+        [ObservableProperty] private bool _isDevHostEnabled = false;
+        [ObservableProperty] private bool _isRansomGuardEnabled = false;
+        [ObservableProperty] private ObservableCollection<PortInfo> _activePorts = new ObservableCollection<PortInfo>();
+        [ObservableProperty] private ObservableCollection<ProcessSecurityInfo> _unsignedProcesses = new ObservableCollection<ProcessSecurityInfo>();
+        [ObservableProperty] private ObservableCollection<PersistenceEntry> _persistenceEntries = new ObservableCollection<PersistenceEntry>();
+
+        [RelayCommand]
+        private async Task ScanMalwarePersistence()
+        {
+            var pEntries = await _creatorService.GetPersistenceEntriesAsync();
+            PersistenceEntries.Clear();
+            foreach (var e in pEntries) PersistenceEntries.Add(e);
+
+            var unsigned = await _creatorService.GetUnsignedProcessesAsync();
+            UnsignedProcesses.Clear();
+            foreach (var u in unsigned) UnsignedProcesses.Add(u);
+        }
+
+        [RelayCommand]
+        private async Task NeutralizeProcess(int pid)
+        {
+            var result = await _creatorService.SuspendProcessAsync(pid);
+            _loggingService.Log(result.Message);
+            ScanMalwarePersistenceCommand.Execute(null);
+        }
+
+        [RelayCommand]
+        private async Task IsolateNetwork(int pid)
+        {
+            var result = await _creatorService.IsolateProcessNetworkAsync(pid, true);
+            _loggingService.Log(result.Message);
+            System.Windows.MessageBox.Show(result.Message, "Malware Hunter", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+        }
+
+        [RelayCommand]
+        private async Task ToggleRansomGuard()
+        {
+            var result = await _creatorService.EnableRansomGuardAsync(IsRansomGuardEnabled);
+            _loggingService.Log(result.Message);
+        }
         
         [ObservableProperty] private string _cpuUsage = "0%";
         [ObservableProperty] private string _ramUsage = "0%";
@@ -99,6 +141,7 @@ namespace Eternal.ViewModels
             _tuningService = new WindowsTuningService();
             _consoleService = new WindowsConsoleService();
             _bootService = new WindowsBootService();
+            _creatorService = new WindowsCreatorService();
 
             _loggingService.Log("Eternal System Intelligence Initialized.");
             _loggingService.Log($"Creator Suite Version 2.0.0P");
@@ -181,6 +224,81 @@ namespace Eternal.ViewModels
 
             // Set initial view
             Navigate("Dashboard");
+            RefreshPortsCommand.Execute(null);
+        }
+
+        [RelayCommand]
+        private async Task ToggleDevMode()
+        {
+            var result = await _creatorService.ToggleDevModeAsync(IsDevModeEnabled);
+            _loggingService.Log(result.Message);
+            System.Windows.MessageBox.Show(result.Message, "Creator Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        }
+
+        [RelayCommand]
+        private async Task ApplySilenceProfile()
+        {
+            var result = await _creatorService.ApplyServiceProfileAsync("Absolute Silence");
+            _loggingService.Log(result.Message);
+            System.Windows.MessageBox.Show(result.Message, "Creator Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        }
+
+        [RelayCommand]
+        private async Task RefreshPorts()
+        {
+            var ports = await _creatorService.GetActivePortsAsync();
+            ActivePorts.Clear();
+            foreach (var p in ports) ActivePorts.Add(p);
+        }
+
+        [RelayCommand]
+        private async Task ForceKillHandle()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog { Title = "Select Locked File to Force Kill" };
+            if (dialog.ShowDialog() == true)
+            {
+                var result = await _creatorService.IdentifyAndKillFileHandleAsync(dialog.FileName);
+                _loggingService.Log(result.Message);
+                System.Windows.MessageBox.Show(result.Message, "Creator Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            }
+        }
+
+        [RelayCommand]
+        private async Task ValidatePath()
+        {
+            var deadLinks = await _creatorService.ValidateEnvironmentPathAsync();
+            if (deadLinks.Count == 0)
+            {
+                System.Windows.MessageBox.Show("All entries in PATH are valid.", "Variable Vault", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            }
+            else
+            {
+                string message = "Found dead links in PATH:\n" + string.Join("\n", deadLinks);
+                System.Windows.MessageBox.Show(message, "Variable Vault Warning", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            }
+        }
+
+        [RelayCommand]
+        private async Task ToggleDevHost()
+        {
+            var result = await _creatorService.ToggleDevHostEntryAsync(IsDevHostEnabled);
+            _loggingService.Log(result.Message);
+            System.Windows.MessageBox.Show(result.Message, "Host Master", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        }
+
+        [RelayCommand]
+        private async Task PurgeRAM()
+        {
+            var result = await _creatorService.PurgeStandbyMemoryAsync();
+            _loggingService.Log(result.Message);
+            System.Windows.MessageBox.Show(result.Message, "RAM Purge", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        }
+
+        [RelayCommand]
+        private async Task CreateJunction()
+        {
+            // Simplified Junction creation for now
+            System.Windows.MessageBox.Show("Please use the drag-and-drop 'Junction Studio' module (coming soon) or use mklink manually for now.", "Symlink Studio", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
 
         [RelayCommand]

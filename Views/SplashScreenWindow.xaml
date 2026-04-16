@@ -5,30 +5,30 @@
         Title="Eternal" Height="350" Width="500"
         WindowStyle="None" AllowsTransparency="True"
         WindowStartupLocation="CenterScreen" Background="Transparent" Topmost="True">
-    <Border Background="{StaticResource BackgroundBrush}" CornerRadius="12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+    <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="12" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
         <Grid>
             <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,39,0,0">
                 <Image Source="/Assets/logo.png" Width="80" Margin="0,0,0,20">
                     <Image.Effect>
-                        <DropShadowEffect Color="{StaticResource AccentColor}" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                        <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
                     </Image.Effect>
                 </Image>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock Text="ETERNAL" FontSize="36" FontWeight="Black" Foreground="{StaticResource TextBrush}"/>
+                    <TextBlock Text="ETERNAL" FontSize="36" FontWeight="Black" Foreground="{DynamicResource TextBrush}"/>
                     <Border Background="#9B59B6" CornerRadius="4" VerticalAlignment="Top" Margin="10,5,0,0" Padding="6,2">
                         <TextBlock Text="CREATOR" FontSize="12" FontWeight="Black" Foreground="#FFFFFF"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="SYSTEM INTELLIGENCE" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                <TextBlock Text="SYSTEM INTELLIGENCE" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
             </StackPanel>
 
             <!-- Loading Progress -->
             <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,40">
-                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="24" Margin="0,0,0,10"/>
-                <TextBlock x:Name="StatusText" Text="Initializing Intelligence Engine..." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="24" Margin="0,0,0,10"/>
+                <TextBlock x:Name="StatusText" Text="Initializing Intelligence Engine..." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
             </StackPanel>
 
-            <TextBlock Text="© 2026 ETERNAL ANALYTICS v1.0.0" FontSize="8" Foreground="{StaticResource TextDisabledBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+            <TextBlock Text="© 2026 ETERNAL ANALYTICS v1.0.0" FontSize="8" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,15"/>
         </Grid>
     </Border>
 </Window>

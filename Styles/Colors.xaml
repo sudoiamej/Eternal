@@ -130,6 +130,11 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="Button" x:Key="StandardButton" BasedOn="{StaticResource PrimaryAction}">
+        <Setter Property="Height" Value="Auto"/>
+        <Setter Property="Padding" Value="20,10"/>
+    </Style>
+
     <Style x:Key="ModernWindow" TargetType="Window">
         <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>

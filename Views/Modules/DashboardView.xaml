@@ -200,6 +200,148 @@
                             <TextBlock Text="Export Brief Report" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
                         </StackPanel>
                     </Button>
+
+                    <TextBlock Text="CREATOR SUITE EXTRAS" Style="{StaticResource Caption}" Margin="0,20,0,15"/>
+                    <Border Style="{StaticResource StandardCard}" Padding="20">
+                        <StackPanel>
+                            <CheckBox IsChecked="{Binding DataContext.IsDevModeEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                      Command="{Binding DataContext.ToggleDevModeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      Content="Enable Dev Mode (Hidden Files/Long Paths)" FontSize="11" Foreground="{StaticResource TextBrush}" Margin="0,0,0,15"/>
+                            
+                            <Button Command="{Binding DataContext.ApplySilenceProfileCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" HorizontalAlignment="Stretch" Margin="0,0,0,15">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="VolumeOff" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Apply Absolute Silence Profile" Foreground="#FFFFFF" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Command="{Binding DataContext.ForceKillHandleCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" HorizontalAlignment="Stretch" Background="#222222" Margin="0,0,0,15">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Skull" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Force Kill File Handle" Foreground="#FFFFFF" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Separator Background="{StaticResource BorderBrush}" Margin="0,5,0,15"/>
+                            <TextBlock Text="WORKFLOW ACCELERATION" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10"/>
+                            
+                            <Button Command="{Binding DataContext.ValidatePathCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" HorizontalAlignment="Stretch" Margin="0,0,0,10" Background="#2c3e50">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="CheckCircle" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Validate PATH Variables" Foreground="#FFFFFF" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Command="{Binding DataContext.PurgeRAMCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Margin="0,0,5,0" Background="#16a085">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="Leaf" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Purge RAM" Foreground="#FFFFFF" FontSize="11"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="1" Command="{Binding DataContext.CreateJunctionCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Margin="5,0,0,0" Background="#d35400">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="Link" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Symlink Studio" Foreground="#FFFFFF" FontSize="11"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <CheckBox IsChecked="{Binding DataContext.IsDevHostEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                      Command="{Binding DataContext.ToggleDevHostCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      Content="Map dev.local to 127.0.0.1 (Hosts)" FontSize="11" Foreground="{StaticResource TextBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="SECURITY HUNTER" Style="{StaticResource Caption}" Margin="0,20,0,15"/>
+                    <Border Style="{StaticResource StandardCard}" Padding="20">
+                        <StackPanel>
+                            <Button Command="{Binding DataContext.ScanMalwarePersistenceCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" HorizontalAlignment="Stretch" Margin="0,0,0,15" Background="#c0392b">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Shield" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Audit Persistence &amp; Signatures" Foreground="#FFFFFF" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
+
+                            <CheckBox IsChecked="{Binding DataContext.IsRansomGuardEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                      Command="{Binding DataContext.ToggleRansomGuardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      Content="Enable Ransom Guard (Documents)" FontSize="11" Foreground="{StaticResource TextBrush}" Margin="0,0,0,15"/>
+
+                            <TextBlock Text="SUSPICIOUS PROCESSES" FontSize="9" FontWeight="Bold" Foreground="{StaticResource CriticalBrush}" Margin="0,0,0,10"
+                                       Visibility="{Binding DataContext.UnsignedProcesses.Count, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource VisibilityConverter}}"/>
+                            
+                            <ItemsControl ItemsSource="{Binding DataContext.UnsignedProcesses, RelativeSource={RelativeSource AncestorType=Window}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#20F44336" Padding="10" Margin="0,0,0,8" CornerRadius="4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#F44336" FontSize="11"/>
+                                                    <TextBlock Text="Unsigned / Suspicious" Foreground="{StaticResource TextSecondaryBrush}" FontSize="9"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                    <Button Command="{Binding DataContext.IsolateNetworkCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding PID}" Style="{StaticResource IconButton}" ToolTip="Isolate Network">
+                                                        <fa:ImageAwesome Icon="Globe" Width="10" Foreground="#FFFFFF"/>
+                                                    </Button>
+                                                    <Button Command="{Binding DataContext.NeutralizeProcessCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding PID}" Style="{StaticResource IconButton}" ToolTip="Neutralize (Kill)" Margin="5,0,0,0">
+                                                        <fa:ImageAwesome Icon="Times" Width="10" Foreground="#F44336"/>
+                                                    </Button>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <TextBlock Text="PERSISTENCE MAP" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,10,0,10"
+                                       Visibility="{Binding DataContext.PersistenceEntries.Count, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource VisibilityConverter}}"/>
+                            
+                            <ItemsControl ItemsSource="{Binding DataContext.PersistenceEntries, RelativeSource={RelativeSource AncestorType=Window}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="5">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"/>
+                                                <TextBlock Text="{Binding Location}" FontSize="8" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="PORT WARDEN (ACTIVE LISTENERS)" Style="{StaticResource Caption}" Margin="0,20,0,15"/>
+                    <Border Style="{StaticResource StandardCard}" Padding="10" MaxHeight="200">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding DataContext.ActivePorts, RelativeSource={RelativeSource AncestorType=Window}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="5">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="50"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Port}" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding ProcessName}" Foreground="{StaticResource TextBrush}" Margin="10,0"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding PID}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
                 </StackPanel>
             </Grid>
                 </Grid>
