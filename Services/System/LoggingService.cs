@@ -63,31 +63,44 @@ namespace Eternal.Services.System
                     string[] logNames = { "System", "Application" };
                     foreach (var name in logNames)
                     {
-                        using var log = new EventLog(name);
-                        int entriesCount = log.Entries.Count;
-                        int start = Math.Max(0, entriesCount - (count / 2));
-                        
-                        for (int i = entriesCount - 1; i >= start; i--)
+                        try 
                         {
-                            var entry = log.Entries[i];
-                            string level = entry.EntryType switch
+                            if (!EventLog.Exists(name)) continue;
+                            
+                            using var log = new EventLog(name);
+                            int entriesCount = log.Entries.Count;
+                            
+                            // Optimization: Only scan the last 'count' entries
+                            int scanCount = Math.Min(entriesCount, count);
+                            int start = entriesCount - 1;
+                            int end = Math.Max(0, entriesCount - scanCount);
+                            
+                            for (int i = start; i >= end; i--)
                             {
-                                EventLogEntryType.Error => "ERROR",
-                                EventLogEntryType.Warning => "WARN",
-                                _ => "INFO"
-                            };
+                                var entry = log.Entries[i];
+                                string level = entry.EntryType switch
+                                {
+                                    EventLogEntryType.Error => "ERROR",
+                                    EventLogEntryType.Warning => "WARN",
+                                    _ => "INFO"
+                                };
 
-                            events.Add(new LogEntry(
-                                entry.TimeGenerated,
-                                $"[{entry.Source}] {entry.Message}",
-                                level
-                            ));
+                                events.Add(new LogEntry(
+                                    entry.TimeGenerated,
+                                    $"[{entry.Source}] {entry.Message}",
+                                    level
+                                ));
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            events.Add(new LogEntry(DateTime.Now, $"Failed to read {name} log: {ex.Message}", "WARN"));
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    events.Add(new LogEntry(DateTime.Now, $"Failed to fetch system logs: {ex.Message}", "ERROR"));
+                    events.Add(new LogEntry(DateTime.Now, $"Critical failure in system log fetch: {ex.Message}", "ERROR"));
                 }
                 return events.OrderByDescending(e => e.Timestamp).Take(count).ToList();
             });

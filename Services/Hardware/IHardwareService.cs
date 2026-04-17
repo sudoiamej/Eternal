@@ -11,8 +11,10 @@ namespace Eternal.Services.Hardware
         Task<List<DiskInfo>> GetDiskInfoAsync();
         Task<MotherboardInfo> GetMotherboardInfoAsync();
         Task<List<NetworkAdapterInfo>> GetNetworkAdaptersAsync();
+        Task<List<SystemSummaryItem>> GetDetailedSystemInfoAsync();
     }
 
+    public record SystemSummaryItem(string Category, string Property, string Value);
     public record CpuInfo(string Name, int Cores, int Threads, string Architecture, string Frequency);
     public record GpuInfo(
         string Name, 

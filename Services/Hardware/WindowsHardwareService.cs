@@ -257,5 +257,89 @@ namespace Eternal.Services.Hardware
                 return adapters;
             });
         }
+
+        public Task<List<SystemSummaryItem>> GetDetailedSystemInfoAsync()
+        {
+            return Task.Run(() =>
+            {
+                var items = new List<SystemSummaryItem>();
+                
+                // 1. OS Info
+                try {
+                    using var searcher = new ManagementObjectSearcher("select * from Win32_OperatingSystem");
+                    foreach (var obj in searcher.Get()) {
+                        items.Add(new SystemSummaryItem("OS", "OS Name", obj["Caption"]?.ToString()));
+                        items.Add(new SystemSummaryItem("OS", "Version", obj["Version"]?.ToString()));
+                        items.Add(new SystemSummaryItem("OS", "Build Number", obj["BuildNumber"]?.ToString()));
+                        items.Add(new SystemSummaryItem("OS", "OS Manufacturer", obj["Manufacturer"]?.ToString()));
+                        items.Add(new SystemSummaryItem("OS", "System Name", obj["CSName"]?.ToString()));
+                        items.Add(new SystemSummaryItem("OS", "Architecture", obj["OSArchitecture"]?.ToString()));
+                        items.Add(new SystemSummaryItem("OS", "Boot Device", obj["BootDevice"]?.ToString()));
+                        items.Add(new SystemSummaryItem("OS", "Windows Directory", obj["WindowsDirectory"]?.ToString()));
+                        items.Add(new SystemSummaryItem("OS", "System Directory", obj["SystemDirectory"]?.ToString()));
+                    }
+                } catch { }
+
+                // 2. System Info
+                try {
+                    using var searcher = new ManagementObjectSearcher("select * from Win32_ComputerSystem");
+                    foreach (var obj in searcher.Get()) {
+                        items.Add(new SystemSummaryItem("System", "System Manufacturer", obj["Manufacturer"]?.ToString()));
+                        items.Add(new SystemSummaryItem("System", "System Model", obj["Model"]?.ToString()));
+                        items.Add(new SystemSummaryItem("System", "System Type", obj["SystemType"]?.ToString()));
+                        items.Add(new SystemSummaryItem("System", "SKU Number", obj["SystemSKUNumber"]?.ToString()));
+                        
+                        ulong totalBytes = global::System.Convert.ToUInt64(obj["TotalPhysicalMemory"] ?? 0);
+                        string memoryStr = (totalBytes / (1024 * 1024 * 1024)).ToString() + " GB";
+                        items.Add(new SystemSummaryItem("System", "Total Physical Memory", memoryStr));
+                        
+                        items.Add(new SystemSummaryItem("System", "Domain", obj["Domain"]?.ToString()));
+                        items.Add(new SystemSummaryItem("System", "User Name", obj["UserName"]?.ToString()));
+                    }
+                } catch { }
+
+                // 3. BIOS Info
+                try {
+                    using var searcher = new ManagementObjectSearcher("select * from Win32_BIOS");
+                    foreach (var obj in searcher.Get()) {
+                        items.Add(new SystemSummaryItem("Firmware", "BIOS Version/Date", obj["SMBIOSBIOSVersion"]?.ToString()));
+                        
+                        string smbios = (obj["SMBIOSMajorVersion"]?.ToString() ?? "0") + "." + (obj["SMBIOSMinorVersion"]?.ToString() ?? "0");
+                        items.Add(new SystemSummaryItem("Firmware", "SMBIOS Version", smbios));
+                        
+                        string ec = (obj["EmbeddedControllerMajorVersion"]?.ToString() ?? "0") + "." + (obj["EmbeddedControllerMinorVersion"]?.ToString() ?? "0");
+                        items.Add(new SystemSummaryItem("Firmware", "Embedded Controller Version", ec));
+                        
+                        items.Add(new SystemSummaryItem("Firmware", "BIOS Mode", "N/A (See UEFI Module)"));
+                    }
+                } catch { }
+
+                // 4. BaseBoard
+                try {
+                    using var searcher = new ManagementObjectSearcher("select * from Win32_BaseBoard");
+                    foreach (var obj in searcher.Get()) {
+                        items.Add(new SystemSummaryItem("Board", "BaseBoard Manufacturer", obj["Manufacturer"]?.ToString()));
+                        items.Add(new SystemSummaryItem("Board", "BaseBoard Product", obj["Product"]?.ToString()));
+                        items.Add(new SystemSummaryItem("Board", "BaseBoard Version", obj["Version"]?.ToString()));
+                    }
+                } catch { }
+
+                // 5. Processor (Detailed)
+                try {
+                    using var searcher = new ManagementObjectSearcher("select * from Win32_Processor");
+                    foreach (var obj in searcher.Get()) {
+                        items.Add(new SystemSummaryItem("Processor", "Name", obj["Name"]?.ToString()));
+                        items.Add(new SystemSummaryItem("Processor", "Description", obj["Description"]?.ToString()));
+                        
+                        string l2 = (obj["L2CacheSize"]?.ToString() ?? "0") + " KB";
+                        string l3 = (obj["L3CacheSize"]?.ToString() ?? "0") + " KB";
+                        items.Add(new SystemSummaryItem("Processor", "L2 Cache Size", l2));
+                        items.Add(new SystemSummaryItem("Processor", "L3 Cache Size", l3));
+                    }
+                } catch { }
+
+                return items;
+            });
+        }
     }
 }

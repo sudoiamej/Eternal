@@ -54,7 +54,7 @@
                                 <fa:ImageAwesome Icon="Download" Width="14" Foreground="{StaticResource SuccessBrush}" Margin="0,0,10,0"/>
                                 <TextBlock Text="DOWNLOAD THROUGHPUT" Style="{StaticResource Caption}"/>
                             </StackPanel>
-                            <TextBlock Grid.Row="1" Text="{Binding DownloadMbps, StringFormat={}{0:F2} Mbps}" FontSize="28" FontWeight="Black" Margin="0,0,0,15"/>
+                            <TextBlock Grid.Row="1" Text="{Binding DownloadMbps, StringFormat='{}{0:F2} Mbps'}" FontSize="28" FontWeight="Black" Margin="0,0,0,15"/>
                             
                             <!-- Download Sparkline -->
                             <ItemsControl Grid.Row="2" ItemsSource="{Binding DownloadHistory}" VerticalAlignment="Bottom">
@@ -99,7 +99,7 @@
                                 <fa:ImageAwesome Icon="Upload" Width="14" Foreground="{StaticResource InfoBrush}" Margin="0,0,10,0"/>
                                 <TextBlock Text="UPLOAD THROUGHPUT" Style="{StaticResource Caption}"/>
                             </StackPanel>
-                            <TextBlock Grid.Row="1" Text="{Binding UploadMbps, StringFormat={}{0:F2} Mbps}" FontSize="28" FontWeight="Black" Margin="0,0,0,15"/>
+                            <TextBlock Grid.Row="1" Text="{Binding UploadMbps, StringFormat='{}{0:F2} Mbps'}" FontSize="28" FontWeight="Black" Margin="0,0,0,15"/>
 
                             <!-- Upload Sparkline -->
                             <ItemsControl Grid.Row="2" ItemsSource="{Binding UploadHistory}" VerticalAlignment="Bottom">

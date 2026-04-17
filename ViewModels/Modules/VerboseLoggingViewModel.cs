@@ -1,10 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Eternal.Models;
 using Eternal.Services.System;
+using System;
 
 namespace Eternal.ViewModels.Modules
 {
@@ -20,23 +23,30 @@ namespace Eternal.ViewModels.Modules
         {
             _loggingService = loggingService;
             
-            // Load app logs
-            foreach (var log in _loggingService.Logs)
+            // 1. Initial Load of buffered app logs (Sort Newest First)
+            var initialLogs = _loggingService.Logs.OrderByDescending(l => l.Timestamp);
+            foreach (var log in initialLogs)
             {
                 LogEntries.Add(log);
             }
 
+            // 2. Real-time Log Stream
             _loggingService.NewLogAdded += (s, entry) =>
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
+                    // Always keep stream at top
                     LogEntries.Insert(0, entry);
-                    if (LogEntries.Count > 1000) LogEntries.RemoveAt(LogEntries.Count - 1);
+                    if (LogEntries.Count > 2000) LogEntries.RemoveAt(LogEntries.Count - 1);
                 });
             };
 
-            // Initial system log fetch
-            _ = LoadSystemLogsAsync();
+            // 3. Deferred System Event Load (to avoid blocking UI init)
+            _ = Task.Run(async () => 
+            {
+                await Task.Delay(1000); 
+                await LoadSystemLogsAsync();
+            });
         }
 
         [RelayCommand]
@@ -44,22 +54,34 @@ namespace Eternal.ViewModels.Modules
         {
             if (IsBusy) return;
             IsBusy = true;
+            
             try
             {
-                var systemLogs = await _loggingService.GetSystemEventsAsync(300);
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                // Fetch deep system events (Win Event Viewer)
+                var systemLogs = await _loggingService.GetSystemEventsAsync(500);
+                
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    // Merge and unique-ify based on message + timestamp
+                    var currentMessages = new HashSet<string>(LogEntries.Select(l => $"{l.Timestamp.Ticks}_{l.Message}"));
+                    
+                    bool addedAny = false;
                     foreach (var log in systemLogs)
                     {
-                        // Add if not duplicate (simple check)
-                        LogEntries.Add(log);
+                        if (!currentMessages.Contains($"{log.Timestamp.Ticks}_{log.Message}"))
+                        {
+                            LogEntries.Add(log);
+                            addedAny = true;
+                        }
                     }
-                    // Sort by timestamp
-                    var sorted = new ObservableCollection<LogEntry>(
-                        System.Linq.Enumerable.OrderByDescending(LogEntries, l => l.Timestamp)
-                    );
-                    LogEntries.Clear();
-                    foreach (var s in sorted) LogEntries.Add(s);
+
+                    if (addedAny)
+                    {
+                        // Maintain strict reverse chronological order
+                        var sorted = LogEntries.OrderByDescending(l => l.Timestamp).ToList();
+                        LogEntries.Clear();
+                        foreach (var log in sorted) LogEntries.Add(log);
+                    }
                 });
             }
             finally { IsBusy = false; }

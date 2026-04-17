@@ -39,8 +39,16 @@
                 <Border Grid.Row="1" Margin="0,0,0,30" BorderThickness="1" CornerRadius="8">
                     <Border.Style>
                         <Style TargetType="Border">
-                            <Setter Property="Background" Value="#0DAccentColor"/>
-                            <Setter Property="BorderBrush" Value="#30AccentColor"/>
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource AccentColor}" Opacity="0.05"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="BorderBrush">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource AccentColor}" Opacity="0.2"/>
+                                </Setter.Value>
+                            </Setter>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding StatusMessage}" Value="Restore point created successfully.">
                                     <Setter Property="Background" Value="#104CAF50"/>

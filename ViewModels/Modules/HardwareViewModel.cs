@@ -14,6 +14,7 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private RamInfo _ram;
         [ObservableProperty] private List<DiskInfo> _disks;
         [ObservableProperty] private MotherboardInfo _motherboard;
+        [ObservableProperty] private List<SystemSummaryItem> _detailedInfo;
         [ObservableProperty] private bool _isLoading;
         [ObservableProperty] private bool _hasError;
         [ObservableProperty] private string _errorMessage;
@@ -39,14 +40,16 @@ namespace Eternal.ViewModels.Modules
                 var ramTask = _hardwareService.GetRamInfoAsync();
                 var diskTask = _hardwareService.GetDiskInfoAsync();
                 var mbTask = _hardwareService.GetMotherboardInfoAsync();
+                var detailedTask = _hardwareService.GetDetailedSystemInfoAsync();
 
-                await Task.WhenAll(cpuTask, gpuTask, ramTask, diskTask, mbTask);
+                await Task.WhenAll(cpuTask, gpuTask, ramTask, diskTask, mbTask, detailedTask);
 
                 Cpu = await cpuTask;
                 Gpu = await gpuTask;
                 Ram = await ramTask;
                 Disks = await diskTask;
                 Motherboard = await mbTask;
+                DetailedInfo = await detailedTask;
             }
             catch (System.Exception ex)
             {

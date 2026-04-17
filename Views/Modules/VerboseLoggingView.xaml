@@ -36,70 +36,95 @@
                 </StackPanel>
             </Grid>
 
-            <!-- 2. Log Output Console -->
-            <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0" Background="#05000000"
-                    Opacity="0.4" IsEnabled="False" ToolTip="feature build ongoing, stay tuned">
-                <DataGrid ItemsSource="{Binding LogEntries}" AutoGenerateColumns="False" 
-                          IsReadOnly="True" Background="Transparent" BorderThickness="0" 
-                          RowBackground="Transparent" GridLinesVisibility="None"
-                          Foreground="{StaticResource TextBrush}" CanUserAddRows="False"
-                          VirtualizingStackPanel.IsVirtualizing="True">
-                    <DataGrid.Resources>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="Background" Value="#0DFFFFFF"/>
-                            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
-                            <Setter Property="Padding" Value="10,5"/>
-                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
-                        </Style>
-                    </DataGrid.Resources>
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="TIMESTAMP" Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss.fff}}" Width="100">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-                                    <Setter Property="FontSize" Value="10"/>
-                                    <Setter Property="FontFamily" Value="Consolas"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        
-                        <DataGridTemplateColumn Header="LEVEL" Width="80">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Level}" FontWeight="Bold" FontSize="10">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="{StaticResource InfoBrush}"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Level}" Value="ERROR">
-                                                        <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Level}" Value="WARN">
-                                                        <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Level}" Value="INFO">
-                                                        <Setter Property="Foreground" Value="White"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+            <!-- 2. Log Output Console (HCI Rule 7: Visibility of System Status) -->
+            <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0" Background="#05000000">
+                <Grid>
+                    <DataGrid ItemsSource="{Binding LogEntries}" AutoGenerateColumns="False" 
+                              IsReadOnly="True" Background="Transparent" BorderThickness="0" 
+                              RowBackground="Transparent" GridLinesVisibility="None"
+                              Foreground="{StaticResource TextBrush}" CanUserAddRows="False"
+                              VirtualizingStackPanel.IsVirtualizing="True"
+                              HeadersVisibility="Column">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#0FFFFFFF"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#1A1A1A"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                <Setter Property="Padding" Value="12,8"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                <Setter Property="FontSize" Value="10"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="TIMESTAMP" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="120">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                        <Setter Property="FontSize" Value="10"/>
+                                        <Setter Property="FontFamily" Value="Consolas"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="12,4"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTemplateColumn Header="LEVEL" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="12,4">
+                                            <TextBlock Text="{Binding Level}" FontWeight="Bold" FontSize="10" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{StaticResource InfoBrush}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Level}" Value="ERROR">
+                                                                <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Level}" Value="WARN">
+                                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Level}" Value="INFO">
+                                                                <Setter Property="Foreground" Value="White"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
 
-                        <DataGridTextColumn Header="MESSAGE" Binding="{Binding Message}" Width="*">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-                                    <Setter Property="FontSize" Value="11"/>
-                                    <Setter Property="TextWrapping" Value="Wrap"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                            <DataGridTextColumn Header="MESSAGE" Binding="{Binding Message}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                                        <Setter Property="FontSize" Value="11"/>
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="Padding" Value="12,4"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Loading Feedback Overlay -->
+                    <Border Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="32" Margin="0,0,0,15"/>
+                            <TextBlock Text="Synchronizing Event Streams..." FontSize="14" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
             </Border>
         </Grid>
     </Border>

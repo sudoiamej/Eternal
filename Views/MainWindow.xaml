@@ -107,12 +107,6 @@
                                                 <Trigger Property="IsMouseOver" Value="True">
                                                     <Setter Property="Background" Value="#0FFFFFFF"/>
                                                 </Trigger>
-                                                <!-- Dim and lock System Logs -->
-                                                <DataTrigger Binding="{Binding ViewName}" Value="Logs">
-                                                    <Setter Property="Opacity" Value="0.4"/>
-                                                    <Setter Property="IsEnabled" Value="False"/>
-                                                    <Setter Property="ToolTip" Value="feature build ongoing, stay tuned"/>
-                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Button.Style>

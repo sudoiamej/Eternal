@@ -51,7 +51,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <Slider Value="{Binding Settings.RefreshFrequency}" Minimum="1" Maximum="10" Width="100" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <TextBlock Text="{Binding Settings.RefreshFrequency, StringFormat={}{0}s}" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Width="25"/>
+                                <TextBlock Text="{Binding Settings.RefreshFrequency, StringFormat='{}{0}s'}" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Width="25"/>
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -82,7 +82,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <Slider Value="{Binding Settings.WmiTimeoutSeconds}" Minimum="2" Maximum="30" Width="100" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <TextBlock Text="{Binding Settings.WmiTimeoutSeconds, StringFormat={}{0}s}" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Width="25"/>
+                                <TextBlock Text="{Binding Settings.WmiTimeoutSeconds, StringFormat='{}{0}s'}" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Width="25"/>
                             </StackPanel>
                         </Grid>
 

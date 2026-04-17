@@ -208,10 +208,12 @@ namespace Eternal.Services.Security
                         string protectors = "None";
                         try
                         {
-                            var invokeRes = (ManagementBaseObject)obj.InvokeMethod("GetKeyProtectors", new object[] { });
-                            if (invokeRes != null && (uint)invokeRes["ReturnValue"] == 0)
+                            var inParams = obj.GetMethodParameters("GetKeyProtectors");
+                            var outParams = obj.InvokeMethod("GetKeyProtectors", inParams, null);
+
+                            if (outParams != null && (uint)outParams["ReturnValue"] == 0)
                             {
-                                var protectorIds = (string[])invokeRes["VolumeKeyProtectorID"];
+                                var protectorIds = (string[])outParams["VolumeKeyProtectorID"];
                                 if (protectorIds != null && protectorIds.Length > 0)
                                 {
                                     var types = new List<string>();

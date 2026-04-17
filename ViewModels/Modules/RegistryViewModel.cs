@@ -136,9 +136,31 @@ namespace Eternal.ViewModels.Modules
             string hive = GetHiveString(CurrentKey.Hive);
             string path = CurrentKey.FullPath.Split(new[] { '\\' }, 2)[1];
 
-            // This would normally open a small dialog to input the new value
-            // For now, we provide a placeholder or specific logic for DWORDs
-            System.Windows.MessageBox.Show($"Modifying {valueInfo.Name}. Simplified editing coming soon.", "Registry Intelligence", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            // Launch Surgical Editor
+            var editWin = new Eternal.Views.Helpers.RegistryEditWindow(valueInfo);
+            editWin.Owner = System.Windows.Application.Current.MainWindow;
+            
+            if (editWin.ShowDialog() == true)
+            {
+                var newValue = editWin.NewValue;
+
+                // 1. Create Backup (Undo Vault)
+                UndoVault.Insert(0, new RegistryUndoEntry
+                {
+                    Hive = hive,
+                    KeyPath = path,
+                    ValueName = valueInfo.Name,
+                    OriginalValue = valueInfo.Value,
+                    Kind = valueInfo.Kind,
+                    Description = $"Manual: {valueInfo.Name}"
+                });
+
+                // 2. Commit Change
+                bool success = await _registryService.SetValueAsync(hive, path, valueInfo.Name, newValue, valueInfo.Kind);
+                StatusMessage = success ? $"Modified: {valueInfo.Name}" : "Failed to modify value. Access denied?";
+                
+                await LoadRegistryAsync();
+            }
         }
 
         [RelayCommand]

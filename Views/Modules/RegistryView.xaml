@@ -146,17 +146,17 @@
                     </Border>
 
                     <!-- Right Column: Tools, Vault & Watchlist -->
-                    <Grid Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/> <!-- Presets -->
-                            <RowDefinition Height="Auto"/> <!-- Watchlist -->
-                            <RowDefinition Height="*"/>    <!-- Undo Vault -->
-                        </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/> <!-- Presets -->
+                                <RowDefinition Height="Auto"/> <!-- Watchlist -->
+                                <RowDefinition Height="Auto"/> <!-- Undo Vault -->
+                            </Grid.RowDefinitions>
 
-                        <!-- Intelligent Presets -->
-                        <StackPanel Grid.Row="0" Margin="0,0,0,25">
-                            <TextBlock Text="INTELLIGENT PRESETS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                            <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                            <!-- Intelligent Presets -->
+                            <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                                <TextBlock Text="INTELLIGENT PRESETS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
                                 <ItemsControl ItemsSource="{Binding CommonTweaks}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -186,15 +186,17 @@
                                                     </Grid>
                                                     <ItemsControl ItemsSource="{Binding Options}" IsEnabled="{Binding IsCurrentOSCompatible}">
                                                         <ItemsControl.ItemsPanel>
-                                                            <ItemsPanelTemplate><UniformGrid Columns="2"/></ItemsPanelTemplate>
+                                                            <ItemsPanelTemplate>
+                                                                <UniformGrid Columns="2"/>
+                                                            </ItemsPanelTemplate>
                                                         </ItemsControl.ItemsPanel>
                                                         <ItemsControl.ItemTemplate>
                                                             <DataTemplate>
-                                                        <Button Style="{StaticResource SecondaryButton}" Margin="2" Padding="5" 
-                                                                Command="{Binding DataContext.ApplyTweakCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                                CommandParameter="{Binding}">
-                                                            <TextBlock Text="{Binding Label}" FontSize="10" TextAlignment="Center"/>
-                                                        </Button>
+                                                                <Button Style="{StaticResource SecondaryButton}" Margin="2" Padding="5" 
+                                                                        Command="{Binding DataContext.ApplyTweakCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                        CommandParameter="{Binding}">
+                                                                    <TextBlock Text="{Binding Label}" FontSize="10" TextAlignment="Center"/>
+                                                                </Button>
                                                             </DataTemplate>
                                                         </ItemsControl.ItemTemplate>
                                                     </ItemsControl>
@@ -203,52 +205,47 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                            </ScrollViewer>
-                        </StackPanel>
+                            </StackPanel>
 
-                        <!-- FEATURE 3: Registry Drift Monitor -->
-                        <StackPanel Grid.Row="1" Margin="0,0,0,25">
-                            <Grid Margin="0,0,0,15">
-                                <TextBlock Text="DRIFT WATCHLIST" Style="{StaticResource Caption}"/>
-                                <Button Command="{Binding RefreshWatchlistCommand}" Style="{StaticResource IconButton}" HorizontalAlignment="Right">
-                                    <fa:ImageAwesome Icon="Refresh" Width="10" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                </Button>
-                            </Grid>
-                            <ItemsControl ItemsSource="{Binding Watchlist}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="#111111" Padding="12,8" Margin="0,0,0,8" CornerRadius="4" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel>
-                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="11"/>
-                                                    <TextBlock Text="{Binding DisplayPath}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="9" TextTrimming="CharacterEllipsis"/>
-                                                </StackPanel>
-                                                <Border Grid.Column="1" Background="{StaticResource WarningBrush}" Padding="6,2" CornerRadius="2" VerticalAlignment="Center"
-                                                        Visibility="{Binding IsDrifting, Converter={StaticResource VisibilityConverter}}">
-                                                    <TextBlock Text="DRIFT" Foreground="Black" FontSize="8" FontWeight="Black"/>
-                                                </Border>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
+                            <!-- FEATURE 3: Registry Drift Monitor -->
+                            <StackPanel Grid.Row="1" Margin="0,0,0,25">
+                                <Grid Margin="0,0,0,15">
+                                    <TextBlock Text="DRIFT WATCHLIST" Style="{StaticResource Caption}"/>
+                                    <Button Command="{Binding RefreshWatchlistCommand}" Style="{StaticResource IconButton}" HorizontalAlignment="Right">
+                                        <fa:ImageAwesome Icon="Refresh" Width="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    </Button>
+                                </Grid>
+                                <ItemsControl ItemsSource="{Binding Watchlist}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#111111" Padding="12,8" Margin="0,0,0,8" CornerRadius="4" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="11"/>
+                                                        <TextBlock Text="{Binding DisplayPath}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="9" TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
+                                                    <Border Grid.Column="1" Background="{StaticResource WarningBrush}" Padding="6,2" CornerRadius="2" VerticalAlignment="Center"
+                                                            Visibility="{Binding IsDrifting, Converter={StaticResource VisibilityConverter}}">
+                                                        <TextBlock Text="DRIFT" Foreground="Black" FontSize="8" FontWeight="Black"/>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
 
-                        <!-- FEATURE 2: Undo Vault -->
-                        <StackPanel Grid.Row="2">
-                            <TextBlock Text="UNDO VAULT (RECOVERY)" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <!-- FEATURE 2: Undo Vault -->
+                            <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                                <TextBlock Text="UNDO VAULT (RECOVERY)" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
                                 <ItemsControl ItemsSource="{Binding UndoVault}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Padding="12" Margin="0,0,0,10" CornerRadius="4" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1">
-                                                <Border.Background>
-                                                    <SolidColorBrush Color="{StaticResource AccentColor}" Opacity="0.1"/>
-                                                </Border.Background>
+                                            <Border Padding="12" Margin="0,0,0,10" CornerRadius="4" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" Background="#159B59B6">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
@@ -267,9 +264,9 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                            </ScrollViewer>
-                        </StackPanel>
-                    </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
                 </Grid>
 
                 <!-- Status Bar -->
