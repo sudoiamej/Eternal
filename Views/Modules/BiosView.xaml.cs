@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 namespace Eternal.Views.Modules {
-    public partial class BiosView : UserControl {
+    public partial class BiosView : System.Windows.Controls.UserControl {
         public BiosView() { InitializeComponent(); }
     }
 }

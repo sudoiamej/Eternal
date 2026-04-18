@@ -16,7 +16,7 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="ETERNAL" FontSize="36" FontWeight="Black" Foreground="{StaticResource TextBrush}"/>
                     <Border Background="#9B59B6" CornerRadius="4" VerticalAlignment="Top" Margin="10,5,0,0" Padding="6,2">
-                        <TextBlock Text="CREATOR" FontSize="12" FontWeight="Black" Foreground="#FFFFFF"/>
+                        <TextBlock Text="DEV PREVIEW" FontSize="12" FontWeight="Black" Foreground="#FFFFFF"/>
                     </Border>
                 </StackPanel>
                 <TextBlock Text="SYSTEM INTELLIGENCE" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
@@ -29,7 +29,7 @@
                 <TextBlock x:Name="DetailText" Text="Ensuring system integrity" FontSize="8" Foreground="{StaticResource TextDisabledBrush}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
             </StackPanel>
 
-            <TextBlock Text="© 2026 ETERNAL ANALYTICS v1.0.0" FontSize="8" Foreground="{StaticResource TextDisabledBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+            <TextBlock Text="© 2026 ETERNAL ANALYTICS" FontSize="8" Foreground="{StaticResource TextDisabledBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,15"/>
         </Grid>
     </Border>
 </Window>

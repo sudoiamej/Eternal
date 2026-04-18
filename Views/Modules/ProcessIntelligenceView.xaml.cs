@@ -5,7 +5,7 @@ using Eternal.Models;
 
 namespace Eternal.Views.Modules
 {
-    public partial class ProcessIntelligenceView : UserControl
+    public partial class ProcessIntelligenceView : System.Windows.Controls.UserControl
     {
         public ProcessIntelligenceView()
         {
@@ -14,7 +14,7 @@ namespace Eternal.Views.Modules
 
         private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (sender is DataGrid dg && dg.SelectedItem is ProcessDetail process)
+            if (sender is System.Windows.Controls.DataGrid dg && dg.SelectedItem is ProcessDetail process)
             {
                 if (DataContext is ProcessIntelligenceViewModel vm)
                 {

@@ -9,6 +9,7 @@
             </ResourceDictionary.MergedDictionaries>
             
             <helpers:ValueToVisibilityConverter x:Key="VisibilityConverter"/>
+            <helpers:BooleanToStatusConverter x:Key="BooleanToStatusConverter"/>
             <helpers:SizeFormatterConverter x:Key="SizeConverter"/>
         </ResourceDictionary>
     </Application.Resources>

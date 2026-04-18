@@ -23,7 +23,7 @@ namespace Eternal.ViewModels.Modules
             _consoleService = consoleService;
             _consoleService.OutputReceived += (s, line) =>
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     OutputLines.Add(line);
                     if (OutputLines.Count > 500) OutputLines.RemoveAt(0);

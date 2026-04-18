@@ -2,7 +2,7 @@ using System.Windows.Controls;
 
 namespace Eternal.Views.Helpers
 {
-    public partial class ErrorCard : UserControl
+    public partial class ErrorCard : System.Windows.Controls.UserControl
     {
         public ErrorCard()
         {

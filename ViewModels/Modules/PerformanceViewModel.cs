@@ -31,9 +31,12 @@ namespace Eternal.ViewModels.Modules
             SelectHistoryCommand = new RelayCommand<HistoryType>(type => SelectedHistory = type);
             
             // Subscribe to global updates to stay in sync with the status bar
-            _performanceService.Updated += (s, snap) => 
+            _performanceService.Updated += (s, snap) =>
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() => 
+                var app = System.Windows.Application.Current;
+                if (app == null) return;
+
+                app.Dispatcher.Invoke(() =>
                 {
                     CurrentCpu = snap.CpuUsage;
                     CurrentRam = snap.RamUsage;
@@ -43,8 +46,7 @@ namespace Eternal.ViewModels.Modules
                     UpdateHistory(RamHistory, CurrentRam);
                     UpdateHistory(DiskHistory, CurrentDisk);
                 });
-            };
-        }
+            };        }
 
         private void UpdateHistory(ObservableCollection<float> history, float value)
         {

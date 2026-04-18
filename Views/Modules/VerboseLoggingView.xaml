@@ -37,10 +37,10 @@
             </Grid>
 
             <!-- 2. Log Output Console (HCI Rule 7: Visibility of System Status) -->
-            <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0" Background="#05000000">
+            <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0">
                 <Grid>
                     <DataGrid ItemsSource="{Binding LogEntries}" AutoGenerateColumns="False" 
-                              IsReadOnly="True" Background="Transparent" BorderThickness="0" 
+                              IsReadOnly="True" Background="#0C0C0C" BorderThickness="0" 
                               RowBackground="Transparent" GridLinesVisibility="None"
                               Foreground="{StaticResource TextBrush}" CanUserAddRows="False"
                               VirtualizingStackPanel.IsVirtualizing="True"
@@ -48,20 +48,22 @@
                         <DataGrid.Resources>
                             <Style TargetType="DataGridRow">
                                 <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#0FFFFFFF"/>
+                                        <Setter Property="Background" Value="#15FFFFFF"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
                             <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="Background" Value="#1A1A1A"/>
+                                <Setter Property="Background" Value="#151515"/>
                                 <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
                                 <Setter Property="Padding" Value="12,8"/>
                                 <Setter Property="BorderThickness" Value="0,0,0,1"/>
                                 <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
                                 <Setter Property="FontSize" Value="10"/>
                                 <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Height" Value="35"/>
                             </Style>
                         </DataGrid.Resources>
                         <DataGrid.Columns>

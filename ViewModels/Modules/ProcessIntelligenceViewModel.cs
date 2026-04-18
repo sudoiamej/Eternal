@@ -112,7 +112,7 @@ namespace Eternal.ViewModels.Modules
             }
 
             var detailWin = new DetailWindow(process.Name, "PROCESS PROPERTIES", properties);
-            detailWin.Owner = Application.Current.MainWindow;
+            detailWin.Owner = System.Windows.Application.Current.MainWindow;
             detailWin.ShowDialog();
         }
 
@@ -121,7 +121,7 @@ namespace Eternal.ViewModels.Modules
         {
             if (process == null) return;
 
-            var result = MessageBox.Show($"Are you sure you want to terminate '{process.Name}' (PID: {process.Id})?\n\nThis may cause system instability if it is a critical process.", 
+            var result = System.Windows.MessageBox.Show($"Are you sure you want to terminate '{process.Name}' (PID: {process.Id})?\n\nThis may cause system instability if it is a critical process.", 
                                          "HCI Safety Enforcement", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
@@ -133,7 +133,7 @@ namespace Eternal.ViewModels.Modules
                 }
                 else
                 {
-                    MessageBox.Show("Failed to terminate process. Access denied or process already closed.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox.Show("Failed to terminate process. Access denied or process already closed.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

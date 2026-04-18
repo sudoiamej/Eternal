@@ -4,17 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
-             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d" d:DesignHeight="720" d:DesignWidth="1000">
     <Border Padding="40">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- Header -->
-                    <RowDefinition Height="Auto"/> <!-- Vitals -->
-                    <RowDefinition Height="*"/>    <!-- Details -->
+                    <RowDefinition Height="Auto"/> <!-- Telemetry Grid -->
+                    <RowDefinition Height="Auto"/> <!-- Details -->
                 </Grid.RowDefinitions>
 
-                <!-- 1. Standardized Header (HCI Rule 9: Consistency) -->
+                <!-- 1. Header -->
                 <Grid Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -35,51 +35,125 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- 2. Primary Telemetry (HCI Rule 7: System Status) -->
+                <!-- 2. Primary Telemetry Grid -->
                 <UniformGrid Grid.Row="1" Columns="2" Margin="0,0,0,25">
-                    <!-- Thermal Gauge Card -->
-                    <Border Style="{StaticResource StandardCard}" Margin="0,0,12,0" Padding="30">
+                    <!-- CPU Card -->
+                    <Border Style="{StaticResource StandardCard}" Margin="0,0,6,12" Padding="25">
                         <StackPanel>
-                            <TextBlock Text="CORE TEMPERATURE" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,0,0,15"/>
-                            <Grid HorizontalAlignment="Center">
-                                <Ellipse Width="120" Height="120" Stroke="{StaticResource BorderBrush}" StrokeThickness="8"/>
+                            <Grid Margin="0,0,0,15">
+                                <TextBlock Text="PROCESSOR TELEMETRY" Style="{StaticResource Caption}"/>
+                                <fa:ImageAwesome Icon="Microchip" Width="12" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid HorizontalAlignment="Center" Margin="0,10">
+                                <Ellipse Width="100" Height="100" Stroke="{StaticResource BorderBrush}" StrokeThickness="6"/>
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding CpuTempText}" FontSize="28" FontWeight="Black" HorizontalAlignment="Center"/>
-                                    <Border Background="{StaticResource SuccessBrush}" Padding="8,2" CornerRadius="2" Margin="0,5,0,0" HorizontalAlignment="Center">
-                                        <TextBlock Text="NOMINAL" FontSize="10" FontWeight="Bold" Foreground="White"/>
-                                    </Border>
+                                    <TextBlock Text="{Binding CpuTempText}" FontSize="24" FontWeight="Black"/>
+                                    <TextBlock Text="CORE TEMP" FontSize="8" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Grid>
-                            <TextBlock Text="Thermal zones update via ACPI telemetry" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,15,0,0"/>
+                            <Grid Margin="0,15,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Power Draw: " FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding CpuPowerText}" FontSize="11" FontWeight="Bold"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <TextBlock Text="Voltage: " FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding CpuVoltageText}" FontSize="11" FontWeight="Bold"/>
+                                </StackPanel>
+                            </Grid>
                         </StackPanel>
                     </Border>
 
-                    <!-- Power State Card (HCI Rule 5: Mapping) -->
-                    <Border Style="{StaticResource StandardCard}" Margin="12,0,0,0" Padding="30">
+                    <!-- GPU Card -->
+                    <Border Style="{StaticResource StandardCard}" Margin="6,0,0,12" Padding="25">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,15">
+                                <TextBlock Text="GRAPHICS TELEMETRY" Style="{StaticResource Caption}"/>
+                                <fa:ImageAwesome Icon="Desktop" Width="12" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid HorizontalAlignment="Center" Margin="0,10">
+                                <Ellipse Width="100" Height="100" Stroke="{StaticResource BorderBrush}" StrokeThickness="6"/>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding GpuTempText}" FontSize="24" FontWeight="Black"/>
+                                    <TextBlock Text="GPU TEMP" FontSize="8" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,15,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Fan Speed: " FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding FanSpeedText}" FontSize="11" FontWeight="Bold"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="2" Padding="6,2">
+                                        <TextBlock Text="ACTIVE" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Power Architecture Card -->
+                    <Border Style="{StaticResource StandardCard}" Margin="0,0,6,0" Padding="25">
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="POWER ARCHITECTURE" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                            <TextBlock Text="POWER ARCHITECTURE" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
                             
-                            <!-- AC Logic -->
                             <StackPanel Visibility="{Binding Data.HasBattery, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
-                                <fa:ImageAwesome Icon="Plug" Width="40" Foreground="{StaticResource AccentBrush}" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                                <TextBlock Text="DIRECT AC POWER" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Desktop configuration detected" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                                <fa:ImageAwesome Icon="Plug" Width="32" Foreground="{StaticResource AccentBrush}" Margin="0,0,0,10"/>
+                                <TextBlock Text="DIRECT AC POWER" FontSize="18" FontWeight="Bold"/>
+                                <TextBlock Text="Desktop configuration detected" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
                             </StackPanel>
 
-                            <!-- Battery Logic -->
                             <StackPanel Visibility="{Binding Data.HasBattery, Converter={StaticResource VisibilityConverter}}">
-                                <Grid Margin="0,0,0,10" HorizontalAlignment="Center">
-                                    <fa:ImageAwesome Icon="BatteryFull" Width="48" Foreground="{StaticResource SuccessBrush}"/>
-                                    <TextBlock Text="{Binding Data.BatteryPercent}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="12" FontWeight="Bold" Margin="0,0,5,0"/>
+                                <Grid Margin="0,0,0,10">
+                                    <fa:ImageAwesome Icon="BatteryFull" Width="32" Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Left"/>
+                                    <TextBlock Text="{Binding Data.BatteryPercent, StringFormat='{}{0}%'}" FontSize="11" FontWeight="Bold" Margin="40,0,0,0" VerticalAlignment="Center"/>
                                 </Grid>
-                                <TextBlock Text="{Binding Data.PowerSource}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                <TextBlock Text="{Binding Data.BatteryStatus}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding Data.PowerSource}" FontSize="18" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding Data.BatteryStatus}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
                             </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- System Status Card -->
+                    <Border Style="{StaticResource StandardCard}" Margin="6,0,0,0" Padding="25">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="THERMAL MARGIN" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                            <Border CornerRadius="20" Padding="20,10" BorderThickness="2">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ThermalStatus}" Value="WARNING">
+                                                <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ThermalStatus}" Value="CRITICAL">
+                                                <Setter Property="BorderBrush" Value="{StaticResource CriticalBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding ThermalStatus}" FontSize="24" FontWeight="Black">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ThermalStatus}" Value="WARNING">
+                                                    <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ThermalStatus}" Value="CRITICAL">
+                                                    <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+                            <TextBlock Text="Intelligence Analysis Active" FontSize="9" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,15,0,0"/>
                         </StackPanel>
                     </Border>
                 </UniformGrid>
 
-                <!-- 3. HCI Intelligence Card (HCI Rule 6: Conceptual Model) -->
+                <!-- 3. Environmental Analysis -->
                 <Border Grid.Row="2" Style="{StaticResource StandardCard}" Padding="25" BorderBrush="{StaticResource InfoBrush}" BorderThickness="0,0,0,4" VerticalAlignment="Top">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -89,13 +163,12 @@
                         <fa:ImageAwesome Icon="LightbulbOutline" Width="24" Foreground="{StaticResource InfoBrush}" VerticalAlignment="Top" Margin="0,2,20,0"/>
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="ENVIRONMENTAL ANALYSIS" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
-                            <TextBlock Text="{Binding ConclusionText}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" TextWrapping="Wrap" LineHeight="22"/>
-                            <TextBlock Text="Based on active power profile and thermal headroom." FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0"/>
+                            <TextBlock Text="{Binding ConclusionText}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" TextWrapping="Wrap" LineHeight="20"/>
                         </StackPanel>
                     </Grid>
                 </Border>
 
-                <!-- Loading Overlay (HCI Rule 7: Status) -->
+                <!-- Loading Overlay -->
                 <Border Grid.RowSpan="3" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}" Margin="-40">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="48" Margin="0,0,0,20"/>

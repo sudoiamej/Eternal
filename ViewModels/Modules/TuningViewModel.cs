@@ -27,6 +27,7 @@ namespace Eternal.ViewModels.Modules
 
         private async Task LoadTweaksAsync()
         {
+            if (IsBusy) return;
             IsBusy = true;
             StatusMessage = "Analyzing system configuration...";
             try
@@ -36,35 +37,54 @@ namespace Eternal.ViewModels.Modules
                 foreach (var t in tweaks) Tweaks.Add(t);
                 StatusMessage = "Analysis complete.";
             }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Analysis failed: {ex.Message}";
+            }
             finally { IsBusy = false; }
         }
 
         [RelayCommand]
         private async Task ToggleTweak(SystemTweak tweak)
         {
-            if (tweak == null) return;
+            if (tweak == null || IsBusy) return;
 
+            IsBusy = true;
             bool success;
-            if (tweak.IsApplied)
-            {
-                StatusMessage = $"Reverting {tweak.Name}...";
-                success = await _tuningService.UndoTweakAsync(tweak.Id);
-            }
-            else
-            {
-                StatusMessage = $"Applying {tweak.Name}...";
-                success = await _tuningService.ApplyTweakAsync(tweak.Id);
-            }
+            bool wasApplied = tweak.IsApplied;
 
-            if (success)
+            try
             {
-                StatusMessage = "Tweak updated successfully.";
-                await LoadTweaksAsync(); // Refresh state
+                if (wasApplied)
+                {
+                    StatusMessage = $"Reverting {tweak.Name}...";
+                    success = await _tuningService.UndoTweakAsync(tweak.Id);
+                }
+                else
+                {
+                    StatusMessage = $"Applying {tweak.Name}...";
+                    success = await _tuningService.ApplyTweakAsync(tweak.Id);
+                }
+
+                if (success)
+                {
+                    tweak.IsApplied = !wasApplied;
+                    StatusMessage = $"{tweak.Name} {(tweak.IsApplied ? "applied" : "reverted")} successfully.";
+                    
+                    // Force a refresh of the individual item state if needed, or reload all
+                    // For now, reload all to be safe and ensure CheckIsApplied runs again
+                    await LoadTweaksAsync();
+                }
+                else
+                {
+                    StatusMessage = "Operation failed. Elevation (Admin) is likely required.";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                StatusMessage = "Failed to update tweak. Elevation may be required.";
+                StatusMessage = $"Error: {ex.Message}";
             }
+            finally { IsBusy = false; }
         }
 
         [RelayCommand]

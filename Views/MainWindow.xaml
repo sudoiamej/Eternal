@@ -46,6 +46,8 @@
         <DataTemplate DataType="{x:Type vmm:TuningViewModel}"><vmv:TuningView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:ConsoleViewModel}"><vmv:ConsoleView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:BootViewModel}"><vmv:BootView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:UserManagementViewModel}"><vmv:UserManagementView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ComponentsViewModel}"><vmv:ComponentsView/></DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -70,8 +72,8 @@
                     <Image Source="/Assets/logo.png" Width="32" HorizontalAlignment="Left" Margin="0,0,0,12"/>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="ETERNAL" FontSize="18" FontWeight="Black" Foreground="{StaticResource TextBrush}"/>
-                        <Border Background="#9B59B6" CornerRadius="2" VerticalAlignment="Center" Margin="6,0,0,0" Padding="4,1">
-                            <TextBlock Text="CREATOR" FontSize="8" FontWeight="Black" Foreground="#FFFFFF"/>
+                        <Border Background="#9B59B6" CornerRadius="3" VerticalAlignment="Center" Margin="8,0,0,0" Padding="5,1">
+                            <TextBlock Text="DEV PREVIEW" FontSize="8" FontWeight="Black" Foreground="#FFFFFF"/>
                         </Border>
                     </StackPanel>
                     <TextBlock Text="SYSTEM INTELLIGENCE" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Opacity="0.6" Margin="0,2,0,0"/>

@@ -52,7 +52,7 @@ namespace Eternal.ViewModels.Modules
             };
 
             var detailWin = new DetailWindow(driver.Name, "DRIVER PROPERTIES", properties);
-            detailWin.Owner = Application.Current.MainWindow;
+            detailWin.Owner = System.Windows.Application.Current.MainWindow;
             detailWin.ShowDialog();
         }
     }

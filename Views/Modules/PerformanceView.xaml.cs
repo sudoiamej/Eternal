@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 namespace Eternal.Views.Modules {
-    public partial class PerformanceView : UserControl {
+    public partial class PerformanceView : System.Windows.Controls.UserControl {
         public PerformanceView() { InitializeComponent(); }
     }
 }

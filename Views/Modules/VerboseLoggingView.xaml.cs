@@ -2,9 +2,9 @@ using System.Windows.Controls;
 
 namespace Eternal.Views.Modules
 {
-    public partial class HardwareView : System.Windows.Controls.UserControl
+    public partial class VerboseLoggingView : System.Windows.Controls.UserControl
     {
-        public HardwareView()
+        public VerboseLoggingView()
         {
             InitializeComponent();
         }

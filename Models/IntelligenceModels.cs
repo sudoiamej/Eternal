@@ -45,11 +45,13 @@ namespace Eternal.Models
         public bool PreloadOnStartup { get; set; } = true;
         public bool IsAdvancedMode { get; set; } = false;
         public string Theme { get; set; } = "Dark";
+        public string ThemeAccentColor { get; set; } = "#9B59B6";
 
         // 1. Telemetry & Performance
         public string PollingProfile { get; set; } = "Balanced"; // Balanced, High, PowerSaver
         public bool RunAtStartup { get; set; } = false;
         public bool MinimizeToTray { get; set; } = false;
+        public string? MachineFingerprint { get; set; }
 
         // 3. Data & Privacy
         public string ExportFolderPath { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);

@@ -17,5 +17,6 @@ namespace Eternal.Models
         public string RegistryValue { get; set; }
         public object AppliedValue { get; set; }
         public object DefaultValue { get; set; }
+        public Microsoft.Win32.RegistryValueKind ValueKind { get; set; } = Microsoft.Win32.RegistryValueKind.DWord;
     }
 }

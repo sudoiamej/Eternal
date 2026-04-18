@@ -36,11 +36,11 @@ namespace Eternal.ViewModels.Modules
                 string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), $"Eternal_Report_{DateTime.Now:yyyyMMdd_HHmmss}.json");
                 
                 File.WriteAllText(path, json);
-                MessageBox.Show($"Report generated successfully on Desktop:\n{path}");
+                System.Windows.MessageBox.Show($"Report generated successfully on Desktop:\n{path}");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to generate report: {ex.Message}");
+                System.Windows.MessageBox.Show($"Failed to generate report: {ex.Message}");
             }
         }
     }

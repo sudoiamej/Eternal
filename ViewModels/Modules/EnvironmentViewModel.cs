@@ -35,7 +35,7 @@ namespace Eternal.ViewModels.Modules
         private async Task UpdateVariable(EnvVar var)
         {
             // Simplified UI logic for prompt
-            MessageBox.Show($"Editing {var.Name}. Feature coming in full build.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            System.Windows.MessageBox.Show($"Editing {var.Name}. Feature coming in full build.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

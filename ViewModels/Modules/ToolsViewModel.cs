@@ -19,42 +19,42 @@ namespace Eternal.ViewModels.Modules
         private async Task FlushDns()
         {
             bool success = await _toolkitService.FlushDnsAsync();
-            MessageBox.Show(success ? "DNS Cache Flushed Successfully" : "Failed to Flush DNS");
+            System.Windows.MessageBox.Show(success ? "DNS Cache Flushed Successfully" : "Failed to Flush DNS");
         }
 
         [RelayCommand]
         private async Task ClearTemp()
         {
             long bytes = await _toolkitService.ClearTempFilesAsync();
-            MessageBox.Show($"Cleared {(bytes / 1024 / 1024)} MB of temporary files.");
+            System.Windows.MessageBox.Show($"Cleared {(bytes / 1024 / 1024)} MB of temporary files.");
         }
 
         [RelayCommand]
         private async Task RebuildIcons()
         {
             bool success = await _toolkitService.RebuildIconCacheAsync();
-            MessageBox.Show(success ? "Icon Cache Rebuild Triggered" : "Failed to rebuild cache. Ensure you have proper permissions.");
+            System.Windows.MessageBox.Show(success ? "Icon Cache Rebuild Triggered" : "Failed to rebuild cache. Ensure you have proper permissions.");
         }
 
         [RelayCommand]
         private async Task ResetNetwork()
         {
             bool success = await _toolkitService.ResetNetworkStackAsync();
-            MessageBox.Show(success ? "Network Stack Reset. A system restart is highly recommended." : "Operation cancelled or failed.");
+            System.Windows.MessageBox.Show(success ? "Network Stack Reset. A system restart is highly recommended." : "Operation cancelled or failed.");
         }
 
         [RelayCommand]
         private async Task RepairSystemFiles()
         {
             bool success = await _toolkitService.RunSfcScanAsync();
-            MessageBox.Show(success ? "System File Checker Completed." : "Operation cancelled or failed.");
+            System.Windows.MessageBox.Show(success ? "System File Checker Completed." : "Operation cancelled or failed.");
         }
 
         [RelayCommand]
         private async Task RunDism()
         {
             bool success = await _toolkitService.RunDismRepairAsync();
-            MessageBox.Show(success ? "DISM Restore Health Completed." : "Operation cancelled or failed.");
+            System.Windows.MessageBox.Show(success ? "DISM Restore Health Completed." : "Operation cancelled or failed.");
         }
     }
 }

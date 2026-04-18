@@ -3,7 +3,7 @@ using Eternal.Views;
 
 namespace Eternal
 {
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         protected override async void OnStartup(StartupEventArgs e)
         {

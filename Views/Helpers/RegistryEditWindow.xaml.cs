@@ -47,7 +47,7 @@ namespace Eternal.Views.Helpers
             }
             catch
             {
-                MessageBox.Show("Invalid input format for the selected registry type.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show("Invalid input format for the selected registry type.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

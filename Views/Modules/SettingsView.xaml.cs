@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 namespace Eternal.Views.Modules {
-    public partial class SettingsView : UserControl {
+    public partial class SettingsView : System.Windows.Controls.UserControl {
         public SettingsView() { InitializeComponent(); }
     }
 }

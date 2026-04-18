@@ -23,17 +23,15 @@ namespace Eternal.ViewModels.Modules
         {
             _loggingService = loggingService;
             
-            // 1. Initial Load of buffered app logs (Sort Newest First)
-            var initialLogs = _loggingService.Logs.OrderByDescending(l => l.Timestamp);
-            foreach (var log in initialLogs)
-            {
-                LogEntries.Add(log);
-            }
+            RefreshLogs();
 
             // 2. Real-time Log Stream
             _loggingService.NewLogAdded += (s, entry) =>
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                var app = System.Windows.Application.Current;
+                if (app == null) return;
+
+                app.Dispatcher.Invoke(() =>
                 {
                     // Always keep stream at top
                     LogEntries.Insert(0, entry);
@@ -49,6 +47,16 @@ namespace Eternal.ViewModels.Modules
             });
         }
 
+        public void RefreshLogs()
+        {
+            LogEntries.Clear();
+            var initialLogs = _loggingService.Logs.OrderByDescending(l => l.Timestamp);
+            foreach (var log in initialLogs)
+            {
+                LogEntries.Add(log);
+            }
+        }
+
         [RelayCommand]
         public async Task LoadSystemLogsAsync()
         {
@@ -60,7 +68,10 @@ namespace Eternal.ViewModels.Modules
                 // Fetch deep system events (Win Event Viewer)
                 var systemLogs = await _loggingService.GetSystemEventsAsync(500);
                 
-                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                var app = System.Windows.Application.Current;
+                if (app == null) return;
+
+                await app.Dispatcher.InvokeAsync(() =>
                 {
                     // Merge and unique-ify based on message + timestamp
                     var currentMessages = new HashSet<string>(LogEntries.Select(l => $"{l.Timestamp.Ticks}_{l.Message}"));

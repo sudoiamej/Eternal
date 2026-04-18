@@ -11,7 +11,7 @@ namespace Eternal.Services.System
         private PerformanceCounter _cpuCounter;
         private PerformanceCounter _diskCounter;
         private bool _isInitialized = false;
-        private Timer _pollingTimer;
+        private global::System.Threading.Timer _pollingTimer;
         private int _isUpdating = 0;
 
         public event EventHandler<PerformanceSnapshot> Updated;
@@ -34,7 +34,7 @@ namespace Eternal.Services.System
         public void StartPolling()
         {
             if (_pollingTimer != null) return;
-            _pollingTimer = new Timer(async _ => await DoUpdateAsync(), null, 0, 1000);
+            _pollingTimer = new global::System.Threading.Timer(async _ => await DoUpdateAsync(), null, 0, 1000);
         }
 
         public void StopPolling()

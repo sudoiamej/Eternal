@@ -217,9 +217,9 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Workflow & Creator Toolkit -->
-                        <StackPanel Grid.Column="0" Margin="0,0,15,0">
-                            <TextBlock Text="CREATOR SUITE &amp; WORKFLOW" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                        <!-- Workflow & Dev Preview Toolkit -->
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="DEV PREVIEW SUITE &amp; WORKFLOW" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
                             <Border Style="{StaticResource StandardCard}" Padding="20">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding DataContext.IsDevModeEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 

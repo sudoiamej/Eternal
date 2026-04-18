@@ -14,6 +14,8 @@ using Eternal.Services.Storage;
 using Eternal.Services.Network;
 using Eternal.Models;
 using Eternal.ViewModels.Modules;
+using System.Windows;
+using System.Windows.Media;
 
 namespace Eternal.ViewModels
 {
@@ -40,6 +42,7 @@ namespace Eternal.ViewModels
         private readonly IBootService _bootService;
         private readonly ICreatorService _creatorService;
         private readonly IRegistryService _registryService;
+        private readonly IUserGroupService _userGroupService;
         private DispatcherTimer _statusTimer;
 
         // Persistent ViewModels
@@ -64,10 +67,14 @@ namespace Eternal.ViewModels
         private ThermalViewModel _thermalVm;
         private EnvironmentViewModel _envVm;
         private VerboseLoggingViewModel _logsVm;
+        private UserManagementViewModel _userVm;
+        private ComponentsViewModel _componentsVm;
 
         [ObservableProperty] private string _title = "Eternal System Intelligence";
         [ObservableProperty] private ObservableObject _currentView;
         [ObservableProperty] private bool _isAdvancedMode = false;
+        
+        public AppSettings Settings => _settingsService.Current;
         [ObservableProperty] private bool _isDevModeEnabled = false;
         [ObservableProperty] private bool _isDevHostEnabled = false;
         [ObservableProperty] private bool _isRansomGuardEnabled = false;
@@ -145,9 +152,10 @@ namespace Eternal.ViewModels
             _bootService = new WindowsBootService();
             _creatorService = new WindowsCreatorService();
             _registryService = new WindowsRegistryService();
+            _userGroupService = new WindowsUserGroupService();
 
             _loggingService.Log("Eternal System Intelligence Initialized.");
-            _loggingService.Log($"Creator Suite Version 2.5.0-M1");
+            _loggingService.Log($"Dev Preview Suite Version 2.5.0-M1");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
             _settingsService.SettingsChanged += (s, settings) => IsAdvancedMode = settings.IsAdvancedMode;
@@ -202,6 +210,7 @@ namespace Eternal.ViewModels
                 {
                     new NavigationItem("Hardware", "Microchip", "Hardware"),
                     new NavigationItem("Thermal", "ThermometerThreeQuarters", "Thermal"),
+                    new NavigationItem("Components", "Laptop", "Components"),
                     new NavigationItem("BIOS / UEFI", "InfoCircle", "Bios"),
                     new NavigationItem("Boot Records", "List", "Boot"),
                     new NavigationItem("Storage", "HddOutline", "Storage")
@@ -212,6 +221,7 @@ namespace Eternal.ViewModels
                     new NavigationItem("Processes", "Tasks", "Processes"),
                     new NavigationItem("Performance", "LineChart", "Performance"),
                     new NavigationItem("Services", "Server", "Services"),
+                    new NavigationItem("User Accounts", "Users", "Users"),
                     new NavigationItem("Network", "Globe", "Network"),
                     new NavigationItem("Security", "Shield", "Security"),
                     new NavigationItem("Drivers", "ListAlt", "Drivers"),
@@ -231,6 +241,27 @@ namespace Eternal.ViewModels
             // Set initial view
             Navigate("Dashboard");
             RefreshPortsCommand.Execute(null);
+
+            ApplyThemeColor();
+        }
+
+        public void ApplyThemeColor()
+        {
+            try
+            {
+                var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(Settings.ThemeAccentColor);
+                System.Windows.Application.Current.Resources["AccentColor"] = color;
+                System.Windows.Application.Current.Resources["AccentBrush"] = new System.Windows.Media.SolidColorBrush(color);
+
+                // Create a slightly lighter secondary color
+                var secondary = System.Windows.Media.Color.FromArgb(color.A, 
+                    (byte)Math.Min(255, color.R + 30), 
+                    (byte)Math.Min(255, color.G + 30), 
+                    (byte)Math.Min(255, color.B + 30));
+                System.Windows.Application.Current.Resources["AccentSecondaryColor"] = secondary;
+                System.Windows.Application.Current.Resources["AccentSecondaryBrush"] = new System.Windows.Media.SolidColorBrush(secondary);
+            }
+            catch { }
         }
 
         [RelayCommand]
@@ -238,7 +269,7 @@ namespace Eternal.ViewModels
         {
             var result = await _creatorService.ToggleDevModeAsync(IsDevModeEnabled);
             _loggingService.Log(result.Message);
-            System.Windows.MessageBox.Show(result.Message, "Creator Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            System.Windows.MessageBox.Show(result.Message, "Dev Preview Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
 
         [RelayCommand]
@@ -246,7 +277,7 @@ namespace Eternal.ViewModels
         {
             var result = await _creatorService.ApplyServiceProfileAsync("Absolute Silence");
             _loggingService.Log(result.Message);
-            System.Windows.MessageBox.Show(result.Message, "Creator Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            System.Windows.MessageBox.Show(result.Message, "Dev Preview Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
 
         [RelayCommand]
@@ -265,7 +296,7 @@ namespace Eternal.ViewModels
             {
                 var result = await _creatorService.IdentifyAndKillFileHandleAsync(dialog.FileName);
                 _loggingService.Log(result.Message);
-                System.Windows.MessageBox.Show(result.Message, "Creator Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                System.Windows.MessageBox.Show(result.Message, "Dev Preview Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             }
         }
 
@@ -330,7 +361,10 @@ namespace Eternal.ViewModels
             _performanceService.StartPolling();
             _performanceService.Updated += (s, snap) => 
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() => 
+                var app = System.Windows.Application.Current;
+                if (app == null) return;
+
+                app.Dispatcher.Invoke(() => 
                 {
                     CpuUsage = $"{snap.CpuUsage:F0}%";
                     RamUsage = $"{snap.RamUsage:F0}%";
@@ -378,6 +412,8 @@ namespace Eternal.ViewModels
             _tuningVm = new TuningViewModel(_tuningService);
             _consoleVm = new ConsoleViewModel(_consoleService);
             _bootVm = new BootViewModel(_bootService);
+            _userVm = new UserManagementViewModel(_userGroupService);
+            _componentsVm = new ComponentsViewModel();
         }
 
         public async Task PreloadAllDataAsync()
@@ -422,6 +458,7 @@ namespace Eternal.ViewModels
             // Deactivate current view if applicable
             if (CurrentView is ThermalViewModel oldThermal) oldThermal.Deactivate();
             else if (CurrentView is NetworkViewModel oldNetwork) oldNetwork.Deactivate();
+            else if (CurrentView is ComponentsViewModel oldComponents) oldComponents.Suspend();
 
             UpdateNavigationSelection(viewName);
 
@@ -473,7 +510,14 @@ namespace Eternal.ViewModels
                 case "Help": OpenHelpWindow(); break;
                 case "PeMode": CurrentView = new PEModeViewModel(_hardwareService, IsPeMode); break;
                 case "Settings": CurrentView = _settingsVm; break;
-                case "Logs": CurrentView = _logsVm; break;
+                case "Logs": 
+                    CurrentView = _logsVm; 
+                    _logsVm.RefreshLogs();
+                    break;
+                case "Users":
+                    CurrentView = _userVm;
+                    await _userVm.LoadDataCommand.ExecuteAsync(null);
+                    break;
                 case "Tuning": 
                     CurrentView = _tuningVm; 
                     await _tuningVm.LoadTweaksCommand.ExecuteAsync(null);
@@ -481,6 +525,10 @@ namespace Eternal.ViewModels
                 case "Console": 
                     CurrentView = _consoleVm; 
                     await _consoleVm.StartConsoleCommand.ExecuteAsync(null);
+                    break;
+                case "Components":
+                    CurrentView = _componentsVm;
+                    _componentsVm.Resume();
                     break;
             }
         }

@@ -54,7 +54,7 @@ namespace Eternal.ViewModels.Modules
             };
 
             var detailWin = new DetailWindow(service.DisplayName, "SERVICE PROPERTIES", properties);
-            detailWin.Owner = Application.Current.MainWindow;
+            detailWin.Owner = System.Windows.Application.Current.MainWindow;
             detailWin.ShowDialog();
         }
     }

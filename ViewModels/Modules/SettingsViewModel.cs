@@ -17,26 +17,34 @@ namespace Eternal.ViewModels.Modules
         private readonly ILoggingService _loggingService;
 
         [ObservableProperty] private AppSettings _settings;
-        [ObservableProperty] private string _appVersion = "2.5.0-M1";
+        [ObservableProperty] private string _appVersion = "2.5.0-M2";
         [ObservableProperty] private string _lastScanTime = "N/A";
+        [ObservableProperty] private string _machineId = "Unknown";
 
         public SettingsViewModel(MainViewModel main, ISettingsService settingsService)
         {
             Main = main;
             _settingsService = settingsService;
             Settings = _settingsService.Current;
-            
-            // Try to resolve logging service from Main if possible, or just skip for now 
-            // In a real app we'd use DI, but here we can try to find it or pass it.
-            // Since we don't have easy DI here, let's just use it if we can.
-        }
 
+            // Generate/Fetch Fingerprint
+            var fingerprintService = new MachineFingerprintService();
+            MachineId = fingerprintService.GetFingerprint();
+            Settings.MachineFingerprint = MachineId;
+        }
         [RelayCommand]
         private void SaveConfig()
         {
             UpdateStartupRegistration();
             _settingsService.Save();
-            MessageBox.Show("Configuration saved successfully to local app data.", "Settings", MessageBoxButton.OK, MessageBoxImage.Information);
+            System.Windows.MessageBox.Show("Configuration saved successfully to local app data.", "Settings", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        [RelayCommand]
+        private void SetThemeColor(string hexColor)
+        {
+            Settings.ThemeAccentColor = hexColor;
+            Main.ApplyThemeColor();
         }
 
         [RelayCommand]
@@ -52,10 +60,12 @@ namespace Eternal.ViewModels.Modules
             Settings.ExportFolderPath = defaults.ExportFolderPath;
             Settings.WmiTimeoutSeconds = defaults.WmiTimeoutSeconds;
             Settings.IsVerboseLoggingEnabled = defaults.IsVerboseLoggingEnabled;
+            Settings.ThemeAccentColor = defaults.ThemeAccentColor;
             
+            Main.ApplyThemeColor();
             UpdateStartupRegistration();
             _settingsService.Save();
-            MessageBox.Show("Settings restored to factory defaults.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+            System.Windows.MessageBox.Show("Settings restored to factory defaults.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         [RelayCommand]

@@ -125,7 +125,7 @@ namespace Eternal.ViewModels.Modules
             };
 
             var detailWin = new DetailWindow("Trust Score Analysis", "INTELLIGENCE BRIEF", properties);
-            detailWin.Owner = Application.Current.MainWindow;
+            detailWin.Owner = System.Windows.Application.Current.MainWindow;
             detailWin.ShowDialog();
         }
 
@@ -136,13 +136,13 @@ namespace Eternal.ViewModels.Modules
         private async Task CleanTemp()
         {
             long bytes = await _toolkitService.ClearTempFilesAsync();
-            MessageBox.Show($"Cleaned {(bytes / 1024 / 1024)} MB of temporary files.", "HCI Feedback", MessageBoxButton.OK, MessageBoxImage.Information);
+            System.Windows.MessageBox.Show($"Cleaned {(bytes / 1024 / 1024)} MB of temporary files.", "HCI Feedback", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         [RelayCommand]
         private void ExportBrief()
         {
-            MessageBox.Show("Brief export feature is integrated into the Reports module.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            System.Windows.MessageBox.Show("Brief export feature is integrated into the Reports module.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

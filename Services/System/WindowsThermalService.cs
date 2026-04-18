@@ -12,7 +12,16 @@ namespace Eternal.Services.System
         Task<ThermalSnapshot> GetThermalDataAsync();
     }
 
-    public record ThermalSnapshot(double CpuTemp, string PowerSource, int BatteryPercent, string BatteryStatus, bool HasBattery);
+    public record ThermalSnapshot(
+        double CpuTemp, 
+        double GpuTemp, 
+        double CpuPower, 
+        double CpuVoltage,
+        double FanSpeed,
+        string PowerSource, 
+        int BatteryPercent, 
+        string BatteryStatus, 
+        bool HasBattery);
 
     public class WindowsThermalService : IThermalService, IDisposable
     {
@@ -27,13 +36,18 @@ namespace Eternal.Services.System
         {
             return Task.Run(() =>
             {
-                double maxTemp = -1;
+                double cpuTemp = -1;
+                double gpuTemp = -1;
+                double cpuPower = 0;
+                double cpuVoltage = 0;
+                double fanSpeed = 0;
                 
                 try
                 {
                     _libreService.Update();
                     foreach (IHardware hardware in _libreService.Computer.Hardware)
                     {
+                        // CPU Telemetry
                         if (hardware.HardwareType == HardwareType.Cpu)
                         {
                             foreach (ISensor sensor in hardware.Sensors)
@@ -41,11 +55,39 @@ namespace Eternal.Services.System
                                 if (sensor.SensorType == SensorType.Temperature)
                                 {
                                     if (sensor.Name.Contains("Core Max") || sensor.Name.Contains("Package"))
-                                    {
-                                        maxTemp = sensor.Value ?? maxTemp;
-                                        break; 
-                                    }
-                                    if (maxTemp == -1) maxTemp = sensor.Value ?? maxTemp;
+                                        cpuTemp = sensor.Value ?? cpuTemp;
+                                    else if (cpuTemp == -1) cpuTemp = sensor.Value ?? cpuTemp;
+                                }
+                                else if (sensor.SensorType == SensorType.Power && (sensor.Name.Contains("Package") || sensor.Name.Contains("Total")))
+                                {
+                                    cpuPower = sensor.Value ?? cpuPower;
+                                }
+                                else if (sensor.SensorType == SensorType.Voltage && sensor.Name.Contains("Core"))
+                                {
+                                    cpuVoltage = sensor.Value ?? cpuVoltage;
+                                }
+                            }
+                        }
+                        // GPU Telemetry
+                        else if (hardware.HardwareType == HardwareType.GpuNvidia || hardware.HardwareType == HardwareType.GpuAmd || hardware.HardwareType == HardwareType.GpuIntel)
+                        {
+                            foreach (ISensor sensor in hardware.Sensors)
+                            {
+                                if (sensor.SensorType == SensorType.Temperature && sensor.Name.Contains("Core"))
+                                    gpuTemp = sensor.Value ?? gpuTemp;
+                                else if (sensor.SensorType == SensorType.Fan)
+                                    fanSpeed = sensor.Value ?? fanSpeed;
+                            }
+                        }
+                        // Motherboard/LPC Fans
+                        else if (hardware.HardwareType == HardwareType.Motherboard)
+                        {
+                            foreach (var subHardware in hardware.SubHardware)
+                            {
+                                foreach (var sensor in subHardware.Sensors)
+                                {
+                                    if (sensor.SensorType == SensorType.Fan && fanSpeed == 0)
+                                        fanSpeed = sensor.Value ?? fanSpeed;
                                 }
                             }
                         }
@@ -79,7 +121,7 @@ namespace Eternal.Services.System
                     status = "No Battery Detected";
                 }
 
-                return new ThermalSnapshot(maxTemp, power, bat, status, hasBattery);
+                return new ThermalSnapshot(cpuTemp, gpuTemp, cpuPower, cpuVoltage, fanSpeed, power, bat, status, hasBattery);
             });
         }
 

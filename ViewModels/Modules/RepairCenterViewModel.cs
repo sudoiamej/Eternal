@@ -142,7 +142,7 @@ namespace Eternal.ViewModels.Modules
                 }
 
                 StatusMessage = success ? "Repair completed successfully." : "Repair failed or requires elevation.";
-                MessageBox.Show(success ? "Eternal Doctor has finished the repair. A restart may be required." : "The repair could not be completed automatically.", "HCI Diagnosis Results", MessageBoxButton.OK, success ? MessageBoxImage.Information : MessageBoxImage.Warning);
+                System.Windows.MessageBox.Show(success ? "Eternal Doctor has finished the repair. A restart may be required." : "The repair could not be completed automatically.", "HCI Diagnosis Results", MessageBoxButton.OK, success ? MessageBoxImage.Information : MessageBoxImage.Warning);
             }
             finally { IsBusy = false; }
         }

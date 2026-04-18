@@ -59,12 +59,12 @@ namespace Eternal.ViewModels.Modules
         {
             if (!_isInPeMode)
             {
-                MessageBox.Show($"Access Denied: '{toolName}' is a destructive recovery tool and can ONLY be executed within a native Windows PE or RE environment.\n\nPlease boot into Advanced Startup Options to use this tool.", 
+                System.Windows.MessageBox.Show($"Access Denied: '{toolName}' is a destructive recovery tool and can ONLY be executed within a native Windows PE or RE environment.\n\nPlease boot into Advanced Startup Options to use this tool.", 
                                 "HCI Safety Enforcement", MessageBoxButton.OK, MessageBoxImage.Stop);
                 return;
             }
 
-            MessageBox.Show($"Initializing {toolName}...", "PE Mode Action", MessageBoxButton.OK, MessageBoxImage.Information);
+            System.Windows.MessageBox.Show($"Initializing {toolName}...", "PE Mode Action", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

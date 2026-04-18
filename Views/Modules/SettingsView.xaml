@@ -11,6 +11,43 @@
             <StackPanel>
                 <TextBlock Text="Application Settings" Style="{StaticResource H1}"/>
 
+                <!-- 0. Appearance & Theme -->
+                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="APPEARANCE &amp; THEME" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+
+                        <TextBlock Text="System Accent Color" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Margin="0,0,0,10"/>
+                        <TextBlock Text="Choose a primary color for the application interface." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+
+                        <UniformGrid Columns="8" HorizontalAlignment="Left">
+                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#9B59B6">
+                                <Border Width="20" Height="20" Background="#9B59B6" CornerRadius="10"/>
+                            </Button>
+                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#3498DB">
+                                <Border Width="20" Height="20" Background="#3498DB" CornerRadius="10"/>
+                            </Button>
+                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#2ECC71">
+                                <Border Width="20" Height="20" Background="#2ECC71" CornerRadius="10"/>
+                            </Button>
+                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#E74C3C">
+                                <Border Width="20" Height="20" Background="#E74C3C" CornerRadius="10"/>
+                            </Button>
+                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#F1C40F">
+                                <Border Width="20" Height="20" Background="#F1C40F" CornerRadius="10"/>
+                            </Button>
+                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#E67E22">
+                                <Border Width="20" Height="20" Background="#E67E22" CornerRadius="10"/>
+                            </Button>
+                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#1ABC9C">
+                                <Border Width="20" Height="20" Background="#1ABC9C" CornerRadius="10"/>
+                            </Button>
+                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#607D8B">
+                                <Border Width="20" Height="20" Background="#607D8B" CornerRadius="10"/>
+                            </Button>
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+
                 <!-- 1. Telemetry & Performance -->
                 <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
                     <StackPanel>
@@ -122,15 +159,28 @@
                 <!-- About Section -->
                 <Border Style="{StaticResource StandardCard}" Margin="0,0,0,30">
                     <StackPanel>
-                        <TextBlock Text="ABOUT Eternal" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
-                        <TextBlock Text="Version: 2.5.0 (Milestone 1)" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                        <TextBlock Text="Compatible with: Windows 10 &amp; 11 ONLY" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock Text="ABOUT ETERNAL" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{Binding AppVersion, StringFormat='Version: {0}'}" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="Compatible with: Windows 10 &amp; 11 (64-bit)" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Right">
+                                <TextBlock Text="MACHINE FINGERPRINT" Style="{StaticResource Caption}" FontSize="8" HorizontalAlignment="Right"/>
+                                <TextBlock Text="{Binding MachineId}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource AccentBrush}" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </Border>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="Reset Defaults" Command="{Binding ResetDefaultsCommand}" Style="{StaticResource IconButton}" Padding="20,10" Margin="0,0,10,0"/>
-                    <Button Content="Save Configuration" Command="{Binding SaveConfigCommand}" Style="{StaticResource PrimaryAction}" Padding="20,10"/>
+                    <Button Command="{Binding SaveConfigCommand}" Style="{StaticResource PrimaryAction}" Padding="25,10">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="Save" Width="12" Margin="0,0,10,0" Foreground="White"/>
+                            <TextBlock Text="COMMIT SETTINGS" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
