@@ -1,4 +1,4 @@
-# Eternal System Intelligence (Creator Plus v2.5.0-M1)
+# Eternal System Intelligence (Dev Preview v2.5.0-M2)
 
 ![Eternal Banner](Assets/logo.png)
 

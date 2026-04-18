@@ -54,17 +54,16 @@ For system administrators and developers, Eternal is a "Forensic Utility."
 VERSION: 2.5.0 "Milestone 2" | © 2026 ETERNAL ANALYTICS
 ================================================================================
 
-5. NEW FEATURES (CREATOR PLUS UPDATE)
--------------------------------------
-- Guardian Tuning (Debloater): A powerful optimization suite allowing users to 
-  disable Telemetry, Bing Search, and Cortana via categorized registry tweaks. 
-  Includes mandatory System Restore Point integration for safety.
-- Eternal Console: An integrated PowerShell/CMD environment with "Macro Blocks" 
-  for one-click execution of complex diagnostic commands (Network status, 
-  Process trees, etc.).
-- Headless CLI: Advanced users can now run Eternal via command line (e.g., 
-  --report, --debloat) for automated system maintenance and forensic gathering 
-  without a GUI.
-  - Boot Architecture: Forensic-level enumeration of Windows Boot Configuration 
-  Data (BCD) records, displaying identifiers, devices, and paths for boot 
-  managers and loaders.
+5. NEW FEATURES (DEV PREVIEW UPDATE)
+------------------------------------
+- Components Diagnostics: A professional-grade hardware testing suite for 
+  verifying Camera feed, Keyboard NKRO, Input precision (Mouse/Touch), and 
+  USB bus activity in real-time.
+- Thermal Intelligence Plus: Expanded telemetry including GPU core thermals, 
+  CPU wattage/voltage tracking, and logical thermal status analysis.
+- Guardian Tuning: A powerful optimization suite for disabling OS telemetry, 
+  Bing Search, and Cortana via categorized registry tweaks.
+- Eternal Console: Integrated PowerShell environment with diagnostic macro 
+  support for rapid system audits.
+- Custom Thematics: Users can now personalize the application interface with 
+  selectable accent colors that persist across sessions.

@@ -1,48 +1,54 @@
 ETERNAL SYSTEM INTELLIGENCE - RELEASE NOTES
-Version: 2.5.0 (Milestone 1)
-Edition: CREATOR PLUS
-Build Date: April 16, 2026
+Version: 2.5.0 (Milestone 2)
+Edition: DEV PREVIEW
+Build Date: April 18, 2026
 
 --------------------------------------------------------------------------------
 OVERVIEW
 --------------------------------------------------------------------------------
-Milestone 1 of the 2.5.0 cycle introduces the "Registry Intelligence" suite,
-providing unprecedented transparency and safety for low-level system configuration.
-This update also features a significant overhaul of the Intelligence Dashboard
-and improved resource resilience.
+Milestone 2 introduces "Components Diagnostics," a professional hardware testing 
+suite. This update also transitions the platform to the modern Windows 26100 SDK, 
+adds custom thematic branding, and significantly expands Thermal Intelligence 
+with detailed GPU and power telemetry.
 
 --------------------------------------------------------------------------------
 NEW FEATURES & ARCHITECTURAL ENHANCEMENTS
 --------------------------------------------------------------------------------
 
-[REGISTRY INTELLIGENCE] - NEW MODULE
-- SURGICAL UNDO VAULT: Automated, real-time backups for every registry change.
-  Users can instantly revert modifications from a dedicated recovery panel.
-- DRIFT WATCHLIST: Continuous monitoring of high-value registry paths (Startup,
-  Shell Extensions). Visual alerts trigger when background drift is detected.
-- BINARY PROVENANCE: The engine now identifies the "Owner" of registry keys,
-  resolving GUIDs and paths back to their originating publisher and binary.
-- VERSION-AWARE TWEAKS: Intelligent presets now automatically detect and 
-  badge compatibility for Windows 10 vs. Windows 11.
+[COMPONENTS DIAGNOSTICS] - NEW MODULE
+- HIGH-PERFORMANCE CAMERA: Low-level frame reader utilizing direct memory 
+  copying (Bgr32) for smooth, real-time sensor verification.
+- KEYBOARD NKRO VISUALIZER: Scaled, row-based physical layout for testing 
+  anti-ghosting and N-Key Rollover limits.
+- INTERACTIVE INPUT CANVAS: Precision path-plotting for Mouse, Touchpad, and 
+  Touchscreen accuracy diagnostics.
+- USB EVENT TRACKER: Real-time monitoring of the USB bus via WMI, logging 
+  peripheral connection/disconnection events.
 
-[INTELLIGENCE DASHBOARD] - UI OVERHAUL
-- HCI REFINEMENT: Layout restructured based on HCI principles (Affordances,
-  Signifiers, Mapping) to reduce cognitive load and improve readability.
-- SYSTEM PULSE: Enhanced focal health card with interactive detailed breakdown.
-- COMPONENT GROUPING: Unified toolkits into "Creator Suite" and "Security Hunter"
-  cards for better intent-based navigation.
+[THERMAL INTELLIGENCE] - EXPANDED TELEMETRY
+- GPU INSIGHTS: Integrated Graphics telemetry for NVIDIA/AMD/Intel hardware.
+- POWER & VOLTAGE: Live tracking of CPU Package Power (W) and Core Voltage (V).
+- LOGICAL ANALYSIS: Intelligent thermal status engine that flags anomalies 
+  (Throttling, High Drain) in plain language.
 
-[STABILITY & RESILIENCE]
-- PACK URI ENFORCEMENT: Modernized resource dictionary loading with explicit 
-  pack URIs to prevent StaticResource resolution failures during startup.
-- ICON COMPATIBILITY: Standardized FontAwesome naming conventions to ensure
-  full stability with the WPF 4.7 asset library.
-- ERROR RECOVERY: Redesigned the splash screen and error handling to provide
-  better diagnostic transparency during the boot sequence.
+[APPEARANCE & BRANDING]
+- DEV PREVIEW REBRANDING: Unified branding overhaul across splash screens, 
+  headers, and log sequences.
+- CUSTOM ACCENT COLORS: User-selectable theme colors with instant application 
+  and session persistence via AppSettings.
+- DATAGRID REFINEMENT: Overhauled global DataGrid styles for perfect dark-mode 
+  readability and consistent header contrast.
+
+[CORE ARCHITECTURE]
+- SDK EVOLUTION: Upgraded target framework to .NET 10 with Windows 10.0.26100 
+  support for native WinRT projection stability.
+- SMART SUSPENSION: Components and sensors now automatically suspend when the 
+  application is out of focus or minimized to reduce background resource drain.
 
 --------------------------------------------------------------------------------
 PREVIOUS VERSIONS
 --------------------------------------------------------------------------------
-Version: 2.0.0
-Build Date: April 15, 2026
-... (Previous notes retained) ...
+Version: 2.5.0 (Milestone 1)
+Build Date: April 16, 2026
+OVERVIEW: Milestone 1 introduced Registry Intelligence and UI Overhaul.
+... (Previous notes retained in archive) ...
