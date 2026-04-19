@@ -57,5 +57,16 @@ namespace Eternal.Models
         public string ExportFolderPath { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         public int WmiTimeoutSeconds { get; set; } = 10;
         public bool IsVerboseLoggingEnabled { get; set; } = true;
+
+        // 4. App Updates
+        public bool IsAutoUpdateEnabled { get; set; } = false;
+        public DateTime? LastUpdateCheck { get; set; }
+
+        // 5. Entry Lock
+        public bool IsStartupLockEnabled { get; set; } = false;
+        public string StartupLockPin { get; set; } = "120076";
+        public DateTime? LockoutEnd { get; set; }
+        public int FailedAttemptsCount { get; set; } = 0;
+        public int CurrentLockoutMinutes { get; set; } = 0;
     }
 }

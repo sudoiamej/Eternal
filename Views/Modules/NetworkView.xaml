@@ -23,7 +23,7 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                             <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                             <TextBlock Text="CONNECTIVITY TELEMETRY" Style="{StaticResource Caption}"/>
                         </StackPanel>
@@ -31,7 +31,7 @@
                     </StackPanel>
                     <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,5">
                         <Button Command="{Binding LoadCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Scan Network Map">
-                            <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -51,7 +51,7 @@
                                 <RowDefinition Height="60"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                                <fa:ImageAwesome Icon="Download" Width="14" Foreground="{StaticResource SuccessBrush}" Margin="0,0,10,0"/>
+                                <fa:ImageAwesome Icon="Download" Width="14" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                 <TextBlock Text="DOWNLOAD THROUGHPUT" Style="{StaticResource Caption}"/>
                             </StackPanel>
                             <TextBlock Grid.Row="1" Text="{Binding DownloadMbps, StringFormat='{}{0:F2} Mbps'}" FontSize="28" FontWeight="Black" Margin="0,0,0,15"/>
@@ -65,7 +65,7 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="{StaticResource SuccessBrush}" Opacity="0.4" Margin="0.5,0" VerticalAlignment="Bottom">
+                                        <Border Background="{DynamicResource SuccessBrush}" Opacity="0.4" Margin="0.5,0" VerticalAlignment="Bottom">
                                             <Border.Style>
                                                 <Style TargetType="Border">
                                                     <Setter Property="Height" Value="{Binding}"/>
@@ -96,7 +96,7 @@
                                 <RowDefinition Height="60"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                                <fa:ImageAwesome Icon="Upload" Width="14" Foreground="{StaticResource InfoBrush}" Margin="0,0,10,0"/>
+                                <fa:ImageAwesome Icon="Upload" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                 <TextBlock Text="UPLOAD THROUGHPUT" Style="{StaticResource Caption}"/>
                             </StackPanel>
                             <TextBlock Grid.Row="1" Text="{Binding UploadMbps, StringFormat='{}{0:F2} Mbps'}" FontSize="28" FontWeight="Black" Margin="0,0,0,15"/>
@@ -110,7 +110,7 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="{StaticResource InfoBrush}" Opacity="0.4" Margin="0.5,0" VerticalAlignment="Bottom">
+                                        <Border Background="{DynamicResource InfoBrush}" Opacity="0.4" Margin="0.5,0" VerticalAlignment="Bottom">
                                             <Border.Style>
                                                 <Style TargetType="Border">
                                                     <Setter Property="Height" Value="{Binding}"/>
@@ -140,19 +140,19 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource StandardCard}" Margin="0,0,10,10" Height="90" BorderBrush="{StaticResource AccentBrush}" BorderThickness="0,0,0,3">
+                                <Border Style="{StaticResource StandardCard}" Margin="0,0,10,10" Height="90" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0,0,0,3">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <fa:ImageAwesome Icon="Globe" Width="20" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Top" Margin="0,4,15,0"/>
+                                        <fa:ImageAwesome Icon="Globe" Width="20" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top" Margin="0,4,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <StackPanel Grid.Column="1">
                                             <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Text="{Binding IpAddress, StringFormat='IPv4: {0}'}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                            <TextBlock Text="{Binding IpAddress, StringFormat='IPv4: {0}'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
                                         </StackPanel>
-                                        <TextBlock Grid.Column="2" Text="{Binding MacAddress}" VerticalAlignment="Bottom" FontSize="10" FontFamily="Consolas" Foreground="{StaticResource TextSecondaryBrush}" Opacity="0.7"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding MacAddress}" VerticalAlignment="Bottom" FontSize="10" FontFamily="Consolas" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.7"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -171,17 +171,17 @@
                     <DataGrid Grid.Row="1" ItemsSource="{Binding Connections}" AutoGenerateColumns="False" 
                               IsReadOnly="True" Background="Transparent" BorderThickness="0" 
                               RowBackground="Transparent" GridLinesVisibility="None"
-                              Foreground="{StaticResource TextBrush}" CanUserAddRows="False"
+                              Foreground="{DynamicResource TextBrush}" CanUserAddRows="False"
                               VirtualizingStackPanel.IsVirtualizing="True"
                               VirtualizingStackPanel.VirtualizationMode="Recycling"
                               Height="400">
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="Background" Value="{StaticResource CardBrush}"/>
-                                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                 <Setter Property="Padding" Value="10,5"/>
                                 <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                             </Style>
                         </DataGrid.Resources>
                         <DataGrid.Columns>
@@ -209,7 +209,7 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="FontFamily" Value="Consolas"/>
                                         <Setter Property="FontSize" Value="11"/>
-                                        <Setter Property="Foreground" Value="{StaticResource AccentSecondaryBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource AccentSecondaryBrush}"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
@@ -234,13 +234,13 @@
                                             <TextBlock Text="{Binding State}" FontSize="10" FontWeight="Bold">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding State}" Value="ESTABLISHED">
-                                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding State}" Value="LISTENING">
-                                                                <Setter Property="Foreground" Value="{StaticResource InfoBrush}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource InfoBrush}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -263,7 +263,7 @@
                             <DataGridTextColumn Header="PID" Binding="{Binding ProcessId}" Width="60">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                         <Setter Property="FontSize" Value="10"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                     </Style>
@@ -276,11 +276,15 @@
                 <!-- Loading Overlay -->
                 <Border Grid.RowSpan="4" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}" Margin="-40">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
-                        <TextBlock Text="Mapping Network Sentry..." FontSize="18" Foreground="{StaticResource TextBrush}"/>
+                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <TextBlock Text="Mapping Network Sentry..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
                     </StackPanel>
                 </Border>
             </Grid>
         </ScrollViewer>
     </Border>
 </UserControl>
+
+
+
+

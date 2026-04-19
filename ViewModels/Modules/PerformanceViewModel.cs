@@ -11,7 +11,7 @@ namespace Eternal.ViewModels.Modules
 {
     public enum HistoryType { Cpu, Ram, Disk }
 
-    public partial class PerformanceViewModel : ObservableObject
+    public partial class PerformanceViewModel : ObservableObject, IDisposable
     {
         private readonly IPerformanceService _performanceService;
 
@@ -31,22 +31,30 @@ namespace Eternal.ViewModels.Modules
             SelectHistoryCommand = new RelayCommand<HistoryType>(type => SelectedHistory = type);
             
             // Subscribe to global updates to stay in sync with the status bar
-            _performanceService.Updated += (s, snap) =>
+            _performanceService.Updated += OnPerformanceUpdated;
+        }
+
+        private void OnPerformanceUpdated(object? sender, PerformanceSnapshot snap)
+        {
+            var app = System.Windows.Application.Current;
+            if (app == null) return;
+
+            app.Dispatcher.Invoke(() =>
             {
-                var app = System.Windows.Application.Current;
-                if (app == null) return;
+                CurrentCpu = snap.CpuUsage;
+                CurrentRam = snap.RamUsage;
+                CurrentDisk = snap.DiskUsage;
 
-                app.Dispatcher.Invoke(() =>
-                {
-                    CurrentCpu = snap.CpuUsage;
-                    CurrentRam = snap.RamUsage;
-                    CurrentDisk = snap.DiskUsage;
+                UpdateHistory(CpuHistory, CurrentCpu);
+                UpdateHistory(RamHistory, CurrentRam);
+                UpdateHistory(DiskHistory, CurrentDisk);
+            });
+        }
 
-                    UpdateHistory(CpuHistory, CurrentCpu);
-                    UpdateHistory(RamHistory, CurrentRam);
-                    UpdateHistory(DiskHistory, CurrentDisk);
-                });
-            };        }
+        public void Dispose()
+        {
+            _performanceService.Updated -= OnPerformanceUpdated;
+        }
 
         private void UpdateHistory(ObservableCollection<float> history, float value)
         {

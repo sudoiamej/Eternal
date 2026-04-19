@@ -23,14 +23,14 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                             <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                             <TextBlock Text="ACTIVE TELEMETRY" Style="{StaticResource Caption}"/>
                         </StackPanel>
                         <TextBlock Text="Process Intelligence" Style="{StaticResource H1}" Margin="0"/>
                     </StackPanel>
                     <Button Grid.Column="1" Command="{Binding LoadCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom" Margin="0,0,0,5" ToolTip="Refresh Process List">
-                        <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     </Button>
                 </Grid>
 
@@ -41,14 +41,14 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <fa:ImageAwesome Icon="Tasks" Width="32" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,25,0"/>
+                        <fa:ImageAwesome Icon="Tasks" Width="32" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,25,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Text="ACTIVE TASKS SUMMARY" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding TotalProcessCount}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                <TextBlock Text=" Active Processes Grouped by Kernel Signature" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="5,0,0,2"/>
+                                <TextBlock Text="{Binding TotalProcessCount}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text=" Active Processes Grouped by Kernel Signature" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="5,0,0,2"/>
                             </StackPanel>
-                            <TextBlock Text="Processes are grouped by name. Expand a group to see individual instances." FontSize="11" Foreground="{StaticResource WarningBrush}" Margin="0,5,0,0"/>
+                            <TextBlock Text="Processes are grouped by name. Expand a group to see individual instances." FontSize="11" Foreground="{DynamicResource WarningBrush}" Margin="0,5,0,0"/>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -61,7 +61,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- Column Headers Simulator -->
-                    <Border Grid.Row="0" Background="{StaticResource CardBrush}" BorderThickness="0,0,0,1" BorderBrush="{StaticResource BorderBrush}" Padding="10,8">
+                    <Border Grid.Row="0" Background="{DynamicResource CardBrush}" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource BorderBrush}" Padding="10,8">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="30"/> <!-- Spacer for toggle -->
@@ -72,11 +72,11 @@
                                 <ColumnDefinition Width="3*"/> <!-- Path -->
                                 <ColumnDefinition Width="50"/> <!-- Action -->
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="1" Text="IMPACT" Style="{StaticResource Caption}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            <TextBlock Grid.Column="2" Text="PROCESS NAME" Style="{StaticResource Caption}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            <TextBlock Grid.Column="3" Text="MEMORY" Style="{StaticResource Caption}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            <TextBlock Grid.Column="4" Text="DETAILS" Style="{StaticResource Caption}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            <TextBlock Grid.Column="5" Text="EXECUTABLE PATH" Style="{StaticResource Caption}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <TextBlock Grid.Column="1" Text="IMPACT" Style="{StaticResource Caption}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Grid.Column="2" Text="PROCESS NAME" Style="{StaticResource Caption}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Grid.Column="3" Text="MEMORY" Style="{StaticResource Caption}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Grid.Column="4" Text="DETAILS" Style="{StaticResource Caption}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Grid.Column="5" Text="EXECUTABLE PATH" Style="{StaticResource Caption}" Foreground="{DynamicResource TextSecondaryBrush}"/>
                         </Grid>
                     </Border>
 
@@ -110,15 +110,15 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
-                                        <TextBlock Text="{Binding Impact}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}">
+                                        <TextBlock Text="{Binding Impact}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Impact}" Value="High">
-                                                            <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Impact}" Value="Medium">
-                                                            <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -127,14 +127,14 @@
                                     </Border>
 
                                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
-                                        <Border Background="{StaticResource AccentBrush}" Opacity="0.2" CornerRadius="2" Margin="10,0,0,0" Padding="4,1" VerticalAlignment="Center">
-                                            <TextBlock Text="APP GROUP" FontSize="8" FontWeight="Black" Foreground="{StaticResource AccentBrush}"/>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <Border Background="{DynamicResource AccentBrush}" Opacity="0.2" CornerRadius="2" Margin="10,0,0,0" Padding="4,1" VerticalAlignment="Center">
+                                            <TextBlock Text="APP GROUP" FontSize="8" FontWeight="Black" Foreground="{DynamicResource AccentBrush}"/>
                                         </Border>
                                     </StackPanel>
 
-                                    <TextBlock Grid.Column="2" Text="{Binding TotalMemory, Converter={StaticResource SizeConverter}}" FontFamily="Consolas" FontWeight="Bold" VerticalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
-                                    <TextBlock Grid.Column="3" Text="{Binding Count, StringFormat='({0} instances)'}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding TotalMemory, Converter={StaticResource SizeConverter}}" FontFamily="Consolas" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding Count, StringFormat='({0} instances)'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center"/>
                                 </Grid>
                             </HierarchicalDataTemplate>
 
@@ -152,16 +152,16 @@
                                         <ColumnDefinition Width="50"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="{StaticResource TextBrush}" FontSize="13" VerticalAlignment="Center" Opacity="0.8"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding MemoryBytes, Converter={StaticResource SizeConverter}}" FontFamily="Consolas" FontSize="11" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                    <TextBlock Grid.Column="3" Text="{Binding Id, StringFormat='PID: {0}'}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="4" Text="{Binding Path}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Opacity="0.6"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="{DynamicResource TextBrush}" FontSize="13" VerticalAlignment="Center" Opacity="0.8"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding MemoryBytes, Converter={StaticResource SizeConverter}}" FontFamily="Consolas" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding Id, StringFormat='PID: {0}'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="4" Text="{Binding Path}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Opacity="0.6"/>
 
                                     <Button Grid.Column="5" Command="{Binding DataContext.TerminateProcessCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
                                             CommandParameter="{Binding}"
                                             Style="{StaticResource IconButton}"
                                             HorizontalAlignment="Center">
-                                        <fa:ImageAwesome Icon="TimesCircle" Width="12" Foreground="{StaticResource CriticalBrush}" Opacity="0.4"/>
+                                        <fa:ImageAwesome Icon="TimesCircle" Width="12" Foreground="{DynamicResource CriticalBrush}" Opacity="0.4"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     </Button>
                                 </Grid>
                             </DataTemplate>
@@ -192,7 +192,7 @@
                                                                         <Setter.Value>
                                                                             <ControlTemplate TargetType="ToggleButton">
                                                                                 <Border Padding="2" Background="Transparent">
-                                                                                    <fa:ImageAwesome Icon="AngleRight" Width="8" Foreground="{StaticResource TextSecondaryBrush}">
+                                                                                    <fa:ImageAwesome Icon="AngleRight" Width="8" Foreground="{DynamicResource TextSecondaryBrush}">
                                                                                         <fa:ImageAwesome.Style>
                                                                                             <Style TargetType="fa:ImageAwesome">
                                                                                                 <Style.Triggers>
@@ -247,8 +247,8 @@
                 <!-- Loading Overlay (HCI Rule 7: Status Feedback) -->
                 <Border Grid.RowSpan="3" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}" Margin="-40">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
-                        <TextBlock Text="Analyzing Process Impact..." FontSize="18" Foreground="{StaticResource TextBrush}"/>
+                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <TextBlock Text="Analyzing Process Impact..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -256,3 +256,7 @@
     </Border>
 
 </UserControl>
+
+
+
+

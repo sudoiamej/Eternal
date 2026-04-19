@@ -1,54 +1,67 @@
 ETERNAL SYSTEM INTELLIGENCE - RELEASE NOTES
-Version: 2.5.0 (Milestone 2)
+Version: 2.5.0 (Milestone 3)
 Edition: DEV PREVIEW
-Build Date: April 18, 2026
+Build Date: April 19, 2026
 
 --------------------------------------------------------------------------------
 OVERVIEW
 --------------------------------------------------------------------------------
-Milestone 2 introduces "Components Diagnostics," a professional hardware testing 
-suite. This update also transitions the platform to the modern Windows 26100 SDK, 
-adds custom thematic branding, and significantly expands Thermal Intelligence 
-with detailed GPU and power telemetry.
+Milestone 3 represents a major evolution in system maintenance and forensic 
+intelligence. This update introduces "PC Intelligence Rating" (WinSAT), a 
+comprehensive "PC Intelligence Scanner," and the "DISM Image Studio." Core 
+usability has been redefined with a new Multi-Theme Engine and an expandable 
+navigation console, all while strictly adhering to HCI safety standards.
 
 --------------------------------------------------------------------------------
 NEW FEATURES & ARCHITECTURAL ENHANCEMENTS
 --------------------------------------------------------------------------------
 
-[COMPONENTS DIAGNOSTICS] - NEW MODULE
-- HIGH-PERFORMANCE CAMERA: Low-level frame reader utilizing direct memory 
-  copying (Bgr32) for smooth, real-time sensor verification.
-- KEYBOARD NKRO VISUALIZER: Scaled, row-based physical layout for testing 
-  anti-ghosting and N-Key Rollover limits.
-- INTERACTIVE INPUT CANVAS: Precision path-plotting for Mouse, Touchpad, and 
-  Touchscreen accuracy diagnostics.
-- USB EVENT TRACKER: Real-time monitoring of the USB bus via WMI, logging 
-  peripheral connection/disconnection events.
+[PC INTELLIGENCE SCANNER] - NEW MODULE
+- MULTI-TIERED AUDIT: Intelligent scanning engine categorizing issues into 
+  Required (Critical), Recommended (High), and Optional (Maintenance).
+- ONE-CLICK FIXES: Direct resolution path for high-priority performance and 
+  cleanup tasks.
+- SMART DIAGNOSTICS: Integrated Network Latency (Ping) and BIOS Age auditing.
 
-[THERMAL INTELLIGENCE] - EXPANDED TELEMETRY
-- GPU INSIGHTS: Integrated Graphics telemetry for NVIDIA/AMD/Intel hardware.
-- POWER & VOLTAGE: Live tracking of CPU Package Power (W) and Core Voltage (V).
-- LOGICAL ANALYSIS: Intelligent thermal status engine that flags anomalies 
-  (Throttling, High Drain) in plain language.
+[PC RATING (WINSAT)] - NEW MODULE
+- NATIVE BENCHMARKING: Resurrection of the Windows Experience Index using 
+  the native WinSAT.exe engine.
+- COMPONENT BREAKDOWN: Detailed performance scores for CPU, RAM, Disk, and 
+  Graphics with human-readable bottleneck analysis.
 
-[APPEARANCE & BRANDING]
-- DEV PREVIEW REBRANDING: Unified branding overhaul across splash screens, 
-  headers, and log sequences.
-- CUSTOM ACCENT COLORS: User-selectable theme colors with instant application 
-  and session persistence via AppSettings.
-- DATAGRID REFINEMENT: Overhauled global DataGrid styles for perfect dark-mode 
-  readability and consistent header contrast.
+[WINDOWS UPDATE & IMAGING]
+- OS UPDATE CONSOLE: Direct interface with WUA API to search, install, and 
+  pause system patches.
+- SMART REBOOT: Detection of pending system restarts with recovery actions.
+- DISM IMAGE STUDIO: Native analysis of .wim and .esd image files with full 
+  index and metadata extraction.
 
-[CORE ARCHITECTURE]
-- SDK EVOLUTION: Upgraded target framework to .NET 10 with Windows 10.0.26100 
-  support for native WinRT projection stability.
-- SMART SUSPENSION: Components and sensors now automatically suspend when the 
-  application is out of focus or minimized to reduce background resource drain.
+[MULTI-THEME ENGINE]
+- QUAD-THEME SUPPORT: Introduction of Dark, Light, Gray, and High Contrast 
+  (AAA Accessibility) modes.
+- ADAPTIVE READABILITY: Algorithmic contrast adjustment that automatically 
+  switches text color based on accent luminance.
+
+[HCI & UX REFINEMENT]
+- EXPANDABLE SIDEBAR: Premium animated "Shrink" console with branded logo 
+  toggle and persistent tooltips.
+- SAFETY INTERLOCKS: "Enable Destructive Actions" interlocks added to Storage 
+  Management to prevent accidental data loss.
+- TYPOGRAPHIC OVERHAUL: Refined character spacing and layout for professional 
+  readability.
+
+[SECURITY & FORENSICS]
+- THREAT HUNTER v2: Expanded persistence audit (HKLM/RunOnce) and advanced 
+  behavioral heuristics for suspicious execution paths.
+- AUTOMATED CLEANUP: Integrated registry cleanup when neutralizing threats.
 
 --------------------------------------------------------------------------------
 PREVIOUS VERSIONS
 --------------------------------------------------------------------------------
+Version: 2.5.0 (Milestone 2)
+Build Date: April 18, 2026
+OVERVIEW: Milestone 2 introduced Components Diagnostics and SDK 26100 evolution.
+
 Version: 2.5.0 (Milestone 1)
 Build Date: April 16, 2026
 OVERVIEW: Milestone 1 introduced Registry Intelligence and UI Overhaul.
-... (Previous notes retained in archive) ...

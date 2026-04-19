@@ -17,7 +17,7 @@
             <Grid Grid.Row="0" Margin="0,0,0,30">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                         <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                         <TextBlock Text="USER MANAGEMENT" Style="{StaticResource Caption}"/>
                     </StackPanel>
@@ -26,7 +26,7 @@
                 
                 <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
                     <Button Command="{Binding LoadDataCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh Data">
-                        <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{StaticResource TextSecondaryBrush}" Spin="{Binding IsBusy}"/>
+                        <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     </Button>
                 </StackPanel>
             </Grid>
@@ -38,7 +38,7 @@
                         <DataGrid ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser}" 
                                   AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent"
                                   BorderThickness="0" RowBackground="Transparent" GridLinesVisibility="None"
-                                  Foreground="{StaticResource TextBrush}">
+                                  Foreground="{DynamicResource TextBrush}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="USERNAME" Binding="{Binding Name}" Width="150"/>
                                 <DataGridTextColumn Header="FULL NAME" Binding="{Binding FullName}" Width="200"/>
@@ -50,11 +50,11 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <Button Command="{Binding DataContext.ToggleUserStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                         CommandParameter="{Binding}" Style="{StaticResource IconButton}" ToolTip="Toggle Status">
-                                                    <fa:ImageAwesome Icon="PowerOff" Width="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                    <fa:ImageAwesome Icon="PowerOff" Width="12" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                 </Button>
                                                 <Button Command="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                         CommandParameter="{Binding}" Style="{StaticResource IconButton}" ToolTip="Delete User" Margin="10,0,0,0">
-                                                    <fa:ImageAwesome Icon="Trash" Width="12" Foreground="{StaticResource CriticalBrush}"/>
+                                                    <fa:ImageAwesome Icon="Trash" Width="12" Foreground="{DynamicResource CriticalBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                 </Button>
                                             </StackPanel>
                                         </DataTemplate>
@@ -70,7 +70,7 @@
                         <DataGrid ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" 
                                   AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent"
                                   BorderThickness="0" RowBackground="Transparent" GridLinesVisibility="None"
-                                  Foreground="{StaticResource TextBrush}">
+                                  Foreground="{DynamicResource TextBrush}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="GROUP NAME" Binding="{Binding Name}" Width="200"/>
                                 <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Description}" Width="*"/>
@@ -79,7 +79,7 @@
                                         <DataTemplate>
                                             <Button Command="{Binding DataContext.DeleteGroupCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                     CommandParameter="{Binding}" Style="{StaticResource IconButton}" ToolTip="Delete Group">
-                                                <fa:ImageAwesome Icon="Trash" Width="12" Foreground="{StaticResource CriticalBrush}"/>
+                                                <fa:ImageAwesome Icon="Trash" Width="12" Foreground="{DynamicResource CriticalBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                             </Button>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -93,11 +93,15 @@
             <!-- 3. Status Bar -->
             <Border Grid.Row="2" Style="{StaticResource StandardCard}" Padding="15,10" Margin="0,20,0,0">
                 <Grid>
-                    <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
-                    <fa:ImageAwesome Icon="Spinner" Spin="True" Width="12" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Right" 
-                                     Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}"/>
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                    <fa:ImageAwesome Icon="Spinner" Spin="True" Width="12" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right" 
+                                     Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                 </Grid>
             </Border>
         </Grid>
     </Border>
 </UserControl>
+
+
+
+

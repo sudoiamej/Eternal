@@ -10,6 +10,11 @@ namespace Eternal.Services.Security
 {
     public class WindowsSecurityService : ISecurityService
     {
+        private readonly EnumerationOptions _wmiOptions = new EnumerationOptions { Timeout = TimeSpan.FromSeconds(5) };
+
+        private ManagementObjectSearcher CreateSearcher(string query, string? scope = null) 
+            => new ManagementObjectSearcher(scope, query, _wmiOptions);
+
         public Task<List<StartupProgram>> GetStartupProgramsAsync()
         {
             return Task.Run(() =>
@@ -52,7 +57,7 @@ namespace Eternal.Services.Security
 
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher(@"Root\Microsoft\Windows\Defender", "select * from MSFT_MpComputerStatus");
+                    using var searcher = CreateSearcher("select RealTimeProtectionEnabled, AntivirusEnabled from MSFT_MpComputerStatus", @"Root\Microsoft\Windows\Defender");
                     foreach (var obj in searcher.Get())
                     {
                         realTime = global::System.Convert.ToBoolean(obj["RealTimeProtectionEnabled"] ?? false);
@@ -73,7 +78,7 @@ namespace Eternal.Services.Security
                 var services = new List<ServiceInfo>();
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("select Name, DisplayName, State, StartMode from Win32_Service");
+                    using var searcher = CreateSearcher("select Name, DisplayName, State, StartMode from Win32_Service");
                     foreach (var obj in searcher.Get())
                     {
                         services.Add(new ServiceInfo(
@@ -131,7 +136,7 @@ namespace Eternal.Services.Security
                 var drivers = new List<DriverSignatureInfo>();
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("select DeviceName, IsSigned, Manufacturer from Win32_PnPSignedDriver");
+                    using var searcher = CreateSearcher("select DeviceName, IsSigned, Manufacturer from Win32_PnPSignedDriver");
                     foreach (var obj in searcher.Get())
                     {
                         drivers.Add(new DriverSignatureInfo(
@@ -191,7 +196,7 @@ namespace Eternal.Services.Security
                 {
                     var scope = new ManagementScope(@"Root\CIMV2\Security\MicrosoftVolumeEncryption");
                     scope.Connect();
-                    using var searcher = new ManagementObjectSearcher(scope, new ObjectQuery("select * from Win32_EncryptableVolume"));
+                    using var searcher = CreateSearcher("select * from Win32_EncryptableVolume", @"Root\CIMV2\Security\MicrosoftVolumeEncryption");
                     
                     foreach (ManagementObject obj in searcher.Get())
                     {

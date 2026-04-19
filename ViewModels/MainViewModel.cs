@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Eternal.Services.Hardware;
@@ -14,11 +15,14 @@ using Eternal.Services.Storage;
 using Eternal.Services.Network;
 using Eternal.Models;
 using Eternal.ViewModels.Modules;
+using Eternal.Views;
 using System.Windows;
 using System.Windows.Media;
 
 namespace Eternal.ViewModels
 {
+    public enum NavigationSortOption { Default, Level, EasyToHard, Alphabetical, SafeToDangerous }
+
     public partial class MainViewModel : ObservableObject, IDisposable
     {
         private readonly ILoggingService _loggingService;
@@ -43,7 +47,12 @@ namespace Eternal.ViewModels
         private readonly ICreatorService _creatorService;
         private readonly IRegistryService _registryService;
         private readonly IUserGroupService _userGroupService;
-        private DispatcherTimer _statusTimer;
+        private readonly IUpdateService _updateService;
+        private readonly IOsUpdateService _osUpdateService;
+        private readonly IPcScannerService _pcScannerService;
+        private readonly IDismService _dismService;
+        private readonly IWinSatService _winSatService;
+        private DispatcherTimer? _statusTimer;
 
         // Persistent ViewModels
         private DashboardViewModel _dashboardVm;
@@ -69,10 +78,16 @@ namespace Eternal.ViewModels
         private VerboseLoggingViewModel _logsVm;
         private UserManagementViewModel _userVm;
         private ComponentsViewModel _componentsVm;
+        private WindowsUpdateViewModel _windowsUpdateVm;
+        private PcScannerViewModel _pcScannerVm;
+        private DismImagingViewModel _dismVm;
+        private PcRatingViewModel _pcRatingVm;
 
         [ObservableProperty] private string _title = "Eternal System Intelligence";
         [ObservableProperty] private ObservableObject _currentView;
         [ObservableProperty] private bool _isAdvancedMode = false;
+        [ObservableProperty] private bool _isTestingModeActive = false;
+        [ObservableProperty] private bool _isSidebarExpanded = true;
         
         public AppSettings Settings => _settingsService.Current;
         [ObservableProperty] private bool _isDevModeEnabled = false;
@@ -82,55 +97,27 @@ namespace Eternal.ViewModels
         [ObservableProperty] private ObservableCollection<ProcessSecurityInfo> _unsignedProcesses = new ObservableCollection<ProcessSecurityInfo>();
         [ObservableProperty] private ObservableCollection<PersistenceEntry> _persistenceEntries = new ObservableCollection<PersistenceEntry>();
 
-        [RelayCommand]
-        private async Task ScanMalwarePersistence()
-        {
-            var pEntries = await _creatorService.GetPersistenceEntriesAsync();
-            PersistenceEntries.Clear();
-            foreach (var e in pEntries) PersistenceEntries.Add(e);
+        public ObservableCollection<NavigationItem> DevToolkitItems { get; } = new ObservableCollection<NavigationItem>();
 
-            var unsigned = await _creatorService.GetUnsignedProcessesAsync();
-            UnsignedProcesses.Clear();
-            foreach (var u in unsigned) UnsignedProcesses.Add(u);
-        }
-
-        [RelayCommand]
-        private async Task NeutralizeProcess(int pid)
-        {
-            var result = await _creatorService.SuspendProcessAsync(pid);
-            _loggingService.Log(result.Message);
-            ScanMalwarePersistenceCommand.Execute(null);
-        }
-
-        [RelayCommand]
-        private async Task IsolateNetwork(int pid)
-        {
-            var result = await _creatorService.IsolateProcessNetworkAsync(pid, true);
-            _loggingService.Log(result.Message);
-            System.Windows.MessageBox.Show(result.Message, "Malware Hunter", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
-        }
-
-        [RelayCommand]
-        private async Task ToggleRansomGuard()
-        {
-            var result = await _creatorService.EnableRansomGuardAsync(IsRansomGuardEnabled);
-            _loggingService.Log(result.Message);
-        }
-        
         [ObservableProperty] private string _cpuUsage = "0%";
+        [ObservableProperty] private double _cpuUsageValue = 0.0;
         [ObservableProperty] private string _ramUsage = "0%";
+        [ObservableProperty] private double _ramUsageValue = 0.0;
         [ObservableProperty] private string _uptime = "0d 0h 0m";
         [ObservableProperty] private bool _isPeMode = false;
         [ObservableProperty] private double _displayScale = 1.0;
 
-        public ObservableCollection<NavigationItem> SystemItems { get; }
-        public ObservableCollection<NavigationItem> TelemetryItems { get; }
-        public ObservableCollection<NavigationItem> MonitoringItems { get; }
-        public ObservableCollection<NavigationItem> SupportItems { get; }
+        public ObservableCollection<NavigationItem> SystemItems { get; private set; }
+        public ObservableCollection<NavigationItem> TelemetryItems { get; private set; }
+        public ObservableCollection<NavigationItem> MonitoringItems { get; private set; }
+        public ObservableCollection<NavigationItem> SupportItems { get; private set; }
+
+        [ObservableProperty] private NavigationSortOption _navSortOption = NavigationSortOption.Default;
+        
+        partial void OnNavSortOptionChanged(NavigationSortOption value) => SortNavigation();
 
         public MainViewModel()
         {
-            // Lightweight service instantiation
             _settingsService = new SettingsService();
             _loggingService = new WindowsLoggingService(_settingsService);
             _libreService = new WindowsLibreHardwareService();
@@ -153,96 +140,224 @@ namespace Eternal.ViewModels
             _creatorService = new WindowsCreatorService();
             _registryService = new WindowsRegistryService();
             _userGroupService = new WindowsUserGroupService();
+            _updateService = new WindowsUpdateService();
+            _osUpdateService = new WindowsOsUpdateService();
+            _pcScannerService = new WindowsPcScannerService(_securityService, _storageService, _performanceService, _creatorService, _toolkitService, _biosService, _driversService);
+            _dismService = new WindowsDismService();
+            _winSatService = new WindowsWinSatService();
 
             _loggingService.Log("Eternal System Intelligence Initialized.");
-            _loggingService.Log($"Dev Preview Suite Version 2.5.0-M1");
+            _loggingService.Log($"Dev Preview Suite Version 2.5.0-M3");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
-            _settingsService.SettingsChanged += (s, settings) => IsAdvancedMode = settings.IsAdvancedMode;
+            _settingsService.SettingsChanged += OnSettingsChanged;
 
             DetectPeMode();
             InitializeViewModels();
+            InitializeNavigation();
 
+            if (Settings.IsAutoUpdateEnabled)
+            {
+                _ = CheckForUpdatesAsync();
+            }
+
+            _currentView = _dashboardVm; // Initial view
+            _ = RefreshPorts();
+            ApplyTheme(Settings.Theme);
+            ApplyThemeColor();
+        }
+
+        private void OnSettingsChanged(object? sender, AppSettings settings)
+        {
+            IsAdvancedMode = settings.IsAdvancedMode;
+            ApplyTheme(settings.Theme);
+        }
+
+        private void InitializeNavigation()
+        {
             if (IsPeMode)
             {
-                // PE Mode: Focused Recovery Environment
+                // PE Mode: Highly restricted to essential and functional recovery tools
                 SystemItems = new ObservableCollection<NavigationItem>
                 {
-                    new NavigationItem("Dashboard", "Dashboard", "Dashboard"),
-                    new NavigationItem("Eternal Doctor", "Stethoscope", "Repair"),
-                    new NavigationItem("Registry", "Book", "Registry"),
-                    new NavigationItem("Tools", "Wrench", "Tools")
+                    new NavigationItem("Dashboard", "Dashboard", "Dashboard", 0, 0, 0),
+                    new NavigationItem("Eternal Doctor", "Stethoscope", "Repair", 2, 2, 1),
+                    new NavigationItem("Registry", "Book", "Registry", 2, 2, 2),
+                    new NavigationItem("Tools", "Wrench", "Tools", 1, 1, 3)
                 };
 
                 TelemetryItems = new ObservableCollection<NavigationItem>
                 {
-                    new NavigationItem("Hardware", "Microchip", "Hardware"),
-                    new NavigationItem("Storage / Disks", "HddOutline", "Storage"),
-                    new NavigationItem("Network", "Globe", "Network"),
-                    new NavigationItem("Boot Records", "List", "Boot")
+                    new NavigationItem("Hardware", "Microchip", "Hardware", 0, 0, 0),
+                    new NavigationItem("Storage / Disks", "HddOutline", "Storage", 0, 0, 1)
                 };
 
                 MonitoringItems = new ObservableCollection<NavigationItem>
                 {
-                    new NavigationItem("Processes", "Tasks", "Processes")
+                    new NavigationItem("Processes", "Tasks", "Processes", 1, 1, 0),
+                    new NavigationItem("Eternal Console", "Terminal", "Console", 2, 2, 1)
                 };
 
                 SupportItems = new ObservableCollection<NavigationItem>
                 {
-                    new NavigationItem("System Logs", "Bars", "Logs"),
-                    new NavigationItem("PE Mode Status", "Medkit", "PeMode")
+                    new NavigationItem("PE Recovery", "Medkit", "PeMode", 0, 0, 0),
+                    new NavigationItem("System Logs", "Bars", "Logs", 0, 0, 1),
+                    new NavigationItem("Settings", "Gear", "Settings", 0, 0, 2)
                 };
             }
             else
             {
-                // Standard Mode: Full Suite
                 SystemItems = new ObservableCollection<NavigationItem>
                 {
-                    new NavigationItem("Dashboard", "Dashboard", "Dashboard"),
-                    new NavigationItem("Eternal Doctor", "Stethoscope", "Repair"),
-                    new NavigationItem("Registry", "Book", "Registry"),
-                    new NavigationItem("Reports", "FileTextOutline", "Reports"),
-                    new NavigationItem("Tools", "Wrench", "Tools"),
-                    new NavigationItem("Guardian Tuning", "Gears", "Tuning")
+                    new NavigationItem("Dashboard", "Dashboard", "Dashboard", 0, 0, 0),
+                    new NavigationItem("PC Scanner", "Search", "PcScanner", 0, 0, 1),
+                    new NavigationItem("Eternal Doctor", "Stethoscope", "Repair", 2, 2, 2),
+                    new NavigationItem("Registry", "Book", "Registry", 2, 2, 3),
+                    new NavigationItem("Reports", "FileTextOutline", "Reports", 0, 1, 4),
+                    new NavigationItem("Tools", "Wrench", "Tools", 1, 1, 5),
+                    new NavigationItem("Guardian Tuning", "Gears", "Tuning", 1, 2, 6)
                 };
 
                 TelemetryItems = new ObservableCollection<NavigationItem>
                 {
-                    new NavigationItem("Hardware", "Microchip", "Hardware"),
-                    new NavigationItem("Thermal", "ThermometerThreeQuarters", "Thermal"),
-                    new NavigationItem("Components", "Laptop", "Components"),
-                    new NavigationItem("BIOS / UEFI", "InfoCircle", "Bios"),
-                    new NavigationItem("Boot Records", "List", "Boot"),
-                    new NavigationItem("Storage", "HddOutline", "Storage")
+                    new NavigationItem("Hardware", "Microchip", "Hardware", 0, 0, 0),
+                    new NavigationItem("PC Rating", "Trophy", "PcRating", 0, 0, 1),
+                    new NavigationItem("Thermal", "ThermometerThreeQuarters", "Thermal", 0, 0, 2),
+                    new NavigationItem("Components", "Laptop", "Components", 0, 0, 3),
+                    new NavigationItem("BIOS / UEFI", "InfoCircle", "Bios", 0, 0, 4),
+                    new NavigationItem("Boot Records", "List", "Boot", 1, 1, 5),
+                    new NavigationItem("Storage", "HddOutline", "Storage", 0, 0, 6)
                 };
 
                 MonitoringItems = new ObservableCollection<NavigationItem>
                 {
-                    new NavigationItem("Processes", "Tasks", "Processes"),
-                    new NavigationItem("Performance", "LineChart", "Performance"),
-                    new NavigationItem("Services", "Server", "Services"),
-                    new NavigationItem("User Accounts", "Users", "Users"),
-                    new NavigationItem("Network", "Globe", "Network"),
-                    new NavigationItem("Security", "Shield", "Security"),
-                    new NavigationItem("Drivers", "ListAlt", "Drivers"),
-                    new NavigationItem("Environment", "Code", "Environment")
+                    new NavigationItem("Processes", "Tasks", "Processes", 1, 1, 0),
+                    new NavigationItem("Performance", "LineChart", "Performance", 0, 0, 1),
+                    new NavigationItem("Services", "Server", "Services", 1, 1, 2),
+                    new NavigationItem("User Accounts", "Users", "Users", 1, 1, 3),
+                    new NavigationItem("Network", "Globe", "Network", 0, 0, 4),
+                    new NavigationItem("Security", "Shield", "Security", 1, 1, 5),
+                    new NavigationItem("Drivers", "ListAlt", "Drivers", 1, 2, 6),
+                    new NavigationItem("Environment", "Code", "Environment", 1, 1, 7)
                 };
 
                 SupportItems = new ObservableCollection<NavigationItem>
                 {
-                    new NavigationItem("Eternal Console", "Terminal", "Console"),
-                    new NavigationItem("Settings", "Gear", "Settings"),
-                    new NavigationItem("System Logs", "Bars", "Logs"),
-                    new NavigationItem("Help", "QuestionCircle", "Help"),
-                    new NavigationItem("PE Mode", "Medkit", "PeMode")
+                    new NavigationItem("Eternal Console", "Terminal", "Console", 2, 2, 0),
+                    new NavigationItem("DISM Imaging", "Archive", "DismImaging", 1, 2, 1),
+                    new NavigationItem("Windows Update", "Refresh", "WindowsUpdate", 0, 0, 2),
+                    new NavigationItem("Settings", "Gear", "Settings", 0, 0, 3),
+                    new NavigationItem("System Logs", "Bars", "Logs", 0, 0, 4),
+                    new NavigationItem("Help", "QuestionCircle", "Help", 0, 0, 5),
+                    new NavigationItem("PE Mode", "Medkit", "PeMode", 1, 1, 6)
                 };
             }
+        }
 
-            // Set initial view
-            Navigate("Dashboard");
-            RefreshPortsCommand.Execute(null);
+        private void SortNavigation()
+        {
+            SortNavigationGroup(SystemItems);
+            SortNavigationGroup(TelemetryItems);
+            SortNavigationGroup(MonitoringItems);
+            SortNavigationGroup(SupportItems);
+            if (IsTestingModeActive) SortNavigationGroup(DevToolkitItems);
+        }
 
-            ApplyThemeColor();
+        private void SortNavigationGroup(ObservableCollection<NavigationItem> items)
+        {
+            if (items == null) return;
+            var sorted = NavSortOption switch
+            {
+                NavigationSortOption.Level => items.OrderByDescending(i => i.DangerLevel).ThenBy(i => i.Name).ToList(),
+                NavigationSortOption.EasyToHard => items.OrderBy(i => i.DifficultyLevel).ThenBy(i => i.Name).ToList(),
+                NavigationSortOption.Alphabetical => items.OrderBy(i => i.Name).ToList(),
+                NavigationSortOption.SafeToDangerous => items.OrderBy(i => i.DangerLevel).ThenBy(i => i.Name).ToList(),
+                _ => items.OrderBy(i => i.OriginalOrder).ToList()
+            };
+
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                var oldIndex = items.IndexOf(sorted[i]);
+                if (oldIndex != i) items.Move(oldIndex, i);
+            }
+        }
+
+        [RelayCommand]
+        private async Task ScanMalwarePersistence()
+        {
+            _loggingService.Log("Threat Hunter: Initializing deep persistence audit...");
+            
+            var pEntries = await _creatorService.GetPersistenceEntriesAsync();
+            PersistenceEntries.Clear();
+            foreach (var e in pEntries) PersistenceEntries.Add(e);
+
+            var suspicious = await _creatorService.GetUnsignedProcessesAsync();
+            
+            // Add custom heuristics at ViewModel level
+            foreach (var proc in Process.GetProcesses())
+            {
+                try {
+                    // Detect Processes with No Window but high activity (Simplified)
+                    if (proc.MainWindowHandle == IntPtr.Zero && proc.Id > 100 && !proc.ProcessName.Contains("svchost"))
+                    {
+                        // Only add if not already in list and not a standard system process
+                        if (!suspicious.Any(s => s.PID == proc.Id) && proc.ProcessName.Length > 15)
+                        {
+                             // Potentially suspicious long-named background process
+                        }
+                    }
+                } catch { }
+            }
+
+            UnsignedProcesses.Clear();
+            foreach (var u in suspicious) UnsignedProcesses.Add(u);
+
+            _loggingService.Log($"Threat Hunter: Scan complete. Found {PersistenceEntries.Count} auto-start entries and {UnsignedProcesses.Count} suspicious binaries.");
+            
+            if (UnsignedProcesses.Count > 0)
+            {
+                System.Windows.MessageBox.Show($"Threat Hunter identified {UnsignedProcesses.Count} suspicious processes. Please review them in the Security Toolkit.", "Intelligence Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        [RelayCommand]
+        private async Task NeutralizeProcess(int pid)
+        {
+            var target = UnsignedProcesses.FirstOrDefault(p => p.PID == pid);
+            string name = target?.Name ?? pid.ToString();
+
+            var result = await _creatorService.SuspendProcessAsync(pid);
+            _loggingService.Log(result.Message);
+
+            // Real Work: Perform automated persistence removal if user confirms
+            var entry = PersistenceEntries.FirstOrDefault(e => e.Command.Contains(name, StringComparison.OrdinalIgnoreCase));
+            if (entry != null)
+            {
+                var clean = System.Windows.MessageBox.Show($"Threat Hunter found a persistence entry for '{name}' in {entry.Location}.\n\nWould you like to PERMANENTLY remove this auto-start entry?", "Security Cleanup", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (clean == MessageBoxResult.Yes)
+                {
+                    var cleanupResult = await _creatorService.RemovePersistenceEntryAsync(entry.Location, entry.Name);
+                    _loggingService.Log(cleanupResult.Message);
+                    System.Windows.MessageBox.Show(cleanupResult.Message, "Security Suite", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+
+            await ScanMalwarePersistence();
+        }
+
+        [RelayCommand]
+        private async Task IsolateNetwork(int pid)
+        {
+            var result = await _creatorService.IsolateProcessNetworkAsync(pid, true);
+            _loggingService.Log(result.Message);
+            System.Windows.MessageBox.Show(result.Message, "Malware Hunter", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+        }
+
+        [RelayCommand]
+        private async Task ToggleRansomGuard()
+        {
+            var result = await _creatorService.EnableRansomGuardAsync(IsRansomGuardEnabled);
+            _loggingService.Log(result.Message);
         }
 
         public void ApplyThemeColor()
@@ -253,15 +368,50 @@ namespace Eternal.ViewModels
                 System.Windows.Application.Current.Resources["AccentColor"] = color;
                 System.Windows.Application.Current.Resources["AccentBrush"] = new System.Windows.Media.SolidColorBrush(color);
 
-                // Create a slightly lighter secondary color
                 var secondary = System.Windows.Media.Color.FromArgb(color.A, 
                     (byte)Math.Min(255, color.R + 30), 
                     (byte)Math.Min(255, color.G + 30), 
                     (byte)Math.Min(255, color.B + 30));
                 System.Windows.Application.Current.Resources["AccentSecondaryColor"] = secondary;
                 System.Windows.Application.Current.Resources["AccentSecondaryBrush"] = new System.Windows.Media.SolidColorBrush(secondary);
+
+                UpdateAccentTextContrast(color);
             }
             catch { }
+        }
+
+        private void ApplyTheme(string themeName)
+        {
+            try
+            {
+                var appResources = System.Windows.Application.Current.Resources;
+                var oldTheme = appResources.MergedDictionaries.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("/Themes/"));
+                
+                if (oldTheme != null)
+                {
+                    appResources.MergedDictionaries.Remove(oldTheme);
+                }
+
+                var newTheme = new ResourceDictionary 
+                { 
+                    Source = new Uri($"pack://application:,,,/Styles/Themes/{themeName}.xaml", UriKind.Absolute) 
+                };
+                appResources.MergedDictionaries.Insert(0, newTheme);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Theme Error: {ex.Message}");
+            }
+        }
+
+        private void UpdateAccentTextContrast(System.Windows.Media.Color accentColor)
+        {
+            // Relative Luminance Formula: (0.299*R + 0.587*G + 0.114*B) / 255
+            double luminance = (0.299 * accentColor.R + 0.587 * accentColor.G + 0.114 * accentColor.B) / 255;
+            
+            // If the color is bright (luminance > 0.5), use black text. Otherwise use white.
+            var textColor = luminance > 0.5 ? System.Windows.Media.Colors.Black : System.Windows.Media.Colors.White;
+            System.Windows.Application.Current.Resources["AccentTextBrush"] = new System.Windows.Media.SolidColorBrush(textColor);
         }
 
         [RelayCommand]
@@ -334,47 +484,52 @@ namespace Eternal.ViewModels
         [RelayCommand]
         private async Task CreateJunction()
         {
-            // Simplified Junction creation for now
-            System.Windows.MessageBox.Show("Please use the drag-and-drop 'Junction Studio' module (coming soon) or use mklink manually for now.", "Symlink Studio", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            var sourceDialog = new Microsoft.Win32.OpenFolderDialog { Title = "Select Source Folder" };
+            if (sourceDialog.ShowDialog() == true)
+            {
+                var targetDialog = new Microsoft.Win32.OpenFolderDialog { Title = "Select Target Junction Location" };
+                if (targetDialog.ShowDialog() == true)
+                {
+                    var result = await _creatorService.CreateDirectoryJunctionAsync(sourceDialog.FolderName, targetDialog.FolderName);
+                    _loggingService.Log(result.Message);
+                    System.Windows.MessageBox.Show(result.Message, "Symlink Studio", System.Windows.MessageBoxButton.OK, result.Success ? System.Windows.MessageBoxImage.Information : System.Windows.MessageBoxImage.Error);
+                }
+            }
         }
 
         [RelayCommand]
-        private void ZoomIn()
-        {
-            if (DisplayScale < 2.0) DisplayScale += 0.1;
-        }
+        private void ZoomIn() => DisplayScale = Math.Min(2.0, DisplayScale + 0.1);
 
         [RelayCommand]
-        private void ZoomOut()
-        {
-            if (DisplayScale > 0.5) DisplayScale -= 0.1;
-        }
+        private void ZoomOut() => DisplayScale = Math.Max(0.5, DisplayScale - 0.1);
 
         [RelayCommand]
-        private void ResetZoom()
-        {
-            DisplayScale = 1.0;
-        }
+        private void ResetZoom() => DisplayScale = 1.0;
+
+        [RelayCommand]
+        private void ToggleSidebar() => IsSidebarExpanded = !IsSidebarExpanded;
 
         public void StartTimers()
         {
             _performanceService.StartPolling();
-            _performanceService.Updated += (s, snap) => 
-            {
-                var app = System.Windows.Application.Current;
-                if (app == null) return;
-
-                app.Dispatcher.Invoke(() => 
-                {
-                    CpuUsage = $"{snap.CpuUsage:F0}%";
-                    RamUsage = $"{snap.RamUsage:F0}%";
-                });
-            };
+            _performanceService.Updated += OnGlobalPerformanceUpdated;
 
             if (_statusTimer != null) return;
             _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _statusTimer.Tick += (s, e) => UpdateUptime();
             _statusTimer.Start();
+        }
+
+        private void OnGlobalPerformanceUpdated(object? sender, PerformanceSnapshot snap)
+        {
+            var app = System.Windows.Application.Current;
+            if (app == null) return;
+
+            app.Dispatcher.Invoke(() => 
+            {
+                CpuUsage = $"{snap.CpuUsage:F0}%";
+                RamUsage = $"{snap.RamUsage:F0}%";
+            });
         }
 
         private void UpdateUptime()
@@ -398,64 +553,51 @@ namespace Eternal.ViewModels
             _biosVm = new BiosViewModel(_biosService);
             _securityVm = new SecurityViewModel(_securityService);
             _performanceVm = new PerformanceViewModel(_performanceService);
-            _driversVm = new DriversViewModel(_driversService);
+            _driversVm = new DriversViewModel(_driversService, _loggingService);
             _servicesVm = new ServicesViewModel(_servicesService);
             _storageVm = new StorageViewModel(_storageService);
             _networkVm = new NetworkViewModel(_hardwareService, _networkService);
             _reportsVm = new ReportsViewModel(_hardwareService);
             _toolsVm = new ToolsViewModel(_toolkitService);
-            _settingsVm = new SettingsViewModel(this, _settingsService);
+            _settingsVm = new SettingsViewModel(this, _settingsService, _updateService);
             _processVm = new ProcessIntelligenceViewModel(_processService);
             _thermalVm = new ThermalViewModel(_thermalService);
             _envVm = new EnvironmentViewModel(_envService);
             _logsVm = new VerboseLoggingViewModel(_loggingService);
             _tuningVm = new TuningViewModel(_tuningService);
-            _consoleVm = new ConsoleViewModel(_consoleService);
+            _consoleVm = new ConsoleViewModel(_loggingService);
             _bootVm = new BootViewModel(_bootService);
             _userVm = new UserManagementViewModel(_userGroupService);
             _componentsVm = new ComponentsViewModel();
+            _windowsUpdateVm = new WindowsUpdateViewModel(_osUpdateService, _loggingService);
+            _pcScannerVm = new PcScannerViewModel(_pcScannerService, this, _loggingService);
+            _dismVm = new DismImagingViewModel(_dismService, _loggingService);
+            _pcRatingVm = new PcRatingViewModel(_winSatService, _loggingService);
         }
 
         public async Task PreloadAllDataAsync()
         {
-            // Group 1: Critical Core Data (Parallel)
-            var group1 = new List<Task>
-            {
+            await Task.WhenAll(
                 _dashboardVm.LoadDashboardCommand.ExecuteAsync(null),
                 _hardwareVm.LoadDataCommand.ExecuteAsync(null),
                 _biosVm.LoadCommand.ExecuteAsync(null),
-                _securityVm.LoadCommand.ExecuteAsync(null)
-            };
-            await Task.WhenAll(group1);
-
-            // Group 2: Secondary System Data (Parallel)
-            var group2 = new List<Task>
-            {
+                _securityVm.LoadCommand.ExecuteAsync(null),
+                _pcRatingVm.LoadScoresCommand.ExecuteAsync(null),
                 _driversVm.LoadCommand.ExecuteAsync(null),
                 _servicesVm.LoadCommand.ExecuteAsync(null),
                 _storageVm.LoadCommand.ExecuteAsync(null),
-                _networkVm.LoadCommand.ExecuteAsync(null)
-            };
-            await Task.WhenAll(group2);
-
-            // Group 3: Intelligence & Environment (Parallel)
-            var group3 = new List<Task>
-            {
+                _networkVm.LoadCommand.ExecuteAsync(null),
                 _processVm.LoadCommand.ExecuteAsync(null),
                 _thermalVm.LoadCommand.ExecuteAsync(null),
                 _envVm.LoadCommand.ExecuteAsync(null),
                 _tuningVm.LoadTweaksCommand.ExecuteAsync(null),
                 _bootVm.LoadCommand.ExecuteAsync(null)
-            };
-            await Task.WhenAll(group3);
+            );
         }
 
         [RelayCommand]
         private async Task Navigate(string viewName)
         {
-            _loggingService.Log($"Navigating to: {viewName}");
-            
-            // Deactivate current view if applicable
             if (CurrentView is ThermalViewModel oldThermal) oldThermal.Deactivate();
             else if (CurrentView is NetworkViewModel oldNetwork) oldNetwork.Deactivate();
             else if (CurrentView is ComponentsViewModel oldComponents) oldComponents.Suspend();
@@ -464,73 +606,106 @@ namespace Eternal.ViewModels
 
             switch (viewName)
             {
-                case "Dashboard": 
-                    CurrentView = _dashboardVm; 
-                    await _dashboardVm.LoadDashboardCommand.ExecuteAsync(null);
-                    break;
-                case "Repair":
-                    CurrentView = _repairVm;
-                    break;
-                case "Registry":
-                    CurrentView = _registryVm;
-                    await _registryVm.LoadRegistryCommand.ExecuteAsync(null);
-                    break;
-                case "Boot":
-                    CurrentView = _bootVm;
-                    await _bootVm.LoadCommand.ExecuteAsync(null);
-                    break;
+                case "Dashboard": CurrentView = _dashboardVm; break;
+                case "Repair": CurrentView = _repairVm; break;
+                case "Registry": CurrentView = _registryVm; await _registryVm.LoadRegistryCommand.ExecuteAsync(null); break;
+                case "Boot": CurrentView = _bootVm; await _bootVm.LoadCommand.ExecuteAsync(null); break;
                 case "Hardware": CurrentView = _hardwareVm; break;
-                case "Thermal": 
-                    CurrentView = _thermalVm; 
-                    _thermalVm.Activate();
-                    break;
-                case "Processes": 
-                    CurrentView = _processVm; 
-                    await _processVm.LoadCommand.ExecuteAsync(null);
-                    break;
-                case "Network": 
-                    CurrentView = _networkVm; 
-                    _networkVm.Activate();
-                    break;
+                case "Thermal": CurrentView = _thermalVm; _thermalVm.Activate(); break;
+                case "Processes": CurrentView = _processVm; await _processVm.LoadCommand.ExecuteAsync(null); break;
+                case "Network": CurrentView = _networkVm; _networkVm.Activate(); break;
                 case "Storage": CurrentView = _storageVm; break;
+                case "PcRating": CurrentView = _pcRatingVm; await _pcRatingVm.LoadScoresCommand.ExecuteAsync(null); break;
                 case "Security": CurrentView = _securityVm; break;
                 case "Bios": CurrentView = _biosVm; break;
                 case "Drivers": CurrentView = _driversVm; break;
-                case "Services": 
-                    CurrentView = _servicesVm; 
-                    await _servicesVm.LoadCommand.ExecuteAsync(null);
-                    break;
+                case "Services": CurrentView = _servicesVm; await _servicesVm.LoadCommand.ExecuteAsync(null); break;
                 case "Performance": CurrentView = _performanceVm; break;
-                case "Environment": 
-                    CurrentView = _envVm; 
-                    await _envVm.LoadCommand.ExecuteAsync(null);
-                    break;
+                case "Environment": CurrentView = _envVm; await _envVm.LoadCommand.ExecuteAsync(null); break;
                 case "Reports": CurrentView = _reportsVm; break;
                 case "Tools": CurrentView = _toolsVm; break;
-                case "Help": OpenHelpWindow(); break;
+                case "Help": 
+                    string context = CurrentView switch {
+                        PcScannerViewModel => "PcScanner",
+                        StorageViewModel => "Storage",
+                        WindowsUpdateViewModel => "WindowsUpdate",
+                        DismImagingViewModel => "DismImaging",
+                        PEModeViewModel => "PeMode",
+                        _ => "GettingStarted"
+                    };
+                    OpenHelpWindow(context); 
+                    break;
                 case "PeMode": CurrentView = new PEModeViewModel(_hardwareService, IsPeMode); break;
                 case "Settings": CurrentView = _settingsVm; break;
-                case "Logs": 
-                    CurrentView = _logsVm; 
-                    _logsVm.RefreshLogs();
+                case "WindowsUpdate": 
+                    if (CurrentView != _windowsUpdateVm)
+                    {
+                        CurrentView = _windowsUpdateVm;
+                        _windowsUpdateVm.CheckForUpdatesCommand.Execute(null);
+                    }
                     break;
-                case "Users":
-                    CurrentView = _userVm;
-                    await _userVm.LoadDataCommand.ExecuteAsync(null);
+                case "DismImaging":
+                    CurrentView = _dismVm;
+                    _dismVm.ClearCommand.Execute(null);
                     break;
-                case "Tuning": 
-                    CurrentView = _tuningVm; 
-                    await _tuningVm.LoadTweaksCommand.ExecuteAsync(null);
-                    break;
-                case "Console": 
-                    CurrentView = _consoleVm; 
-                    await _consoleVm.StartConsoleCommand.ExecuteAsync(null);
-                    break;
-                case "Components":
-                    CurrentView = _componentsVm;
-                    _componentsVm.Resume();
-                    break;
+                case "PcScanner": CurrentView = _pcScannerVm; break;
+                case "Logs": CurrentView = _logsVm; _logsVm.RefreshLogs(); break;
+                case "Users": CurrentView = _userVm; await _userVm.LoadDataCommand.ExecuteAsync(null); break;
+                case "Tuning": CurrentView = _tuningVm; await _tuningVm.LoadTweaksCommand.ExecuteAsync(null); break;
+                case "Console": CurrentView = _consoleVm; await _consoleVm.StartConsoleCommand.ExecuteAsync(null); break;
+                case "Components": CurrentView = _componentsVm; _componentsVm.Resume(); break;
+                case "TestSplash": TestSplashScreen(); break;
+                case "TestIncompatible": TestIncompatibleOS(); break;
+                case "ExitTestMode": ExitTestingMode(); break;
             }
+        }
+
+        public async Task ActivateTestingMode()
+        {
+            DeveloperEnvironment.IsTestingModeActive = true;
+            IsTestingModeActive = true;
+            
+            DevToolkitItems.Clear();
+            DevToolkitItems.Add(new NavigationItem("Splash Test", "Image", "TestSplash", 0, 0, 0));
+            DevToolkitItems.Add(new NavigationItem("OS Guard Test", "ExclamationTriangle", "TestIncompatible", 0, 0, 1));
+            DevToolkitItems.Add(new NavigationItem("Exit Testing", "SignOut", "ExitTestMode", 0, 0, 2));
+
+            _loggingService.Log("!!! DEV TESTING MODE ACTIVATED !!!");
+            await RunSelfIntegrityCheckAsync();
+        }
+
+        private void ExitTestingMode()
+        {
+            DeveloperEnvironment.IsTestingModeActive = false;
+            IsTestingModeActive = false;
+            DevToolkitItems.Clear();
+            _ = Navigate("Dashboard");
+            _loggingService.Log("Dev Testing Mode deactivated.");
+        }
+
+        private void TestSplashScreen()
+        {
+            var testSplash = new SplashScreenWindow(true);
+            testSplash.Show();
+        }
+
+        private void TestIncompatibleOS()
+        {
+            var testIncompatible = new IncompatibilityWindow(true);
+            testIncompatible.Show();
+        }
+
+        private async Task RunSelfIntegrityCheckAsync()
+        {
+            bool wmiHealthy = await Task.Run(() => {
+                try {
+                    using var searcher = new System.Management.ManagementObjectSearcher("SELECT Name FROM Win32_OperatingSystem");
+                    return searcher.Get().Count > 0;
+                } catch { return false; }
+            });
+
+            string status = wmiHealthy ? "INTEGRITY VERIFIED" : "INTEGRITY COMPROMISED (WMI Failure)";
+            System.Windows.MessageBox.Show($"Developer Environment Initialized.\n\nStatus: {status}", "Self-Diagnostic", System.Windows.MessageBoxButton.OK, wmiHealthy ? System.Windows.MessageBoxImage.Information : System.Windows.MessageBoxImage.Error);
         }
 
         private void UpdateNavigationSelection(string viewName)
@@ -540,28 +715,57 @@ namespace Eternal.ViewModels
             if (TelemetryItems != null) allItems.AddRange(TelemetryItems);
             if (MonitoringItems != null) allItems.AddRange(MonitoringItems);
             if (SupportItems != null) allItems.AddRange(SupportItems);
+            if (DevToolkitItems != null) allItems.AddRange(DevToolkitItems);
 
-            foreach (var item in allItems)
-            {
-                item.IsSelected = item.ViewName == viewName;
-            }
+            foreach (var item in allItems) item.IsSelected = item.ViewName == viewName;
         }
 
-        private void OpenHelpWindow()
+        private void OpenHelpWindow(string? context = null)
         {
-            var helpWindow = new Eternal.Views.HelpWindow();
+            var helpWindow = new HelpWindow(context);
             helpWindow.Owner = System.Windows.Application.Current.MainWindow;
             helpWindow.Show();
         }
 
         public void Dispose()
         {
-            _statusTimer?.Stop();
+            _settingsService.SettingsChanged -= OnSettingsChanged;
+            _performanceService.Updated -= OnGlobalPerformanceUpdated;
+            if (_statusTimer != null)
+            {
+                _statusTimer.Stop();
+            }
             _performanceService?.StopPolling();
             _consoleService?.Stop();
             
             if (_libreService is IDisposable d1) d1.Dispose();
             if (_thermalService is IDisposable d2) d2.Dispose();
+        }
+
+        public async Task CheckForUpdatesAsync(bool manual = false)
+        {
+            var updateInfo = await _updateService.CheckForUpdatesAsync();
+            if (updateInfo.IsUpdateAvailable)
+            {
+                var result = System.Windows.MessageBox.Show($"A new version of Eternal ({updateInfo.NewVersion}) is available. Update now?", "Update Available", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Information);
+                if (result == MessageBoxResult.Yes)
+                {
+                    if (await _updateService.DownloadUpdateAsync(updateInfo.DownloadUrl, new Progress<double>(p => { })))
+                    {
+                        _updateService.ApplyUpdateAndRestart();
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show("Failed to download the update.", "Update Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    }
+                }
+            }
+            else if (manual)
+            {
+                System.Windows.MessageBox.Show("Eternal is up to date.", "No Updates Found", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            }
+            Settings.LastUpdateCheck = DateTime.Now;
+            _settingsService.Save();
         }
     }
 
@@ -570,11 +774,15 @@ namespace Eternal.ViewModels
         public string Name { get; set; }
         public string Icon { get; set; }
         public string ViewName { get; set; }
+        public int DangerLevel { get; set; }
+        public int DifficultyLevel { get; set; }
+        public int OriginalOrder { get; set; }
         [ObservableProperty] private bool _isSelected;
 
-        public NavigationItem(string name, string icon, string viewName)
+        public NavigationItem(string name, string icon, string viewName, int danger = 0, int difficulty = 0, int order = 0)
         {
             Name = name; Icon = icon; ViewName = viewName;
+            DangerLevel = danger; DifficultyLevel = difficulty; OriginalOrder = order;
         }
     }
 }

@@ -21,7 +21,7 @@
                 <Grid Grid.Row="0" Margin="0,0,0,30">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                             <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                             <TextBlock Text="ETERNAL DOCTOR" Style="{StaticResource Caption}"/>
                         </StackPanel>
@@ -30,15 +30,15 @@
                     
                     <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#104CAF50" Padding="12,6" CornerRadius="4">
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="CheckCircle" Width="12" Foreground="{StaticResource SuccessBrush}" Margin="0,0,8,0"/>
-                            <TextBlock Text="Diagnostic Engine Active" Foreground="{StaticResource SuccessBrush}" FontSize="11" FontWeight="SemiBold"/>
+                            <fa:ImageAwesome Icon="CheckCircle" Width="12" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <TextBlock Text="Diagnostic Engine Active" Foreground="{DynamicResource SuccessBrush}" FontSize="11" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Border>
                 </Grid>
 
                 <!-- 2. Triage Description -->
                 <TextBlock Grid.Row="1" Text="Select the symptom that best describes your system's behavior. Eternal Doctor will perform a surgical diagnosis and attempt an automated recovery." 
-                           Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,35" FontSize="13" TextWrapping="Wrap" MaxWidth="800" HorizontalAlignment="Left" LineHeight="20"/>
+                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,35" FontSize="13" TextWrapping="Wrap" MaxWidth="800" HorizontalAlignment="Left" LineHeight="20"/>
 
                 <!-- 3. Problem Grid (UX: Chunking & Visual Hierarchy) -->
                 <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
@@ -53,11 +53,11 @@
                                 <Border x:Name="RepairCard" Margin="0,0,15,15" BorderThickness="1" CornerRadius="8" Cursor="Hand">
                                     <Border.Style>
                                         <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
-                                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                             <Style.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
                                                     <Setter Property="Background" Value="#0FFFFFFF"/>
-                                                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                                                 </Trigger>
                                             </Style.Triggers>
                                         </Style>
@@ -73,27 +73,27 @@
                                             <!-- Symptom Meta (HCI Rule 4: Mapping) -->
                                             <Grid Grid.Row="0" Margin="0,0,0,15">
                                                 <Border Background="#15FFFFFF" HorizontalAlignment="Left" Padding="10" CornerRadius="6">
-                                                    <fa:ImageAwesome Icon="Stethoscope" Width="18" Foreground="{StaticResource InfoBrush}"/>
+                                                    <fa:ImageAwesome Icon="Stethoscope" Width="18" Foreground="{DynamicResource InfoBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                 </Border>
                                                 <Border HorizontalAlignment="Right" VerticalAlignment="Top" Padding="6,2" CornerRadius="2">
                                                     <Border.Background>
                                                         <SolidColorBrush Color="{StaticResource AccentColor}" Opacity="0.1"/>
                                                     </Border.Background>
-                                                    <TextBlock Text="{Binding Category}" FontSize="9" FontWeight="Black" Foreground="{StaticResource AccentBrush}"/>
+                                                    <TextBlock Text="{Binding Category}" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}"/>
                                                 </Border>
                                             </Grid>
 
                                             <!-- Content (UX: Progressive Disclosure) -->
                                             <StackPanel Grid.Row="1">
                                                 <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,4"/>
-                                                <TextBlock Text="{Binding Symptom}" FontSize="12" Foreground="{StaticResource WarningBrush}" Margin="0,0,0,8" FontWeight="Medium"/>
-                                                <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                <TextBlock Text="{Binding Symptom}" FontSize="12" Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,8" FontWeight="Medium"/>
+                                                <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="16"/>
                                             </StackPanel>
 
                                             <!-- Direct Action (HCI Rule 1: Affordance) -->
                                             <Button Grid.Row="2" Command="{Binding FixCommand}" Margin="0,20,0,0" Height="42" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <fa:ImageAwesome Icon="Wrench" Width="12" Margin="0,0,10,0" Foreground="White"/>
+                                                    <fa:ImageAwesome Icon="Wrench" Width="12" Margin="0,0,10,0" Foreground="White"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                     <TextBlock Text="INITIATE REPAIR" FontWeight="Bold" FontSize="12"/>
                                                 </StackPanel>
                                             </Button>
@@ -106,15 +106,15 @@
                 </ScrollViewer>
 
                 <!-- 4. Modern Status Bar (HCI Rule 3: Feedback) -->
-                <Border Grid.Row="3" Background="#0DFFFFFF" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="15,12" Margin="0,20,0,0" CornerRadius="6">
+                <Border Grid.Row="3" Background="#0DFFFFFF" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Padding="15,12" Margin="0,20,0,0" CornerRadius="6">
                     <Grid>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="InfoCircle" Width="12" Foreground="{StaticResource AccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center" FontSize="12" FontWeight="Medium"/>
+                            <fa:ImageAwesome Icon="InfoCircle" Width="12" Foreground="{DynamicResource AccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" FontSize="12" FontWeight="Medium"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <TextBlock Text="V2.5.0-M1 CORE" Foreground="{StaticResource TextSecondaryBrush}" Opacity="0.5" FontSize="9" VerticalAlignment="Center" Margin="0,0,15,0"/>
-                            <fa:ImageAwesome Icon="Spinner" Spin="{Binding IsBusy}" Width="12" Foreground="{StaticResource AccentBrush}" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}"/>
+                            <TextBlock Text="V2.5.0-M1 CORE" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5" FontSize="9" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <fa:ImageAwesome Icon="Spinner" Spin="{Binding IsBusy}" Width="12" Foreground="{DynamicResource AccentBrush}" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -124,18 +124,22 @@
         <!-- Global Repair Overlay (HCI Rule 6: Conceptual Model Clarity) -->
         <Border Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="500">
-                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="48" Margin="0,0,0,25"/>
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,25"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                 <TextBlock Text="REPAIR IN PROGRESS" FontSize="22" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                <TextBlock Text="{Binding StatusMessage}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding StatusMessage}" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
                 
-                <Border Margin="0,30,0,0" Background="#10FFFFFF" Padding="20" CornerRadius="6" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <Border Margin="0,30,0,0" Background="#10FFFFFF" Padding="20" CornerRadius="6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                     <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="Shield" Width="14" Foreground="{StaticResource SuccessBrush}" Margin="0,0,15,0"/>
+                        <fa:ImageAwesome Icon="Shield" Width="14" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <TextBlock Text="Safety protocol active. System integrity is being monitored during the operation." 
-                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
             </StackPanel>
         </Border>
     </Grid>
 </UserControl>
+
+
+
+

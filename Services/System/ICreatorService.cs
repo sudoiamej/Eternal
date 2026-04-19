@@ -27,6 +27,7 @@ namespace Eternal.Services.System
         Task<List<ProcessSecurityInfo>> GetUnsignedProcessesAsync();
         Task<(bool Success, string Message)> SuspendProcessAsync(int pid);
         Task<List<PersistenceEntry>> GetPersistenceEntriesAsync();
+        Task<(bool Success, string Message)> RemovePersistenceEntryAsync(string location, string name);
         Task<(bool Success, string Message)> IsolateProcessNetworkAsync(int pid, bool block);
         Task<(bool Success, string Message)> EnableRansomGuardAsync(bool enable);
     }
@@ -38,6 +39,7 @@ namespace Eternal.Services.System
         public string Path { get; set; }
         public bool IsSigned { get; set; }
         public string Signer { get; set; }
+        public string Description { get; set; } = "Suspicious activity detected";
     }
 
     public class PersistenceEntry

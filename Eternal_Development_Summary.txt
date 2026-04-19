@@ -1,0 +1,47 @@
+# ETERNAL SYSTEM INTELLIGENCE - DEVELOPMENT MILESTONE OVERVIEW
+
+## 1. Core Platform Enhancements
+*   **App Updater**: Integrated a GitHub-based update engine that checks for latest releases, downloads standalone executables, and handles self-replacement via a custom batch script.
+*   **OS Compatibility Guard**: Implemented a startup safety check in the Splash Screen that restricts the app to Windows 10 (Build 19041+) or Windows 11.
+*   **Startup Entry Lock**: Created a themed security gate requiring a 6-digit PIN (Default: 120076) to access the app.
+*   **Adaptive Lockout Logic**: Implemented security protection that locks the app for 1 minute (and incrementing) after 3 failed attempts, with a hardcoded override (000000).
+*   **Modern Toggle Switches**: Redesigned all settings toggles into large, animated "ModernSwitch" pills for better accessibility and aesthetics.
+*   **Global Sorting System**: Integrated dynamic sorting across the entire app (Sidebar & Scanner) by Level, Difficulty, Alphabetical, and Safety status.
+*   **Sidebar Scrollability**: Added vertical scroll support to the navigation sidebar to handle high zoom levels and many modules.
+
+## 2. PC Intelligence Scanner (New Module)
+*   **Multi-Tiered Audit**: Comprehensive scanning engine that categorizes PC issues into Required (Critical), Recommended (High), and Optional (Maintenance).
+*   **Smart Diagnostics**:
+    *   **Network Latency**: Real-time ping audit flagging high latency.
+    *   **BIOS Age Check**: Automatically flags firmware older than 2 years as a recommended update.
+    *   **Driver Integrity**: Identifies critical hardware (GPU/Network) running on generic Microsoft drivers.
+    *   **Security Audit**: Detects disabled antivirus/real-time protection and unsigned processes.
+*   **One-Click Fixes**: Integrated automated resolutions for RAM purging and temporary file cleanup.
+*   **Guided Resolution**: Dynamic "REVIEW" buttons that navigate the user directly to the relevant module for complex issues.
+
+## 3. Windows Update Module (New Module)
+*   **WUA API Integration**: Deep integration with the Windows Update Agent for real-time patch discovery.
+*   **Installation Engine**: Capability to download and install specific or all available updates directly within the Eternal UI.
+*   **Update Management**: Implemented registry-level "Pause Updates" functionality (7-day intervals).
+*   **Smart Reboot**: Automatically detects pending system restarts and provides a "REBOOT NOW" recovery action.
+
+## 4. Hardware & Driver Intelligence
+*   **Manufacturer-Direct Driver Finder**: Developed a system that extracts true Hardware IDs (HWIDs) and OEM Serial Numbers.
+*   **Official Portal Routing**: Implemented a dynamic link engine that directs users to verified support pages (NVIDIA, Intel, AMD, Dell, HP, etc.) instead of 3rd-party sites.
+*   **Lazy Camera Activation**: Updated the Components module to ensure the camera hardware only powers on when the Camera tab is actively selected and viewed.
+
+## 5. PE & Emergency Recovery
+*   **WinRE/Advanced Startup**: Added one-click commands to restart the PC into Windows Recovery Environment.
+*   **PE Boot Configuration**: Integrated `reagentc` commands to force a PE boot environment on next restart.
+*   **Functional Native Tools**: Replaced placeholders with real system commands for SFC Scans, BCD Rebuilds, and Disk Checks when running in a native PE environment.
+
+## 6. Developer & Security Features
+*   **Unsafe Mode (Testing Mode)**: Secret developer shortcut (Ctrl+Shift+Alt+T) with PIN protection (7734) to bypass system restrictions for testing.
+*   **Simulation Hooks**: Safety overrides on all destructive methods (Purge RAM, Host editing, Net Isolation) that return simulated results when Testing Mode is active.
+*   **Self-Diagnostic Integrity**: Real-time verification of WMI health and service availability upon developer mode activation.
+*   **Startup PIN Editor**: Functional 6-digit access code manager within the Settings tab.
+
+## 7. Technical Quality & HCI
+*   **Ambiguity Resolution**: Cleaned up all namespace collisions between WPF and WinForms (KeyEventArgs, UserControl, Application).
+*   **Zero-Placeholder Policy**: Removed all "Coming Soon" or empty method placeholders, replacing them with functional logic or dialog-driven guidance.
+*   **Build Integrity**: Exempted migration packages from the project build to ensure a clean compilation.

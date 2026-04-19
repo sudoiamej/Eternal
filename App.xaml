@@ -5,12 +5,19 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Styles/Themes/Dark.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Styles/Colors.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
             <helpers:ValueToVisibilityConverter x:Key="VisibilityConverter"/>
             <helpers:BooleanToStatusConverter x:Key="BooleanToStatusConverter"/>
             <helpers:SizeFormatterConverter x:Key="SizeConverter"/>
+            <helpers:InvertBooleanConverter x:Key="InvertBooleanConverter"/>
+            <helpers:IntToBooleanConverter x:Key="IntToBooleanConverter"/>
+            <helpers:MultiBooleanToVisibilityConverter x:Key="MultiBooleanToVisibilityConverter"/>
+            <helpers:NumericValueConverter x:Key="NumericValueConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
+
+

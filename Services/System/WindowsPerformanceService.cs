@@ -13,9 +13,13 @@ namespace Eternal.Services.System
         private bool _isInitialized = false;
         private global::System.Threading.Timer _pollingTimer;
         private int _isUpdating = 0;
+        private readonly EnumerationOptions _wmiOptions = new EnumerationOptions { Timeout = TimeSpan.FromSeconds(5) };
 
         public event EventHandler<PerformanceSnapshot> Updated;
         public PerformanceSnapshot CurrentSnapshot { get; private set; } = new PerformanceSnapshot(0, 0, 0, 0);
+
+        private ManagementObjectSearcher CreateSearcher(string query) 
+            => new ManagementObjectSearcher(null, query, _wmiOptions);
 
         private void EnsureInitialized()
         {
@@ -72,7 +76,7 @@ namespace Eternal.Services.System
                 float ramPercent = 0;
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("select TotalVisibleMemorySize, FreePhysicalMemory from Win32_OperatingSystem");
+                    using var searcher = CreateSearcher("select TotalVisibleMemorySize, FreePhysicalMemory from Win32_OperatingSystem");
                     foreach (var obj in searcher.Get())
                     {
                         ulong total = global::System.Convert.ToUInt64(obj["TotalVisibleMemorySize"]);

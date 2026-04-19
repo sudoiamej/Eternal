@@ -25,7 +25,7 @@
                         </StackPanel>
                         <Button Command="{Binding RefreshCameraCommand}" HorizontalAlignment="Right" Style="{StaticResource SecondaryButton}">
                             <StackPanel Orientation="Horizontal">
-                                <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,8,0"/>
+                                <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                 <TextBlock Text="Refresh Feed"/>
                             </StackPanel>
                         </Button>
@@ -38,9 +38,9 @@
                         <Border Background="#AA000000" VerticalAlignment="Bottom" Padding="20">
                             <StackPanel>
                                 <TextBlock Text="LIVE CAMERA FEED" Foreground="White" FontWeight="Bold" FontSize="14"/>
-                                <TextBlock Text="{Binding CameraStatus}" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" FontSize="12" Margin="0,2,0,5"/>
-                                <TextBlock Text="{Binding FrameInfo}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" Margin="0,0,0,5"/>
-                                <TextBlock Text="Verifying sensor integrity and frame consistency." Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                <TextBlock Text="{Binding CameraStatus}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" FontSize="12" Margin="0,2,0,5"/>
+                                <TextBlock Text="{Binding FrameInfo}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,0,0,5"/>
+                                <TextBlock Text="Verifying sensor integrity and frame consistency." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
                             </StackPanel>
                         </Border>
                     </Grid>
@@ -59,8 +59,8 @@
                 <Border Grid.Row="0" Style="{StaticResource StandardCard}" Margin="0,0,0,20">
                     <Grid>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{StaticResource InfoBrush}" Margin="0,0,10,0"/>
-                            <TextBlock Text="Tracking Accuracy Test: Move or touch the canvas to plot input data. Use the clear button to reset." VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <TextBlock Text="Tracking Accuracy Test: Move or touch the canvas to plot input data. Use the clear button to reset." VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
                         </StackPanel>
                         <Button Content="Clear Canvas" HorizontalAlignment="Right" Style="{StaticResource SecondaryButton}" Click="ClearCanvas_Click"/>
                     </Grid>
@@ -88,10 +88,10 @@
                     <StackPanel Orientation="Horizontal">
                         <StackPanel Margin="0,0,40,0">
                             <TextBlock Text="N-KEY ROLLOVER" Style="{StaticResource Caption}"/>
-                            <TextBlock Text="{Binding ActiveKeysCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock Text="{Binding ActiveKeysCount}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
                         </StackPanel>
                         <TextBlock Text="Press multiple keys simultaneously to test ghosting and rollover limits. Ensure focus is on this window." 
-                                   VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" MaxWidth="500" TextWrapping="Wrap"/>
+                                   VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" MaxWidth="500" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
 
@@ -109,14 +109,14 @@
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Border x:Name="KeyBorder" Width="{Binding Width}" Height="45" Margin="2" CornerRadius="4" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" Background="#111111">
-                                                        <TextBlock Text="{Binding Display}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                    <Border x:Name="KeyBorder" Width="{Binding Width}" Height="45" Margin="2" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}" Background="#111111">
+                                                        <TextBlock Text="{Binding Display}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                                     </Border>
                                                     <DataTemplate.Triggers>
                                                         <DataTrigger Binding="{Binding IsPressed}" Value="True">
-                                                            <Setter TargetName="KeyBorder" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                            <Setter TargetName="KeyBorder" Property="Background" Value="{DynamicResource AccentBrush}"/>
                                                             <Setter TargetName="KeyBorder" Property="TextBlock.Foreground" Value="White"/>
-                                                            <Setter TargetName="KeyBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                            <Setter TargetName="KeyBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                                                         </DataTrigger>
                                                     </DataTemplate.Triggers>
                                                 </DataTemplate>
@@ -135,9 +135,9 @@
         <DataTemplate x:Key="SpeakersTemplate">
             <Border Style="{StaticResource StandardCard}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400">
                 <StackPanel HorizontalAlignment="Center">
-                    <fa:ImageAwesome Icon="VolumeUp" Width="64" Foreground="{StaticResource AccentBrush}" Margin="0,0,0,30"/>
+                    <fa:ImageAwesome Icon="VolumeUp" Width="64" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,30"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     <TextBlock Text="AUDIO CHANNEL TEST" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                    <TextBlock Text="Verify speakers or headphones output clean audio signal." Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+                    <TextBlock Text="Verify speakers or headphones output clean audio signal." Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,30"/>
                     <Button Command="{Binding PlayTestSoundCommand}" Style="{StaticResource PrimaryButton}" Content="Play Test Tone" Width="200"/>
                 </StackPanel>
             </Border>
@@ -147,12 +147,12 @@
         <DataTemplate x:Key="MonitorTemplate">
             <Border Style="{StaticResource StandardCard}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="450">
                 <StackPanel HorizontalAlignment="Center">
-                    <fa:ImageAwesome Icon="Television" Width="64" Foreground="{StaticResource InfoBrush}" Margin="0,0,0,30"/>
+                    <fa:ImageAwesome Icon="Television" Width="64" Foreground="{DynamicResource InfoBrush}" Margin="0,0,0,30"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     <TextBlock Text="COLOR INTEGRITY TEST" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
                     <TextBlock Text="Detect dead pixels or backlight bleed by cycling through solid colors (RGBW+K)." 
-                               Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,30" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,30" TextWrapping="Wrap"/>
                     <Button Command="{Binding StartMonitorTestCommand}" Style="{StaticResource PrimaryButton}" Content="Start Full-Screen Test" Width="200"/>
-                    <TextBlock Text="Press any key or click to cycle colors. ESC to exit." FontSize="10" Foreground="{StaticResource TextDisabledBrush}" HorizontalAlignment="Center" Margin="0,15,0,0"/>
+                    <TextBlock Text="Press any key or click to cycle colors. ESC to exit." FontSize="10" Foreground="{DynamicResource TextDisabledBrush}" HorizontalAlignment="Center" Margin="0,15,0,0"/>
                 </StackPanel>
             </Border>
         </DataTemplate>
@@ -167,9 +167,9 @@
 
                 <Border Grid.Row="0" Style="{StaticResource StandardCard}" Margin="0,0,0,20">
                     <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="Usb" Width="16" Foreground="{StaticResource WarningBrush}" Margin="0,0,15,0"/>
+                        <fa:ImageAwesome Icon="Usb" Width="16" Foreground="{DynamicResource WarningBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <TextBlock Text="USB EVENT TRACKER: Monitoring bus changes in real-time. Connect/Disconnect devices to verify ports." 
-                                   VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                   VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     </StackPanel>
                 </Border>
 
@@ -194,10 +194,10 @@
                                             <TextBlock Text="{Binding Action}" FontSize="10" FontWeight="Bold">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Action}" Value="Disconnected">
-                                                                <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -226,7 +226,7 @@
             <Grid Grid.Row="0" Margin="0,0,0,30">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                         <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                         <TextBlock Text="COMPONENT DIAGNOSTICS" Style="{StaticResource Caption}"/>
                     </StackPanel>
@@ -257,23 +257,23 @@
                                                         <ColumnDefinition Width="30"/>
                                                         <ColumnDefinition Width="*"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="14" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center">
+                                                    <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center">
                                                         <fa:ImageAwesome.Style>
                                                             <Style TargetType="fa:ImageAwesome">
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+                                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </fa:ImageAwesome.Style>
                                                     </fa:ImageAwesome>
-                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}">
+                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}">
                                                         <TextBlock.Style>
                                                             <Style TargetType="TextBlock">
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                        <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                                         <Setter Property="FontWeight" Value="SemiBold"/>
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
@@ -336,3 +336,7 @@
         </Grid>
     </Border>
 </UserControl>
+
+
+
+

@@ -1,0 +1,48 @@
+<Window x:Class="Eternal.Views.Helpers.TestingAuthWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        Title="Developer Access" Height="280" Width="350"
+        WindowStyle="None" AllowsTransparency="True"
+        WindowStartupLocation="CenterOwner" Background="Transparent">
+    <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="12" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+        <Grid Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                <fa:ImageAwesome Icon="Terminal" Width="24" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                <TextBlock Text="UNSAFE MODE" Style="{StaticResource H1}" FontSize="18" Foreground="{DynamicResource AccentBrush}"/>
+                <TextBlock Text="Enter Developer Access Code" 
+                           Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <!-- PIN Input -->
+            <StackPanel Grid.Row="1">
+                <PasswordBox x:Name="PinInput" Padding="12" Background="{DynamicResource CardBrush}" 
+                             Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                             FontSize="14" HorizontalContentAlignment="Center" MaxLength="8"
+                             KeyDown="PinInput_KeyDown"/>
+                <TextBlock x:Name="ErrorText" Text="Invalid Access Code" Foreground="{DynamicResource CriticalBrush}" 
+                           FontSize="10" Margin="0,5,0,0" Visibility="Collapsed" HorizontalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Actions -->
+            <Grid Grid.Row="3" Margin="0,15,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="CANCEL" Style="{StaticResource SecondaryButton}" Margin="0,0,5,0" Click="Cancel_Click"/>
+                <Button Grid.Column="1" Content="AUTHORIZE" Style="{StaticResource PrimaryButton}" Margin="5,0,0,0" Click="Authorize_Click"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
+
+

@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Item Properties" Height="650" Width="700"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource BackgroundBrush}"
+        Background="{DynamicResource BackgroundBrush}"
         Style="{StaticResource ModernWindow}">
     
     <Border Padding="25">
@@ -21,7 +21,7 @@
             <!-- Header -->
             <StackPanel Grid.Row="0" Margin="0,0,0,20">
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                    <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{StaticResource AccentBrush}" Margin="0,0,10,0"/>
+                    <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0"/>
                     <TextBlock x:Name="TypeHeader" Text="PROPERTIES" Style="{StaticResource Caption}"/>
                 </StackPanel>
                 <TextBlock x:Name="TitleHeader" Text="Item Details" Style="{StaticResource H1}" TextWrapping="Wrap" FontSize="20"/>
@@ -32,7 +32,7 @@
                 <ItemsControl x:Name="PropertiesList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,10">
+                            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,10">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="180"/>
@@ -44,7 +44,7 @@
                                             <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Value}" Value="------------------------">
-                                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
                                                         <Setter Property="FontSize" Value="12"/>
                                                         <Setter Property="Opacity" Value="1"/>
                                                     </DataTrigger>
@@ -53,12 +53,12 @@
                                         </TextBlock.Style>
                                     </TextBlock>
 
-                                    <TextBlock Grid.Column="1" Text="{Binding Value}" Foreground="{StaticResource TextBrush}" TextWrapping="Wrap" FontSize="13" FontFamily="Consolas">
+                                    <TextBlock Grid.Column="1" Text="{Binding Value}" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" FontSize="13" FontFamily="Consolas">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Key}" Value="Anomaly Detected">
-                                                        <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
                                                         <Setter Property="FontWeight" Value="Bold"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Value}" Value="------------------------">
@@ -80,3 +80,5 @@
         </Grid>
     </Border>
 </Window>
+
+

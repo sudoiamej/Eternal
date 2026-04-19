@@ -1,0 +1,20 @@
+# ETERNAL SYSTEM INTELLIGENCE - MIGRATION PROMPT
+
+To apply these functional updates (OS Guard, Testing Mode, Simulation Hooks) to the **Dev Preview** project, please provide me with the following instruction when you open that project folder:
+
+---
+
+"I have a migration package named 'DevPreview_UpdatePackage'. Please perform a functional migration of these features into the current project. 
+
+REQUIREMENTS:
+1. Do NOT include any licensing, product key, or trial logic.
+2. Keep the existing project version and branding.
+3. Integrate the OS Compatibility Guard into the startup sequence.
+4. Integrate the 'Unsafe Mode' secret shortcut (Ctrl+Shift+Alt+T) and access prompt.
+5. Apply the 'Simulation Hooks' to all destructive methods in the WindowsCreatorService.
+6. Ensure the 'Developer Toolkit' group is visible in the sidebar only when in Testing Mode.
+7. Fix any navigation or layout overlaps that occur when adding these new items."
+
+---
+
+I will then read the files in the package and surgically apply them to your Dev Preview codebase while strictly adhering to the 'Non-Retail' constraints.

@@ -26,6 +26,10 @@ namespace Eternal.Services.System
     public class WindowsThermalService : IThermalService, IDisposable
     {
         private readonly ILibreHardwareService _libreService;
+        private readonly EnumerationOptions _wmiOptions = new EnumerationOptions { Timeout = TimeSpan.FromSeconds(5) };
+
+        private ManagementObjectSearcher CreateSearcher(string query) 
+            => new ManagementObjectSearcher(null, query, _wmiOptions);
 
         public WindowsThermalService(ILibreHardwareService libreService)
         {
@@ -102,7 +106,7 @@ namespace Eternal.Services.System
 
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("select EstimatedChargeRemaining, BatteryStatus from Win32_Battery");
+                    using var searcher = CreateSearcher("select EstimatedChargeRemaining, BatteryStatus from Win32_Battery");
                     foreach (var obj in searcher.Get())
                     {
                         hasBattery = true;

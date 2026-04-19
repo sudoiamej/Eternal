@@ -43,6 +43,7 @@ namespace Eternal.ViewModels.Modules
         // USB properties
         public ObservableCollection<UsbEvent> UsbHistory { get; } = new ObservableCollection<UsbEvent>();
         private ManagementEventWatcher? _usbWatcher;
+        private bool _isActive = false;
 
         // Mouse properties
         [ObservableProperty] private bool _isLeftClicked;
@@ -117,7 +118,7 @@ namespace Eternal.ViewModels.Modules
             {
                 _ = StopCameraAsync();
             }
-            else
+            else if (_isActive)
             {
                 _ = LoadCamerasAndStartAsync();
             }
@@ -389,39 +390,43 @@ namespace Eternal.ViewModels.Modules
                 _usbWatcher = new ManagementEventWatcher();
                 var query = new WqlEventQuery("SELECT * FROM __InstanceOperationEvent WITHIN 1 WHERE TargetInstance ISA 'Win32_PnPEntity'");
                 _usbWatcher.Query = query;
-                _usbWatcher.EventArrived += (s, e) =>
-                {
-                    var instance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
-                    var pnpId = instance["PNPDeviceID"]?.ToString() ?? "";
-                    
-                    if (pnpId.Contains("USB"))
-                    {
-                        var name = instance["Name"]?.ToString() ?? "Unknown USB Device";
-                        var eventType = e.NewEvent.ClassPath.ClassName;
-                        var action = eventType.Contains("Creation") ? "Connected" : (eventType.Contains("Deletion") ? "Disconnected" : null);
-
-                        if (action != null)
-                        {
-                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                UsbHistory.Insert(0, new UsbEvent { Timestamp = DateTime.Now, DeviceName = name, Action = action });
-                            });
-                        }
-                    }
-                };
+                _usbWatcher.EventArrived += OnUsbEventArrived;
                 _usbWatcher.Start();
             }
             catch { }
         }
 
+        private void OnUsbEventArrived(object sender, EventArrivedEventArgs e)
+        {
+            var instance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
+            var pnpId = instance["PNPDeviceID"]?.ToString() ?? "";
+            
+            if (pnpId.Contains("USB"))
+            {
+                var name = instance["Name"]?.ToString() ?? "Unknown USB Device";
+                var eventType = e.NewEvent.ClassPath.ClassName;
+                var action = eventType.Contains("Creation") ? "Connected" : (eventType.Contains("Deletion") ? "Disconnected" : null);
+
+                if (action != null)
+                {
+                    System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        UsbHistory.Insert(0, new UsbEvent { Timestamp = DateTime.Now, DeviceName = name, Action = action });
+                    }));
+                }
+            }
+        }
+
         public void Suspend()
         {
+            _isActive = false;
             _ = StopCameraAsync();
             _usbWatcher?.Stop();
         }
 
         public void Resume()
         {
+            _isActive = true;
             if (SelectedComponent?.Type == HardwareComponentType.Camera)
             {
                 _ = LoadCamerasAndStartAsync();
@@ -432,8 +437,12 @@ namespace Eternal.ViewModels.Modules
         public void Dispose()
         {
             _ = StopCameraAsync();
-            _usbWatcher?.Stop();
-            _usbWatcher?.Dispose();
+            if (_usbWatcher != null)
+            {
+                _usbWatcher.EventArrived -= OnUsbEventArrived;
+                _usbWatcher.Stop();
+                _usbWatcher.Dispose();
+            }
         }
     }
 

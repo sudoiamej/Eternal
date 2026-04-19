@@ -20,7 +20,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                         <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                         <TextBlock Text="SUPPORT &amp; SAFETY" Style="{StaticResource Caption}"/>
                     </StackPanel>
@@ -28,10 +28,10 @@
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,0,0,5">
                     <Button Command="{Binding LoadSystemLogsCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh Logs" Margin="0,0,10,0">
-                        <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{StaticResource TextSecondaryBrush}" Spin="{Binding IsBusy}"/>
+                        <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     </Button>
                     <Button Command="{Binding ClearLogsCommand}" Style="{StaticResource IconButton}" ToolTip="Clear Console">
-                        <fa:ImageAwesome Icon="Trash" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <fa:ImageAwesome Icon="Trash" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     </Button>
                 </StackPanel>
             </Grid>
@@ -42,7 +42,7 @@
                     <DataGrid ItemsSource="{Binding LogEntries}" AutoGenerateColumns="False" 
                               IsReadOnly="True" Background="#0C0C0C" BorderThickness="0" 
                               RowBackground="Transparent" GridLinesVisibility="None"
-                              Foreground="{StaticResource TextBrush}" CanUserAddRows="False"
+                              Foreground="{DynamicResource TextBrush}" CanUserAddRows="False"
                               VirtualizingStackPanel.IsVirtualizing="True"
                               HeadersVisibility="Column">
                         <DataGrid.Resources>
@@ -57,10 +57,10 @@
                             </Style>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="Background" Value="#151515"/>
-                                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                 <Setter Property="Padding" Value="12,8"/>
                                 <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                 <Setter Property="FontSize" Value="10"/>
                                 <Setter Property="FontWeight" Value="Bold"/>
                                 <Setter Property="Height" Value="35"/>
@@ -70,7 +70,7 @@
                             <DataGridTextColumn Header="TIMESTAMP" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="120">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                         <Setter Property="FontSize" Value="10"/>
                                         <Setter Property="FontFamily" Value="Consolas"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -86,13 +86,13 @@
                                             <TextBlock Text="{Binding Level}" FontWeight="Bold" FontSize="10" VerticalAlignment="Center">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{StaticResource InfoBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource InfoBrush}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Level}" Value="ERROR">
-                                                                <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Level}" Value="WARN">
-                                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Level}" Value="INFO">
                                                                 <Setter Property="Foreground" Value="White"/>
@@ -109,7 +109,7 @@
                             <DataGridTextColumn Header="MESSAGE" Binding="{Binding Message}" Width="*">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                         <Setter Property="FontSize" Value="11"/>
                                         <Setter Property="TextWrapping" Value="Wrap"/>
                                         <Setter Property="Padding" Value="12,4"/>
@@ -122,8 +122,8 @@
                     <!-- Loading Feedback Overlay -->
                     <Border Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="32" Margin="0,0,0,15"/>
-                            <TextBlock Text="Synchronizing Event Streams..." FontSize="14" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="32" Margin="0,0,0,15"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <TextBlock Text="Synchronizing Event Streams..." FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -131,3 +131,7 @@
         </Grid>
     </Border>
 </UserControl>
+
+
+
+

@@ -11,11 +11,16 @@ namespace Eternal.Services.Hardware
     public class WindowsHardwareService : IHardwareService
     {
         private readonly ILibreHardwareService _libreService;
+        private readonly EnumerationOptions _wmiOptions;
 
         public WindowsHardwareService(ILibreHardwareService libreService)
         {
             _libreService = libreService;
+            _wmiOptions = new EnumerationOptions { Timeout = TimeSpan.FromSeconds(5) };
         }
+
+        private ManagementObjectSearcher CreateSearcher(string query) 
+            => new ManagementObjectSearcher(null, query, _wmiOptions);
 
         public Task<CpuInfo> GetCpuInfoAsync()
         {
@@ -30,7 +35,7 @@ namespace Eternal.Services.Hardware
                 try
                 {
                     // 1. Try WMI first
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_Processor");
+                    using var searcher = CreateSearcher("select Name, NumberOfCores, NumberOfLogicalProcessors, Architecture, MaxClockSpeed from Win32_Processor");
                     foreach (var obj in searcher.Get())
                     {
                         name = obj["Name"]?.ToString() ?? name;
@@ -92,7 +97,7 @@ namespace Eternal.Services.Hardware
                 
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_VideoController");
+                    using var searcher = CreateSearcher("select Name, DriverVersion, AdapterRAM from Win32_VideoController");
                     foreach (var obj in searcher.Get())
                     {
                         name = obj["Name"]?.ToString() ?? name;
@@ -143,7 +148,7 @@ namespace Eternal.Services.Hardware
 
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_PhysicalMemory");
+                    using var searcher = CreateSearcher("select Capacity, Speed from Win32_PhysicalMemory");
                     foreach (var obj in searcher.Get())
                     {
                         totalBytes += global::System.Convert.ToInt64(obj["Capacity"] ?? 0);
@@ -171,7 +176,7 @@ namespace Eternal.Services.Hardware
                 var disks = new List<DiskInfo>();
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_DiskDrive");
+                    using var searcher = CreateSearcher("select Model, Size, Status, InterfaceType from Win32_DiskDrive");
                     foreach (var obj in searcher.Get())
                     {
                         string model = obj["Model"]?.ToString() ?? "Unknown";
@@ -213,7 +218,7 @@ namespace Eternal.Services.Hardware
 
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_BaseBoard");
+                    using var searcher = CreateSearcher("select Manufacturer, Product from Win32_BaseBoard");
                     foreach (var obj in searcher.Get())
                     {
                         manufacturer = obj["Manufacturer"]?.ToString() ?? manufacturer;
@@ -242,7 +247,7 @@ namespace Eternal.Services.Hardware
                 var adapters = new List<NetworkAdapterInfo>();
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_NetworkAdapterConfiguration where IPEnabled = 'True'");
+                    using var searcher = CreateSearcher("select Description, MACAddress, IPAddress from Win32_NetworkAdapterConfiguration where IPEnabled = 'True'");
                     foreach (var obj in searcher.Get())
                     {
                         string name = obj["Description"]?.ToString() ?? "Unknown";
@@ -266,7 +271,7 @@ namespace Eternal.Services.Hardware
                 
                 // 1. OS Info
                 try {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_OperatingSystem");
+                    using var searcher = CreateSearcher("select Caption, Version, BuildNumber, Manufacturer, CSName, OSArchitecture, BootDevice, WindowsDirectory, SystemDirectory from Win32_OperatingSystem");
                     foreach (var obj in searcher.Get()) {
                         items.Add(new SystemSummaryItem("OS", "OS Name", obj["Caption"]?.ToString()));
                         items.Add(new SystemSummaryItem("OS", "Version", obj["Version"]?.ToString()));
@@ -282,7 +287,7 @@ namespace Eternal.Services.Hardware
 
                 // 2. System Info
                 try {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_ComputerSystem");
+                    using var searcher = CreateSearcher("select Manufacturer, Model, SystemType, SystemSKUNumber, TotalPhysicalMemory, Domain, UserName from Win32_ComputerSystem");
                     foreach (var obj in searcher.Get()) {
                         items.Add(new SystemSummaryItem("System", "System Manufacturer", obj["Manufacturer"]?.ToString()));
                         items.Add(new SystemSummaryItem("System", "System Model", obj["Model"]?.ToString()));
@@ -300,7 +305,7 @@ namespace Eternal.Services.Hardware
 
                 // 3. BIOS Info
                 try {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_BIOS");
+                    using var searcher = CreateSearcher("select SMBIOSBIOSVersion, SMBIOSMajorVersion, SMBIOSMinorVersion, EmbeddedControllerMajorVersion, EmbeddedControllerMinorVersion from Win32_BIOS");
                     foreach (var obj in searcher.Get()) {
                         items.Add(new SystemSummaryItem("Firmware", "BIOS Version/Date", obj["SMBIOSBIOSVersion"]?.ToString()));
                         
@@ -316,7 +321,7 @@ namespace Eternal.Services.Hardware
 
                 // 4. BaseBoard
                 try {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_BaseBoard");
+                    using var searcher = CreateSearcher("select Manufacturer, Product, Version from Win32_BaseBoard");
                     foreach (var obj in searcher.Get()) {
                         items.Add(new SystemSummaryItem("Board", "BaseBoard Manufacturer", obj["Manufacturer"]?.ToString()));
                         items.Add(new SystemSummaryItem("Board", "BaseBoard Product", obj["Product"]?.ToString()));
@@ -326,7 +331,7 @@ namespace Eternal.Services.Hardware
 
                 // 5. Processor (Detailed)
                 try {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_Processor");
+                    using var searcher = CreateSearcher("select Name, Description, L2CacheSize, L3CacheSize from Win32_Processor");
                     foreach (var obj in searcher.Get()) {
                         items.Add(new SystemSummaryItem("Processor", "Name", obj["Name"]?.ToString()));
                         items.Add(new SystemSummaryItem("Processor", "Description", obj["Description"]?.ToString()));

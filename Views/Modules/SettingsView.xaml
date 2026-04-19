@@ -9,15 +9,28 @@
     <Border Padding="40">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBlock Text="Application Settings" Style="{StaticResource H1}"/>
+                <StackPanel Style="{StaticResource ModuleHeaderStyle}"><TextBlock Text="ETERNAL › SYSTEM INTELLIGENCE" Style="{StaticResource HeaderBreadcrumb}"/><TextBlock Text="Application Settings" Style="{StaticResource H1}" Margin="0"/></StackPanel>
 
                 <!-- 0. Appearance & Theme -->
                 <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
                     <StackPanel>
                         <TextBlock Text="APPEARANCE &amp; THEME" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
 
-                        <TextBlock Text="System Accent Color" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Margin="0,0,0,10"/>
-                        <TextBlock Text="Choose a primary color for the application interface." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+                        <Grid Margin="0,0,0,20">
+                            <StackPanel>
+                                <TextBlock Text="Interface Theme" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Select a global visual style for the application." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ComboBox SelectedValue="{Binding SelectedTheme}" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <system:String>Dark</system:String>
+                                <system:String>Light</system:String>
+                                <system:String>Gray</system:String>
+                                <system:String>HighContrast</system:String>
+                            </ComboBox>
+                        </Grid>
+
+                        <TextBlock Text="System Accent Color" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,10"/>
+                        <TextBlock Text="Choose a primary color for the application interface." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,15"/>
 
                         <UniformGrid Columns="8" HorizontalAlignment="Left">
                             <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#9B59B6">
@@ -55,24 +68,24 @@
                         
                         <Grid Margin="0,0,0,15">
                             <StackPanel>
-                                <TextBlock Text="Run at Windows Startup" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                <TextBlock Text="Automatically launch Eternal when you sign in." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Run at Windows Startup" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Automatically launch Eternal when you sign in." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
-                            <ToggleButton IsChecked="{Binding Settings.RunAtStartup}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.RunAtStartup}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Grid>
 
                         <Grid Margin="0,0,0,15">
                             <StackPanel>
-                                <TextBlock Text="Minimize to System Tray" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                <TextBlock Text="Keep the app running in the background when closed." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Minimize to System Tray" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Keep the app running in the background when closed." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
-                            <ToggleButton IsChecked="{Binding Settings.MinimizeToTray}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.MinimizeToTray}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Grid>
 
                         <Grid Margin="0,0,0,15">
                             <StackPanel>
-                                <TextBlock Text="Telemetry Polling Profile" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                <TextBlock Text="Optimize sensor updates for battery or accuracy." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Telemetry Polling Profile" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Optimize sensor updates for battery or accuracy." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                             <ComboBox SelectedValue="{Binding Settings.PollingProfile}" Width="120" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <system:String>Balanced</system:String>
@@ -83,12 +96,12 @@
 
                         <Grid>
                             <StackPanel>
-                                <TextBlock Text="Refresh Frequency" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                <TextBlock Text="Set interval for live telemetry updates (seconds)." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Refresh Frequency" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Set interval for live telemetry updates (seconds)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <Slider Value="{Binding Settings.RefreshFrequency}" Minimum="1" Maximum="10" Width="100" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <TextBlock Text="{Binding Settings.RefreshFrequency, StringFormat='{}{0}s'}" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Width="25"/>
+                                <TextBlock Text="{Binding Settings.RefreshFrequency, StringFormat='{}{0}s'}" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Width="25"/>
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -100,35 +113,35 @@
                         <TextBlock Text="DATA &amp; PRIVACY" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
 
                         <StackPanel Margin="0,0,0,15">
-                            <TextBlock Text="Intelligence Export Path" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                            <TextBlock Text="Default folder for saving intelligence reports (.json)." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+                            <TextBlock Text="Intelligence Export Path" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                            <TextBlock Text="Default folder for saving intelligence reports (.json)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Text="{Binding Settings.ExportFolderPath}" IsReadOnly="True" Background="#0DFFFFFF" BorderBrush="{StaticResource BorderBrush}" Padding="8,5" Foreground="{StaticResource TextBrush}"/>
+                                <TextBox Text="{Binding Settings.ExportFolderPath}" IsReadOnly="True" Background="#0DFFFFFF" BorderBrush="{DynamicResource BorderBrush}" Padding="8,5" Foreground="{DynamicResource TextBrush}"/>
                                 <Button Grid.Column="1" Command="{Binding SelectExportFolderCommand}" Content="Browse" Margin="8,0,0,0" Padding="15,0" Style="{StaticResource PrimaryAction}"/>
                             </Grid>
                         </StackPanel>
 
                         <Grid Margin="0,0,0,15">
                             <StackPanel>
-                                <TextBlock Text="WMI Query Timeout" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                <TextBlock Text="Seconds to wait for low-level system responses." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="WMI Query Timeout" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Seconds to wait for low-level system responses." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <Slider Value="{Binding Settings.WmiTimeoutSeconds}" Minimum="2" Maximum="30" Width="100" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <TextBlock Text="{Binding Settings.WmiTimeoutSeconds, StringFormat='{}{0}s'}" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Width="25"/>
+                                <TextBlock Text="{Binding Settings.WmiTimeoutSeconds, StringFormat='{}{0}s'}" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Width="25"/>
                             </StackPanel>
                         </Grid>
 
                         <Grid>
                             <StackPanel>
-                                <TextBlock Text="Verbose Session Logging" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                <TextBlock Text="Capture detailed app actions in the 'System Logs' tab." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Verbose Session Logging" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Capture detailed app actions in the 'System Logs' tab." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
-                            <ToggleButton IsChecked="{Binding Settings.IsVerboseLoggingEnabled}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.IsVerboseLoggingEnabled}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -140,19 +153,60 @@
                         
                         <Grid Margin="0,0,0,15">
                             <StackPanel>
-                                <TextBlock Text="Advanced Intelligence Mode" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                <TextBlock Text="Enables deep telemetry and raw system identifiers." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Advanced Intelligence Mode" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Enables deep telemetry and raw system identifiers." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
-                            <ToggleButton IsChecked="{Binding Settings.IsAdvancedMode}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.IsAdvancedMode}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Grid>
 
                         <Grid>
                             <StackPanel>
-                                <TextBlock Text="Preload Data on Startup" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                <TextBlock Text="Loads system metrics in background during app launch." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Preload Data on Startup" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Loads system metrics in background during app launch." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
-                            <ToggleButton IsChecked="{Binding Settings.PreloadOnStartup}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.PreloadOnStartup}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 4. App Updates -->
+                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="APP UPDATES" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+
+                        <Grid Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="Automatic Update Checks" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Automatically check for new versions on app startup." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.IsAutoUpdateEnabled}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <Button Command="{Binding CheckForUpdatesCommand}" Content="Check for Updates" Style="{StaticResource PrimaryAction}" Padding="15,8"/>
+                            <TextBlock Text="{Binding Settings.LastUpdateCheck, StringFormat='Last checked: {0:g}'}" 
+                                       FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" 
+                                       VerticalAlignment="Center" Margin="15,0,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 5. Security & Locks -->
+                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="SECURITY &amp; LOCKS" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+
+                        <Grid Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="Startup Entry Lock" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Require a 6-digit access code when the application starts." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.IsStartupLockEnabled}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <Button Command="{Binding ChangeStartupPinCommand}" Content="Change Access Code" Style="{StaticResource SecondaryButton}" Padding="15,8"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
@@ -163,11 +217,11 @@
                         <Grid>
                             <StackPanel>
                                 <TextBlock Text="{Binding AppVersion, StringFormat='Version: {0}'}" FontWeight="Bold" Foreground="White"/>
-                                <TextBlock Text="Compatible with: Windows 10 &amp; 11 (64-bit)" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Compatible with: Windows 10 &amp; 11 (64-bit)" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                             <StackPanel HorizontalAlignment="Right">
                                 <TextBlock Text="MACHINE FINGERPRINT" Style="{StaticResource Caption}" FontSize="8" HorizontalAlignment="Right"/>
-                                <TextBlock Text="{Binding MachineId}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource AccentBrush}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding MachineId}" FontFamily="Consolas" FontSize="11" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -177,7 +231,7 @@
                     <Button Content="Reset Defaults" Command="{Binding ResetDefaultsCommand}" Style="{StaticResource IconButton}" Padding="20,10" Margin="0,0,10,0"/>
                     <Button Command="{Binding SaveConfigCommand}" Style="{StaticResource PrimaryAction}" Padding="25,10">
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Save" Width="12" Margin="0,0,10,0" Foreground="White"/>
+                            <fa:ImageAwesome Icon="Save" Width="12" Margin="0,0,10,0" Foreground="White"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             <TextBlock Text="COMMIT SETTINGS" FontWeight="Bold"/>
                         </StackPanel>
                     </Button>
@@ -186,3 +240,7 @@
         </ScrollViewer>
     </Border>
 </UserControl>
+
+
+
+

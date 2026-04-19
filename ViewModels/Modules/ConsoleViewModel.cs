@@ -1,79 +1,108 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Eternal.Services.System;
+using Eternal.Models;
 
 namespace Eternal.ViewModels.Modules
 {
     public partial class ConsoleViewModel : ObservableObject
     {
-        private readonly IConsoleService _consoleService;
+        private readonly ILoggingService _loggingService;
 
-        public ObservableCollection<string> OutputLines { get; } = new ObservableCollection<string>();
+        public ObservableCollection<ConsoleSession> Sessions { get; } = new ObservableCollection<ConsoleSession>();
         public ObservableCollection<ConsoleMacro> Macros { get; } = new ObservableCollection<ConsoleMacro>();
+        public List<ConsoleProfile> AvailableProfiles { get; } = new List<ConsoleProfile>();
         
-        [ObservableProperty] private string _currentInput = "";
+        [ObservableProperty] private ConsoleSession? _selectedSession;
         [ObservableProperty] private bool _isBusy;
 
-        public ConsoleViewModel(IConsoleService consoleService)
+        public ConsoleViewModel(ILoggingService loggingService)
         {
-            _consoleService = consoleService;
-            _consoleService.OutputReceived += (s, line) =>
-            {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    OutputLines.Add(line);
-                    if (OutputLines.Count > 500) OutputLines.RemoveAt(0);
-                });
-            };
-
+            _loggingService = loggingService;
+            
+            InitializeProfiles();
             InitializeMacros();
-            StartConsoleCommand = new AsyncRelayCommand(StartConsoleAsync);
+            
+            StartConsoleCommand = new AsyncRelayCommand(StartDefaultSessionAsync);
         }
 
         public IAsyncRelayCommand StartConsoleCommand { get; }
 
-        private async Task StartConsoleAsync()
+        private async Task StartDefaultSessionAsync()
         {
-            if (IsBusy) return;
-            IsBusy = true;
-            OutputLines.Add("[ETERNAL] Initializing Integrated Shell Environment...");
-            await _consoleService.StartAsync();
-            IsBusy = false;
+            if (Sessions.Count == 0)
+            {
+                await NewTabAsync(AvailableProfiles.First());
+            }
+        }
+
+        [RelayCommand]
+        private async Task NewTabAsync(ConsoleProfile profile)
+        {
+            if (profile == null) return;
+
+            var session = new ConsoleSession(new WindowsConsoleService(), profile.Name, profile.Icon);
+            Sessions.Add(session);
+            SelectedSession = session;
+            
+            _loggingService.Log($"Console: Opening new {profile.Name} session.");
+            await session.StartAsync(profile.Executable);
+        }
+
+        [RelayCommand]
+        private void CloseTab(ConsoleSession session)
+        {
+            if (session == null) return;
+            
+            session.Dispose();
+            Sessions.Remove(session);
+            
+            if (SelectedSession == null && Sessions.Any())
+            {
+                SelectedSession = Sessions.Last();
+            }
         }
 
         [RelayCommand]
         private async Task SendCommand()
         {
-            if (string.IsNullOrWhiteSpace(CurrentInput)) return;
-            
-            string cmd = CurrentInput;
-            CurrentInput = "";
-            OutputLines.Add($"> {cmd}");
-            await _consoleService.SendCommandAsync(cmd);
+            if (SelectedSession == null) return;
+            await SelectedSession.SendCommandAsync(SelectedSession.CurrentInput);
+            SelectedSession.CurrentInput = "";
         }
 
         [RelayCommand]
         private async Task RunMacro(ConsoleMacro macro)
         {
-            if (macro == null) return;
-            OutputLines.Add($"[MACRO] Running: {macro.Name}");
-            await _consoleService.SendCommandAsync(macro.Command);
+            if (macro == null || SelectedSession == null) return;
+            _loggingService.Log($"Console: Running macro '{macro.Name}' in active session.");
+            await SelectedSession.SendCommandAsync(macro.Command);
         }
 
         [RelayCommand]
         private void ClearConsole()
         {
-            OutputLines.Clear();
-            OutputLines.Add("[ETERNAL] Console Buffer Cleared.");
+            SelectedSession?.OutputLines.Clear();
+            SelectedSession?.OutputLines.Add("[ETERNAL] Console Buffer Cleared.");
+        }
+
+        private void InitializeProfiles()
+        {
+            AvailableProfiles.Add(new ConsoleProfile { Name = "PowerShell", Executable = "powershell.exe", Icon = "Terminal" });
+            AvailableProfiles.Add(new ConsoleProfile { Name = "Command Prompt", Executable = "cmd.exe", Icon = "Code" });
+            
+            // Future: Detect WSL, Git Bash, etc.
         }
 
         private void InitializeMacros()
         {
-            Macros.Add(new ConsoleMacro("Network Status", "netstat -ano | select -first 20", "View active connections"));
+            Macros.Add(new ConsoleMacro("Network Status", "netstat -ano", "View active connections"));
             Macros.Add(new ConsoleMacro("Process Tree", "Get-Process | Sort-Object CPU -Descending | Select-Object -First 15", "List top CPU consumers"));
             Macros.Add(new ConsoleMacro("System Info", "systeminfo", "Detailed Windows summary"));
             Macros.Add(new ConsoleMacro("IP Config", "ipconfig /all", "Detailed adapter info"));

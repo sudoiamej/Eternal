@@ -6,7 +6,7 @@
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d" 
              d:DesignHeight="720" d:DesignWidth="1000"
-             Background="{StaticResource BackgroundBrush}">
+             Background="{DynamicResource BackgroundBrush}">
 
     <Border Padding="40">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -17,26 +17,64 @@
                 </Grid.RowDefinitions>
 
                 <!-- 1. Unified Header (HCI Rule 9 & 18: Consistency & Safety) -->
-                <Grid Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource CriticalBrush}"/>
-                            <TextBlock Text=" › " Style="{StaticResource Caption}"/>
-                            <TextBlock Text="RECOVERY &amp; EMERGENCY CONSOLE" Style="{StaticResource Caption}"/>
-                        </StackPanel>
+                <StackPanel Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
+                    <TextBlock Text="ETERNAL › RECOVERY &amp; EMERGENCY CONSOLE" Style="{StaticResource HeaderBreadcrumb}" Foreground="{DynamicResource CriticalBrush}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Medkit" Width="24" Foreground="{StaticResource CriticalBrush}" VerticalAlignment="Center" Margin="0,0,15,8"/>
+                            <fa:ImageAwesome Icon="Medkit" Width="24" Foreground="{DynamicResource CriticalBrush}" VerticalAlignment="Center" Margin="0,0,15,8"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             <TextBlock Text="PE Mode Diagnostics" Style="{StaticResource H1}" Margin="0"/>
                         </StackPanel>
-                    </StackPanel>
-                    <Button Grid.Column="1" Command="{Binding LoadDiagnosticsCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom" Margin="0,0,0,5" ToolTip="Rerun Hardware Scan">
-                        <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
-                    </Button>
-                </Grid>
+
+                        <!-- PE Environment Status Badge (HCI Rule 7: System Status) -->
+                        <Border Grid.Column="1" Padding="15,8" CornerRadius="4" VerticalAlignment="Center">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="#1A4CAF50"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsInPeMode}" Value="False">
+                                            <Setter Property="Background" Value="#1AF44336"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel Orientation="Horizontal">
+                                <fa:ImageAwesome Icon="InfoCircle" Width="12" Margin="0,0,8,0">
+                                    <fa:ImageAwesome.Style>
+                                        <Style TargetType="fa:ImageAwesome">
+                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsInPeMode}" Value="False">
+                                                    <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </fa:ImageAwesome.Style>
+                                </fa:ImageAwesome>
+                                <TextBlock Text="{Binding StatusMessage}" FontSize="11" FontWeight="Bold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsInPeMode}" Value="False">
+                                                    <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                        CommandParameter="Help" Style="{StaticResource IconButton}" ToolTip="Open Knowledge Base" Margin="15,0,0,0" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="QuestionCircleOutline" Width="10" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
 
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
@@ -47,52 +85,60 @@
                     <!-- 2. Offline Hardware Diagnostics (HCI Rule 6: Conceptual Model) -->
                     <StackPanel Grid.Column="0" Margin="0,0,30,0">
                         <TextBlock Text="OFFLINE HARDWARE DIAGNOSTICS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                        <Border Style="{StaticResource StandardCard}" Padding="30" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                        <Border Style="{StaticResource StandardCard}" Padding="30" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                             <StackPanel>
                                 <Grid Margin="0,0,0,20">
                                     <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="HddOutline" Width="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                                        <TextBlock Text="System Drive Health" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <fa:ImageAwesome Icon="HddOutline" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <TextBlock Text="System Drive Health" FontSize="15" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
-                                    <TextBlock Text="{Binding SystemDriveStatus}" FontSize="15" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Right"/>
-                                </Grid>
-                                
-                                <Grid Margin="0,0,0,20">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Shield" Width="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Boot Record (BCD) Integrity" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                    </StackPanel>
-                                    <TextBlock Text="{Binding BootRecordStatus}" FontSize="15" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Right"/>
+                                    <TextBlock Text="{Binding SystemDriveStatus}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Right"/>
                                 </Grid>
 
-                                <Grid Margin="0,0,0,25">
+                                <Grid Margin="0,0,0,20">
                                     <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Microchip" Width="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Physical Memory Status" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <fa:ImageAwesome Icon="List" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <TextBlock Text="Boot Records (BCD)" FontSize="15" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
-                                    <TextBlock Text="{Binding MemoryStatus}" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextBrush}" HorizontalAlignment="Right"/>
+                                    <TextBlock Text="{Binding BootRecordStatus}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Right"/>
                                 </Grid>
-                                
-                                <Separator Background="{StaticResource BorderBrush}" Margin="0,0,0,20"/>
-                                <TextBlock Text="Note: Diagnostics are performed using native offline calls and do not require active drivers." 
-                                           FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="Microchip" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <TextBlock Text="Memory Allocation" FontSize="15" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding MemoryStatus}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <Separator Background="{DynamicResource BorderBrush}" Margin="0,30,0,25"/>
+
+                                <TextBlock Text="ENVIRONMENTAL DETAILS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                                <Grid Margin="0,0,0,12">
+                                    <TextBlock Text="Boot Media Path" Foreground="{DynamicResource TextDisabledBrush}"/>
+                                    <TextBlock Text="X:\Windows\System32" HorizontalAlignment="Right" Foreground="{DynamicResource TextDisabledBrush}"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="WMI Support" Foreground="{DynamicResource TextDisabledBrush}"/>
+                                    <TextBlock Text="Full (Integrated)" HorizontalAlignment="Right" Foreground="{DynamicResource SuccessBrush}"/>
+                                </Grid>
                             </StackPanel>
                         </Border>
                     </StackPanel>
 
-                    <!-- 3. Recovery Emergency Console (HCI Rule 18: Safety by Design) -->
+                    <!-- 3. Recovery Operations (HCI Rule 18: Error Prevention) -->
                     <StackPanel Grid.Column="1">
-                        <TextBlock Text="SYSTEM RECOVERY TOOLS" Style="{StaticResource Caption}" Margin="0,0,0,15" Foreground="{StaticResource CriticalBrush}"/>
-                        <Border Style="{StaticResource StandardCard}" Padding="20" BorderBrush="{StaticResource CriticalBrush}" BorderThickness="0,0,0,4">
+                        <TextBlock Text="SYSTEM RECOVERY TOOLS" Style="{StaticResource Caption}" Margin="0,0,0,15" Foreground="{DynamicResource CriticalBrush}"/>
+                        <Border Style="{StaticResource StandardCard}" Padding="20" BorderBrush="{DynamicResource CriticalBrush}" BorderThickness="0,0,0,4" Margin="0,0,0,20">
                             <StackPanel>
                                 <Button Command="{Binding RunRecoveryToolCommand}" CommandParameter="BCD Rebuild" 
                                         Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalContentAlignment="Left" Padding="15" Margin="0,0,0,12" Background="#0AFFFFFF">
                                     <Grid>
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                        <fa:ImageAwesome Grid.Column="0" Icon="Wrench" Width="16" Foreground="{StaticResource CriticalBrush}" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                                        <fa:ImageAwesome Grid.Column="0" Icon="Wrench" Width="16" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,15,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <StackPanel Grid.Column="1">
-                                            <TextBlock Text="Rebuild Boot Config (BCD)" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                            <TextBlock Text="Fix missing or corrupt boot files." FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="Rebuild Boot Config (BCD)" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                            <TextBlock Text="Fix missing or corrupt boot files." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         </StackPanel>
                                     </Grid>
                                 </Button>
@@ -101,10 +147,10 @@
                                         Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalContentAlignment="Left" Padding="15" Margin="0,0,0,12" Background="#0AFFFFFF">
                                     <Grid>
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                        <fa:ImageAwesome Grid.Column="0" Icon="Search" Width="16" Foreground="{StaticResource WarningBrush}" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                                        <fa:ImageAwesome Grid.Column="0" Icon="Search" Width="16" Foreground="{DynamicResource WarningBrush}" Margin="0,0,15,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <StackPanel Grid.Column="1">
-                                            <TextBlock Text="System File Checker" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                            <TextBlock Text="Repair corrupt Windows system files." FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="System File Checker" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                            <TextBlock Text="Repair corrupt Windows system files." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         </StackPanel>
                                     </Grid>
                                 </Button>
@@ -113,30 +159,28 @@
                                         Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalContentAlignment="Left" Padding="15" Background="#0AFFFFFF">
                                     <Grid>
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                        <fa:ImageAwesome Grid.Column="0" Icon="HddOutline" Width="16" Foreground="{StaticResource InfoBrush}" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                                        <fa:ImageAwesome Grid.Column="0" Icon="HddOutline" Width="16" Foreground="{DynamicResource InfoBrush}" Margin="0,0,15,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <StackPanel Grid.Column="1">
-                                            <TextBlock Text="Check Disk (Chkdsk)" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                            <TextBlock Text="Scan and repair filesystem errors." FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="Check Disk (Chkdsk)" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                            <TextBlock Text="Scan and repair filesystem errors." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         </StackPanel>
                                     </Grid>
                                 </Button>
                             </StackPanel>
                         </Border>
-                        <TextBlock Text="Warning: These tools can modify system state. Ensure data is backed up before execution." 
-                                   FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,15,0,0" TextAlignment="Center" TextWrapping="Wrap"/>
+
+                        <TextBlock Text="BOOT CONTROL" Style="{StaticResource Caption}" Margin="0,0,0,15" Foreground="{DynamicResource InfoBrush}"/>
+                        <Border Style="{StaticResource StandardCard}" Padding="20">
+                            <StackPanel>
+                                <Button Command="{Binding RestartInWinRECommand}" Content="RESTART IN WinRE" Style="{StaticResource PrimaryAction}" Padding="15,10" Margin="0,0,0,10"/>
+                                <Button Command="{Binding RestartInPeModeCommand}" Content="FORCE PE BOOT" Style="{StaticResource SecondaryButton}" Padding="15,10"/>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </Grid>
-
-                <!-- Loading Overlay (HCI Rule 7: Status) -->
-                <Border Grid.RowSpan="2" Background="#CC000000" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}" Margin="-40">
-                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource CriticalBrush}" Width="48" Margin="0,0,0,20"/>
-                        <TextBlock Text="Initializing System Recovery Console..." FontSize="18" Foreground="{StaticResource TextBrush}" FontWeight="Bold"/>
-                        <TextBlock Text="Scanning hardware and boot sectors..." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Border>
             </Grid>
         </ScrollViewer>
     </Border>
-
 </UserControl>
+
+

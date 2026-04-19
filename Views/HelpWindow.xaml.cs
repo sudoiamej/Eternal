@@ -1,6 +1,6 @@
 using System.Windows;
-using System.Windows.Controls;
 using Eternal.ViewModels;
+using Eternal.Services.System;
 
 namespace Eternal.Views
 {
@@ -8,18 +8,15 @@ namespace Eternal.Views
     {
         private readonly HelpViewModel _viewModel;
 
-        public HelpWindow()
+        public HelpWindow(string? initialTopicId = null)
         {
             InitializeComponent();
-            _viewModel = new HelpViewModel();
+            _viewModel = new HelpViewModel(new WindowsKnowledgeBaseService());
             this.DataContext = _viewModel;
-        }
-
-        private void TopicList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count > 0 && e.AddedItems[0] is ListBoxItem item)
+            
+            if (!string.IsNullOrEmpty(initialTopicId))
             {
-                _viewModel?.ChangeTopic(item.Content.ToString());
+                _ = _viewModel.InitializeAsync(initialTopicId);
             }
         }
 

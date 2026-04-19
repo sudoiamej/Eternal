@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.Win32;
 using System.Management;
 using System.Runtime.InteropServices;
+using Eternal.Models;
 
 namespace Eternal.Services.System
 {
@@ -14,6 +15,7 @@ namespace Eternal.Services.System
     {
         public async Task<(bool Success, string Message)> ToggleDevModeAsync(bool enable)
         {
+            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Dev Mode {(enable ? "Enabled" : "Disabled")}");
             try
             {
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true))
@@ -35,6 +37,7 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> ApplyServiceProfileAsync(string profileName)
         {
+            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Applied Service Profile: {profileName}");
             try
             {
                 var servicesToKill = new List<string>();
@@ -94,6 +97,7 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> IdentifyAndKillFileHandleAsync(string filePath)
         {
+            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Identified and killed process holding handle to: {filePath}");
             try
             {
                 // This typically requires 'handle.exe' from Sysinternals, but we can attempt to identify via WMI or CIM
@@ -138,6 +142,7 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> ToggleDevHostEntryAsync(bool enable)
         {
+            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Dev Host Entry {(enable ? "Added" : "Removed")}");
             try
             {
                 string hostsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), @"drivers\etc\hosts");
@@ -155,6 +160,7 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> PurgeStandbyMemoryAsync()
         {
+            if (DeveloperEnvironment.IsTestingModeActive) return (true, "[SIMULATION] Standby Memory Purge Executed.");
             try
             {
                 // Reclaim Working Set for all processes as a "Soft Purge"
@@ -172,6 +178,7 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> CreateDirectoryJunctionAsync(string source, string target)
         {
+            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Directory Junction created: {target} -> {source}");
             try
             {
                 var psi = new ProcessStartInfo("cmd", $"/c mklink /j \"{target}\" \"{source}\"") { WindowStyle = ProcessWindowStyle.Hidden };
@@ -183,34 +190,81 @@ namespace Eternal.Services.System
 
         public async Task<List<ProcessSecurityInfo>> GetUnsignedProcessesAsync()
         {
-            var unsigned = new List<ProcessSecurityInfo>();
-            try
+            return await Task.Run(async () =>
             {
-                var processes = Process.GetProcesses().Where(p => p.Id > 10 && !p.ProcessName.Equals("Idle", StringComparison.OrdinalIgnoreCase)).Take(20);
-                foreach (var p in processes)
+                var suspicious = new List<ProcessSecurityInfo>();
+                try
                 {
-                    try
+                    var processes = Process.GetProcesses().Where(p => p.Id > 10).ToList();
+                    string tempPath = Path.GetTempPath().ToLower();
+                    string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToLower();
+
+                    foreach (var p in processes)
                     {
-                        string path = p.MainModule.FileName;
-                        // Using PowerShell to check signature (Creator-level trick)
-                        var psi = new ProcessStartInfo("powershell", $"-Command \"(Get-AuthenticodeSignature '{path}').Status\"") { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
-                        var proc = Process.Start(psi);
-                        string status = await proc.StandardOutput.ReadToEndAsync();
-                        
-                        if (!status.Contains("Valid"))
+                        try
                         {
-                            unsigned.Add(new ProcessSecurityInfo { PID = p.Id, Name = p.ProcessName, Path = path, IsSigned = false });
+                            string path = p.MainModule?.FileName ?? "";
+                            if (string.IsNullOrEmpty(path)) continue;
+
+                            bool isSuspicious = false;
+                            string reason = "Unsigned Binary";
+
+                            // 1. Path Heuristics
+                            string lowerPath = path.ToLower();
+                            if (lowerPath.StartsWith(tempPath) || lowerPath.Contains(@"\appdata\local\temp\"))
+                            {
+                                isSuspicious = true;
+                                reason = "Running from Temp directory";
+                            }
+                            else if (lowerPath.Contains(@"\appdata\roaming\") && !lowerPath.Contains(@"\microsoft\"))
+                            {
+                                isSuspicious = true;
+                                reason = "Non-standard AppData execution";
+                            }
+
+                            // 2. Extension Heuristics (Double Extensions)
+                            string fileName = Path.GetFileName(path).ToLower();
+                            if (fileName.Contains(".pdf.exe") || fileName.Contains(".txt.exe") || fileName.Contains(".jpg.exe"))
+                            {
+                                isSuspicious = true;
+                                reason = "Masquerading Extension detected";
+                            }
+
+                            // 3. Signature Check (Async PowerShell)
+                            if (!isSuspicious)
+                            {
+                                var psi = new ProcessStartInfo("powershell", $"-Command \"(Get-AuthenticodeSignature '{path}').Status\"") { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
+                                var signProc = Process.Start(psi);
+                                string status = await signProc.StandardOutput.ReadToEndAsync();
+                                if (!status.Contains("Valid"))
+                                {
+                                    isSuspicious = true;
+                                    reason = "Unsigned Binary";
+                                }
+                            }
+
+                            if (isSuspicious)
+                            {
+                                suspicious.Add(new ProcessSecurityInfo { 
+                                    PID = p.Id, 
+                                    Name = p.ProcessName, 
+                                    Path = path, 
+                                    IsSigned = !reason.Contains("Unsigned"),
+                                    Description = reason 
+                                });
+                            }
                         }
+                        catch { }
                     }
-                    catch { }
                 }
-            }
-            catch { }
-            return unsigned;
+                catch { }
+                return suspicious;
+            });
         }
 
         public async Task<(bool Success, string Message)> SuspendProcessAsync(int pid)
         {
+            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Suspended Process {pid}");
             try
             {
                 // This is a "Creator" trick: using the undocumented NtSuspendProcess via a child process or ntdll (simplified here with a taskkill-like pause)
@@ -225,25 +279,67 @@ namespace Eternal.Services.System
 
         public async Task<List<PersistenceEntry>> GetPersistenceEntriesAsync()
         {
-            var entries = new List<PersistenceEntry>();
-            try
+            return await Task.Run(() =>
             {
-                // Registry Run Keys
-                using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run"))
+                var entries = new List<PersistenceEntry>();
+                string[] locations = {
+                    @"Software\Microsoft\Windows\CurrentVersion\Run",
+                    @"Software\Microsoft\Windows\CurrentVersion\RunOnce"
+                };
+
+                // 1. Audit Current User (HKCU)
+                foreach (var loc in locations)
                 {
-                    if (key != null)
-                    {
-                        foreach (var name in key.GetValueNames())
-                            entries.Add(new PersistenceEntry { Name = name, Command = key.GetValue(name).ToString(), Location = "HKCU Run", Type = "Registry" });
-                    }
+                    try {
+                        using var key = Registry.CurrentUser.OpenSubKey(loc);
+                        if (key != null) {
+                            foreach (var name in key.GetValueNames())
+                                entries.Add(new PersistenceEntry { Name = name, Command = key.GetValue(name)?.ToString() ?? "", Location = $"HKCU {loc.Split('\\').Last()}", Type = "Registry" });
+                        }
+                    } catch { }
                 }
-            }
-            catch { }
-            return entries;
+
+                // 2. Audit Local Machine (HKLM) - Requires Admin
+                foreach (var loc in locations)
+                {
+                    try {
+                        using var key = Registry.LocalMachine.OpenSubKey(loc);
+                        if (key != null) {
+                            foreach (var name in key.GetValueNames())
+                                entries.Add(new PersistenceEntry { Name = name, Command = key.GetValue(name)?.ToString() ?? "", Location = $"HKLM {loc.Split('\\').Last()}", Type = "Registry" });
+                        }
+                    } catch { }
+                }
+                
+                return entries;
+            });
+        }
+
+        public async Task<(bool Success, string Message)> RemovePersistenceEntryAsync(string location, string name)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    bool isHklm = location.StartsWith("HKLM");
+                    string subKey = location.Replace("HKLM ", "").Replace("HKCU ", "");
+                    string registryPath = $@"Software\Microsoft\Windows\CurrentVersion\{subKey}";
+
+                    using var baseKey = isHklm ? Registry.LocalMachine.OpenSubKey(registryPath, true) : Registry.CurrentUser.OpenSubKey(registryPath, true);
+                    if (baseKey != null)
+                    {
+                        baseKey.DeleteValue(name, false);
+                        return (true, $"Persistence entry '{name}' removed from {location}.");
+                    }
+                    return (false, "Registry key not found.");
+                }
+                catch (Exception ex) { return (false, ex.Message); }
+            });
         }
 
         public async Task<(bool Success, string Message)> IsolateProcessNetworkAsync(int pid, bool block)
         {
+            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Network Isolation {(block ? "Enabled" : "Disabled")} for PID {pid}");
             try
             {
                 string ruleName = $"EternalIsolation_{pid}";
@@ -266,6 +362,7 @@ namespace Eternal.Services.System
         private FileSystemWatcher _ransomWatcher;
         public async Task<(bool Success, string Message)> EnableRansomGuardAsync(bool enable)
         {
+            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Ransom Guard {(enable ? "Activated" : "Deactivated")}");
             try
             {
                 if (enable)

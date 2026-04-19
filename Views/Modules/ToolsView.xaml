@@ -12,7 +12,7 @@
                     <Grid Style="{StaticResource ModuleHeaderStyle}">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                                <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                                 <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                                 <TextBlock Text="SYSTEM TOOLKIT" Style="{StaticResource Caption}"/>
                             </StackPanel>
@@ -25,10 +25,10 @@
                         <Button Command="{Binding FlushDnsCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Globe" Width="20" Margin="0,0,15,0" Foreground="{StaticResource AccentBrush}"/>
+                                    <fa:ImageAwesome Icon="Globe" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
-                                        <TextBlock Text="Flush DNS Cache" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                        <TextBlock Text="Clears system DNS resolver records." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="Flush DNS Cache" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Clears system DNS resolver records." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -37,10 +37,10 @@
                         <Button Command="{Binding ClearTempCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="TrashOutline" Width="20" Margin="0,0,15,0" Foreground="{StaticResource AccentBrush}"/>
+                                    <fa:ImageAwesome Icon="TrashOutline" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
-                                        <TextBlock Text="Clear Temp Files" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                        <TextBlock Text="Deletes files in the system temp directory." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="Clear Temp Files" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Deletes files in the system temp directory." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -49,10 +49,10 @@
                         <Button Command="{Binding RebuildIconsCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Refresh" Width="20" Margin="0,0,15,0" Foreground="{StaticResource AccentBrush}"/>
+                                    <fa:ImageAwesome Icon="Refresh" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
-                                        <TextBlock Text="Rebuild Icon Cache" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                        <TextBlock Text="Forces Windows to reload explorer icons." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="Rebuild Icon Cache" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Forces Windows to reload explorer icons." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -61,10 +61,10 @@
                         <Button Command="{Binding ResetNetworkCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Wifi" Width="20" Margin="0,0,15,0" Foreground="{StaticResource AccentBrush}"/>
+                                    <fa:ImageAwesome Icon="Wifi" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
-                                        <TextBlock Text="Reset Network Stack" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                        <TextBlock Text="Reinitializes Winsock and IP stack." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="Reset Network Stack" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Reinitializes Winsock and IP stack." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -74,24 +74,24 @@
                     <TextBlock Text="SYSTEM INTEGRITY REPAIR" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
                     <UniformGrid Columns="2">
                         <Button Command="{Binding RepairSystemFilesCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
-                            <Border Style="{StaticResource StandardCard}" Margin="0" BorderBrush="{StaticResource InfoBrush}">
+                            <Border Style="{StaticResource StandardCard}" Margin="0" BorderBrush="{DynamicResource InfoBrush}">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Shield" Width="20" Margin="0,0,15,0" Foreground="{StaticResource InfoBrush}"/>
+                                    <fa:ImageAwesome Icon="Shield" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource InfoBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
-                                        <TextBlock Text="SFC Scan &amp; Repair" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                        <TextBlock Text="Repairs corrupted system files (Admin)." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="SFC Scan &amp; Repair" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Repairs corrupted system files (Admin)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
                         </Button>
 
                         <Button Command="{Binding RunDismCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
-                            <Border Style="{StaticResource StandardCard}" Margin="0" BorderBrush="{StaticResource InfoBrush}">
+                            <Border Style="{StaticResource StandardCard}" Margin="0" BorderBrush="{DynamicResource InfoBrush}">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Magic" Width="20" Margin="0,0,15,0" Foreground="{StaticResource InfoBrush}"/>
+                                    <fa:ImageAwesome Icon="Magic" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource InfoBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
-                                        <TextBlock Text="DISM Health Restore" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                        <TextBlock Text="Repairs Windows Component Store (Admin)." FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="DISM Health Restore" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Repairs Windows Component Store (Admin)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -102,3 +102,7 @@
         </Grid>
     </Border>
 </UserControl>
+
+
+
+

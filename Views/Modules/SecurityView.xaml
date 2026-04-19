@@ -20,14 +20,14 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                         <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                         <TextBlock Text="SECURITY &amp; INTEGRITY" Style="{StaticResource Caption}"/>
                     </StackPanel>
                     <TextBlock Text="Security Audit" Style="{StaticResource H1}" Margin="0"/>
                 </StackPanel>
                 <Button Grid.Column="1" Command="{Binding LoadCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom" Margin="0,0,0,5">
-                    <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                 </Button>
             </Grid>
 
@@ -50,23 +50,23 @@
                                 <StackPanel>
                                     <TextBlock Text="WINDOWS DEFENDER" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                        <TextBlock Text="Real-time: " Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
-                                        <TextBlock Text="ACTIVE" Foreground="{StaticResource SuccessBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding Defender.RealTimeProtection, Converter={StaticResource VisibilityConverter}}"/>
-                                        <TextBlock Text="OFF" Foreground="{StaticResource CriticalBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding Defender.RealTimeProtection, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
+                                        <TextBlock Text="Real-time: " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBlock Text="ACTIVE" Foreground="{DynamicResource SuccessBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding Defender.RealTimeProtection, Converter={StaticResource VisibilityConverter}}"/>
+                                        <TextBlock Text="OFF" Foreground="{DynamicResource CriticalBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding Defender.RealTimeProtection, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Cloud Protection: " Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
-                                        <TextBlock Text="ENABLED" Foreground="{StaticResource SuccessBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding Defender.AntivirusEnabled, Converter={StaticResource VisibilityConverter}}"/>
-                                        <TextBlock Text="INACTIVE" Foreground="{StaticResource CriticalBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding Defender.AntivirusEnabled, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
+                                        <TextBlock Text="Cloud Protection: " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBlock Text="ENABLED" Foreground="{DynamicResource SuccessBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding Defender.AntivirusEnabled, Converter={StaticResource VisibilityConverter}}"/>
+                                        <TextBlock Text="INACTIVE" Foreground="{DynamicResource CriticalBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding Defender.AntivirusEnabled, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
                                     </StackPanel>
                                 </StackPanel>
                                 <fa:ImageAwesome Grid.Column="1" Icon="Shield" Width="24" Opacity="0.5" VerticalAlignment="Center">
                                     <fa:ImageAwesome.Style>
                                         <Style TargetType="fa:ImageAwesome">
-                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Defender.RealTimeProtection}" Value="False">
-                                                    <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                    <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -85,13 +85,13 @@
                                 <StackPanel>
                                     <TextBlock Text="WINDOWS RECOVERY (REAGENT)" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                        <TextBlock Text="Status: " Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
-                                        <TextBlock Text="ENABLED" Foreground="{StaticResource SuccessBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding ReAgent.IsEnabled, Converter={StaticResource VisibilityConverter}}"/>
-                                        <TextBlock Text="DISABLED" Foreground="{StaticResource WarningBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding ReAgent.IsEnabled, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
+                                        <TextBlock Text="Status: " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBlock Text="ENABLED" Foreground="{DynamicResource SuccessBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding ReAgent.IsEnabled, Converter={StaticResource VisibilityConverter}}"/>
+                                        <TextBlock Text="DISABLED" Foreground="{DynamicResource WarningBrush}" FontWeight="Bold" FontSize="12" Visibility="{Binding ReAgent.IsEnabled, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
                                     </StackPanel>
-                                    <TextBlock Text="{Binding ReAgent.WindowsLocation}" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding ReAgent.WindowsLocation}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
-                                <fa:ImageAwesome Grid.Column="1" Icon="LifeRing" Width="24" Foreground="{StaticResource InfoBrush}" Opacity="0.5" VerticalAlignment="Center"/>
+                                <fa:ImageAwesome Grid.Column="1" Icon="LifeRing" Width="24" Foreground="{DynamicResource InfoBrush}" Opacity="0.5" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             </Grid>
                         </Border>
                     </Grid>
@@ -102,14 +102,14 @@
                         <DataGrid ItemsSource="{Binding BitLockerVolumes}" AutoGenerateColumns="False" 
                                   IsReadOnly="True" Background="Transparent" BorderThickness="0" 
                                   RowBackground="Transparent" GridLinesVisibility="None"
-                                  Foreground="{StaticResource TextBrush}" CanUserAddRows="False">
+                                  Foreground="{DynamicResource TextBrush}" CanUserAddRows="False">
                             <DataGrid.Resources>
                                 <Style TargetType="DataGridColumnHeader">
                                     <Setter Property="Background" Value="#0DFFFFFF"/>
-                                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                     <Setter Property="Padding" Value="10,5"/>
                                     <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                                    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                 </Style>
                             </DataGrid.Resources>
                             <DataGrid.Columns>
@@ -120,10 +120,10 @@
                                             <TextBlock Text="{Binding ProtectionStatus}" FontWeight="Bold">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding ProtectionStatus}" Value="Off">
-                                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -144,15 +144,15 @@
                         <DataGrid ItemsSource="{Binding Startups}" AutoGenerateColumns="False" 
                                   IsReadOnly="True" Background="Transparent" BorderThickness="0" 
                                   RowBackground="Transparent" GridLinesVisibility="None"
-                                  Foreground="{StaticResource TextBrush}" CanUserAddRows="False"
+                                  Foreground="{DynamicResource TextBrush}" CanUserAddRows="False"
                                   Height="200">
                             <DataGrid.Resources>
                                 <Style TargetType="DataGridColumnHeader">
                                     <Setter Property="Background" Value="#0DFFFFFF"/>
-                                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                     <Setter Property="Padding" Value="10,5"/>
                                     <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                                    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                 </Style>
                             </DataGrid.Resources>
                             <DataGrid.Columns>
@@ -169,15 +169,15 @@
                         <DataGrid ItemsSource="{Binding Services}" AutoGenerateColumns="False" 
                                   IsReadOnly="True" Background="Transparent" BorderThickness="0" 
                                   RowBackground="Transparent" GridLinesVisibility="None"
-                                  Foreground="{StaticResource TextBrush}" CanUserAddRows="False"
+                                  Foreground="{DynamicResource TextBrush}" CanUserAddRows="False"
                                   Height="200">
                             <DataGrid.Resources>
                                 <Style TargetType="DataGridColumnHeader">
                                     <Setter Property="Background" Value="#0DFFFFFF"/>
-                                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                     <Setter Property="Padding" Value="10,5"/>
                                     <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                                    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                 </Style>
                             </DataGrid.Resources>
                             <DataGrid.Columns>
@@ -194,10 +194,14 @@
             <!-- Loading Overlay -->
             <Border Grid.RowSpan="2" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
-                    <TextBlock Text="Auditing System Security..." FontSize="18" Foreground="{StaticResource TextBrush}"/>
+                    <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                    <TextBlock Text="Auditing System Security..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
                 </StackPanel>
             </Border>
         </Grid>
     </Border>
 </UserControl>
+
+
+
+

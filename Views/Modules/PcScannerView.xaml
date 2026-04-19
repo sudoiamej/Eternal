@@ -1,0 +1,242 @@
+<UserControl x:Class="Eternal.Views.Modules.PcScannerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:vmm="clr-namespace:Eternal.ViewModels.Modules"
+             xmlns:models="clr-namespace:Eternal.Models"
+             mc:Ignorable="d" 
+             d:DesignHeight="720" d:DesignWidth="1000">
+
+    <Grid>
+        <Border Padding="40">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <DataTemplate x:Key="IssueItemTemplate">
+                            <Border Background="{DynamicResource CardBrush}" Padding="20" Margin="0,0,0,12" CornerRadius="6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <fa:ImageAwesome Grid.Column="0" Width="18" VerticalAlignment="Top" Margin="0,2,20,0">
+                                        <fa:ImageAwesome.Style>
+                                            <Style TargetType="fa:ImageAwesome">
+                                                <Setter Property="Icon" Value="ExclamationCircle"/>
+                                                <Style.Triggers>
+                                                    <!-- Category Icons -->
+                                                    <DataTrigger Binding="{Binding Category}" Value="Security">
+                                                        <Setter Property="Icon" Value="Shield"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Category}" Value="Storage">
+                                                        <Setter Property="Icon" Value="Database"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Category}" Value="Performance">
+                                                        <Setter Property="Icon" Value="Flash"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Category}" Value="Cleanup">
+                                                        <Setter Property="Icon" Value="TrashOutline"/>
+                                                    </DataTrigger>
+                                                    
+                                                    <!-- Severity Colors -->
+                                                    <DataTrigger Binding="{Binding Severity}" Value="Required">
+                                                        <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Severity}" Value="Recommended">
+                                                        <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Severity}" Value="Optional">
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </fa:ImageAwesome.Style>
+                                    </fa:ImageAwesome>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14" Foreground="White"/>
+                                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,5,30,0" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <Button Grid.Column="2" Command="{Binding DataContext.FixIssueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                            CommandParameter="{Binding}" VerticalAlignment="Center" Padding="15,7">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActionType}" Value="AutoFix">
+                                                        <Setter Property="Content" Value="FIX NOW"/>
+                                                        <Setter Property="Background" Value="#1A4CAF50"/>
+                                                        <Setter Property="ToolTip" Value="Attempt to resolve this issue automatically with one click."/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding ActionType}" Value="ManualNavigation">
+                                                        <Setter Property="Content" Value="REVIEW"/>
+                                                        <Setter Property="ToolTip" Value="Navigate to the specialized module to address this issue manually."/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </StackPanel.Resources>
+
+                    <!-- Header -->
+                    <StackPanel Style="{StaticResource ModuleHeaderStyle}">
+                        <TextBlock Text="ETERNAL › SYSTEM DIAGNOSTICS" Style="{StaticResource HeaderBreadcrumb}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="PC Intelligence Scanner" Style="{StaticResource H1}" Margin="0"/>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Bottom">
+                                <TextBlock Text="SORT BY" Style="{StaticResource Caption}" HorizontalAlignment="Right" Margin="0,0,5,5" Opacity="0.5"/>
+                                <ComboBox SelectedValue="{Binding CurrentSortOption}" SelectedValuePath="Tag" Width="150"
+                                          Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}">
+                                    <ComboBoxItem Content="Default" Tag="{x:Static models:ScannerSortOption.Default}"/>
+                                    <ComboBoxItem Content="Level" Tag="{x:Static models:ScannerSortOption.Level}"/>
+                                    <ComboBoxItem Content="Easy to Hard" Tag="{x:Static models:ScannerSortOption.EasyToHard}"/>
+                                    <ComboBoxItem Content="Alphabetical" Tag="{x:Static models:ScannerSortOption.Alphabetical}"/>
+                                    <ComboBoxItem Content="Safe to Dangerous" Tag="{x:Static models:ScannerSortOption.SafeToDangerous}"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Scan Control Banner -->
+                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,30" Padding="30">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Width="64" Height="64" Background="{DynamicResource CardBrush}" CornerRadius="32" Margin="0,0,25,0">
+                                <fa:ImageAwesome Icon="Search" Width="28" Foreground="{DynamicResource AccentBrush}" 
+                                                 Spin="{Binding IsScanning}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            </Border>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding ScanStatus}" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                                <ProgressBar Height="6" Margin="0,15,40,0" Value="{Binding ScanProgress}" 
+                                             Style="{StaticResource GlowingProgressBar}"
+                                             Visibility="{Binding IsScanning, Converter={StaticResource VisibilityConverter}}"/>
+                            </StackPanel>
+
+
+                            <Button Grid.Column="2" Command="{Binding StartScanCommand}" IsEnabled="{Binding IsScanning, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"
+                                    Content="START FULL SCAN" Style="{StaticResource PrimaryAction}" Padding="30,12"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Summary Cards -->
+                    <UniformGrid Columns="3" Margin="0,0,0,30">
+                        <Border Style="{StaticResource StandardCard}" Margin="0,0,15,0" Padding="20" BorderBrush="{DynamicResource CriticalBrush}" BorderThickness="0,0,0,3">
+                            <StackPanel>
+                                <TextBlock Text="REQUIRED" Style="{StaticResource Caption}" Foreground="{DynamicResource CriticalBrush}"/>
+                                <TextBlock Text="{Binding RequiredCount}" FontSize="32" FontWeight="Black" Foreground="White" Margin="0,5"/>
+                                <TextBlock Text="Critical issues needing attention" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource StandardCard}" Margin="7,0,7,0" Padding="20" BorderBrush="{DynamicResource WarningBrush}" BorderThickness="0,0,0,3">
+                            <StackPanel>
+                                <TextBlock Text="RECOMMENDED" Style="{StaticResource Caption}" Foreground="{DynamicResource WarningBrush}"/>
+                                <TextBlock Text="{Binding RecommendedCount}" FontSize="32" FontWeight="Black" Foreground="White" Margin="0,5"/>
+                                <TextBlock Text="Performance &amp; security improvements" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource StandardCard}" Margin="15,0,0,0" Padding="20" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0,0,0,3">
+                            <StackPanel>
+                                <TextBlock Text="OPTIONAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
+                                <TextBlock Text="{Binding OptionalCount}" FontSize="32" FontWeight="Black" Foreground="White" Margin="0,5"/>
+                                <TextBlock Text="Minor optimizations &amp; maintenance" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <!-- Tiered View (Default Sort) -->
+                    <StackPanel Name="TieredContainer">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentSortOption}" Value="Default">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </Style>
+                        </StackPanel.Style>
+                        
+                        <!-- Required Issues List -->
+                        <StackPanel Visibility="{Binding RequiredCount, Converter={StaticResource VisibilityConverter}}">
+                            <TextBlock Text="REQUIRED ACTIONS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            <ItemsControl ItemsSource="{Binding RequiredIssues}" ItemTemplate="{StaticResource IssueItemTemplate}"/>
+                        </StackPanel>
+
+                        <!-- Recommended Issues List -->
+                        <StackPanel Visibility="{Binding RecommendedCount, Converter={StaticResource VisibilityConverter}}" Margin="0,20,0,0">
+                            <TextBlock Text="RECOMMENDED IMPROVEMENTS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            <ItemsControl ItemsSource="{Binding RecommendedIssues}" ItemTemplate="{StaticResource IssueItemTemplate}"/>
+                        </StackPanel>
+
+                        <!-- Optional Issues List -->
+                        <StackPanel Visibility="{Binding OptionalCount, Converter={StaticResource VisibilityConverter}}" Margin="0,20,0,0">
+                            <TextBlock Text="OPTIONAL OPTIMIZATIONS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            <ItemsControl ItemsSource="{Binding OptionalIssues}" ItemTemplate="{StaticResource IssueItemTemplate}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Sorted View (Any other Sort) -->
+                    <StackPanel Name="SortedContainer">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentSortOption}" Value="Default">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </Style>
+                        </StackPanel.Style>
+                        
+                        <TextBlock Text="SORTED DIAGNOSTICS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                        <ItemsControl ItemsSource="{Binding SortedIssues}" ItemTemplate="{StaticResource IssueItemTemplate}"/>
+                    </StackPanel>
+
+                    <!-- Empty State -->
+                    <Border Background="{DynamicResource CardBrush}" Padding="40" CornerRadius="8" Margin="0,20,0,0"
+                            Visibility="{Binding RequiredCount, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RecommendedCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel HorizontalAlignment="Center">
+                            <fa:ImageAwesome Icon="CheckCircle" Width="48" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <TextBlock Text="Your system is currently within optimal parameters." 
+                                       Foreground="White" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Run a full scan periodically to ensure security and performance integrity." 
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>
+
+
+
+

@@ -8,6 +8,11 @@ namespace Eternal.Services.System
 {
     public class WindowsBiosService : IBiosService
     {
+        private readonly EnumerationOptions _wmiOptions = new EnumerationOptions { Timeout = TimeSpan.FromSeconds(5) };
+
+        private ManagementObjectSearcher CreateSearcher(string query, string? scope = null) 
+            => new ManagementObjectSearcher(scope, query, _wmiOptions);
+
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern int GetFirmwareEnvironmentVariable(string lpName, string lpGuid, IntPtr pBuffer, uint nSize);
 
@@ -21,7 +26,7 @@ namespace Eternal.Services.System
 
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("select * from Win32_BIOS");
+                    using var searcher = CreateSearcher("select Manufacturer, SMBIOSBIOSVersion, ReleaseDate from Win32_BIOS");
                     foreach (var obj in searcher.Get())
                     {
                         vendor = obj["Manufacturer"]?.ToString() ?? vendor;
@@ -71,9 +76,7 @@ namespace Eternal.Services.System
 
                     try
                     {
-                        var scope = new ManagementScope(@"Root\CIMV2\Security\MicrosoftTpm");
-                        scope.Connect();
-                        using var searcher = new ManagementObjectSearcher(scope, new ObjectQuery("select * from Win32_Tpm"));
+                        using var searcher = CreateSearcher("select IsEnabled_InitialValue, IsActivated_InitialValue, IsOwned_InitialValue, SpecVersion, ManufacturerId from Win32_Tpm", @"Root\CIMV2\Security\MicrosoftTpm");
                         foreach (var obj in searcher.Get())
                         {
                             bool isEnabled = global::System.Convert.ToBoolean(obj["IsEnabled_InitialValue"] ?? false);

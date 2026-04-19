@@ -22,14 +22,14 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                             <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                             <TextBlock Text="SYSTEM ENVIRONMENT" Style="{StaticResource Caption}"/>
                         </StackPanel>
                         <TextBlock Text="Environment Manager" Style="{StaticResource H1}" Margin="0"/>
                     </StackPanel>
                     <Button Grid.Column="1" Command="{Binding LoadCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom" Margin="0,0,0,5" ToolTip="Refresh Variables">
-                        <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     </Button>
                 </Grid>
 
@@ -40,14 +40,14 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <fa:ImageAwesome Icon="Code" Width="32" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,25,0"/>
+                        <fa:ImageAwesome Icon="Code" Width="32" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,25,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Text="CONFIGURATION AUDIT" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Variables.Count}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
-                                <TextBlock Text=" Active Environment Variables Defined" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="5,0,0,2"/>
+                                <TextBlock Text="{Binding Variables.Count}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text=" Active Environment Variables Defined" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="5,0,0,2"/>
                             </StackPanel>
-                            <TextBlock Text="Variables define the execution context for system processes and user applications." FontSize="11" Foreground="{StaticResource InfoBrush}" Margin="0,5,0,0"/>
+                            <TextBlock Text="Variables define the execution context for system processes and user applications." FontSize="11" Foreground="{DynamicResource InfoBrush}" Margin="0,5,0,0"/>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -56,15 +56,15 @@
                 <DataGrid Grid.Row="2" ItemsSource="{Binding Variables}" AutoGenerateColumns="False" 
                           IsReadOnly="True" Background="Transparent" BorderThickness="0" 
                           RowBackground="Transparent" GridLinesVisibility="None"
-                          Foreground="{StaticResource TextBrush}" CanUserAddRows="False"
+                          Foreground="{DynamicResource TextBrush}" CanUserAddRows="False"
                           VirtualizingStackPanel.IsVirtualizing="True">
                     <DataGrid.Resources>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="Background" Value="{StaticResource CardBrush}"/>
-                            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                             <Setter Property="Padding" Value="10,5"/>
                             <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                         </Style>
                     </DataGrid.Resources>
                     <DataGrid.Columns>
@@ -81,7 +81,7 @@
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                     <Setter Property="FontSize" Value="11"/>
                                     <Setter Property="VerticalAlignment" Value="Center"/>
                                 </Style>
@@ -96,7 +96,7 @@
                                             Style="{StaticResource IconButton}"
                                             ToolTip="Modify Variable (Validation Required)"
                                             HorizontalAlignment="Center">
-                                        <fa:ImageAwesome Icon="Pencil" Width="12" Foreground="{StaticResource TextSecondaryBrush}" Opacity="0.6"/>
+                                        <fa:ImageAwesome Icon="Pencil" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.6"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     </Button>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -107,8 +107,8 @@
                 <!-- Loading Overlay (HCI Rule 7: Status) -->
                 <Border Grid.RowSpan="3" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}" Margin="-40">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
-                        <TextBlock Text="Parsing System Environment..." FontSize="18" Foreground="{StaticResource TextBrush}"/>
+                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <TextBlock Text="Parsing System Environment..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -116,3 +116,7 @@
     </Border>
 
 </UserControl>
+
+
+
+

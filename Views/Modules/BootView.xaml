@@ -20,14 +20,14 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                         <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                         <TextBlock Text="BOOT ARCHITECTURE" Style="{StaticResource Caption}"/>
                     </StackPanel>
                     <TextBlock Text="Boot Records" Style="{StaticResource H1}" Margin="0"/>
                 </StackPanel>
                 <Button Grid.Column="1" Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                    <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{StaticResource TextSecondaryBrush}" Spin="{Binding IsBusy}"/>
+                    <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                 </Button>
             </Grid>
 
@@ -46,10 +46,10 @@
                                     <!-- Indicator Icon -->
                                     <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20" Background="#10FFFFFF" Margin="0,0,20,0">
                                         <Grid>
-                                            <fa:ImageAwesome Icon="ExternalLink" Width="16" Foreground="{StaticResource InfoBrush}" Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}}"/>
-                                            <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{StaticResource SuccessBrush}" Visibility="{Binding IsCurrent, Converter={StaticResource VisibilityConverter}}"/>
-                                            <fa:ImageAwesome Icon="HddOutline" Width="16" Foreground="{StaticResource TextSecondaryBrush}" 
-                                                           Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
+                                            <fa:ImageAwesome Icon="ExternalLink" Width="16" Foreground="{DynamicResource InfoBrush}" Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                            <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{DynamicResource SuccessBrush}" Visibility="{Binding IsCurrent, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                            <fa:ImageAwesome Icon="HddOutline" Width="16" Foreground="{DynamicResource TextSecondaryBrush}" 
+                                                           Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         </Grid>
                                     </Border>
 
@@ -58,7 +58,7 @@
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Description}" FontWeight="Bold" FontSize="16" Foreground="White"/>
                                             <Border Background="#20FFFFFF" CornerRadius="2" Padding="4,1" Margin="10,0,0,0" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Identifier}" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Consolas"/>
+                                                <TextBlock Text="{Binding Identifier}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" FontFamily="Consolas"/>
                                             </Border>
                                         </StackPanel>
 
@@ -66,21 +66,21 @@
                                             <StackPanel Margin="0,0,10,10">
                                                 <TextBlock Text="DEVICE / PATH" Style="{StaticResource Caption}"/>
                                                 <TextBlock Text="{Binding Device}" FontSize="11" Foreground="White"/>
-                                                <TextBlock Text="{Binding Path}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                                                <TextBlock Text="{Binding Path}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
                                             </StackPanel>
                                             <StackPanel Margin="0,0,10,10">
                                                 <TextBlock Text="OS ARCHITECTURE" Style="{StaticResource Caption}"/>
                                                 <TextBlock Text="{Binding OsDevice}" FontSize="11" Foreground="White"/>
-                                                <TextBlock Text="{Binding SystemRoot}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                <TextBlock Text="{Binding SystemRoot}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                             </StackPanel>
                                             <StackPanel Margin="0,0,10,0">
                                                 <TextBlock Text="RESUME OBJECT" Style="{StaticResource Caption}"/>
-                                                <TextBlock Text="{Binding ResumeObject}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Consolas"/>
+                                                <TextBlock Text="{Binding ResumeObject}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" FontFamily="Consolas"/>
                                             </StackPanel>
                                             <StackPanel Margin="0,0,10,0">
                                                 <TextBlock Text="BOOT POLICY" Style="{StaticResource Caption}"/>
                                                 <TextBlock Text="{Binding BootMenuPolicy}" FontSize="11" Foreground="White"/>
-                                                <TextBlock Text="{Binding Nx, StringFormat='NX: {0}'}" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                <TextBlock Text="{Binding Nx, StringFormat='NX: {0}'}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                             </StackPanel>
                                         </UniformGrid>
                                     </StackPanel>
@@ -93,3 +93,7 @@
         </Grid>
     </Border>
 </UserControl>
+
+
+
+

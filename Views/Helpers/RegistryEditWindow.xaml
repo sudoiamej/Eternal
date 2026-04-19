@@ -15,7 +15,7 @@
 
         <!-- 1. Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="VALUE MODIFICATION" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}" Margin="0,0,0,5"/>
+            <TextBlock Text="VALUE MODIFICATION" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,5"/>
             <TextBlock x:Name="ValueNameText" Text="Value Name" FontSize="18" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis"/>
         </StackPanel>
 
@@ -25,12 +25,12 @@
                 <Border Background="#111111" Padding="15" CornerRadius="4" Margin="0,0,0,25">
                     <StackPanel>
                         <Grid Margin="0,0,0,8">
-                            <TextBlock Text="Type" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11"/>
+                            <TextBlock Text="Type" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
                             <TextBlock x:Name="TypeText" Text="REG_DWORD" HorizontalAlignment="Right" Foreground="White" FontSize="11" FontWeight="SemiBold"/>
                         </Grid>
                         <Grid>
-                            <TextBlock Text="Current Value" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11"/>
-                            <TextBlock x:Name="CurrentValueText" Text="0x00000000" HorizontalAlignment="Right" Foreground="{StaticResource AccentSecondaryBrush}" FontSize="11" FontWeight="SemiBold"/>
+                            <TextBlock Text="Current Value" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+                            <TextBlock x:Name="CurrentValueText" Text="0x00000000" HorizontalAlignment="Right" Foreground="{DynamicResource AccentSecondaryBrush}" FontSize="11" FontWeight="SemiBold"/>
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -39,7 +39,7 @@
                 <StackPanel VerticalAlignment="Top">
                     <TextBlock Text="New Value Entry" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
                     <TextBox x:Name="ValueInput" Padding="12,10" Background="#1A1A1A" Foreground="White" 
-                             BorderBrush="{StaticResource BorderBrush}" FontSize="14" FontFamily="Consolas"/>
+                             BorderBrush="{DynamicResource BorderBrush}" FontSize="14" FontFamily="Consolas"/>
                     
                     <!-- Specific Options (Progressive Disclosure for known values) -->
                     <ItemsControl x:Name="QuickOptions" Margin="0,15,0,0" Visibility="Collapsed">
@@ -52,9 +52,9 @@
                 <!-- 4. Warning (HCI Rule 5: Constraints) -->
                 <Border Background="#20F44336" Padding="12" CornerRadius="4" Margin="0,15,0,20">
                     <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="ExclamationTriangle" Width="12" Foreground="{StaticResource CriticalBrush}" Margin="0,0,12,0" VerticalAlignment="Top"/>
+                        <fa:ImageAwesome Icon="ExclamationTriangle" Width="12" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,12,0" VerticalAlignment="Top"/>
                         <TextBlock Text="Direct registry modification can affect system stability. Ensure the input is valid for this data type." 
-                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" TextWrapping="Wrap" MaxWidth="350"/>
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" TextWrapping="Wrap" MaxWidth="350"/>
                     </StackPanel>
                 </Border>
             </StackPanel>
@@ -71,3 +71,5 @@
         </Grid>
     </Grid>
 </Window>
+
+

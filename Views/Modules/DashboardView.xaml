@@ -22,30 +22,29 @@
                     </Grid.RowDefinitions>
 
                     <!-- 1. Header Section -->
-                    <Grid Grid.Row="0" Margin="0,0,0,30">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <StackPanel Grid.Column="0">
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
-                                <TextBlock Text=" › " Style="{StaticResource Caption}"/>
-                                <TextBlock Text="SYSTEM OVERVIEW" Style="{StaticResource Caption}"/>
-                            </StackPanel>
+                    <StackPanel Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
+                        <TextBlock Text="ETERNAL › SYSTEM OVERVIEW" Style="{StaticResource HeaderBreadcrumb}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
                             <TextBlock Text="Intelligence Dashboard" Style="{StaticResource H1}" Margin="0"/>
-                        </StackPanel>
 
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
-                            <Button Command="{Binding RefreshSystemCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Refresh System Data">
-                                <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            </Button>
-                            <Button Command="{Binding CleanTempCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Clear Temporary Files" Margin="10,0,0,0">
-                                <fa:ImageAwesome Icon="TrashOutline" Width="14" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            </Button>
-                        </StackPanel>
-                    </Grid>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                                <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                        CommandParameter="Help" Style="{StaticResource IconButton}" ToolTip="Open Knowledge Base" Margin="0,0,10,0">
+                                    <fa:ImageAwesome Icon="QuestionCircleOutline" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                </Button>
+                                <Button Command="{Binding RefreshSystemCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Refresh System Data">
+                                    <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                </Button>
+                                <Button Command="{Binding CleanTempCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Clear Temporary Files" Margin="10,0,0,0">
+                                    <fa:ImageAwesome Icon="TrashOutline" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
 
                     <!-- 2. Primary Focal Point: System Pulse (HCI Rule 1 & 2: Affordance & Signifiers) -->
                     <Button Grid.Row="1" Command="{Binding ShowTrustDetailsCommand}" Margin="0,0,0,30" Padding="0" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Stretch">
@@ -54,13 +53,13 @@
                                 <Border x:Name="PulseBorder" Padding="30" BorderThickness="1" Cursor="Hand" CornerRadius="8">
                                     <Border.Style>
                                         <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
-                                            <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource SuccessBrush}"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Warning}">
-                                                    <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource WarningBrush}"/>
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Critical}">
-                                                    <Setter Property="BorderBrush" Value="{StaticResource CriticalBrush}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource CriticalBrush}"/>
                                                 </DataTrigger>
                                                 <Trigger Property="IsMouseOver" Value="True">
                                                     <Setter Property="Background" Value="#0FFFFFFF"/>
@@ -85,25 +84,25 @@
                                 <TextBlock Text="{Binding SystemStatusText}" FontSize="28" FontWeight="Black">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
-                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.Medium}">
-                                                    <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.High}">
-                                                    <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                    <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding HighestSeverity}" Value="{x:Static m:SeverityLevel.Critical}">
-                                                    <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                    <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                                <TextBlock Text="{Binding SystemStatusExplanation}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" MaxWidth="450" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding SystemStatusExplanation}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13" MaxWidth="450" TextWrapping="Wrap" Margin="0,5,0,0"/>
                             </StackPanel>
 
-                            <Separator Grid.Column="1" Width="1" Margin="40,10" Background="{StaticResource BorderBrush}"/>
+                            <Separator Grid.Column="1" Width="1" Margin="40,10" Background="{DynamicResource BorderBrush}"/>
 
                             <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <TextBlock Text="TRUST INDEX" Style="{StaticResource Caption}" HorizontalAlignment="Right" Margin="0,0,0,5"/>
@@ -111,21 +110,21 @@
                                     <TextBlock Text="{Binding TrustScoreIndex}" FontSize="42" FontWeight="Black">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Warning}">
-                                                        <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding TrustLevel}" Value="{x:Static m:TrustLevel.Critical}">
-                                                        <Setter Property="Foreground" Value="{StaticResource CriticalBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    <TextBlock Text="/100" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="5,0,0,10"/>
+                                    <TextBlock Text="/100" FontSize="16" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="5,0,0,10"/>
                                 </StackPanel>
-                                <TextBlock Text="{Binding TrustScoreExplanation}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" TextAlignment="Right" MaxWidth="220" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding TrustScoreExplanation}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" TextAlignment="Right" MaxWidth="220" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Grid>
                     </Button>
@@ -144,21 +143,21 @@
                                 <ItemsControl ItemsSource="{Binding RootCauses}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="{StaticResource CardBrush}" Padding="20" Margin="0,0,0,12" CornerRadius="6" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                            <Border Background="{DynamicResource CardBrush}" Padding="20" Margin="0,0,0,12" CornerRadius="6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="*"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <fa:ImageAwesome Grid.Column="0" Icon="ExclamationTriangle" Width="16" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Top" Margin="0,4,15,0"/>
+                                                    <fa:ImageAwesome Grid.Column="0" Icon="ExclamationTriangle" Width="16" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Top" Margin="0,4,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                     <StackPanel Grid.Column="1">
                                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                                            <TextBlock Text="{Binding ProcessName}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource TextBrush}"/>
-                                                            <TextBlock Text=" · " Foreground="{StaticResource TextSecondaryBrush}" Margin="5,0"/>
-                                                            <TextBlock Text="{Binding Component}" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="12"/>
+                                                            <TextBlock Text="{Binding ProcessName}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextBrush}"/>
+                                                            <TextBlock Text=" · " Foreground="{DynamicResource TextSecondaryBrush}" Margin="5,0"/>
+                                                            <TextBlock Text="{Binding Component}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="12"/>
                                                         </StackPanel>
-                                                        <TextBlock Text="{Binding Explanation.PlainLanguage}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" FontSize="13" LineHeight="18"/>
-                                                        <TextBlock Text="{Binding Explanation.TechnicalValue}" Foreground="{StaticResource WarningBrush}" FontWeight="SemiBold" FontSize="11" Margin="0,8,0,0"/>
+                                                        <TextBlock Text="{Binding Explanation.PlainLanguage}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" FontSize="13" LineHeight="18"/>
+                                                        <TextBlock Text="{Binding Explanation.TechnicalValue}" Foreground="{DynamicResource WarningBrush}" FontWeight="SemiBold" FontSize="11" Margin="0,8,0,0"/>
                                                     </StackPanel>
                                                 </Grid>
                                             </Border>
@@ -169,9 +168,9 @@
                             <Border Background="#104CAF50" Padding="20" CornerRadius="6" 
                                     Visibility="{Binding RootCauses.Count, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{StaticResource SuccessBrush}" Margin="0,0,15,0"/>
+                                    <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="Intelligence engine reports all system parameters within optimal thresholds." 
-                                               Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                               Foreground="{DynamicResource SuccessBrush}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -182,29 +181,29 @@
                             <Border Style="{StaticResource StandardCard}" Padding="25">
                                 <StackPanel>
                                     <Grid Margin="0,0,0,18">
-                                        <TextBlock Text="Architecture" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="Architecture" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         <TextBlock Text="{Binding CpuName}" HorizontalAlignment="Right" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="220"/>
                                     </Grid>
                                     <Grid Margin="0,0,0,18">
-                                        <TextBlock Text="Total Memory" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="Total Memory" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         <TextBlock Text="{Binding RamTotal}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
                                     </Grid>
-                                    <Separator Background="{StaticResource BorderBrush}" Margin="0,5,0,18"/>
+                                    <Separator Background="{DynamicResource BorderBrush}" Margin="0,5,0,18"/>
                                     <Grid Margin="0,0,0,18">
-                                        <TextBlock Text="OS Version" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="OS Version" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         <TextBlock Text="{Binding OsVersion}" HorizontalAlignment="Right" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="220"/>
                                     </Grid>
                                     <Grid>
-                                        <TextBlock Text="Secure Boot" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                        <TextBlock Text="{Binding SecureBootStatus}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"/>
+                                        <TextBlock Text="Secure Boot" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding SecureBootStatus}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
                             
                             <Button Command="{Binding ExportBriefCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" Padding="15,8" Margin="0,15,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="FileTextOutline" Width="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0"/>
-                                    <TextBlock Text="Export Brief Intelligence Report" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <fa:ImageAwesome Icon="FileTextOutline" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <TextBlock Text="Export Brief Intelligence Report" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -225,12 +224,12 @@
                                     <CheckBox IsChecked="{Binding DataContext.IsDevModeEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
                                               Command="{Binding DataContext.ToggleDevModeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                               Content="Enable System Developer Mode (Long Paths/Symlinks)" 
-                                              FontSize="12" FontWeight="Medium" Foreground="{StaticResource TextBrush}" Margin="0,0,0,12"/>
+                                              FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,12"/>
                                     
                                     <CheckBox IsChecked="{Binding DataContext.IsDevHostEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
                                               Command="{Binding DataContext.ToggleDevHostCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                               Content="Map dev.local to 127.0.0.1 (Hosts File)" 
-                                              FontSize="12" FontWeight="Medium" Foreground="{StaticResource TextBrush}" Margin="0,0,0,20"/>
+                                              FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,20"/>
                                     
                                     <Grid Margin="0,0,0,15">
                                         <Grid.ColumnDefinitions>
@@ -239,13 +238,13 @@
                                         </Grid.ColumnDefinitions>
                                         <Button Grid.Column="0" Command="{Binding DataContext.ApplySilenceProfileCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Margin="0,0,5,0">
                                             <StackPanel Orientation="Horizontal">
-                                                <fa:ImageAwesome Icon="VolumeOff" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                                <fa:ImageAwesome Icon="VolumeOff" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                 <TextBlock Text="Silence Profile" FontSize="11" Foreground="#FFFFFF"/>
                                             </StackPanel>
                                         </Button>
                                         <Button Grid.Column="1" Command="{Binding DataContext.ForceKillHandleCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Background="#333333" Margin="5,0,0,0">
                                             <StackPanel Orientation="Horizontal">
-                                                <fa:ImageAwesome Icon="Bomb" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                                <fa:ImageAwesome Icon="Bomb" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                 <TextBlock Text="Force Kill Handle" FontSize="11" Foreground="#FFFFFF"/>
                                             </StackPanel>
                                         </Button>
@@ -253,7 +252,7 @@
 
                                     <Button Command="{Binding DataContext.PurgeRAMCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Background="#16a085" HorizontalAlignment="Stretch">
                                         <StackPanel Orientation="Horizontal">
-                                            <fa:ImageAwesome Icon="Leaf" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                            <fa:ImageAwesome Icon="Leaf" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                             <TextBlock Text="Purge Standby List &amp; RAM" FontSize="11" Foreground="#FFFFFF"/>
                                         </StackPanel>
                                     </Button>
@@ -268,7 +267,7 @@
                                 <StackPanel>
                                     <Button Command="{Binding DataContext.ScanMalwarePersistenceCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource StandardButton}" Background="#c0392b" HorizontalAlignment="Stretch" Margin="0,0,0,20">
                                         <StackPanel Orientation="Horizontal">
-                                            <fa:ImageAwesome Icon="Shield" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"/>
+                                            <fa:ImageAwesome Icon="Shield" Width="12" Foreground="#FFFFFF" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                             <TextBlock Text="Scan for Persistence &amp; Malware" FontSize="11" Foreground="#FFFFFF"/>
                                         </StackPanel>
                                     </Button>
@@ -276,9 +275,9 @@
                                     <CheckBox IsChecked="{Binding DataContext.IsRansomGuardEnabled, RelativeSource={RelativeSource AncestorType=Window}}" 
                                               Command="{Binding DataContext.ToggleRansomGuardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                               Content="Active Ransom Guard (Protected Docs)" 
-                                              FontSize="12" FontWeight="Medium" Foreground="{StaticResource TextBrush}" Margin="0,0,0,15"/>
+                                              FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,15"/>
                                     
-                                    <TextBlock Text="SUSPICIOUS PROCESSES" FontSize="9" FontWeight="Black" Foreground="{StaticResource CriticalBrush}" Margin="0,5,0,10"
+                                    <TextBlock Text="SUSPICIOUS PROCESSES" FontSize="9" FontWeight="Black" Foreground="{DynamicResource CriticalBrush}" Margin="0,5,0,10"
                                                Visibility="{Binding DataContext.UnsignedProcesses.Count, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource VisibilityConverter}}"/>
                                     
                                     <ItemsControl ItemsSource="{Binding DataContext.UnsignedProcesses, RelativeSource={RelativeSource AncestorType=Window}}">
@@ -292,10 +291,10 @@
                                                         </Grid.ColumnDefinitions>
                                                         <StackPanel>
                                                             <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#F44336" FontSize="11"/>
-                                                            <TextBlock Text="Unsigned Binary" Foreground="{StaticResource TextSecondaryBrush}" FontSize="9"/>
+                                                            <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9"/>
                                                         </StackPanel>
                                                         <Button Grid.Column="1" Command="{Binding DataContext.NeutralizeProcessCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding PID}" Style="{StaticResource IconButton}" ToolTip="Kill Process">
-                                                            <fa:ImageAwesome Icon="Times" Width="10" Foreground="#F44336"/>
+                                                            <fa:ImageAwesome Icon="Times" Width="10" Foreground="#F44336"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                         </Button>
                                                     </Grid>
                                                 </Border>
@@ -322,9 +321,13 @@
         <!-- Feedback Overlay -->
         <Border Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
-                <TextBlock Text="Synchronizing Intelligence Engine..." FontSize="18" Foreground="{StaticResource TextBrush}"/>
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                <TextBlock Text="Synchronizing Intelligence Engine..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
             </StackPanel>
         </Border>
     </Grid>
 </UserControl>
+
+
+
+

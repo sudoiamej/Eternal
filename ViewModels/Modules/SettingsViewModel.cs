@@ -15,16 +15,32 @@ namespace Eternal.ViewModels.Modules
         public MainViewModel Main { get; }
         private readonly ISettingsService _settingsService;
         private readonly ILoggingService _loggingService;
+        private readonly IUpdateService _updateService;
 
         [ObservableProperty] private AppSettings _settings;
-        [ObservableProperty] private string _appVersion = "2.5.0-M2";
+        [ObservableProperty] private string _appVersion = "2.5.0-M3";
         [ObservableProperty] private string _lastScanTime = "N/A";
         [ObservableProperty] private string _machineId = "Unknown";
 
-        public SettingsViewModel(MainViewModel main, ISettingsService settingsService)
+        public string SelectedTheme
+        {
+            get => Settings.Theme;
+            set
+            {
+                if (Settings.Theme != value)
+                {
+                    Settings.Theme = value;
+                    OnPropertyChanged();
+                    Main.ApplyThemeColor(); // This will trigger theme refresh
+                }
+            }
+        }
+
+        public SettingsViewModel(MainViewModel main, ISettingsService settingsService, IUpdateService updateService)
         {
             Main = main;
             _settingsService = settingsService;
+            _updateService = updateService;
             Settings = _settingsService.Current;
 
             // Generate/Fetch Fingerprint
@@ -62,10 +78,36 @@ namespace Eternal.ViewModels.Modules
             Settings.IsVerboseLoggingEnabled = defaults.IsVerboseLoggingEnabled;
             Settings.ThemeAccentColor = defaults.ThemeAccentColor;
             
+            Settings.IsStartupLockEnabled = defaults.IsStartupLockEnabled;
+            Settings.StartupLockPin = defaults.StartupLockPin;
+            Settings.LockoutEnd = null;
+            Settings.FailedAttemptsCount = 0;
+            Settings.CurrentLockoutMinutes = 0;
+            
             Main.ApplyThemeColor();
             UpdateStartupRegistration();
             _settingsService.Save();
             System.Windows.MessageBox.Show("Settings restored to factory defaults.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        [RelayCommand]
+        private void ChangeStartupPin()
+        {
+            var editWin = new Eternal.Views.Helpers.StartupPinEditWindow();
+            editWin.Owner = System.Windows.Application.Current.MainWindow;
+            
+            if (editWin.ShowDialog() == true)
+            {
+                Settings.StartupLockPin = editWin.NewPin;
+                _settingsService.Save();
+                System.Windows.MessageBox.Show("Startup Access Code updated successfully.", "Security", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        [RelayCommand]
+        private async Task CheckForUpdates()
+        {
+            await Main.CheckForUpdatesAsync(true);
         }
 
         [RelayCommand]

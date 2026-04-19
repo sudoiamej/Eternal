@@ -21,7 +21,7 @@
                 <Grid Grid.Row="0" Margin="0,0,0,30">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                             <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                             <TextBlock Text="GUARDIAN TUNING" Style="{StaticResource Caption}"/>
                         </StackPanel>
@@ -30,7 +30,7 @@
                     
                     <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
                         <Button Command="{Binding LoadTweaksCommand}" Style="{StaticResource IconButton}" ToolTip="Re-analyze System" Margin="0,0,15,0">
-                            <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -52,7 +52,7 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding StatusMessage}" Value="Restore point created successfully.">
                                     <Setter Property="Background" Value="#104CAF50"/>
-                                    <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource SuccessBrush}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -66,18 +66,18 @@
                             </Grid.ColumnDefinitions>
                         
                             <Border Grid.Column="0" Background="#15FFFFFF" Padding="12" CornerRadius="6" Margin="0,0,20,0">
-                                <fa:ImageAwesome Icon="Shield" Width="20" Foreground="{StaticResource SuccessBrush}"/>
+                                <fa:ImageAwesome Icon="Shield" Width="20" Foreground="{DynamicResource SuccessBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             </Border>
 
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="SYSTEM PROTECTION PROTOCOL" FontWeight="Black" FontSize="11" Foreground="{StaticResource SuccessBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Text="SYSTEM PROTECTION PROTOCOL" FontWeight="Black" FontSize="11" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,0,4"/>
                                 <TextBlock Text="It is highly recommended to establish a Restore Point before applying low-level registry modifications." 
-                                           Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" TextWrapping="Wrap"/>
+                                           Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" TextWrapping="Wrap"/>
                             </StackPanel>
 
                             <Button Grid.Column="2" Command="{Binding CreateRestorePointCommand}" Style="{StaticResource PrimaryAction}" Padding="20,10">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Magic" Width="12" Margin="0,0,10,0" Foreground="White"/>
+                                    <fa:ImageAwesome Icon="Magic" Width="12" Margin="0,0,10,0" Foreground="White"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="INITIALIZE SAFETY SNAPSHOT" FontWeight="Bold"/>
                                 </StackPanel>
                             </Button>
@@ -98,10 +98,10 @@
                                 <Border Margin="0,0,15,15" CornerRadius="8" BorderThickness="1">
                                     <Border.Style>
                                         <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
-                                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsApplied}" Value="True">
-                                                    <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource SuccessBrush}"/>
                                                     <Setter Property="Background" Value="#054CAF50"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -116,12 +116,12 @@
                                         
                                             <StackPanel Grid.Column="0">
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                                    <fa:ImageAwesome Icon="Magic" Width="12" Foreground="{StaticResource AccentSecondaryBrush}" Margin="0,0,10,0"/>
-                                                    <TextBlock Text="{Binding Category, FallbackValue='OPTIMIZATION'}" Style="{StaticResource Caption}" Foreground="{StaticResource AccentSecondaryBrush}"/>
+                                                    <fa:ImageAwesome Icon="Magic" Width="12" Foreground="{DynamicResource AccentSecondaryBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                    <TextBlock Text="{Binding Category, FallbackValue='OPTIMIZATION'}" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentSecondaryBrush}"/>
                                                 </StackPanel>
                                             
                                                 <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,5"/>
-                                                <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="16"/>
                                             </StackPanel>
 
                                             <!-- Toggle Affordance (HCI Rule 3: Feedback) -->
@@ -150,16 +150,20 @@
                 </ScrollViewer>
 
                 <!-- 4. Status Bar -->
-                <Border Grid.Row="3" Background="#0DFFFFFF" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="15,12" Margin="0,20,0,0" CornerRadius="6">
+                <Border Grid.Row="3" Background="#0DFFFFFF" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Padding="15,12" Margin="0,20,0,0" CornerRadius="6">
                     <Grid>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="InfoCircle" Width="12" Foreground="{StaticResource AccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center" FontSize="12" FontWeight="Medium"/>
+                            <fa:ImageAwesome Icon="InfoCircle" Width="12" Foreground="{DynamicResource AccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" FontSize="12" FontWeight="Medium"/>
                         </StackPanel>
-                        <fa:ImageAwesome Icon="Spinner" Spin="{Binding IsBusy}" Width="12" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Right" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}"/>
+                        <fa:ImageAwesome Icon="Spinner" Spin="{Binding IsBusy}" Width="12" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     </Grid>
                 </Border>
             </Grid>
         </Border>
     </Grid>
 </UserControl>
+
+
+
+

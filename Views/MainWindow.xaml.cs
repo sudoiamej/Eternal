@@ -18,6 +18,21 @@ namespace Eternal.Views
             InitializeTray();
         }
 
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.T && 
+                System.Windows.Input.Keyboard.Modifiers == (System.Windows.Input.ModifierKeys.Control | System.Windows.Input.ModifierKeys.Shift | System.Windows.Input.ModifierKeys.Alt))
+            {
+                var authWindow = new Eternal.Views.Helpers.TestingAuthWindow();
+                authWindow.Owner = this;
+                if (authWindow.ShowDialog() == true && authWindow.IsAuthorized)
+                {
+                    var vm = this.DataContext as MainViewModel;
+                    vm?.ActivateTestingMode();
+                }
+            }
+        }
+
         private void InitializeTray()
         {
             _notifyIcon = new NotifyIcon();
@@ -49,12 +64,11 @@ namespace Eternal.Views
 
         private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (_canClose) 
+            if (_canClose)
             {
                 CleanupTray();
                 return;
             }
-
             // Check if we should minimize to tray instead of closing
             var vm = this.DataContext as MainViewModel;
             if (vm?.Settings?.MinimizeToTray == true)

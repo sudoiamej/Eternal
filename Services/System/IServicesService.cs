@@ -15,6 +15,11 @@ namespace Eternal.Services.System
 
     public class WindowsServicesService : IServicesService
     {
+        private readonly EnumerationOptions _wmiOptions = new EnumerationOptions { Timeout = TimeSpan.FromSeconds(5) };
+
+        private ManagementObjectSearcher CreateSearcher(string query) 
+            => new ManagementObjectSearcher(null, query, _wmiOptions);
+
         public Task<List<ServiceInfo>> GetServicesAsync()
         {
             return Task.Run(() =>
@@ -23,7 +28,7 @@ namespace Eternal.Services.System
                 try
                 {
                     // Query Win32_Service (Matches services.msc behavior)
-                    using var searcher = new ManagementObjectSearcher("select Name, DisplayName, State, StartMode, StartName, Description from Win32_Service");
+                    using var searcher = CreateSearcher("select Name, DisplayName, State, StartMode, StartName, Description from Win32_Service");
 
                     foreach (var obj in searcher.Get())
                     {

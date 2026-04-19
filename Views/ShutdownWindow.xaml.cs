@@ -15,5 +15,11 @@ namespace Eternal.Views
             if (!string.IsNullOrEmpty(detail))
                 DetailText.Text = detail;
         }
+
+        private void Window_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+                this.DragMove();
+        }
     }
 }

@@ -4,100 +4,215 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
-             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="900">
-    <Border Padding="40">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="220"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- 1. Header (Spans both) -->
-            <Grid Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource ModuleHeaderStyle}" Margin="0,0,0,20">
+             xmlns:models="clr-namespace:Eternal.Models"
+             mc:Ignorable="d" d:DesignHeight="720" d:DesignWidth="1000">
+    <Grid>
+        <Border Padding="40">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
-                        <TextBlock Text=" › " Style="{StaticResource Caption}"/>
-                        <TextBlock Text="INTEGRATED SHELL" Style="{StaticResource Caption}"/>
+
+                <!-- 1. Header (Spans both) -->
+                <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,25">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
+                            <TextBlock Text=" › " Style="{StaticResource Caption}"/>
+                            <TextBlock Text="TERMINAL ECOSYSTEM" Style="{StaticResource Caption}"/>
+                        </StackPanel>
+                        <TextBlock Text="Terminal Intelligence" Style="{StaticResource H1}" Margin="0"/>
                     </StackPanel>
-                    <TextBlock Text="Eternal Console" Style="{StaticResource H1}" Margin="0"/>
-                </StackPanel>
-                <Button Grid.Column="1" Command="{Binding ClearConsoleCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                    <fa:ImageAwesome Icon="Trash" Width="16" Foreground="{StaticResource TextSecondaryBrush}"/>
-                </Button>
-            </Grid>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                        <Button Command="{Binding ClearConsoleCommand}" Style="{StaticResource IconButton}" ToolTip="Clear Active Buffer" Margin="0,0,10,0">
+                            <fa:ImageAwesome Icon="Trash" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        </Button>
+                        <Button Style="{StaticResource IconButton}" ToolTip="Terminal Settings">
+                            <fa:ImageAwesome Icon="Gear" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        </Button>
+                    </StackPanel>
+                </Grid>
 
-            <!-- 2. Macro Sidebar -->
-            <Border Grid.Row="1" Grid.Column="0" Background="#0DFFFFFF" CornerRadius="4,0,0,4" Padding="15">
-                <StackPanel>
-                    <TextBlock Text="DIAGNOSTIC MACROS" Style="{StaticResource Caption}" Margin="0,0,0,15" Foreground="{StaticResource AccentBrush}"/>
-                    <ItemsControl ItemsSource="{Binding Macros}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Command="{Binding DataContext.RunMacroCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                        CommandParameter="{Binding}"
-                                        Style="{StaticResource IconButton}" Margin="0,0,0,10" HorizontalAlignment="Stretch" Padding="10">
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                        <fa:ImageAwesome Icon="Terminal" Width="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0"/>
-                                        <TextBlock Text="{Binding Name}" FontSize="12" Foreground="White"/>
-                                    </StackPanel>
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </Border>
+                <!-- 2. Macro Sidebar -->
+                <Border Grid.Row="1" Grid.Column="0" Background="#0DFFFFFF" CornerRadius="8,0,0,8" Padding="20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,1,0,1">
+                    <StackPanel>
+                        <TextBlock Text="DIAGNOSTIC MACROS" Style="{StaticResource Caption}" Margin="0,0,0,20" Foreground="{DynamicResource AccentBrush}"/>
+                        <ItemsControl ItemsSource="{Binding Macros}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding DataContext.RunMacroCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource IconButton}" Margin="0,0,0,10" HorizontalAlignment="Stretch" Padding="12" Background="#08FFFFFF">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                            <fa:ImageAwesome Icon="Terminal" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,12,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                            <TextBlock Text="{Binding Name}" FontSize="12" Foreground="White" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
 
-            <!-- 3. Terminal View -->
-            <Border Grid.Row="1" Grid.Column="1" Background="#05000000" CornerRadius="0,4,4,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,1,1">
-                <Grid>
+                <!-- 3. Terminal View (Windows Terminal Style) -->
+                <Grid Grid.Row="1" Grid.Column="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/> <!-- Tab Strip -->
+                        <RowDefinition Height="*"/>    <!-- Terminal Area -->
                     </Grid.RowDefinitions>
 
-                    <ListBox x:Name="ConsoleOutputList" ItemsSource="{Binding OutputLines}" Background="Transparent" BorderThickness="0" 
-                             ScrollViewer.VerticalScrollBarVisibility="Auto" Padding="10"
-                             VirtualizingStackPanel.IsVirtualizing="True">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" Foreground="#CCFFFFFF" FontSize="11" FontFamily="Consolas" TextWrapping="Wrap"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="Padding" Value="0,1"/>
-                                <Setter Property="Focusable" Value="False"/>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                    </ListBox>
+                    <!-- Tab Strip (HCI: Mental Models) -->
+                    <Grid Grid.Row="0" Background="#111111">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Border Grid.Row="1" Background="#10FFFFFF" Padding="10">
+                        <ListBox ItemsSource="{Binding Sessions}" SelectedItem="{Binding SelectedSession}"
+                                 Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="TabBorder" Background="Transparent" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" MinWidth="120" MaxWidth="200" Padding="15,8">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Title}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                        <Button Grid.Column="2" Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                                CommandParameter="{Binding}" Style="{StaticResource IconButton}" Margin="10,0,0,0" Opacity="0.5">
+                                                            <fa:ImageAwesome Icon="Close" Width="8" Foreground="White"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                        </Button>
+                                                    </Grid>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="TabBorder" Property="Background" Value="#1A1A1A"/>
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="TabBorder" Property="Background" Value="#222222"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+
+                        <!-- Add Tab Dropdown -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button Style="{StaticResource IconButton}" Padding="10" VerticalAlignment="Stretch">
+                                <fa:ImageAwesome Icon="Plus" Width="10" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <Button.ContextMenu>
+                                    <ContextMenu Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource BorderBrush}">
+                                        <MenuItem Header="New PowerShell Session" Command="{Binding NewTabAsyncCommand}" CommandParameter="{Binding AvailableProfiles[0]}">
+                                            <MenuItem.Icon><fa:ImageAwesome Icon="Terminal" Width="12" Foreground="{StaticResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome></MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="New Command Prompt" Command="{Binding NewTabAsyncCommand}" CommandParameter="{Binding AvailableProfiles[1]}">
+                                            <MenuItem.Icon><fa:ImageAwesome Icon="Code" Width="12" Foreground="{StaticResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome></MenuItem.Icon>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Active Terminal Area -->
+                    <Border Grid.Row="1" Background="#0F0F0F" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,1,1" CornerRadius="0,0,8,0">
                         <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="PS › " Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" FontFamily="Consolas" FontWeight="Bold"/>
-                            <TextBox Grid.Column="1" Text="{Binding CurrentInput, UpdateSourceTrigger=PropertyChanged}" 
-                                     Background="Transparent" BorderThickness="0" Foreground="White"
-                                     FontFamily="Consolas" VerticalAlignment="Center" CaretBrush="White" Margin="5,0,0,0">
-                                <TextBox.InputBindings>
-                                    <KeyBinding Key="Enter" Command="{Binding SendCommandCommand}"/>
-                                </TextBox.InputBindings>
-                            </TextBox>
+                            <ContentControl Content="{Binding SelectedSession}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate DataType="{x:Type models:ConsoleSession}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Output -->
+                                            <ListBox x:Name="SessionOutputList" ItemsSource="{Binding OutputLines}" Background="Transparent" BorderThickness="0" 
+                                                     ScrollViewer.VerticalScrollBarVisibility="Auto" Padding="15" VirtualizingStackPanel.IsVirtualizing="True">
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" Foreground="#E0E0E0" FontSize="12" FontFamily="Consolas" TextWrapping="Wrap" Opacity="0.9"/>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                                <ListBox.ItemContainerStyle>
+                                                    <Style TargetType="ListBoxItem">
+                                                        <Setter Property="Padding" Value="0,1"/>
+                                                        <Setter Property="Focusable" Value="False"/>
+                                                    </Style>
+                                                </ListBox.ItemContainerStyle>
+                                            </ListBox>
+
+                                            <!-- Input -->
+                                            <Border Grid.Row="1" Background="#111111" Padding="12,10" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="PS › " Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" FontFamily="Consolas" FontWeight="Bold" FontSize="13"/>
+                                                    <TextBox Grid.Column="1" Text="{Binding CurrentInput, UpdateSourceTrigger=PropertyChanged}" 
+                                                             Background="Transparent" BorderThickness="0" Foreground="White"
+                                                             FontFamily="Consolas" VerticalAlignment="Center" CaretBrush="White" Margin="8,0,0,0" FontSize="13">
+                                                        <TextBox.InputBindings>
+                                                            <KeyBinding Key="Enter" Command="{Binding DataContext.SendCommandCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                                        </TextBox.InputBindings>
+                                                    </TextBox>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Loading Spinner for Session Start -->
+                                            <Border Background="#CC000000" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+                                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                    <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="32" Margin="0,0,0,15"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                    <TextBlock Text="Initializing Secure Shell..." Foreground="White" FontSize="12" FontWeight="Bold"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+
+                            <!-- Empty State -->
+                            <Border Visibility="{Binding SelectedSession, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Background="#0F0F0F">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.5">
+                                    <fa:ImageAwesome Icon="Terminal" Width="48" Foreground="{DynamicResource TextDisabledBrush}" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <TextBlock Text="No Active Terminal Sessions" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Click the '+' button to open a new PowerShell or CMD tab." Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,0"/>
+                                </StackPanel>
+                            </Border>
                         </Grid>
                     </Border>
                 </Grid>
-            </Border>
-        </Grid>
-    </Border>
+            </Grid>
+        </Border>
+    </Grid>
 </UserControl>
+
+

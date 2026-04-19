@@ -8,42 +8,37 @@ namespace Eternal.Services.System
 {
     public class WindowsConsoleService : IConsoleService
     {
-        private Process _process;
-        public event EventHandler<string> OutputReceived;
+        private Process? _process;
+        public event EventHandler<string>? OutputReceived;
+        public event EventHandler? Exited;
 
-        public Task StartAsync(string shell = "powershell.exe")
+        public bool IsRunning => _process != null && !_process.HasExited;
+
+        public Task StartAsync(string shell, string name)
         {
             return Task.Run(() =>
             {
                 try
                 {
-                    // Check if shell exists (important for PE mode where PowerShell might be missing)
-                    string fullPath = Path.Combine(Environment.SystemDirectory, shell == "powershell.exe" ? @"WindowsPowerShell\v1.0\powershell.exe" : shell);
-                    
-                    // Simple fallback check
-                    if (!File.Exists(fullPath) && !File.Exists(shell))
-                    {
-                        OutputReceived?.Invoke(this, $"[FATAL] Shell '{shell}' not found on this system.");
-                        return;
-                    }
-
                     _process = new Process
                     {
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = shell,
-                            Arguments = "-NoExit -NoProfile",
+                            Arguments = shell.Contains("powershell") ? "-NoExit -NoProfile" : "",
                             UseShellExecute = false,
                             RedirectStandardInput = true,
                             RedirectStandardOutput = true,
                             RedirectStandardError = true,
                             CreateNoWindow = true,
                             StandardOutputEncoding = Encoding.UTF8
-                        }
+                        },
+                        EnableRaisingEvents = true
                     };
 
                     _process.OutputDataReceived += (s, e) => { if (e.Data != null) OutputReceived?.Invoke(this, e.Data); };
                     _process.ErrorDataReceived += (s, e) => { if (e.Data != null) OutputReceived?.Invoke(this, "[ERROR] " + e.Data); };
+                    _process.Exited += (s, e) => Exited?.Invoke(this, EventArgs.Empty);
 
                     _process.Start();
                     _process.BeginOutputReadLine();
@@ -72,10 +67,19 @@ namespace Eternal.Services.System
                 if (_process != null && !_process.HasExited)
                 {
                     _process.Kill(true);
-                    _process.Dispose();
                 }
             }
             catch { }
+            finally
+            {
+                _process?.Dispose();
+                _process = null;
+            }
+        }
+
+        public void Dispose()
+        {
+            Stop();
         }
     }
 }

@@ -11,7 +11,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
     <Version>2.5.0</Version>
-    <InformationalVersion>2.5.0 (Milestone 2)</InformationalVersion>
+    <InformationalVersion>2.5.0 (Milestone 3)</InformationalVersion>
     <Authors>Eternal Analytics</Authors>
     <Product>Eternal System Intelligence</Product>
     <Description>System Intelligence and Diagnostics Suite</Description>
@@ -32,6 +32,13 @@
     <Resource Include="Assets\icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="DevPreview_UpdatePackage\**" />
+    <EmbeddedResource Remove="DevPreview_UpdatePackage\**" />
+    <None Remove="DevPreview_UpdatePackage\**" />
+    <Page Remove="DevPreview_UpdatePackage\**" />
   </ItemGroup>
 
   <ItemGroup>
