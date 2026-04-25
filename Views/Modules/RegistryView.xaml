@@ -9,34 +9,38 @@
              d:DesignHeight="720" d:DesignWidth="1200">
 
     <Grid>
-        <Border Padding="30">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="400"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left: Registry Intelligence (Data) -->
+        <Border Grid.Column="0" Padding="40" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- Search & Navigation -->
-                    <RowDefinition Height="*"/>    <!-- Main Content -->
-                    <RowDefinition Height="Auto"/> <!-- Status Bar -->
+                    <RowDefinition Height="*"/>    <!-- Main Key Browsing -->
                 </Grid.RowDefinitions>
 
                 <!-- Search & Navigation -->
-                <Grid Grid.Row="0" Margin="0,0,0,25">
+                <Grid Grid.Row="0" Margin="0,0,0,30">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="REGISTRY INTELLIGENCE" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,5"/>
+                        <TextBlock Text="ETERNAL › SYSTEM CONFIGURATION" Style="{StaticResource HeaderBreadcrumb}"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Button Command="{Binding NavigateUpCommand}" Style="{StaticResource IconButton}" Margin="0,0,10,0">
-                                <fa:ImageAwesome Icon="AngleUp" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="AngleUp" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </Button>
                             <TextBox Grid.Column="1" Text="{Binding SearchPath, UpdateSourceTrigger=PropertyChanged}" 
-                                     Padding="10,8" Background="#111111" Foreground="White" BorderBrush="{DynamicResource BorderBrush}" 
-                                     VerticalContentAlignment="Center" FontSize="13">
+                                     Style="{StaticResource ModernTextBox}" FontSize="13">
                                 <TextBox.InputBindings>
                                     <KeyBinding Key="Enter" Command="{Binding LoadRegistryCommand}"/>
                                 </TextBox.InputBindings>
@@ -45,243 +49,171 @@
                     </StackPanel>
 
                     <Button Grid.Column="1" Command="{Binding LoadRegistryCommand}" Style="{StaticResource PrimaryButton}" 
-                            Content="Surgical Read" Margin="15,20,0,0"/>
+                            Content="SURGICAL READ" Margin="15,20,0,0"/>
                 </Grid>
 
-                <!-- Main Content -->
+                <!-- Key Browsing Content -->
                 <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="400"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Key Metadata -->
+                        <RowDefinition Height="*"/>    <!-- Value List -->
+                    </Grid.RowDefinitions>
 
-                    <!-- Left: Registry Values & Browsing -->
-                    <Border Grid.Column="0" Margin="0,0,20,0" Style="{StaticResource StandardCard}" Padding="0">
+                    <Border Grid.Row="0" Background="#15FFFFFF" Padding="20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,20">
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/> <!-- Key Metadata & Provenance -->
-                                <RowDefinition Height="*"/>    <!-- Value List -->
-                            </Grid.RowDefinitions>
-
-                            <!-- FEATURE 4: Component Provenance -->
-                            <Border Grid.Row="0" Background="#1A1A1A" Padding="20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding CurrentKey.Name}" FontSize="18" FontWeight="Bold" Foreground="White"/>
-                                        <TextBlock Text="{Binding KeyDescription}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,5,0,10" TextWrapping="Wrap"/>
-                                        
-                                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                            <fa:ImageAwesome Icon="Shield" Width="10" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                            <TextBlock Text="PROVENANCE:" Style="{StaticResource Caption}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                            <TextBlock Text="{Binding CurrentProvenance.OwnerName}" Foreground="White" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                            <TextBlock Text=" · " Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="5,0"/>
-                                            <TextBlock Text="{Binding CurrentProvenance.Publisher}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                    </StackPanel>
-                                    
-                                    <Border Grid.Column="1" Background="#204CAF50" Padding="8,4" CornerRadius="4" VerticalAlignment="Top" 
-                                            Visibility="{Binding CurrentProvenance.IsSystemComponent, Converter={StaticResource VisibilityConverter}}">
-                                        <TextBlock Text="SYSTEM PROTECTED" Foreground="{DynamicResource SuccessBrush}" FontSize="9" FontWeight="Black"/>
-                                    </Border>
-                                </Grid>
-                            </Border>
-
-                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                                <StackPanel Margin="15">
-                                    <!-- Sub-keys Navigation -->
-                                    <TextBlock Text="CHILD KEYS" Style="{StaticResource Caption}" Margin="5,0,0,10" Visibility="{Binding CurrentKey.SubKeys.Count, Converter={StaticResource VisibilityConverter}}"/>
-                                    <ItemsControl ItemsSource="{Binding CurrentKey.SubKeys}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <WrapPanel Orientation="Horizontal"/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Button Command="{Binding DataContext.NavigateToSubKeyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                        CommandParameter="{Binding}" Style="{StaticResource SecondaryButton}" Margin="5" Padding="10,5">
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <fa:ImageAwesome Icon="FolderOutline" Width="10" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                                        <TextBlock Text="{Binding}" FontSize="11"/>
-                                                    </StackPanel>
-                                                </Button>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-
-                                    <Separator Background="{DynamicResource BorderBrush}" Margin="0,15" Visibility="{Binding CurrentKey.SubKeys.Count, Converter={StaticResource VisibilityConverter}}"/>
-
-                                    <!-- Values -->
-                                    <TextBlock Text="REGISTRY VALUES" Style="{StaticResource Caption}" Margin="5,0,0,10"/>
-                                    <ItemsControl ItemsSource="{Binding CurrentKey.Values}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Border Background="#111111" Padding="15" Margin="0,0,0,10" CornerRadius="4" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <StackPanel>
-                                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="13"/>
-                                                            <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource AccentSecondaryBrush}" FontSize="11" Margin="0,3,0,5"/>
-                                                            <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" TextWrapping="Wrap"/>
-                                                        </StackPanel>
-                                                        <Button Grid.Column="1" Command="{Binding DataContext.ModifyValueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                                CommandParameter="{Binding}" Style="{StaticResource IconButton}" VerticalAlignment="Top">
-                                                            <fa:ImageAwesome Icon="Pencil" Width="12" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                                        </Button>
-                                                    </Grid>
-                                                </Border>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="{Binding CurrentKey.Name}" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="{Binding KeyDescription}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,5,0,10" TextWrapping="Wrap"/>
+                                
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Shield" Width="10" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="PROVENANCE:" Style="{StaticResource Caption}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                    <TextBlock Text="{Binding CurrentProvenance.OwnerName}" Foreground="White" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <TextBlock Text=" · " Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="5,0"/>
+                                    <TextBlock Text="{Binding CurrentProvenance.Publisher}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center"/>
                                 </StackPanel>
-                            </ScrollViewer>
+                            </StackPanel>
+                            
+                            <Border Grid.Column="1" Background="#204CAF50" Padding="8,4" CornerRadius="4" VerticalAlignment="Top" 
+                                    Visibility="{Binding CurrentProvenance.IsSystemComponent, Converter={StaticResource VisibilityConverter}}">
+                                <TextBlock Text="SYSTEM PROTECTED" Foreground="{DynamicResource SuccessBrush}" FontSize="9" FontWeight="Black"/>
+                            </Border>
                         </Grid>
                     </Border>
 
-                    <!-- Right Column: Tools, Vault & Watchlist -->
-                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/> <!-- Presets -->
-                                <RowDefinition Height="Auto"/> <!-- Watchlist -->
-                                <RowDefinition Height="Auto"/> <!-- Undo Vault -->
-                            </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <!-- Sub-keys -->
+                            <TextBlock Text="CHILD KEYS" Style="{StaticResource Caption}" Margin="5,0,0,10" Visibility="{Binding CurrentKey.SubKeys.Count, Converter={StaticResource VisibilityConverter}}"/>
+                            <ItemsControl ItemsSource="{Binding CurrentKey.SubKeys}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><WrapPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Command="{Binding DataContext.NavigateToSubKeyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                CommandParameter="{Binding}" Style="{StaticResource SecondaryButton}" Margin="5" Padding="12,6">
+                                            <StackPanel Orientation="Horizontal">
+                                                <fa:ImageAwesome Icon="FolderOutline" Width="10" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0"/>
+                                                <TextBlock Text="{Binding}" FontSize="11"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
-                            <!-- Intelligent Presets -->
-                            <StackPanel Grid.Row="0" Margin="0,0,0,25">
-                                <TextBlock Text="INTELLIGENT PRESETS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                                <ItemsControl ItemsSource="{Binding CommonTweaks}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Margin="0,0,0,12" Padding="15">
-                                                <Border.Style>
-                                                    <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsCurrentOSCompatible}" Value="False">
-                                                                <Setter Property="Opacity" Value="0.5"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Border.Style>
+                            <Separator Background="{DynamicResource BorderBrush}" Margin="0,20" Visibility="{Binding CurrentKey.SubKeys.Count, Converter={StaticResource VisibilityConverter}}"/>
+
+                            <!-- Values -->
+                            <TextBlock Text="REGISTRY VALUES" Style="{StaticResource Caption}" Margin="5,0,0,10"/>
+                            <ItemsControl ItemsSource="{Binding CurrentKey.Values}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#0CFFFFFF" Padding="15" Margin="0,0,0,10" CornerRadius="6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
                                                 <StackPanel>
-                                                    <Grid Margin="0,0,0,8">
-                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="12" Foreground="White" VerticalAlignment="Center"/>
-                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                                            <Border Background="#20FFFFFF" Padding="4,1" CornerRadius="2" Margin="5,0,0,0"
-                                                                    Visibility="{Binding IsWin10Compatible, Converter={StaticResource VisibilityConverter}}">
-                                                                <TextBlock Text="W10" FontSize="7" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                                            </Border>
-                                                            <Border Background="#20FFFFFF" Padding="4,1" CornerRadius="2" Margin="5,0,0,0"
-                                                                    Visibility="{Binding IsWin11Compatible, Converter={StaticResource VisibilityConverter}}">
-                                                                <TextBlock Text="W11" FontSize="7" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                                            </Border>
-                                                        </StackPanel>
-                                                    </Grid>
-                                                    <ItemsControl ItemsSource="{Binding Options}" IsEnabled="{Binding IsCurrentOSCompatible}">
-                                                        <ItemsControl.ItemsPanel>
-                                                            <ItemsPanelTemplate>
-                                                                <UniformGrid Columns="2"/>
-                                                            </ItemsPanelTemplate>
-                                                        </ItemsControl.ItemsPanel>
-                                                        <ItemsControl.ItemTemplate>
-                                                            <DataTemplate>
-                                                                <Button Style="{StaticResource SecondaryButton}" Margin="2" Padding="5" 
-                                                                        Command="{Binding DataContext.ApplyTweakCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                                        CommandParameter="{Binding}">
-                                                                    <TextBlock Text="{Binding Label}" FontSize="10" TextAlignment="Center"/>
-                                                                </Button>
-                                                            </DataTemplate>
-                                                        </ItemsControl.ItemTemplate>
-                                                    </ItemsControl>
+                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="13"/>
+                                                    <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource AccentSecondaryBrush}" FontSize="11" Margin="0,3,0,5"/>
+                                                    <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" TextWrapping="Wrap"/>
                                                 </StackPanel>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-
-                            <!-- FEATURE 3: Registry Drift Monitor -->
-                            <StackPanel Grid.Row="1" Margin="0,0,0,25">
-                                <Grid Margin="0,0,0,15">
-                                    <TextBlock Text="DRIFT WATCHLIST" Style="{StaticResource Caption}"/>
-                                    <Button Command="{Binding RefreshWatchlistCommand}" Style="{StaticResource IconButton}" HorizontalAlignment="Right">
-                                        <fa:ImageAwesome Icon="Refresh" Width="10" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                    </Button>
-                                </Grid>
-                                <ItemsControl ItemsSource="{Binding Watchlist}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Background="#111111" Padding="12,8" Margin="0,0,0,8" CornerRadius="4" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackPanel>
-                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="11"/>
-                                                        <TextBlock Text="{Binding DisplayPath}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" TextTrimming="CharacterEllipsis"/>
-                                                    </StackPanel>
-                                                    <Border Grid.Column="1" Background="{DynamicResource WarningBrush}" Padding="6,2" CornerRadius="2" VerticalAlignment="Center"
-                                                            Visibility="{Binding IsDrifting, Converter={StaticResource VisibilityConverter}}">
-                                                        <TextBlock Text="DRIFT" Foreground="Black" FontSize="8" FontWeight="Black"/>
-                                                    </Border>
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-
-                            <!-- FEATURE 2: Undo Vault -->
-                            <StackPanel Grid.Row="2" Margin="0,0,0,20">
-                                <TextBlock Text="UNDO VAULT (RECOVERY)" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                                <ItemsControl ItemsSource="{Binding UndoVault}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Padding="12" Margin="0,0,0,10" CornerRadius="4" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" Background="#159B59B6">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackPanel>
-                                                        <TextBlock Text="{Binding Description}" FontWeight="Bold" Foreground="White" FontSize="11"/>
-                                                        <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss}'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9"/>
-                                                    </StackPanel>
-                                                    <Button Grid.Column="1" Command="{Binding DataContext.UndoChangeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                            CommandParameter="{Binding}" Style="{StaticResource SecondaryButton}" Padding="8,4">
-                                                        <fa:ImageAwesome Icon="Undo" Width="10" Foreground="White"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                                    </Button>
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </Grid>
+                                                <Button Grid.Column="1" Command="{Binding DataContext.ModifyValueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                        IsEnabled="{Binding IsChecked, ElementName=SafetyLock}"
+                                                        CommandParameter="{Binding}" Style="{StaticResource IconButton}" VerticalAlignment="Top">
+                                                    <fa:ImageAwesome Icon="Pencil" Width="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
                     </ScrollViewer>
                 </Grid>
-
-                <!-- Status Bar -->
-                <Border Grid.Row="2" Background="#111111" Padding="10" Margin="0,20,0,0" CornerRadius="4">
-                    <Grid>
-                        <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center"/>
-                        <fa:ImageAwesome Icon="Spinner" Spin="True" Width="12" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right"
-                                         Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                    </Grid>
-                </Border>
             </Grid>
+        </Border>
+
+        <!-- Right: Management Pane (HCI Rule 6) -->
+        <Border Grid.Column="1" Padding="30" Background="{DynamicResource SidebarBrush}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="REGISTRY FORENSICS" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                    
+                    <!-- Safety Constraint -->
+                    <Border Background="{DynamicResource CardBrush}" Padding="20" CornerRadius="8" Margin="0,0,0,25">
+                        <StackPanel>
+                            <TextBlock Text="SECURITY CONSTRAINTS" Style="{StaticResource Caption}" Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,10"/>
+                            <CheckBox x:Name="SafetyLock" Content="Unlock Intelligence Editing" 
+                                      Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,0,0,5"/>
+                            <TextBlock Text="Manual modifications can cause system instability." FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Presets -->
+                    <TextBlock Text="INTELLIGENT PRESETS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                    <ItemsControl ItemsSource="{Binding CommonTweaks}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,12" Padding="15">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="12" Foreground="White" Margin="0,0,0,10"/>
+                                        <ItemsControl ItemsSource="{Binding Options}">
+                                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Button Style="{StaticResource SecondaryButton}" Margin="2" Padding="5" 
+                                                            IsEnabled="{Binding IsChecked, ElementName=SafetyLock}"
+                                                            Command="{Binding DataContext.ApplyTweakCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}">
+                                                        <TextBlock Text="{Binding Label}" FontSize="10"/>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Recovery Vault -->
+                    <TextBlock Text="UNDO VAULT" Style="{StaticResource Caption}" Margin="0,15,0,15"/>
+                    <ItemsControl ItemsSource="{Binding UndoVault}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12" Margin="0,0,0,10" CornerRadius="4" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" Background="#109B59B6">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Description}" FontWeight="Bold" Foreground="White" FontSize="11"/>
+                                            <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss}'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Command="{Binding DataContext.UndoChangeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                CommandParameter="{Binding}" Style="{StaticResource IconButton}">
+                                            <fa:ImageAwesome Icon="Undo" Width="10" Foreground="White"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Loading Overlay -->
+        <Border Grid.ColumnSpan="2" Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
+                <TextBlock Text="{Binding StatusMessage}" FontSize="18" Foreground="{DynamicResource TextBrush}"/>
+            </StackPanel>
         </Border>
     </Grid>
 </UserControl>
-
-
-
-

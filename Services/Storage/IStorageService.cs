@@ -2,23 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Management;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Eternal.Services.Storage
 {
     public interface IStorageService
     {
         Task<List<PhysicalDisk>> GetPhysicalDisksAsync();
-        Task<List<PartitionInfo>> GetPartitionsAsync();
         Task<(bool Success, string Message)> RenameVolumeAsync(string driveLetter, string newLabel);
         Task<(bool Success, string Message)> FormatVolumeAsync(string driveLetter, string fileSystem, string label, bool quick);
         Task<(bool Success, string Message)> ResizeVolumeAsync(string driveLetter, long newSizeInBytes);
         Task<bool> RunDiskSurfaceTestAsync(string physicalDiskName, global::System.IProgress<double> progress);
         Task<(bool Success, string Message)> ConvertDiskLayoutAsync(string deviceId, string targetLayout);
         Task<(bool Success, string Message)> SetPartitionAttributesAsync(string driveLetter, bool isReadOnly, bool isHidden);
+        Task<(bool Success, string Message)> ChangeDriveLetterAsync(string oldLetter, string newLetter);
+        Task<(bool Success, string Message)> DeletePartitionAsync(int diskIndex, int partitionIndex);
     }
 
-    public record PhysicalDisk(string DeviceID, string Model, string Interface, long Size, string Status, string Serial);
-    public record PartitionInfo(string DriveLetter, string Label, long TotalSize, long FreeSpace, string FileSystem);
+    public record PhysicalDisk(string DeviceID, string Model, string Interface, long Size, string Status, string Serial, int Index, List<PartitionInfo> Partitions);
+    public record PartitionInfo(string DriveLetter, string Label, long TotalSize, long FreeSpace, string FileSystem, string Type, int Index, bool IsBoot);
 
     public class WindowsStorageService : IStorageService
     {
@@ -34,43 +36,57 @@ namespace Eternal.Services.Storage
                 var disks = new List<PhysicalDisk>();
                 try
                 {
-                    using var searcher = CreateSearcher("select DeviceID, Model, InterfaceType, Size, Status, SerialNumber from Win32_DiskDrive");
-                    foreach (var obj in searcher.Get())
+                    using var diskSearcher = CreateSearcher("select DeviceID, Model, InterfaceType, Size, Status, SerialNumber, Index from Win32_DiskDrive");
+                    foreach (var diskObj in diskSearcher.Get())
                     {
-                        disks.Add(new PhysicalDisk(
-                            obj["DeviceID"]?.ToString() ?? "",
-                            obj["Model"]?.ToString() ?? "Unknown",
-                            obj["InterfaceType"]?.ToString() ?? "Unknown",
-                            global::System.Convert.ToInt64(obj["Size"] ?? 0),
-                            obj["Status"]?.ToString() ?? "Unknown",
-                            obj["SerialNumber"]?.ToString()?.Trim() ?? "N/A"
-                        ));
-                    }
-                } catch { }
-                return disks;
-            });
-        }
+                        string deviceId = diskObj["DeviceID"]?.ToString() ?? "";
+                        int diskIndex = global::System.Convert.ToInt32(diskObj["Index"] ?? 0);
+                        var partitions = new List<PartitionInfo>();
 
-        public Task<List<PartitionInfo>> GetPartitionsAsync()
-        {
-            return Task.Run(() =>
-            {
-                var parts = new List<PartitionInfo>();
-                try
-                {
-                    using var searcher = CreateSearcher("select DeviceID, VolumeName, Size, FreeSpace, FileSystem from Win32_LogicalDisk where DriveType = 3");
-                    foreach (var obj in searcher.Get())
-                    {
-                        parts.Add(new PartitionInfo(
-                            obj["DeviceID"]?.ToString() ?? "",
-                            obj["VolumeName"]?.ToString() ?? "Local Disk",
-                            global::System.Convert.ToInt64(obj["Size"] ?? 0),
-                            global::System.Convert.ToInt64(obj["FreeSpace"] ?? 0),
-                            obj["FileSystem"]?.ToString() ?? "Unknown"
+                        // Find associated partitions for this disk
+                        string partQuery = $"ASSOCIATORS OF {{Win32_DiskDrive.DeviceID='{deviceId}'}} WHERE AssocClass = Win32_DiskDriveToDiskPartition";
+                        using var partSearcher = CreateSearcher(partQuery);
+                        
+                        foreach (var partObj in partSearcher.Get())
+                        {
+                            string partDeviceId = partObj["DeviceID"]?.ToString() ?? "";
+                            int partIndex = global::System.Convert.ToInt32(partObj["Index"] ?? 0);
+                            long partSize = global::System.Convert.ToInt64(partObj["Size"] ?? 0);
+                            string partType = partObj["Type"]?.ToString() ?? "Unknown";
+                            bool isBoot = (bool)(partObj["BootPartition"] ?? false);
+
+                            // Find associated logical disk (drive letter)
+                            string driveLetter = "";
+                            string label = "System Reserved / Hidden";
+                            long freeSpace = 0;
+                            string fs = "N/A";
+
+                            string logQuery = $"ASSOCIATORS OF {{Win32_DiskPartition.DeviceID='{partDeviceId}'}} WHERE AssocClass = Win32_LogicalDiskToPartition";
+                            using var logSearcher = CreateSearcher(logQuery);
+                            foreach (var logObj in logSearcher.Get())
+                            {
+                                driveLetter = logObj["DeviceID"]?.ToString() ?? "";
+                                label = logObj["VolumeName"]?.ToString() ?? "Local Disk";
+                                freeSpace = global::System.Convert.ToInt64(logObj["FreeSpace"] ?? 0);
+                                fs = logObj["FileSystem"]?.ToString() ?? "Unknown";
+                            }
+
+                            partitions.Add(new PartitionInfo(driveLetter, label, partSize, freeSpace, fs, partType, partIndex, isBoot));
+                        }
+
+                        disks.Add(new PhysicalDisk(
+                            deviceId,
+                            diskObj["Model"]?.ToString() ?? "Unknown",
+                            diskObj["InterfaceType"]?.ToString() ?? "Unknown",
+                            global::System.Convert.ToInt64(diskObj["Size"] ?? 0),
+                            diskObj["Status"]?.ToString() ?? "Unknown",
+                            diskObj["SerialNumber"]?.ToString()?.Trim() ?? "N/A",
+                            diskIndex,
+                            partitions.OrderBy(p => p.Index).ToList()
                         ));
                     }
                 } catch { }
-                return parts;
+                return disks.OrderBy(d => d.Index).ToList();
             });
         }
 
@@ -95,7 +111,6 @@ namespace Eternal.Services.Storage
 
         public async Task<(bool Success, string Message)> FormatVolumeAsync(string driveLetter, string fileSystem, string label, bool quick)
         {
-            // 1. Try WMI first (Cleanest)
             try
             {
                 using var searcher = CreateSearcher($"select * from Win32_Volume where DriveLetter = '{driveLetter}'");
@@ -111,7 +126,6 @@ namespace Eternal.Services.Storage
             }
             catch { }
 
-            // 2. Diskpart Fallback (Bulletproof in WinRE)
             return await Task.Run(() =>
             {
                 try
@@ -125,7 +139,6 @@ namespace Eternal.Services.Storage
 
         public async Task<(bool Success, string Message)> ResizeVolumeAsync(string driveLetter, long newSizeInBytes)
         {
-            // 1. Try WMI first
             try
             {
                 using var searcher = CreateSearcher($"select * from Win32_Volume where DriveLetter = '{driveLetter}'");
@@ -139,14 +152,10 @@ namespace Eternal.Services.Storage
             }
             catch { }
 
-            // 2. Diskpart Fallback
             return await Task.Run(() =>
             {
                 try
                 {
-                    // Diskpart uses MB for shrink/extend. This is a simplified "extend" logic.
-                    // For a true "Resize" in diskpart we'd need to calculate the difference, 
-                    // but for WinRE purposes, we'll attempt a direct extend.
                     long mb = newSizeInBytes / (1024 * 1024);
                     string script = $"select volume {driveLetter.Replace(":", "")}\nextend size={mb}";
                     return RunDiskpartScript(script, $"Resize {driveLetter}");
@@ -161,10 +170,7 @@ namespace Eternal.Services.Storage
             {
                 try
                 {
-                    // Extract disk number from DeviceID (e.g. \\.\PHYSICALDRIVE0 -> 0)
                     string diskNum = deviceId.Replace(@"\\.\PHYSICALDRIVE", "");
-                    
-                    // Conversion requires a 'clean' disk in diskpart
                     string script = $"select disk {diskNum}\nclean\nconvert {targetLayout.ToLower()}";
                     return RunDiskpartScript(script, $"Convert Disk {diskNum} to {targetLayout}");
                 }
@@ -181,6 +187,36 @@ namespace Eternal.Services.Storage
                     string vol = driveLetter.Replace(":", "");
                     string script = $"select volume {vol}\nattributes volume {(isReadOnly ? "set" : "clear")} readonly\nattributes volume {(isHidden ? "set" : "clear")} hidden";
                     return RunDiskpartScript(script, $"Set Attributes for {driveLetter}");
+                }
+                catch (global::System.Exception ex) { return (false, ex.Message); }
+            });
+        }
+
+        public async Task<(bool Success, string Message)> ChangeDriveLetterAsync(string oldLetter, string newLetter)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    string old = oldLetter.Replace(":", "");
+                    string neu = newLetter.Replace(":", "");
+                    string script = $"select volume {old}\nassign letter={neu}";
+                    return RunDiskpartScript(script, $"Change letter {old} to {neu}");
+                }
+                catch (global::System.Exception ex) { return (false, ex.Message); }
+            });
+        }
+
+        public async Task<(bool Success, string Message)> DeletePartitionAsync(int diskIndex, int partitionIndex)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    // WMI partition indexes are 0-based, diskpart partition indexes are 1-based
+                    int dpIndex = partitionIndex + 1;
+                    string script = $"select disk {diskIndex}\nselect partition {dpIndex}\ndelete partition override";
+                    return RunDiskpartScript(script, $"Delete partition {partitionIndex} on disk {diskIndex}");
                 }
                 catch (global::System.Exception ex) { return (false, ex.Message); }
             });
@@ -212,25 +248,17 @@ namespace Eternal.Services.Storage
             {
                 try
                 {
-                    // Convert DeviceID (e.g. \\.\PHYSICALDRIVE0) to a path for FileStream
-                    // Note: Requires Administrative privileges to read raw device
                     using (var fs = new global::System.IO.FileStream(physicalDiskName, global::System.IO.FileMode.Open, global::System.IO.FileAccess.Read, global::System.IO.FileShare.ReadWrite))
                     {
                         long totalSize = fs.Length;
-                        long step = totalSize / 100; // 1% chunks
-                        byte[] buffer = new byte[65536]; // 64KB buffer for efficient reading
+                        long step = totalSize / 100;
+                        byte[] buffer = new byte[65536];
 
                         for (int i = 1; i <= 100; i++)
                         {
-                            // Read a small portion of the disk in this percentage block
-                            // We don't read the whole disk to keep the test "Diagnostic" and not an "Hour-long benchmark"
-                            // but we verify we can jump and read from different sectors.
                             fs.Seek(step * (i - 1), global::System.IO.SeekOrigin.Begin);
                             int read = fs.Read(buffer, 0, buffer.Length);
-                            
                             progress.Report(i);
-                            
-                            // Check for cancellation or just provide a small delay to keep UI responsive
                             global::System.Threading.Thread.Sleep(10); 
                         }
                     }

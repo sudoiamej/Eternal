@@ -6,34 +6,34 @@ using System.Threading.Tasks;
 using System.Linq;
 using Eternal.Models;
 using Eternal.Services.System;
+using Eternal.Views.Helpers;
+using System.Windows;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class UserManagementViewModel : ObservableObject
+    public partial class UserManagementViewModel : BaseViewModel
     {
         private readonly IUserGroupService _userGroupService;
+        private readonly IToastService _toastService;
 
         public ObservableCollection<UserAccount> Users { get; } = new ObservableCollection<UserAccount>();
         public ObservableCollection<UserGroup> Groups { get; } = new ObservableCollection<UserGroup>();
 
-        [ObservableProperty] private bool _isBusy;
-        [ObservableProperty] private string _statusMessage = "Ready";
         [ObservableProperty] private UserAccount? _selectedUser;
         [ObservableProperty] private UserGroup? _selectedGroup;
 
-        public UserManagementViewModel(IUserGroupService userGroupService)
+        public UserManagementViewModel(IUserGroupService userGroupService, IToastService toastService)
         {
             _userGroupService = userGroupService;
+            _toastService = toastService;
             LoadDataCommand = new AsyncRelayCommand(LoadDataAsync);
         }
 
         public IAsyncRelayCommand LoadDataCommand { get; }
 
-        private async Task LoadDataAsync()
+        public async Task LoadDataAsync()
         {
-            IsBusy = true;
-            StatusMessage = "Fetching users and groups...";
-            try
+            await ExecuteBusyActionAsync(async () =>
             {
                 var usersTask = _userGroupService.GetUsersAsync();
                 var groupsTask = _userGroupService.GetGroupsAsync();
@@ -45,14 +45,45 @@ namespace Eternal.ViewModels.Modules
 
                 Groups.Clear();
                 foreach (var g in groupsTask.Result) Groups.Add(g);
+            }, "Syncing User Accounts...");
+        }
 
-                StatusMessage = $"Loaded {Users.Count} users and {Groups.Count} groups.";
-            }
-            catch (Exception ex)
+        [RelayCommand]
+        private void CreateUser()
+        {
+            var win = new CreateUserWindow(_userGroupService);
+            win.Owner = System.Windows.Application.Current.MainWindow;
+            if (win.ShowDialog() == true)
             {
-                StatusMessage = $"Error: {ex.Message}";
+                _toastService.ShowSuccess("User created successfully.");
+                _ = LoadDataAsync();
             }
-            finally { IsBusy = false; }
+        }
+
+        [RelayCommand]
+        private void ShowUserDetails(UserAccount user)
+        {
+            if (user == null) return;
+            var win = new UserDetailsWindow(_userGroupService, user);
+            win.Owner = System.Windows.Application.Current.MainWindow;
+            if (win.ShowDialog() == true)
+            {
+                _toastService.ShowInfo($"Properties updated for {user.Name}");
+                _ = LoadDataAsync();
+            }
+        }
+
+        [RelayCommand]
+        private void ShowGroupDetails(UserGroup group)
+        {
+            if (group == null) return;
+            var win = new GroupDetailsWindow(_userGroupService, group);
+            win.Owner = System.Windows.Application.Current.MainWindow;
+            if (win.ShowDialog() == true)
+            {
+                _toastService.ShowInfo($"Members updated for {group.Name}");
+                _ = LoadDataAsync();
+            }
         }
 
         [RelayCommand]
@@ -60,18 +91,20 @@ namespace Eternal.ViewModels.Modules
         {
             if (user == null) return;
             bool newStatus = !user.IsEnabled;
-            StatusMessage = $"{(newStatus ? "Enabling" : "Disabling")} user {user.Name}...";
             
-            if (await _userGroupService.SetUserEnabledAsync(user.Name, newStatus))
+            await ExecuteBusyActionAsync(async () =>
             {
-                user.IsEnabled = newStatus;
-                StatusMessage = $"User {user.Name} {(newStatus ? "enabled" : "disabled")}.";
-                await LoadDataAsync();
-            }
-            else
-            {
-                StatusMessage = "Failed to update user status. Admin rights required.";
-            }
+                if (await _userGroupService.SetUserEnabledAsync(user.Name, newStatus))
+                {
+                    user.IsEnabled = newStatus;
+                    _toastService.ShowInfo($"User {user.Name} {(newStatus ? "enabled" : "disabled")}.");
+                    await LoadDataAsync();
+                }
+                else
+                {
+                    _toastService.ShowError("Failed to update status. Admin rights required.");
+                }
+            }, "Updating Account State...");
         }
 
         [RelayCommand]
@@ -81,16 +114,18 @@ namespace Eternal.ViewModels.Modules
             var result = System.Windows.MessageBox.Show($"Are you sure you want to delete user '{user.Name}'?", "Confirm Delete", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
             if (result != System.Windows.MessageBoxResult.Yes) return;
 
-            StatusMessage = $"Deleting user {user.Name}...";
-            if (await _userGroupService.DeleteUserAsync(user.Name))
+            await ExecuteBusyActionAsync(async () =>
             {
-                StatusMessage = $"User {user.Name} deleted.";
-                await LoadDataAsync();
-            }
-            else
-            {
-                StatusMessage = "Failed to delete user.";
-            }
+                if (await _userGroupService.DeleteUserAsync(user.Name))
+                {
+                    _toastService.ShowSuccess($"User {user.Name} deleted.");
+                    await LoadDataAsync();
+                }
+                else
+                {
+                    _toastService.ShowError("Failed to delete user.");
+                }
+            }, "Deleting Account...");
         }
 
         [RelayCommand]
@@ -100,16 +135,18 @@ namespace Eternal.ViewModels.Modules
             var result = System.Windows.MessageBox.Show($"Are you sure you want to delete group '{group.Name}'?", "Confirm Delete", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
             if (result != System.Windows.MessageBoxResult.Yes) return;
 
-            StatusMessage = $"Deleting group {group.Name}...";
-            if (await _userGroupService.DeleteGroupAsync(group.Name))
+            await ExecuteBusyActionAsync(async () =>
             {
-                StatusMessage = $"Group {group.Name} deleted.";
-                await LoadDataAsync();
-            }
-            else
-            {
-                StatusMessage = "Failed to delete group.";
-            }
+                if (await _userGroupService.DeleteGroupAsync(group.Name))
+                {
+                    _toastService.ShowSuccess($"Group {group.Name} deleted.");
+                    await LoadDataAsync();
+                }
+                else
+                {
+                    _toastService.ShowError("Failed to delete group.");
+                }
+            }, "Deleting Group...");
         }
     }
 }

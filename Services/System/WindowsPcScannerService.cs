@@ -43,22 +43,27 @@ namespace Eternal.Services.System
 
             // 1. Storage Scan (15%)
             progress.Report(10);
-            var partitions = await _storageService.GetPartitionsAsync();
-            foreach (var p in partitions)
+            var disks = await _storageService.GetPhysicalDisksAsync();
+            foreach (var disk in disks)
             {
-                double freePercentage = (double)p.FreeSpace / p.TotalSize * 100;
-                if (freePercentage < 5)
+                foreach (var p in disk.Partitions)
                 {
-                    issues.Add(new ScannerIssue
+                    if (string.IsNullOrEmpty(p.DriveLetter)) continue;
+
+                    double freePercentage = (double)p.FreeSpace / p.TotalSize * 100;
+                    if (freePercentage < 5)
                     {
-                        Id = $"LOW_DISK_{p.DriveLetter}",
-                        Title = $"Critical Disk Space: {p.DriveLetter}",
-                        Description = $"Drive {p.DriveLetter} has less than 5% free space ({p.FreeSpace / 1024 / 1024 / 1024} GB). System performance may be severely impacted.",
-                        Severity = IssueSeverity.Required,
-                        ActionType = ScannerActionType.ManualNavigation,
-                        ActionTarget = "Storage",
-                        Category = "Storage"
-                    });
+                        issues.Add(new ScannerIssue
+                        {
+                            Id = $"LOW_DISK_{p.DriveLetter}",
+                            Title = $"Critical Disk Space: {p.DriveLetter}",
+                            Description = $"Drive {p.DriveLetter} has less than 5% free space ({p.FreeSpace / 1024 / 1024 / 1024} GB). System performance may be severely impacted.",
+                            Severity = IssueSeverity.Required,
+                            ActionType = ScannerActionType.ManualNavigation,
+                            ActionTarget = "Storage",
+                            Category = "Storage"
+                        });
+                    }
                 }
             }
 

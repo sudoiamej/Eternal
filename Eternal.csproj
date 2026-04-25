@@ -11,7 +11,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
     <Version>2.5.0</Version>
-    <InformationalVersion>2.5.0 (Milestone 3)</InformationalVersion>
+    <InformationalVersion>2.5.0 (Milestone 4)</InformationalVersion>
     <Authors>Eternal Analytics</Authors>
     <Product>Eternal System Intelligence</Product>
     <Description>System Intelligence and Diagnostics Suite</Description>
@@ -46,6 +46,7 @@
     <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="System.Management" Version="10.0.5" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="10.0.5" />

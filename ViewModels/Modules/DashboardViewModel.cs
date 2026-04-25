@@ -12,13 +12,15 @@ using Eternal.Views.Helpers;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class DashboardViewModel : ObservableObject
+    public partial class DashboardViewModel : BaseViewModel
     {
         private readonly IHardwareService _hardwareService;
         private readonly IBiosService _biosService;
         private readonly ISecurityService _securityService;
         private readonly IIntelligenceService _intelligenceService;
         private readonly IToolkitService _toolkitService;
+        private readonly IToastService _toastService;
+        private readonly IEnvironmentService _envService;
 
         private TrustScore? _lastTrustScore;
 
@@ -30,6 +32,10 @@ namespace Eternal.ViewModels.Modules
         
         [ObservableProperty] private string _trustScoreIndex;
         [ObservableProperty] private string _trustScoreExplanation;
+        [ObservableProperty] private int _startupScore;
+        [ObservableProperty] private int _driverScore;
+        [ObservableProperty] private int _systemFileScore;
+        [ObservableProperty] private int _networkScore;
         [ObservableProperty] private TrustLevel _trustLevel;
         
         [ObservableProperty] private string _systemStatusText;
@@ -37,19 +43,23 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private SeverityLevel _highestSeverity;
         [ObservableProperty] private List<RootCause> _rootCauses;
 
-        [ObservableProperty] private bool _isLoading;
         [ObservableProperty] private bool _hasError;
         [ObservableProperty] private string _errorMessage;
         [ObservableProperty] private string _errorDetails;
 
-        public DashboardViewModel(IHardwareService hardwareService, IBiosService biosService, ISecurityService securityService, IIntelligenceService intelligenceService, IToolkitService toolkitService)
+        [ObservableProperty] private bool _isPeMode;
+
+        public DashboardViewModel(IHardwareService hardwareService, IBiosService biosService, ISecurityService securityService, IIntelligenceService intelligenceService, IToolkitService toolkitService, IToastService toastService, IEnvironmentService envService)
         {
             _hardwareService = hardwareService;
             _biosService = biosService;
             _securityService = securityService;
             _intelligenceService = intelligenceService;
             _toolkitService = toolkitService;
+            _toastService = toastService;
+            _envService = envService;
             
+            IsPeMode = _envService.IsPeMode;
             LoadDashboardCommand = new AsyncRelayCommand(LoadDashboardAsync);
         }
 
@@ -57,61 +67,85 @@ namespace Eternal.ViewModels.Modules
 
         public async Task LoadDashboardAsync()
         {
-            IsLoading = true;
-            HasError = false;
-            try
+            await ExecuteBusyActionAsync(async () =>
             {
+                HasError = false;
+                
+                // Base hardware tasks (Safe in PE)
                 var cpuTask = _hardwareService.GetCpuInfoAsync();
                 var gpuTask = _hardwareService.GetGpuInfoAsync();
                 var ramTask = _hardwareService.GetRamInfoAsync();
                 var uefiTask = _biosService.GetUefiStatusAsync();
-                var anomalyTask = _intelligenceService.GetSystemAnomaliesAsync();
-                var trustTask = _intelligenceService.CalculateTrustScoreAsync();
-                var rootCauseTask = _intelligenceService.GetPerformanceRootCausesAsync();
 
-                await Task.WhenAll(cpuTask, gpuTask, ramTask, uefiTask, anomalyTask, trustTask, rootCauseTask);
-
-                CpuName = (await cpuTask).Name;
-                GpuName = (await gpuTask).Name;
-                RamTotal = (await ramTask).TotalCapacity;
-                SecureBootStatus = (await uefiTask).SecureBootEnabled ? "Enabled" : "Disabled";
-                OsVersion = global::System.Environment.OSVersion.ToString();
-
-                _lastTrustScore = await trustTask;
-                TrustScoreIndex = _lastTrustScore.OverallIndex.ToString();
-                TrustScoreExplanation = _lastTrustScore.Explanation;
-                TrustLevel = _lastTrustScore.Status;
-
-                var anomalies = await anomalyTask;
-                var highestAnomaly = anomalies.OrderByDescending(a => a.Severity).FirstOrDefault();
-                HighestSeverity = highestAnomaly?.Severity ?? SeverityLevel.Info;
-                
-                if (highestAnomaly != null && highestAnomaly.Severity > SeverityLevel.Info)
+                if (IsPeMode)
                 {
-                    SystemStatusText = "System Attention Required";
-                    SystemStatusExplanation = highestAnomaly.Explanation.PlainLanguage;
+                    await Task.WhenAll(cpuTask, gpuTask, ramTask, uefiTask);
+                    
+                    CpuName = (await cpuTask).Name;
+                    GpuName = (await gpuTask).Name;
+                    RamTotal = (await ramTask).TotalCapacity;
+                    SecureBootStatus = (await uefiTask).SecureBootEnabled ? "Enabled" : "Disabled";
+                    OsVersion = "Windows RE (PE Environment)";
+
+                    TrustScoreIndex = "N/A";
+                    SystemStatusText = "Recovery Mode";
+                    SystemStatusExplanation = "Advanced system intelligence and trust scoring are disabled while running from a recovery partition.";
+                    TrustLevel = TrustLevel.Unknown;
+                    RootCauses = new List<RootCause>();
                 }
                 else
                 {
-                    SystemStatusText = "System Healthy";
-                    SystemStatusExplanation = "Your system is currently performing within optimal parameters.";
-                }
+                    // Live OS tasks
+                    var anomalyTask = _intelligenceService.GetSystemAnomaliesAsync();
+                    var trustTask = _intelligenceService.CalculateTrustScoreAsync();
+                    var rootCauseTask = _intelligenceService.GetPerformanceRootCausesAsync();
 
-                RootCauses = await rootCauseTask;
-            }
-            catch (global::System.Exception ex)
-            {
-                HasError = true;
-                ErrorMessage = "Dashboard failed to load system summary.";
-                ErrorDetails = ex.Message;
-            }
-            finally { IsLoading = false; }
+                    await Task.WhenAll(cpuTask, gpuTask, ramTask, uefiTask, anomalyTask, trustTask, rootCauseTask);
+
+                    CpuName = (await cpuTask).Name;
+                    GpuName = (await gpuTask).Name;
+                    RamTotal = (await ramTask).TotalCapacity;
+                    SecureBootStatus = (await uefiTask).SecureBootEnabled ? "Enabled" : "Disabled";
+                    OsVersion = global::System.Environment.OSVersion.ToString();
+
+                    _lastTrustScore = await trustTask;
+                    TrustScoreIndex = _lastTrustScore.OverallIndex.ToString();
+                    TrustScoreExplanation = _lastTrustScore.Explanation;
+                    TrustLevel = _lastTrustScore.Status;
+                    
+                    StartupScore = _lastTrustScore.StartupScore;
+                    DriverScore = _lastTrustScore.DriverScore;
+                    SystemFileScore = _lastTrustScore.SystemFileScore;
+                    NetworkScore = _lastTrustScore.NetworkScore;
+
+                    var anomalies = await anomalyTask;
+                    var highestAnomaly = anomalies.OrderByDescending(a => a.Severity).FirstOrDefault();
+                    HighestSeverity = highestAnomaly?.Severity ?? SeverityLevel.Info;
+                    
+                    if (highestAnomaly != null && highestAnomaly.Severity > SeverityLevel.Info)
+                    {
+                        SystemStatusText = "Attention Required";
+                        SystemStatusExplanation = highestAnomaly.Explanation.PlainLanguage;
+                    }
+                    else
+                    {
+                        SystemStatusText = "System Healthy";
+                        SystemStatusExplanation = "All parameters within optimal thresholds.";
+                    }
+
+                    RootCauses = await rootCauseTask;
+                }
+            }, "Syncing Intelligence Engine...");
         }
 
         [RelayCommand]
         private void ShowTrustDetails()
         {
-            if (_lastTrustScore == null) return;
+            if (IsPeMode || _lastTrustScore == null)
+            {
+                _toastService.ShowInfo("Trust details are unavailable in WinRE.");
+                return;
+            }
 
             var properties = new List<PropertyItem>
             {
@@ -135,14 +169,22 @@ namespace Eternal.ViewModels.Modules
         [RelayCommand]
         private async Task CleanTemp()
         {
-            long bytes = await _toolkitService.ClearTempFilesAsync();
-            System.Windows.MessageBox.Show($"Cleaned {(bytes / 1024 / 1024)} MB of temporary files.", "HCI Feedback", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (IsPeMode)
+            {
+                _toastService.ShowWarning("Cache cleanup is disabled in WinRE.");
+                return;
+            }
+            await ExecuteBusyActionAsync(async () =>
+            {
+                long bytes = await _toolkitService.ClearTempFilesAsync();
+                _toastService.ShowSuccess($"Cleaned {(bytes / 1024 / 1024)} MB of temporary cache.");
+            }, "Purging Cache...");
         }
 
         [RelayCommand]
         private void ExportBrief()
         {
-            System.Windows.MessageBox.Show("Brief export feature is integrated into the Reports module.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            _toastService.ShowInfo("Brief export integrated into Reports module.");
         }
     }
 }

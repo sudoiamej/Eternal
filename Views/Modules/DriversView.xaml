@@ -4,200 +4,137 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
-             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="1000">
-    <Border Padding="40">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+             mc:Ignorable="d" d:DesignHeight="720" d:DesignWidth="1100">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="380"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left: Driver Stack (Data) -->
+        <Border Grid.Column="0" Padding="40" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- Header -->
-                    <RowDefinition Height="Auto"/> <!-- Summary Overview -->
-                    <RowDefinition Height="*"/>    <!-- Detailed List -->
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- 1. Unified Header (HCI Rule 9: Consistency) -->
-                <Grid Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
-                            <TextBlock Text=" › " Style="{StaticResource Caption}"/>
-                            <TextBlock Text="KERNEL &amp; INTERFACE" Style="{StaticResource Caption}"/>
-                        </StackPanel>
+                <StackPanel Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
+                    <TextBlock Text="ETERNAL › ACTIVE MONITORING" Style="{StaticResource HeaderBreadcrumb}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
                         <TextBlock Text="Driver Inspector" Style="{StaticResource H1}" Margin="0"/>
-                    </StackPanel>
-                    <Button Grid.Column="1" Command="{Binding LoadCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom" Margin="0,0,0,5" ToolTip="Rescan Drivers">
-                        <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                    </Button>
-                </Grid>
+                        
+                        <Button Grid.Column="1" Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh Driver List" VerticalAlignment="Center">
+                            <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"/>
+                        </Button>
+                    </Grid>
+                </StackPanel>
 
-                <!-- 2. Summary Overview (HCI Rule 11: Progressive Disclosure) -->
-                <Grid Grid.Row="1" Margin="0,0,0,20">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Border Grid.Column="0" Style="{StaticResource StandardCard}" Margin="0,0,15,0" Padding="20">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <fa:ImageAwesome Icon="ListAlt" Width="32" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,25,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="DRIVER REPOSITORY SUMMARY" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Drivers.Count}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                    <TextBlock Text=" Total Active Driver Modules Detected" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="5,0,0,2"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <!-- System Identifier / OEM Support Banner -->
-                    <Border Grid.Column="1" Style="{StaticResource StandardCard}" Padding="20" BorderBrush="{DynamicResource AccentSecondaryBrush}" BorderThickness="1">
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Shield" Width="24" Foreground="{DynamicResource AccentSecondaryBrush}" Margin="0,0,20,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                            <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="SYSTEM SUPPORT IDENTIFIER" Style="{StaticResource Caption}" Margin="0,0,0,3"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding OemInfo.Vendor}" FontWeight="Black" Foreground="White"/>
-                                    <TextBlock Text=" - " Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                    <TextBlock Text="{Binding OemInfo.SerialNumber}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
-                                </StackPanel>
-                            </StackPanel>
-                            <Button Command="{Binding OpenOemSupportCommand}" Content="OPEN OFFICIAL PORTAL" 
-                                    Style="{StaticResource PrimaryAction}" Margin="25,0,0,0" Padding="15,8" FontSize="10"/>
-                        </StackPanel>
-                    </Border>
-                </Grid>
-
-
-                <!-- 3. Categorized List (HCI Rule 5: Mapping & Cognitive Load) -->
-                <DataGrid Grid.Row="2" ItemsSource="{Binding Drivers}" AutoGenerateColumns="False" 
-                          IsReadOnly="True" Background="Transparent" BorderThickness="0" 
-                          RowBackground="Transparent" GridLinesVisibility="None"
-                          Foreground="{DynamicResource TextBrush}" CanUserAddRows="False"
-                          VirtualizingStackPanel.IsVirtualizing="True"
-                          VirtualizingStackPanel.VirtualizationMode="Recycling"
-                          MouseDoubleClick="DataGrid_MouseDoubleClick">
-                    <DataGrid.Resources>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                            <Setter Property="Padding" Value="10,5"/>
-                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-                        </Style>
-                    </DataGrid.Resources>
-                    
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Drivers}" SelectedItem="{Binding SelectedDriver}" 
+                          AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" 
+                          HeadersVisibility="Column" GridLinesVisibility="None">
+                    <DataGrid.InputBindings>
+                        <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding ShowDetailsCommand}" CommandParameter="{Binding SelectedDriver}"/>
+                    </DataGrid.InputBindings>
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="TYPE" Width="100">
+                        <DataGridTemplateColumn Header="PROVIDER" Width="150">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Padding="8,3" CornerRadius="2" HorizontalAlignment="Left">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#1AFFFFFF"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Type}" Value="3rd Party">
-                                                        <Setter Property="Background" Value="#1A2B88D8"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <TextBlock Text="{Binding Type}" FontSize="9" FontWeight="Bold">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Type}" Value="3rd Party">
-                                                            <Setter Property="Foreground" Value="{DynamicResource AccentSecondaryBrush}"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
+                                    <Border Padding="6,2" CornerRadius="3" Background="#15FFFFFF">
+                                        <TextBlock Text="{Binding Provider}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </Border>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-
-                        <DataGridTextColumn Header="NAME" Binding="{Binding Name}" Width="1.5*">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontWeight" Value="SemiBold"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="FontSize" Value="11"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-
-                        <DataGridTextColumn Header="PROVIDER" Binding="{Binding Provider}" Width="1*">
-                             <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="FontSize" Value="11"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-
-                        <DataGridTextColumn Header="VERSION" Binding="{Binding Version}" Width="100">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="FontSize" Value="10"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        
-                        <DataGridTemplateColumn Header="FIND OFFICIAL" Width="Auto">
+                        <DataGridTextColumn Header="DEVICE NAME" Binding="{Binding Name}" Width="*" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="VERSION" Binding="{Binding Version}" Width="120"/>
+                        <DataGridTemplateColumn Header="TYPE" Width="130">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Command="{Binding DataContext.FindOfficialDriverCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                            CommandParameter="{Binding}"
-                                            Style="{StaticResource IconButton}" 
-                                            HorizontalAlignment="Center" 
-                                            ToolTip="Open Manufacturer Support Page">
-                                        <StackPanel Orientation="Horizontal">
-                                            <fa:ImageAwesome Icon="ExternalLink" Width="10" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                            <TextBlock Text="PORTAL" FontSize="9" Margin="5,0,0,0" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
-                                        </StackPanel>
-                                    </Button>
+                                    <TextBlock Text="{Binding Type}" FontSize="10">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Type}" Value="3rd Party">
+                                                        <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-
-                        <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Description}" Width="2*">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                                    <Setter Property="FontSize" Value="10"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
-
-                <!-- Loading Overlay (HCI Rule 7: Status) -->
-                <Border Grid.Row="2" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}" Margin="-40">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="32" Margin="0,0,0,10"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                        <TextBlock Text="Analyzing Driver Stack..." Foreground="{DynamicResource TextBrush}"/>
-                    </StackPanel>
-                </Border>
             </Grid>
-        </ScrollViewer>
-    </Border>
+        </Border>
 
+        <!-- Right: Management Pane (HCI) -->
+        <Border Grid.Column="1" Padding="30" Background="{DynamicResource SidebarBrush}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="SYSTEM SUPPORT IDENTIFIER" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                    <Border Style="{StaticResource StandardCard}" Padding="20" Margin="0,0,0,25">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding OemInfo.Vendor}" FontWeight="Black" Foreground="White" FontSize="14"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding OemInfo.Model}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="{Binding OemInfo.SerialNumber}" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5" Margin="0,2,0,15"/>
+                            
+                            <Button Command="{Binding OpenOemSupportCommand}" Content="OPEN OFFICIAL PORTAL" Style="{StaticResource StandardButton}" Background="{DynamicResource AccentBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="DRIVER FORENSICS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                    <Border Visibility="{Binding SelectedDriver, Converter={StaticResource VisibilityConverter}}" 
+                            Background="{DynamicResource CardBrush}" Padding="20" CornerRadius="8">
+                        <StackPanel>
+                            <TextBlock Text="{Binding SelectedDriver.Name}" FontSize="16" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding SelectedDriver.HardwareId}" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,5,0,20" TextWrapping="Wrap" Opacity="0.6"/>
+
+                            <Button Command="{Binding FindOfficialDriverCommand}" 
+                                    CommandParameter="{Binding SelectedDriver}"
+                                    Style="{StaticResource PrimaryButton}" Margin="0,0,0,10" HorizontalAlignment="Stretch">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Download" Width="12" Foreground="White" Margin="0,0,10,0"/>
+                                    <TextBlock Text="SEARCH FOR UPDATES" FontSize="11" FontWeight="Bold"/>
+                                </StackPanel>
+                            </Button>
+                            
+                            <Button Command="{Binding ShowDetailsCommand}" 
+                                    CommandParameter="{Binding SelectedDriver}"
+                                    Style="{StaticResource SecondaryButton}" HorizontalAlignment="Stretch">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="List" Width="12" Foreground="White" Margin="0,0,10,0"/>
+                                    <TextBlock Text="FULL STACK PROPERTIES" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Visibility="{Binding SelectedDriver, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" 
+                            Background="{DynamicResource CardBrush}" Padding="30" CornerRadius="8" Opacity="0.5">
+                        <TextBlock Text="Select a driver from the stack to analyze provenance and check for updates." 
+                                   TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Loading Overlay -->
+        <Border Grid.ColumnSpan="2" Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
+                <TextBlock Text="{Binding StatusMessage}" FontSize="18" Foreground="{DynamicResource TextBrush}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
 </UserControl>
-
-
-
-

@@ -2,6 +2,8 @@ using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
+using Eternal.Models;
 
 namespace Eternal.Helpers
 {
@@ -125,6 +127,87 @@ namespace Eternal.Helpers
                     return result;
             }
             return 0.0;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class TrustLevelToBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is TrustLevel level)
+            {
+                return level switch
+                {
+                    TrustLevel.Safe => System.Windows.Application.Current.Resources["SuccessBrush"],
+                    TrustLevel.Warning => System.Windows.Application.Current.Resources["WarningBrush"],
+                    TrustLevel.Critical => System.Windows.Application.Current.Resources["CriticalBrush"],
+                    _ => System.Windows.Application.Current.Resources["TextSecondaryBrush"]
+                };
+            }
+            return System.Windows.Application.Current.Resources["TextSecondaryBrush"];
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class SeverityToBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is Services.System.ToastSeverity severity)
+            {
+                return severity switch
+                {
+                    Services.System.ToastSeverity.Success => System.Windows.Application.Current.Resources["SuccessBrush"],
+                    Services.System.ToastSeverity.Warning => System.Windows.Application.Current.Resources["WarningBrush"],
+                    Services.System.ToastSeverity.Error => System.Windows.Application.Current.Resources["CriticalBrush"],
+                    _ => System.Windows.Application.Current.Resources["InfoBrush"]
+                };
+            }
+            return System.Windows.Application.Current.Resources["InfoBrush"];
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class TrustLevelToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is TrustLevel level)
+            {
+                return level switch
+                {
+                    TrustLevel.Safe => System.Windows.Application.Current.Resources["SuccessColor"],
+                    TrustLevel.Warning => System.Windows.Application.Current.Resources["WarningColor"],
+                    TrustLevel.Critical => System.Windows.Application.Current.Resources["CriticalColor"],
+                    _ => System.Windows.Application.Current.Resources["TextSecondaryColor"]
+                };
+            }
+            return System.Windows.Application.Current.Resources["TextSecondaryColor"];
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class BooleanToIconConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == DependencyProperty.UnsetValue) return FontAwesome.WPF.FontAwesomeIcon.Question;
+
+            if (parameter is string param)
+            {
+                var icons = param.Split(':');
+                if (icons.Length == 2)
+                {
+                    bool isTrue = value is bool b && b;
+                    string iconName = isTrue ? icons[0] : icons[1];
+                    if (Enum.TryParse(typeof(FontAwesome.WPF.FontAwesomeIcon), iconName, out var icon))
+                    {
+                        return icon!;
+                    }
+                }
+            }
+            return FontAwesome.WPF.FontAwesomeIcon.Question;
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }

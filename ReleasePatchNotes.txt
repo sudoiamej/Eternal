@@ -1,63 +1,44 @@
 ETERNAL SYSTEM INTELLIGENCE - RELEASE NOTES
-Version: 2.5.0 (Milestone 3)
+Version: 2.5.0 (Milestone 4)
 Edition: DEV PREVIEW
-Build Date: April 19, 2026
+Build Date: April 23, 2026
 
 --------------------------------------------------------------------------------
 OVERVIEW
 --------------------------------------------------------------------------------
-Milestone 3 represents a major evolution in system maintenance and forensic 
-intelligence. This update introduces "PC Intelligence Rating" (WinSAT), a 
-comprehensive "PC Intelligence Scanner," and the "DISM Image Studio." Core 
-usability has been redefined with a new Multi-Theme Engine and an expandable 
-navigation console, all while strictly adhering to HCI safety standards.
+Milestone 4 focuses on UI/UX modernization and log stream isolation. This update 
+introduces a major overhaul of the navigation system with a new hover-to-expand 
+"Drawer" architecture and isolated logging streams for better diagnostic 
+traceability.
 
 --------------------------------------------------------------------------------
 NEW FEATURES & ARCHITECTURAL ENHANCEMENTS
 --------------------------------------------------------------------------------
 
-[PC INTELLIGENCE SCANNER] - NEW MODULE
-- MULTI-TIERED AUDIT: Intelligent scanning engine categorizing issues into 
-  Required (Critical), Recommended (High), and Optional (Maintenance).
-- ONE-CLICK FIXES: Direct resolution path for high-priority performance and 
-  cleanup tasks.
-- SMART DIAGNOSTICS: Integrated Network Latency (Ping) and BIOS Age auditing.
+[NAVIGATION OVERHAUL] - UI MODERNIZATION
+- HOVER-TO-EXPAND DRAWER: The sidebar now functions as a fluid overlay, 
+  expanding on hover and collapsing to a compact icon view automatically.
+- ACCENT GLOW HIGHLIGHTS: Premium linear gradient highlights and glow effects 
+  using the application's active Accent Color.
+- OVERLAY ARCHITECTURE: Navigation no longer shifts main content, providing 
+  a more stable and premium "System Drawer" feel.
 
-[PC RATING (WINSAT)] - NEW MODULE
-- NATIVE BENCHMARKING: Resurrection of the Windows Experience Index using 
-  the native WinSAT.exe engine.
-- COMPONENT BREAKDOWN: Detailed performance scores for CPU, RAM, Disk, and 
-  Graphics with human-readable bottleneck analysis.
-
-[WINDOWS UPDATE & IMAGING]
-- OS UPDATE CONSOLE: Direct interface with WUA API to search, install, and 
-  pause system patches.
-- SMART REBOOT: Detection of pending system restarts with recovery actions.
-- DISM IMAGE STUDIO: Native analysis of .wim and .esd image files with full 
-  index and metadata extraction.
-
-[MULTI-THEME ENGINE]
-- QUAD-THEME SUPPORT: Introduction of Dark, Light, Gray, and High Contrast 
-  (AAA Accessibility) modes.
-- ADAPTIVE READABILITY: Algorithmic contrast adjustment that automatically 
-  switches text color based on accent luminance.
-
-[HCI & UX REFINEMENT]
-- EXPANDABLE SIDEBAR: Premium animated "Shrink" console with branded logo 
-  toggle and persistent tooltips.
-- SAFETY INTERLOCKS: "Enable Destructive Actions" interlocks added to Storage 
-  Management to prevent accidental data loss.
-- TYPOGRAPHIC OVERHAUL: Refined character spacing and layout for professional 
-  readability.
-
-[SECURITY & FORENSICS]
-- THREAT HUNTER v2: Expanded persistence audit (HKLM/RunOnce) and advanced 
-  behavioral heuristics for suspicious execution paths.
-- AUTOMATED CLEANUP: Integrated registry cleanup when neutralizing threats.
+[LOGGING ISOLATION] - DIAGNOSTIC TRACEABILITY
+- DUAL-STREAM LOGGING: Complete separation of internal "Application Actions" 
+  from Windows "Event Viewer" entries.
+- SIDE-BY-SIDE CONSOLE: New dual-grid layout in Verbose Logging for simultaneous 
+  monitoring of app behavior and system events.
+- SYNC FEEDBACK: Dedicated loading states and synchronization overlays for 
+  Windows Event log retrieval.
 
 --------------------------------------------------------------------------------
 PREVIOUS VERSIONS
 --------------------------------------------------------------------------------
+Version: 2.5.0 (Milestone 3)
+Build Date: April 19, 2026
+OVERVIEW: Milestone 3 introduced PC Intelligence Scanner, WinSAT PC Rating, 
+and DISM Image Studio. Core usability was redefined with the Theme Engine.
+
 Version: 2.5.0 (Milestone 2)
 Build Date: April 18, 2026
 OVERVIEW: Milestone 2 introduced Components Diagnostics and SDK 26100 evolution.

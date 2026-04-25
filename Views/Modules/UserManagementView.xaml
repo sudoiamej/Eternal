@@ -4,104 +4,185 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
-             mc:Ignorable="d" d:DesignHeight="720" d:DesignWidth="1000">
-    <Border Padding="40">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/> <!-- Header -->
-                <RowDefinition Height="*"/>    <!-- Content -->
-                <RowDefinition Height="Auto"/> <!-- Status -->
-            </Grid.RowDefinitions>
+             mc:Ignorable="d" d:DesignHeight="720" d:DesignWidth="1100">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="380"/>
+        </Grid.ColumnDefinitions>
 
-            <!-- 1. Header -->
-            <Grid Grid.Row="0" Margin="0,0,0,30">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                        <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
-                        <TextBlock Text=" › " Style="{StaticResource Caption}"/>
-                        <TextBlock Text="USER MANAGEMENT" Style="{StaticResource Caption}"/>
-                    </StackPanel>
-                    <TextBlock Text="Local Users &amp; Groups" Style="{StaticResource H1}" Margin="0"/>
-                </StackPanel>
-                
-                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
-                    <Button Command="{Binding LoadDataCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh Data">
-                        <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                    </Button>
-                </StackPanel>
-            </Grid>
+        <!-- Left: User & Group Inventory (Data) -->
+        <Border Grid.Column="0" Padding="40" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <!-- 2. Content -->
-            <TabControl Grid.Row="1" Style="{StaticResource ModernTabControl}">
-                <TabItem Header="USERS">
-                    <Border Style="{StaticResource StandardCard}" Padding="0" Margin="0,20,0,0">
-                        <DataGrid ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser}" 
-                                  AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent"
-                                  BorderThickness="0" RowBackground="Transparent" GridLinesVisibility="None"
-                                  Foreground="{DynamicResource TextBrush}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="USERNAME" Binding="{Binding Name}" Width="150"/>
-                                <DataGridTextColumn Header="FULL NAME" Binding="{Binding FullName}" Width="200"/>
-                                <DataGridTextColumn Header="STATUS" Binding="{Binding IsEnabled, Converter={StaticResource BooleanToStatusConverter}}" Width="100"/>
-                                <DataGridTextColumn Header="SID" Binding="{Binding Sid}" Width="*"/>
-                                <DataGridTemplateColumn Header="ACTIONS" Width="120">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button Command="{Binding DataContext.ToggleUserStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                        CommandParameter="{Binding}" Style="{StaticResource IconButton}" ToolTip="Toggle Status">
-                                                    <fa:ImageAwesome Icon="PowerOff" Width="12" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                                </Button>
-                                                <Button Command="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                        CommandParameter="{Binding}" Style="{StaticResource IconButton}" ToolTip="Delete User" Margin="10,0,0,0">
-                                                    <fa:ImageAwesome Icon="Trash" Width="12" Foreground="{DynamicResource CriticalBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                                </Button>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Border>
-                </TabItem>
+                <StackPanel Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
+                    <TextBlock Text="ETERNAL › ACTIVE MONITORING" Style="{StaticResource HeaderBreadcrumb}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Local Users &amp; Groups" Style="{StaticResource H1}" Margin="0"/>
+                        
+                        <Button Grid.Column="1" Command="{Binding LoadDataCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh User Data" VerticalAlignment="Center">
+                            <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"/>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+
+                <TabControl Grid.Row="1" Style="{StaticResource ModernTabControl}">
+                    <TabItem Header="USERS">
+                        <Border Style="{StaticResource StandardCard}" Padding="0" Margin="0,20,0,0">
+                            <DataGrid ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser}" 
+                                      AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent"
+                                      BorderThickness="0" RowBackground="Transparent" GridLinesVisibility="None"
+                                      Foreground="{DynamicResource TextBrush}">
+                                <DataGrid.InputBindings>
+                                    <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding ShowUserDetailsCommand}" CommandParameter="{Binding SelectedUser}"/>
+                                </DataGrid.InputBindings>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="USERNAME" Binding="{Binding Name}" Width="150"/>
+                                    <DataGridTextColumn Header="FULL NAME" Binding="{Binding FullName}" Width="*"/>
+                                    <DataGridTemplateColumn Header="STATUS" Width="100">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="6,2" CornerRadius="2" HorizontalAlignment="Left">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsEnabled}" Value="True">
+                                                                    <Setter Property="Background" Value="#1A4CAF50"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                                    <Setter Property="Background" Value="#1AF44336"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock FontSize="9" FontWeight="Black">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsEnabled}" Value="True">
+                                                                        <Setter Property="Text" Value="ACTIVE"/>
+                                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                                        <Setter Property="Text" Value="DISABLED"/>
+                                                                        <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="LAST LOGON" Binding="{Binding LastLogon, StringFormat='{}{0:g}'}" Width="150"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                    </TabItem>
                     
-                <TabItem Header="GROUPS">
-                    <Border Style="{StaticResource StandardCard}" Padding="0" Margin="0,20,0,0">
-                        <DataGrid ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" 
-                                  AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent"
-                                  BorderThickness="0" RowBackground="Transparent" GridLinesVisibility="None"
-                                  Foreground="{DynamicResource TextBrush}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="GROUP NAME" Binding="{Binding Name}" Width="200"/>
-                                <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Description}" Width="*"/>
-                                <DataGridTemplateColumn Header="ACTIONS" Width="80">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button Command="{Binding DataContext.DeleteGroupCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                    CommandParameter="{Binding}" Style="{StaticResource IconButton}" ToolTip="Delete Group">
-                                                <fa:ImageAwesome Icon="Trash" Width="12" Foreground="{DynamicResource CriticalBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                            </Button>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                    <TabItem Header="GROUPS">
+                        <Border Style="{StaticResource StandardCard}" Padding="0" Margin="0,20,0,0">
+                            <DataGrid ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" 
+                                      AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent"
+                                      BorderThickness="0" RowBackground="Transparent" GridLinesVisibility="None"
+                                      Foreground="{DynamicResource TextBrush}">
+                                <DataGrid.InputBindings>
+                                    <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding ShowGroupDetailsCommand}" CommandParameter="{Binding SelectedGroup}"/>
+                                </DataGrid.InputBindings>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="GROUP NAME" Binding="{Binding Name}" Width="200" FontWeight="Bold"/>
+                                    <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Description}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Border>
+
+        <!-- Right: Management Pane (HCI) -->
+        <Border Grid.Column="1" Padding="30" Background="{DynamicResource SidebarBrush}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="IDENTITY MANAGEMENT" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                    
+                    <!-- Global Actions -->
+                    <Border Background="{DynamicResource CardBrush}" Padding="20" CornerRadius="8" Margin="0,0,0,30">
+                        <StackPanel>
+                            <TextBlock Text="QUICK PROVISIONING" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            <Button Command="{Binding CreateUserCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch" Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="UserPlus" Width="12" Foreground="White" Margin="0,0,10,0"/>
+                                    <TextBlock Text="PROVISION NEW USER" FontSize="11" FontWeight="Bold"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
                     </Border>
-                </TabItem>
-            </TabControl>
 
-            <!-- 3. Status Bar -->
-            <Border Grid.Row="2" Style="{StaticResource StandardCard}" Padding="15,10" Margin="0,20,0,0">
-                <Grid>
-                    <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
-                    <fa:ImageAwesome Icon="Spinner" Spin="True" Width="12" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right" 
-                                     Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                </Grid>
-            </Border>
-        </Grid>
-    </Border>
+                    <!-- Selected User Management -->
+                    <TextBlock Text="SELECTION CONTEXT" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                    <Border Visibility="{Binding SelectedUser, Converter={StaticResource VisibilityConverter}}" 
+                            Background="{DynamicResource CardBrush}" Padding="20" CornerRadius="8" Margin="0,0,0,25">
+                        <StackPanel>
+                            <TextBlock Text="{Binding SelectedUser.Name}" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                            <TextBlock Text="{Binding SelectedUser.FullName}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,20"/>
+
+                            <TextBlock Text="ACCOUNT CONSTRAINTS" Style="{StaticResource Caption}" Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,10"/>
+                            <CheckBox x:Name="UserSafetyLock" Content="Unlock Administrative Actions" 
+                                      Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,0,0,20"/>
+
+                            <Button Command="{Binding ToggleUserStatusCommand}" CommandParameter="{Binding SelectedUser}"
+                                    IsEnabled="{Binding IsChecked, ElementName=UserSafetyLock}"
+                                    Style="{StaticResource StandardButton}" Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="PowerOff" Width="12" Foreground="White" Margin="0,0,10,0"/>
+                                    <TextBlock Text="TOGGLE ENABLED STATE" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Command="{Binding DeleteUserCommand}" CommandParameter="{Binding SelectedUser}"
+                                    IsEnabled="{Binding IsChecked, ElementName=UserSafetyLock}"
+                                    Style="{StaticResource StandardButton}" Background="{DynamicResource CriticalBrush}" Margin="0,0,0,15">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Trash" Width="12" Foreground="White" Margin="0,0,10,0"/>
+                                    <TextBlock Text="PURGE USER ACCOUNT" FontSize="11" FontWeight="Bold"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Command="{Binding ShowUserDetailsCommand}" CommandParameter="{Binding SelectedUser}"
+                                    Style="{StaticResource SecondaryButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="InfoCircle" Width="12" Foreground="White" Margin="0,0,10,0"/>
+                                    <TextBlock Text="VIEW FULL PROPERTIES" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Visibility="{Binding SelectedUser, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" 
+                            Background="{DynamicResource CardBrush}" Padding="30" CornerRadius="8" Opacity="0.5">
+                        <TextBlock Text="Select a user from the inventory to manage account state and policies." 
+                                   TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Loading Overlay -->
+        <Border Grid.ColumnSpan="2" Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
+                <TextBlock Text="{Binding StatusMessage}" FontSize="18" Foreground="{DynamicResource TextBrush}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
 </UserControl>
-
-
-
-

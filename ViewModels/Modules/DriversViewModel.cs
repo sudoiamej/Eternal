@@ -11,19 +11,22 @@ using System;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class DriversViewModel : ObservableObject
+    public partial class DriversViewModel : BaseViewModel
     {
         private readonly IDriversService _driversService;
         private readonly ILoggingService _loggingService;
+        private readonly IToastService _toastService;
 
         [ObservableProperty] private List<DriverInfo> _drivers = new();
-        [ObservableProperty] private bool _isLoading;
+        [ObservableProperty] private DriverInfo? _selectedDriver;
         [ObservableProperty] private OemSupportInfo? _oemInfo;
 
-        public DriversViewModel(IDriversService driversService, ILoggingService loggingService)
+        public DriversViewModel(IDriversService driversService, ILoggingService loggingService, IToastService toastService)
         {
             _driversService = driversService;
             _loggingService = loggingService;
+            _toastService = toastService;
+            
             LoadCommand = new AsyncRelayCommand(LoadDataAsync);
             ShowDetailsCommand = new RelayCommand<DriverInfo>(ShowDetails);
             FindOfficialDriverCommand = new RelayCommand<DriverInfo>(FindOfficialDriver);
@@ -37,16 +40,11 @@ namespace Eternal.ViewModels.Modules
 
         public async Task LoadDataAsync()
         {
-            if (IsLoading) return;
-            IsLoading = true;
-            try {
+            await ExecuteBusyActionAsync(async () =>
+            {
                 Drivers = await _driversService.GetInstalledDriversAsync();
                 OemInfo = await _driversService.GetOemSupportInfoAsync();
-            } 
-            catch { 
-                Drivers = new List<DriverInfo>(); 
-            }
-            finally { IsLoading = false; }
+            }, "Enumerating Driver Stack...");
         }
 
         private void FindOfficialDriver(DriverInfo? driver)
@@ -54,7 +52,8 @@ namespace Eternal.ViewModels.Modules
             if (driver == null || OemInfo == null) return;
 
             string url = Eternal.Helpers.DriverLinkHelper.GenerateOfficialSupportLink(driver, OemInfo);
-            _loggingService.Log($"Redirecting to official support portal for {driver.Name} ({driver.HardwareId})");
+            _loggingService.Log($"Redirecting to official support portal for {driver.Name}");
+            _toastService.ShowInfo($"Opening support portal for {driver.Name}");
             
             try
             {
@@ -62,7 +61,7 @@ namespace Eternal.ViewModels.Modules
             }
             catch (Exception ex)
             {
-                _loggingService.Log($"Failed to open driver URL: {ex.Message}");
+                _toastService.ShowError($"Failed to launch browser: {ex.Message}");
             }
         }
 
@@ -70,11 +69,10 @@ namespace Eternal.ViewModels.Modules
         {
             if (OemInfo == null) return;
 
-            // Use a dummy driver object to trigger OEM-level link generation in the helper
             var dummyDriver = new DriverInfo("System Support", "", "", OemInfo.Vendor, "", true, "");
             string url = Eternal.Helpers.DriverLinkHelper.GenerateOfficialSupportLink(dummyDriver, OemInfo);
             
-            _loggingService.Log($"Opening system OEM support portal for {OemInfo.Vendor}");
+            _toastService.ShowInfo($"Opening {OemInfo.Vendor} support page...");
             try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); } catch { }
         }
 

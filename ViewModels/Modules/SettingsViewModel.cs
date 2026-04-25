@@ -14,11 +14,10 @@ namespace Eternal.ViewModels.Modules
     {
         public MainViewModel Main { get; }
         private readonly ISettingsService _settingsService;
-        private readonly ILoggingService _loggingService;
         private readonly IUpdateService _updateService;
 
         [ObservableProperty] private AppSettings _settings;
-        [ObservableProperty] private string _appVersion = "2.5.0-M3";
+        [ObservableProperty] private string _appVersion = "2.5.0-M4";
         [ObservableProperty] private string _lastScanTime = "N/A";
         [ObservableProperty] private string _machineId = "Unknown";
 

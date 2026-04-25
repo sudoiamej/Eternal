@@ -1,4 +1,4 @@
-# Eternal System Intelligence (Dev Preview v2.5.0-M2)
+# Eternal System Intelligence (Dev Preview v2.5.0-M4)
 
 ![Eternal Banner](Assets/logo.png)
 

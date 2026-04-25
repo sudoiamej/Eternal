@@ -47,15 +47,15 @@ namespace Eternal.Views
             // Minimum display time for branding visibility (3 seconds)
             var timerTask = Task.Delay(3000);
 
-            // Initialize the Main ViewModel first (Lightweight)
+            // Initialize the Main ViewModel first (via DI)
             StatusText.Text = "Initializing Eternal Intelligence...";
-            var mainVm = new MainViewModel();
+            var mainVm = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<MainViewModel>(App.ServiceProvider);
             await Task.Delay(500); 
 
             // Entry Lock Check
             if (!_isTestMode && mainVm.Settings.IsStartupLockEnabled)
             {
-                var lockWindow = new Eternal.Views.Helpers.EntryLockWindow(new SettingsService());
+                var lockWindow = new Eternal.Views.Helpers.EntryLockWindow(Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ISettingsService>(App.ServiceProvider));
                 if (lockWindow.ShowDialog() != true)
                 {
                     this.Close();
@@ -66,6 +66,9 @@ namespace Eternal.Views
             StatusText.Text = "Synchronizing System Telemetry...";
             // Fully await preloading before continuing to ensure Dashboard is ready immediately
             await mainVm.PreloadAllDataAsync();
+            
+            // Trigger initial navigation after construction and preload are complete
+            await mainVm.Navigate("Dashboard");
 
             StatusText.Text = "Mapping System Architecture...";
 

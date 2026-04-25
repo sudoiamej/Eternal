@@ -12,6 +12,9 @@ namespace Eternal.Services.Hardware
         Task<MotherboardInfo> GetMotherboardInfoAsync();
         Task<List<NetworkAdapterInfo>> GetNetworkAdaptersAsync();
         Task<List<SystemSummaryItem>> GetDetailedSystemInfoAsync();
+
+        void StartStressTest(int threads);
+        void StopStressTest();
     }
 
     public record SystemSummaryItem(string Category, string Property, string Value);

@@ -60,7 +60,7 @@ namespace Eternal.ViewModels.Modules
         [RelayCommand]
         private void RunRecoveryTool(string toolName)
         {
-            if (!_isInPeMode)
+            if (!IsInPeMode)
             {
                 System.Windows.MessageBox.Show($"Access Denied: '{toolName}' is a destructive recovery tool and can ONLY be executed within a native Windows PE or RE environment.\n\nPlease boot into Advanced Startup Options to use this tool.", 
                                 "HCI Safety Enforcement", MessageBoxButton.OK, MessageBoxImage.Stop);

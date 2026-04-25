@@ -18,19 +18,21 @@ namespace Eternal.Models
 
     public record NetworkConnection(string Protocol, string LocalAddress, string RemoteAddress, string State, int ProcessId, string ProcessName);
 
-    public record ProcessDetail(int Id, string Name, double CpuUsage, long MemoryBytes, string Path, bool IsSigned, string Impact);
+    public record ProcessDetail(int PID, string Name, double CpuUsage, long MemoryBytes, string Path, bool IsSigned, string Impact, string Status, int SessionId)
+    {
+        public string MemoryUsage => (MemoryBytes / 1024.0 / 1024.0).ToString("F1") + " MB";
+    }
 
     public record ProcessGroup(string Name, List<ProcessDetail> Items)
     {
         public long TotalMemory => Items.Sum(i => i.MemoryBytes);
         public int Count => Items.Count;
         public string Impact => Items.Any(i => i.Impact == "High") ? "High" : (Items.Any(i => i.Impact == "Medium") ? "Medium" : "Low");
-    }
-    
+    }    
     public record PropertyItem(string Key, string Value);
 
     public record ExtendedProcessInfo(
-        int Id,
+        int PID,
         string Name,
         List<string> StaticImports,
         List<string> LoadedModules,
@@ -68,5 +70,6 @@ namespace Eternal.Models
         public DateTime? LockoutEnd { get; set; }
         public int FailedAttemptsCount { get; set; } = 0;
         public int CurrentLockoutMinutes { get; set; } = 0;
+        public List<string> DisabledFeatures { get; set; } = new();
     }
 }

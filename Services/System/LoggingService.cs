@@ -28,22 +28,6 @@ namespace Eternal.Services.System
         public WindowsLoggingService(ISettingsService settings)
         {
             _settings = settings;
-            
-            // Pre-seed with system events so it's not empty on start
-            _ = Task.Run(async () => 
-            {
-                var initialEvents = await GetSystemEventsAsync(100);
-                lock (_logs)
-                {
-                    _logs.AddRange(initialEvents);
-                    // Maintain max logs limit
-                    if (_logs.Count > _maxLogs)
-                    {
-                        var toRemove = _logs.Count - _maxLogs;
-                        _logs.RemoveRange(0, toRemove);
-                    }
-                }
-            });
         }
 
         public void Log(string message, string level = "INFO")

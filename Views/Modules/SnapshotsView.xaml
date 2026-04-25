@@ -1,0 +1,164 @@
+<UserControl x:Class="Eternal.Views.Modules.SnapshotsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="1000">
+    <Border Padding="40">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Header -->
+                <RowDefinition Height="*"/>    <!-- Content -->
+            </Grid.RowDefinitions>
+
+            <!-- 1. Header -->
+            <Grid Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="ETERNAL › SYSTEM FORENSICS" Style="{StaticResource HeaderBreadcrumb}"/>
+                    <TextBlock Text="Time Machine Snapshots" Style="{StaticResource H1}" Margin="0"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <TextBox Text="{Binding NewSnapshotDescription, UpdateSourceTrigger=PropertyChanged}" Width="250" Margin="0,0,10,0" VerticalAlignment="Center" Padding="8,4" Background="#10FFFFFF" BorderBrush="{DynamicResource BorderBrush}" Foreground="White"/>
+                    <Button Command="{Binding TakeSnapshotCommand}" Style="{StaticResource PrimaryButton}" Padding="15,8">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="Camera" Width="12" Foreground="White" Margin="0,0,8,0"/>
+                            <TextBlock Text="TAKE SNAPSHOT" FontSize="11" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- 2. Dual-Panel Content -->
+            <Grid Grid.Row="1" Margin="0,20,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="350"/>
+                    <ColumnDefinition Width="20"/> <!-- Spacing -->
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Snapshot List -->
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="SAVED SYSTEM STATES" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
+                    <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0">
+                        <ListBox ItemsSource="{Binding Snapshots}" Background="Transparent" BorderThickness="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="10,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Description}" FontWeight="Bold" Foreground="White"/>
+                                            <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:g}'}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Command="{Binding DataContext.DeleteSnapshotCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Style="{StaticResource IconButton}" VerticalAlignment="Center">
+                                            <fa:ImageAwesome Icon="Trash" Width="10" Foreground="{DynamicResource CriticalBrush}"/>
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+                    
+                    <StackPanel Grid.Row="2" Margin="0,15,0,0">
+                        <TextBlock Text="COMPARE SNAPSHOTS" Style="{StaticResource Caption}" Margin="0,0,0,8"/>
+                        <ComboBox ItemsSource="{Binding Snapshots}" SelectedItem="{Binding SelectedSnapshotA}" DisplayMemberPath="Description" Margin="0,0,0,8" Background="Transparent" Foreground="White" BorderBrush="{DynamicResource BorderBrush}"/>
+                        <ComboBox ItemsSource="{Binding Snapshots}" SelectedItem="{Binding SelectedSnapshotB}" DisplayMemberPath="Description" Margin="0,0,0,12" Background="Transparent" Foreground="White" BorderBrush="{DynamicResource BorderBrush}"/>
+                        <Button Command="{Binding CompareSelectedCommand}" Style="{StaticResource StandardButton}" Content="RUN COMPARISON ANALYSIS" Background="{DynamicResource AccentBrush}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Right: Comparison Analysis -->
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Text="INTELLIGENCE COMPARISON" Style="{StaticResource Caption}"/>
+                        <TextBlock Text=" (Showing Changes Only)" FontSize="9" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="5,0,0,0" Visibility="{Binding IsComparing, Converter={StaticResource VisibilityConverter}}"/>
+                    </StackPanel>
+
+                    <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0">
+                        <Grid>
+                            <DataGrid ItemsSource="{Binding ComparisonResults}" AutoGenerateColumns="False" 
+                                      IsReadOnly="True" Background="#0C0C0C" BorderThickness="0" 
+                                      HeadersVisibility="Column" GridLinesVisibility="None">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="TYPE" Width="80">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="10,4" CornerRadius="2">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Type}" Value="Added">
+                                                                    <Setter Property="Background" Value="#1A4CAF50"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Type}" Value="Removed">
+                                                                    <Setter Property="Background" Value="#1AF44336"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Type}" Value="Modified">
+                                                                    <Setter Property="Background" Value="#1A8E44AD"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding Type}" FontSize="9" FontWeight="Black" HorizontalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Type}" Value="Added">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Type}" Value="Removed">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Type}" Value="Modified">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource InfoBrush}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="CATEGORY" Binding="{Binding Category}" Width="100"/>
+                                    <DataGridTextColumn Header="NAME" Binding="{Binding Name}" Width="150"/>
+                                    <DataGridTextColumn Header="STATE CHANGE (OLD › NEW)" Binding="{Binding NewValue}" Width="*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="TextWrapping" Value="Wrap"/>
+                                                <Setter Property="Padding" Value="5"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <!-- Placeholder -->
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsComparing, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
+                                <fa:ImageAwesome Icon="ClockOutline" Width="32" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.3" Margin="0,0,0,15"/>
+                                <TextBlock Text="SELECT TWO SNAPSHOTS TO ANALYZE DRIFT" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

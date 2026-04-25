@@ -51,7 +51,7 @@ For system administrators and developers, Eternal is a "Forensic Utility."
   traps, and a clean resource release pipeline.
 
 ================================================================================
-VERSION: 2.5.0 "Milestone 2" | © 2026 ETERNAL ANALYTICS
+VERSION: 2.5.0 "Milestone 4" | © 2026 ETERNAL ANALYTICS
 ================================================================================
 
 5. NEW FEATURES (DEV PREVIEW UPDATE)

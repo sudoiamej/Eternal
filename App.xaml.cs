@@ -1,34 +1,37 @@
+using System;
+using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using Eternal.Services.Hardware;
+using Eternal.Services.System;
+using Eternal.Services.Security;
+using Eternal.Services.Storage;
+using Eternal.Services.Network;
+using Eternal.ViewModels;
+using Eternal.ViewModels.Modules;
 using Eternal.Views;
 
 namespace Eternal
 {
     public partial class App : System.Windows.Application
     {
+        public static IServiceProvider ServiceProvider { get; private set; }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            // Global Safety Net
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+            ServiceProvider = serviceCollection.BuildServiceProvider();
+
             this.DispatcherUnhandledException += (s, ex) => {
                 System.Windows.MessageBox.Show($"Eternal Intelligence encountered a critical interface error:\n\n{ex.Exception.Message}", "Security Exception", MessageBoxButton.OK, MessageBoxImage.Error);
                 ex.Handled = true;
             };
 
-            TaskScheduler.UnobservedTaskException += (s, ex) => {
-                // Background task failed - log but don't necessarily crash
-            };
-
             try
             {
-                // 1. Check for CLI Arguments (Headless Mode)
-                if (e.Args.Length > 0)
-                {
-                    _ = HandleCommandLineArgs(e.Args);
-                    return;
-                }
-
-                // 2. Launch GUI if no args
                 var splash = new SplashScreenWindow();
                 splash.Show();
             }
@@ -39,30 +42,81 @@ namespace Eternal
             }
         }
 
-        private async Task HandleCommandLineArgs(string[] args)
+        private void ConfigureServices(IServiceCollection services)
         {
-            // Simple CLI Handler for Experts/Automation
-            string arg = args[0].ToLower();
+            // Services
+            services.AddSingleton<ISettingsService, SettingsService>();
+            services.AddSingleton<ILoggingService, WindowsLoggingService>();
+            services.AddSingleton<ILibreHardwareService, WindowsLibreHardwareService>();
+            services.AddSingleton<IHardwareService, WindowsHardwareService>();
+            services.AddSingleton<IBiosService, WindowsBiosService>();
+            services.AddSingleton<ISecurityService, WindowsSecurityService>();
+            services.AddSingleton<IPerformanceService, WindowsPerformanceService>();
+            services.AddSingleton<IIntelligenceService, WindowsIntelligenceService>();
+            services.AddSingleton<INeuralAdvisorService, WindowsIntelligenceEngine>();
+            services.AddSingleton<IToolkitService, WindowsToolkitService>();
+            services.AddSingleton<IDriversService, WindowsDriversService>();
+            services.AddSingleton<IServicesService, WindowsServicesService>();
+            services.AddSingleton<IStorageService, WindowsStorageService>();
+            services.AddSingleton<INetworkService, WindowsNetworkService>();
+            services.AddSingleton<IProcessService, WindowsProcessService>();
+            services.AddSingleton<IThermalService, WindowsThermalService>();
+            services.AddSingleton<IEnvironmentService, WindowsEnvironmentService>();
+            services.AddSingleton<ITuningService, WindowsTuningService>();
+            services.AddSingleton<IConsoleService, WindowsConsoleService>();
+            services.AddSingleton<IBootService, WindowsBootService>();
+            services.AddSingleton<ICreatorService, WindowsCreatorService>();
+            services.AddSingleton<IRegistryService, WindowsRegistryService>();
+            services.AddSingleton<IUserGroupService, WindowsUserGroupService>();
+            services.AddSingleton<IUpdateService, WindowsUpdateService>();
+            services.AddSingleton<IOsUpdateService, WindowsOsUpdateService>();
+            services.AddSingleton<IPcScannerService, WindowsPcScannerService>();
+            services.AddSingleton<IDismService, WindowsDismService>();
+            services.AddSingleton<IWinSatService, WindowsWinSatService>();
+            services.AddSingleton<ISnapshotService, WindowsSnapshotService>();
+            services.AddSingleton<IToastService, ToastNotificationService>();
+            services.AddSingleton<IPrivacyService, WindowsPrivacyService>();
+            services.AddSingleton<IBatteryService, WindowsBatteryService>();
+            services.AddSingleton<IFileForensicsService, WindowsFileForensicsService>();
 
-            if (arg == "--report")
-            {
-                Console.WriteLine("ETERNAL CLI: Generating System Intelligence Report...");
-                // In a real scenario, we'd instantiate services, gather data, and write to a file
-                await Task.Delay(2000); 
-                Console.WriteLine("Report generated: C:\\ProgramData\\Eternal\\LastReport.json");
-            }
-            else if (arg == "--debloat")
-            {
-                Console.WriteLine("ETERNAL CLI: Applying 'Safe' Debloat Preset...");
-                await Task.Delay(3000);
-                Console.WriteLine("System Optimized successfully.");
-            }
-            else
-            {
-                Console.WriteLine("Unknown command. Available: --report, --debloat");
-            }
-
-            Shutdown();
+            // ViewModels - Singletons to preserve state during navigation
+            services.AddSingleton<MainViewModel>();
+            services.AddSingleton<ToastViewModel>();
+            services.AddSingleton<DashboardViewModel>();
+            services.AddSingleton<RepairCenterViewModel>();
+            services.AddSingleton<RegistryViewModel>();
+            services.AddSingleton<HardwareViewModel>();
+            services.AddSingleton<BiosViewModel>();
+            services.AddSingleton<SecurityViewModel>();
+            services.AddSingleton<PerformanceViewModel>();
+            services.AddSingleton<DriversViewModel>();
+            services.AddSingleton<ServicesViewModel>();
+            services.AddSingleton<StorageViewModel>();
+            services.AddSingleton<NetworkViewModel>();
+            services.AddSingleton<ReportsViewModel>();
+            services.AddSingleton<ToolsViewModel>();
+            services.AddSingleton<SettingsViewModel>();
+            services.AddSingleton<ProcessIntelligenceViewModel>();
+            services.AddSingleton<ThermalViewModel>();
+            services.AddSingleton<EnvironmentViewModel>();
+            services.AddSingleton<VerboseLoggingViewModel>();
+            services.AddSingleton<TuningViewModel>();
+            services.AddSingleton<ConsoleViewModel>();
+            services.AddSingleton<BootViewModel>();
+            services.AddSingleton<UserManagementViewModel>();
+            services.AddSingleton<ComponentsViewModel>();
+            services.AddSingleton<WindowsUpdateViewModel>();
+            services.AddSingleton<PcScannerViewModel>();
+            services.AddSingleton<DismImagingViewModel>();
+            services.AddSingleton<PcRatingViewModel>();
+            services.AddSingleton<SnapshotsViewModel>();
+            services.AddSingleton<HardwareStressViewModel>();
+            services.AddSingleton<CommandPaletteViewModel>();
+            services.AddSingleton<AdvisorViewModel>();
+            services.AddSingleton<PrivacyViewModel>();
+            services.AddSingleton<BatteryViewModel>();
+            services.AddSingleton<FileForensicsViewModel>();
+            services.AddSingleton<FeatureTogglesViewModel>();
         }
     }
 }

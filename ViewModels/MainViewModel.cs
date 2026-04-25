@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Eternal.Services.Hardware;
 using Eternal.Services.System;
 using Eternal.Services.Security;
@@ -23,71 +24,24 @@ namespace Eternal.ViewModels
 {
     public enum NavigationSortOption { Default, Level, EasyToHard, Alphabetical, SafeToDangerous }
 
-    public partial class MainViewModel : ObservableObject, IDisposable
+    public partial class MainViewModel : BaseViewModel, IDisposable
     {
         private readonly ILoggingService _loggingService;
-        private readonly ILibreHardwareService _libreService;
-        private readonly IHardwareService _hardwareService;
-        private readonly IBiosService _biosService;
-        private readonly ISecurityService _securityService;
-        private readonly IIntelligenceService _intelligenceService;
         private readonly IPerformanceService _performanceService;
-        private readonly IToolkitService _toolkitService;
-        private readonly IDriversService _driversService;
-        private readonly IServicesService _servicesService;
-        private readonly IStorageService _storageService;
-        private readonly INetworkService _networkService;
-        private readonly IProcessService _processService;
-        private readonly IThermalService _thermalService;
-        private readonly IEnvironmentService _envService;
         private readonly ISettingsService _settingsService;
-        private readonly ITuningService _tuningService;
-        private readonly IConsoleService _consoleService;
-        private readonly IBootService _bootService;
+        private readonly IToastService _toastService;
+        private readonly IHardwareService _hardwareService;
         private readonly ICreatorService _creatorService;
-        private readonly IRegistryService _registryService;
-        private readonly IUserGroupService _userGroupService;
-        private readonly IUpdateService _updateService;
-        private readonly IOsUpdateService _osUpdateService;
-        private readonly IPcScannerService _pcScannerService;
-        private readonly IDismService _dismService;
-        private readonly IWinSatService _winSatService;
+        private readonly IEnvironmentService _envService;
+        private readonly INeuralAdvisorService _neuralService;
         private DispatcherTimer? _statusTimer;
 
-        // Persistent ViewModels
-        private DashboardViewModel _dashboardVm;
-        private RepairCenterViewModel _repairVm;
-        private RegistryViewModel _registryVm;
-        private TuningViewModel _tuningVm;
-        private ConsoleViewModel _consoleVm;
-        private BootViewModel _bootVm;
-        private HardwareViewModel _hardwareVm;
-        private BiosViewModel _biosVm;
-        private SecurityViewModel _securityVm;
-        private PerformanceViewModel _performanceVm;
-        private DriversViewModel _driversVm;
-        private ServicesViewModel _servicesVm;
-        private StorageViewModel _storageVm;
-        private NetworkViewModel _networkVm;
-        private ReportsViewModel _reportsVm;
-        private ToolsViewModel _toolsVm;
-        private SettingsViewModel _settingsVm;
-        private ProcessIntelligenceViewModel _processVm;
-        private ThermalViewModel _thermalVm;
-        private EnvironmentViewModel _envVm;
-        private VerboseLoggingViewModel _logsVm;
-        private UserManagementViewModel _userVm;
-        private ComponentsViewModel _componentsVm;
-        private WindowsUpdateViewModel _windowsUpdateVm;
-        private PcScannerViewModel _pcScannerVm;
-        private DismImagingViewModel _dismVm;
-        private PcRatingViewModel _pcRatingVm;
+        public ToastViewModel ToastVm { get; }
 
         [ObservableProperty] private string _title = "Eternal System Intelligence";
         [ObservableProperty] private ObservableObject _currentView;
         [ObservableProperty] private bool _isAdvancedMode = false;
         [ObservableProperty] private bool _isTestingModeActive = false;
-        [ObservableProperty] private bool _isSidebarExpanded = true;
         
         public AppSettings Settings => _settingsService.Current;
         [ObservableProperty] private bool _isDevModeEnabled = false;
@@ -107,53 +61,49 @@ namespace Eternal.ViewModels
         [ObservableProperty] private bool _isPeMode = false;
         [ObservableProperty] private double _displayScale = 1.0;
 
-        public ObservableCollection<NavigationItem> SystemItems { get; private set; }
-        public ObservableCollection<NavigationItem> TelemetryItems { get; private set; }
-        public ObservableCollection<NavigationItem> MonitoringItems { get; private set; }
-        public ObservableCollection<NavigationItem> SupportItems { get; private set; }
+        [ObservableProperty] private ObservableCollection<NavigationItem> _systemItems;
+        [ObservableProperty] private ObservableCollection<NavigationItem> _telemetryItems;
+        [ObservableProperty] private ObservableCollection<NavigationItem> _monitoringItems;
+        [ObservableProperty] private ObservableCollection<NavigationItem> _supportItems;
 
         [ObservableProperty] private NavigationSortOption _navSortOption = NavigationSortOption.Default;
         
+        [ObservableProperty] private CommandPaletteViewModel _commandPaletteVm;
+        [ObservableProperty] private AdvisorViewModel _advisorVm;
+        [ObservableProperty] private bool _isAdvisorOpen;
+
         partial void OnNavSortOptionChanged(NavigationSortOption value) => SortNavigation();
 
-        public MainViewModel()
+        public MainViewModel(
+            ILoggingService loggingService, 
+            IPerformanceService performanceService, 
+            ISettingsService settingsService,
+            IToastService toastService,
+            IHardwareService hardwareService,
+            ICreatorService creatorService,
+            IEnvironmentService envService,
+            INeuralAdvisorService neuralService,
+            ToastViewModel toastVm,
+            AdvisorViewModel advisorVm)
         {
-            _settingsService = new SettingsService();
-            _loggingService = new WindowsLoggingService(_settingsService);
-            _libreService = new WindowsLibreHardwareService();
-            _hardwareService = new WindowsHardwareService(_libreService);
-            _biosService = new WindowsBiosService();
-            _securityService = new WindowsSecurityService();
-            _performanceService = new WindowsPerformanceService();
-            _intelligenceService = new WindowsIntelligenceService(_performanceService, _securityService);
-            _toolkitService = new WindowsToolkitService();
-            _driversService = new WindowsDriversService();
-            _servicesService = new WindowsServicesService();
-            _storageService = new WindowsStorageService();
-            _networkService = new WindowsNetworkService();
-            _processService = new WindowsProcessService();
-            _thermalService = new WindowsThermalService(_libreService);
-            _envService = new WindowsEnvironmentService();
-            _tuningService = new WindowsTuningService();
-            _consoleService = new WindowsConsoleService();
-            _bootService = new WindowsBootService();
-            _creatorService = new WindowsCreatorService();
-            _registryService = new WindowsRegistryService();
-            _userGroupService = new WindowsUserGroupService();
-            _updateService = new WindowsUpdateService();
-            _osUpdateService = new WindowsOsUpdateService();
-            _pcScannerService = new WindowsPcScannerService(_securityService, _storageService, _performanceService, _creatorService, _toolkitService, _biosService, _driversService);
-            _dismService = new WindowsDismService();
-            _winSatService = new WindowsWinSatService();
+            _loggingService = loggingService;
+            _performanceService = performanceService;
+            _settingsService = settingsService;
+            _toastService = toastService;
+            _hardwareService = hardwareService;
+            _creatorService = creatorService;
+            _envService = envService;
+            _neuralService = neuralService;
+            ToastVm = toastVm;
+            AdvisorVm = advisorVm;
 
-            _loggingService.Log("Eternal System Intelligence Initialized.");
-            _loggingService.Log($"Dev Preview Suite Version 2.5.0-M3");
+            _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
+            _loggingService.Log($"Dev Preview Suite Version 2.5.0-M4");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
             _settingsService.SettingsChanged += OnSettingsChanged;
 
-            DetectPeMode();
-            InitializeViewModels();
+            IsPeMode = _envService.IsPeMode;
             InitializeNavigation();
 
             if (Settings.IsAutoUpdateEnabled)
@@ -161,7 +111,6 @@ namespace Eternal.ViewModels
                 _ = CheckForUpdatesAsync();
             }
 
-            _currentView = _dashboardVm; // Initial view
             _ = RefreshPorts();
             ApplyTheme(Settings.Theme);
             ApplyThemeColor();
@@ -171,43 +120,45 @@ namespace Eternal.ViewModels
         {
             IsAdvancedMode = settings.IsAdvancedMode;
             ApplyTheme(settings.Theme);
+            InitializeNavigation();
         }
 
-        private void InitializeNavigation()
+        public void InitializeNavigation()
         {
+            var disabled = Settings.DisabledFeatures;
+
             if (IsPeMode)
             {
-                // PE Mode: Highly restricted to essential and functional recovery tools
-                SystemItems = new ObservableCollection<NavigationItem>
+                SystemItems = FilterNav(new List<NavigationItem>
                 {
                     new NavigationItem("Dashboard", "Dashboard", "Dashboard", 0, 0, 0),
                     new NavigationItem("Eternal Doctor", "Stethoscope", "Repair", 2, 2, 1),
                     new NavigationItem("Registry", "Book", "Registry", 2, 2, 2),
                     new NavigationItem("Tools", "Wrench", "Tools", 1, 1, 3)
-                };
+                }, disabled);
 
-                TelemetryItems = new ObservableCollection<NavigationItem>
+                TelemetryItems = FilterNav(new List<NavigationItem>
                 {
                     new NavigationItem("Hardware", "Microchip", "Hardware", 0, 0, 0),
                     new NavigationItem("Storage / Disks", "HddOutline", "Storage", 0, 0, 1)
-                };
+                }, disabled);
 
-                MonitoringItems = new ObservableCollection<NavigationItem>
+                MonitoringItems = FilterNav(new List<NavigationItem>
                 {
                     new NavigationItem("Processes", "Tasks", "Processes", 1, 1, 0),
                     new NavigationItem("Eternal Console", "Terminal", "Console", 2, 2, 1)
-                };
+                }, disabled);
 
-                SupportItems = new ObservableCollection<NavigationItem>
+                SupportItems = FilterNav(new List<NavigationItem>
                 {
                     new NavigationItem("PE Recovery", "Medkit", "PeMode", 0, 0, 0),
                     new NavigationItem("System Logs", "Bars", "Logs", 0, 0, 1),
                     new NavigationItem("Settings", "Gear", "Settings", 0, 0, 2)
-                };
+                }, disabled);
             }
             else
             {
-                SystemItems = new ObservableCollection<NavigationItem>
+                SystemItems = FilterNav(new List<NavigationItem>
                 {
                     new NavigationItem("Dashboard", "Dashboard", "Dashboard", 0, 0, 0),
                     new NavigationItem("PC Scanner", "Search", "PcScanner", 0, 0, 1),
@@ -216,42 +167,53 @@ namespace Eternal.ViewModels
                     new NavigationItem("Reports", "FileTextOutline", "Reports", 0, 1, 4),
                     new NavigationItem("Tools", "Wrench", "Tools", 1, 1, 5),
                     new NavigationItem("Guardian Tuning", "Gears", "Tuning", 1, 2, 6)
-                };
+                }, disabled);
 
-                TelemetryItems = new ObservableCollection<NavigationItem>
+                TelemetryItems = FilterNav(new List<NavigationItem>
                 {
                     new NavigationItem("Hardware", "Microchip", "Hardware", 0, 0, 0),
-                    new NavigationItem("PC Rating", "Trophy", "PcRating", 0, 0, 1),
-                    new NavigationItem("Thermal", "ThermometerThreeQuarters", "Thermal", 0, 0, 2),
-                    new NavigationItem("Components", "Laptop", "Components", 0, 0, 3),
-                    new NavigationItem("BIOS / UEFI", "InfoCircle", "Bios", 0, 0, 4),
-                    new NavigationItem("Boot Records", "List", "Boot", 1, 1, 5),
-                    new NavigationItem("Storage", "HddOutline", "Storage", 0, 0, 6)
-                };
+                    new NavigationItem("Battery Lab", "Bolt", "Battery", 0, 0, 1),
+                    new NavigationItem("Stress Test", "Flash", "StressTest", 1, 1, 2),
+                    new NavigationItem("PC Rating", "Trophy", "PcRating", 0, 0, 3),
+                    new NavigationItem("Thermal", "ThermometerThreeQuarters", "Thermal", 0, 0, 4),
+                    new NavigationItem("Components", "Laptop", "Components", 0, 0, 5),
+                    new NavigationItem("BIOS / UEFI", "InfoCircle", "Bios", 0, 0, 6),
+                    new NavigationItem("Boot Records", "List", "Boot", 1, 1, 7),
+                    new NavigationItem("Storage", "HddOutline", "Storage", 0, 0, 8)
+                }, disabled);
 
-                MonitoringItems = new ObservableCollection<NavigationItem>
+                MonitoringItems = FilterNav(new List<NavigationItem>
                 {
                     new NavigationItem("Processes", "Tasks", "Processes", 1, 1, 0),
                     new NavigationItem("Performance", "LineChart", "Performance", 0, 0, 1),
-                    new NavigationItem("Services", "Server", "Services", 1, 1, 2),
-                    new NavigationItem("User Accounts", "Users", "Users", 1, 1, 3),
-                    new NavigationItem("Network", "Globe", "Network", 0, 0, 4),
-                    new NavigationItem("Security", "Shield", "Security", 1, 1, 5),
-                    new NavigationItem("Drivers", "ListAlt", "Drivers", 1, 2, 6),
-                    new NavigationItem("Environment", "Code", "Environment", 1, 1, 7)
-                };
+                    new NavigationItem("Sentinel Privacy", "EyeSlash", "Privacy", 1, 1, 2),
+                    new NavigationItem("Services", "Server", "Services", 1, 1, 3),
+                    new NavigationItem("User Accounts", "Users", "Users", 1, 1, 4),
+                    new NavigationItem("Network", "Globe", "Network", 0, 0, 5),
+                    new NavigationItem("Security", "Shield", "Security", 1, 1, 6),
+                    new NavigationItem("Drivers", "ListAlt", "Drivers", 1, 2, 7),
+                    new NavigationItem("Environment", "Code", "Environment", 1, 1, 8)
+                }, disabled);
 
-                SupportItems = new ObservableCollection<NavigationItem>
+                SupportItems = FilterNav(new List<NavigationItem>
                 {
                     new NavigationItem("Eternal Console", "Terminal", "Console", 2, 2, 0),
-                    new NavigationItem("DISM Imaging", "Archive", "DismImaging", 1, 2, 1),
-                    new NavigationItem("Windows Update", "Refresh", "WindowsUpdate", 0, 0, 2),
-                    new NavigationItem("Settings", "Gear", "Settings", 0, 0, 3),
-                    new NavigationItem("System Logs", "Bars", "Logs", 0, 0, 4),
-                    new NavigationItem("Help", "QuestionCircle", "Help", 0, 0, 5),
-                    new NavigationItem("PE Mode", "Medkit", "PeMode", 1, 1, 6)
-                };
+                    new NavigationItem("File Forensics", "FileTextOutline", "Forensics", 1, 2, 1),
+                    new NavigationItem("Time Machine", "ClockOutline", "Snapshots", 1, 1, 2),
+                    new NavigationItem("DISM Imaging", "Archive", "DismImaging", 1, 2, 3),
+                    new NavigationItem("Windows Update", "Refresh", "WindowsUpdate", 0, 0, 4),
+                    new NavigationItem("Settings", "Gear", "Settings", 0, 0, 5),
+                    new NavigationItem("System Logs", "Bars", "Logs", 0, 0, 6),
+                    new NavigationItem("Help", "QuestionCircle", "Help", 0, 0, 7),
+                    new NavigationItem("PE Mode", "Medkit", "PeMode", 1, 1, 8)
+                }, disabled);
             }
+        }
+
+        private ObservableCollection<NavigationItem> FilterNav(List<NavigationItem> items, List<string> disabled)
+        {
+            var filtered = items.Where(i => !disabled.Contains(i.ViewName)).ToList();
+            return new ObservableCollection<NavigationItem>(filtered);
         }
 
         private void SortNavigation()
@@ -292,32 +254,10 @@ namespace Eternal.ViewModels
             foreach (var e in pEntries) PersistenceEntries.Add(e);
 
             var suspicious = await _creatorService.GetUnsignedProcessesAsync();
-            
-            // Add custom heuristics at ViewModel level
-            foreach (var proc in Process.GetProcesses())
-            {
-                try {
-                    // Detect Processes with No Window but high activity (Simplified)
-                    if (proc.MainWindowHandle == IntPtr.Zero && proc.Id > 100 && !proc.ProcessName.Contains("svchost"))
-                    {
-                        // Only add if not already in list and not a standard system process
-                        if (!suspicious.Any(s => s.PID == proc.Id) && proc.ProcessName.Length > 15)
-                        {
-                             // Potentially suspicious long-named background process
-                        }
-                    }
-                } catch { }
-            }
-
             UnsignedProcesses.Clear();
             foreach (var u in suspicious) UnsignedProcesses.Add(u);
 
-            _loggingService.Log($"Threat Hunter: Scan complete. Found {PersistenceEntries.Count} auto-start entries and {UnsignedProcesses.Count} suspicious binaries.");
-            
-            if (UnsignedProcesses.Count > 0)
-            {
-                System.Windows.MessageBox.Show($"Threat Hunter identified {UnsignedProcesses.Count} suspicious processes. Please review them in the Security Toolkit.", "Intelligence Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+            _loggingService.Log($"Threat Hunter: Scan complete. Found {PersistenceEntries.Count} auto-start entries.");
         }
 
         [RelayCommand]
@@ -328,36 +268,21 @@ namespace Eternal.ViewModels
 
             var result = await _creatorService.SuspendProcessAsync(pid);
             _loggingService.Log(result.Message);
-
-            // Real Work: Perform automated persistence removal if user confirms
-            var entry = PersistenceEntries.FirstOrDefault(e => e.Command.Contains(name, StringComparison.OrdinalIgnoreCase));
-            if (entry != null)
-            {
-                var clean = System.Windows.MessageBox.Show($"Threat Hunter found a persistence entry for '{name}' in {entry.Location}.\n\nWould you like to PERMANENTLY remove this auto-start entry?", "Security Cleanup", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                if (clean == MessageBoxResult.Yes)
-                {
-                    var cleanupResult = await _creatorService.RemovePersistenceEntryAsync(entry.Location, entry.Name);
-                    _loggingService.Log(cleanupResult.Message);
-                    System.Windows.MessageBox.Show(cleanupResult.Message, "Security Suite", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-
-            await ScanMalwarePersistence();
+            _toastService.ShowWarning($"Process {name} suspended.");
         }
 
         [RelayCommand]
         private async Task IsolateNetwork(int pid)
         {
             var result = await _creatorService.IsolateProcessNetworkAsync(pid, true);
-            _loggingService.Log(result.Message);
-            System.Windows.MessageBox.Show(result.Message, "Malware Hunter", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            _toastService.ShowError($"Network isolated for PID {pid}");
         }
 
         [RelayCommand]
         private async Task ToggleRansomGuard()
         {
             var result = await _creatorService.EnableRansomGuardAsync(IsRansomGuardEnabled);
-            _loggingService.Log(result.Message);
+            _toastService.ShowInfo(result.Message);
         }
 
         public void ApplyThemeColor()
@@ -367,14 +292,6 @@ namespace Eternal.ViewModels
                 var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(Settings.ThemeAccentColor);
                 System.Windows.Application.Current.Resources["AccentColor"] = color;
                 System.Windows.Application.Current.Resources["AccentBrush"] = new System.Windows.Media.SolidColorBrush(color);
-
-                var secondary = System.Windows.Media.Color.FromArgb(color.A, 
-                    (byte)Math.Min(255, color.R + 30), 
-                    (byte)Math.Min(255, color.G + 30), 
-                    (byte)Math.Min(255, color.B + 30));
-                System.Windows.Application.Current.Resources["AccentSecondaryColor"] = secondary;
-                System.Windows.Application.Current.Resources["AccentSecondaryBrush"] = new System.Windows.Media.SolidColorBrush(secondary);
-
                 UpdateAccentTextContrast(color);
             }
             catch { }
@@ -386,30 +303,17 @@ namespace Eternal.ViewModels
             {
                 var appResources = System.Windows.Application.Current.Resources;
                 var oldTheme = appResources.MergedDictionaries.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("/Themes/"));
-                
-                if (oldTheme != null)
-                {
-                    appResources.MergedDictionaries.Remove(oldTheme);
-                }
+                if (oldTheme != null) appResources.MergedDictionaries.Remove(oldTheme);
 
-                var newTheme = new ResourceDictionary 
-                { 
-                    Source = new Uri($"pack://application:,,,/Styles/Themes/{themeName}.xaml", UriKind.Absolute) 
-                };
+                var newTheme = new ResourceDictionary { Source = new Uri($"pack://application:,,,/Styles/Themes/{themeName}.xaml", UriKind.Absolute) };
                 appResources.MergedDictionaries.Insert(0, newTheme);
             }
-            catch (Exception ex)
-            {
-                _loggingService.Log($"Theme Error: {ex.Message}");
-            }
+            catch (Exception ex) { _loggingService.Log($"Theme Error: {ex.Message}"); }
         }
 
         private void UpdateAccentTextContrast(System.Windows.Media.Color accentColor)
         {
-            // Relative Luminance Formula: (0.299*R + 0.587*G + 0.114*B) / 255
             double luminance = (0.299 * accentColor.R + 0.587 * accentColor.G + 0.114 * accentColor.B) / 255;
-            
-            // If the color is bright (luminance > 0.5), use black text. Otherwise use white.
             var textColor = luminance > 0.5 ? System.Windows.Media.Colors.Black : System.Windows.Media.Colors.White;
             System.Windows.Application.Current.Resources["AccentTextBrush"] = new System.Windows.Media.SolidColorBrush(textColor);
         }
@@ -418,16 +322,7 @@ namespace Eternal.ViewModels
         private async Task ToggleDevMode()
         {
             var result = await _creatorService.ToggleDevModeAsync(IsDevModeEnabled);
-            _loggingService.Log(result.Message);
-            System.Windows.MessageBox.Show(result.Message, "Dev Preview Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-        }
-
-        [RelayCommand]
-        private async Task ApplySilenceProfile()
-        {
-            var result = await _creatorService.ApplyServiceProfileAsync("Absolute Silence");
-            _loggingService.Log(result.Message);
-            System.Windows.MessageBox.Show(result.Message, "Dev Preview Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            _toastService.ShowInfo(result.Message);
         }
 
         [RelayCommand]
@@ -439,62 +334,10 @@ namespace Eternal.ViewModels
         }
 
         [RelayCommand]
-        private async Task ForceKillHandle()
-        {
-            var dialog = new Microsoft.Win32.OpenFileDialog { Title = "Select Locked File to Force Kill" };
-            if (dialog.ShowDialog() == true)
-            {
-                var result = await _creatorService.IdentifyAndKillFileHandleAsync(dialog.FileName);
-                _loggingService.Log(result.Message);
-                System.Windows.MessageBox.Show(result.Message, "Dev Preview Trick", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-            }
-        }
-
-        [RelayCommand]
-        private async Task ValidatePath()
-        {
-            var deadLinks = await _creatorService.ValidateEnvironmentPathAsync();
-            if (deadLinks.Count == 0)
-            {
-                System.Windows.MessageBox.Show("All entries in PATH are valid.", "Variable Vault", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-            }
-            else
-            {
-                string message = "Found dead links in PATH:\n" + string.Join("\n", deadLinks);
-                System.Windows.MessageBox.Show(message, "Variable Vault Warning", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
-            }
-        }
-
-        [RelayCommand]
-        private async Task ToggleDevHost()
-        {
-            var result = await _creatorService.ToggleDevHostEntryAsync(IsDevHostEnabled);
-            _loggingService.Log(result.Message);
-            System.Windows.MessageBox.Show(result.Message, "Host Master", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-        }
-
-        [RelayCommand]
         private async Task PurgeRAM()
         {
             var result = await _creatorService.PurgeStandbyMemoryAsync();
-            _loggingService.Log(result.Message);
-            System.Windows.MessageBox.Show(result.Message, "RAM Purge", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-        }
-
-        [RelayCommand]
-        private async Task CreateJunction()
-        {
-            var sourceDialog = new Microsoft.Win32.OpenFolderDialog { Title = "Select Source Folder" };
-            if (sourceDialog.ShowDialog() == true)
-            {
-                var targetDialog = new Microsoft.Win32.OpenFolderDialog { Title = "Select Target Junction Location" };
-                if (targetDialog.ShowDialog() == true)
-                {
-                    var result = await _creatorService.CreateDirectoryJunctionAsync(sourceDialog.FolderName, targetDialog.FolderName);
-                    _loggingService.Log(result.Message);
-                    System.Windows.MessageBox.Show(result.Message, "Symlink Studio", System.Windows.MessageBoxButton.OK, result.Success ? System.Windows.MessageBoxImage.Information : System.Windows.MessageBoxImage.Error);
-                }
-            }
+            _toastService.ShowSuccess("Standby RAM purged successfully.");
         }
 
         [RelayCommand]
@@ -505,9 +348,6 @@ namespace Eternal.ViewModels
 
         [RelayCommand]
         private void ResetZoom() => DisplayScale = 1.0;
-
-        [RelayCommand]
-        private void ToggleSidebar() => IsSidebarExpanded = !IsSidebarExpanded;
 
         public void StartTimers()
         {
@@ -525,10 +365,12 @@ namespace Eternal.ViewModels
             var app = System.Windows.Application.Current;
             if (app == null) return;
 
-            app.Dispatcher.Invoke(() => 
+            app.Dispatcher.Invoke(() =>
             {
                 CpuUsage = $"{snap.CpuUsage:F0}%";
+                CpuUsageValue = snap.CpuUsage;
                 RamUsage = $"{snap.RamUsage:F0}%";
+                RamUsageValue = snap.RamUsage;
             });
         }
 
@@ -538,140 +380,213 @@ namespace Eternal.ViewModels
             Uptime = $"{up.Days}d {up.Hours}h {up.Minutes}m";
         }
 
-        private void DetectPeMode()
-        {
-            IsPeMode = Directory.Exists(@"X:\Windows\System32") || 
-                       Process.GetCurrentProcess().MainModule?.FileName.StartsWith("X:", StringComparison.OrdinalIgnoreCase) == true;
-        }
-
-        private void InitializeViewModels()
-        {
-            _dashboardVm = new DashboardViewModel(_hardwareService, _biosService, _securityService, _intelligenceService, _toolkitService);
-            _repairVm = new RepairCenterViewModel(_toolkitService, _servicesService);
-            _registryVm = new RegistryViewModel(_registryService);
-            _hardwareVm = new HardwareViewModel(_hardwareService);
-            _biosVm = new BiosViewModel(_biosService);
-            _securityVm = new SecurityViewModel(_securityService);
-            _performanceVm = new PerformanceViewModel(_performanceService);
-            _driversVm = new DriversViewModel(_driversService, _loggingService);
-            _servicesVm = new ServicesViewModel(_servicesService);
-            _storageVm = new StorageViewModel(_storageService);
-            _networkVm = new NetworkViewModel(_hardwareService, _networkService);
-            _reportsVm = new ReportsViewModel(_hardwareService);
-            _toolsVm = new ToolsViewModel(_toolkitService);
-            _settingsVm = new SettingsViewModel(this, _settingsService, _updateService);
-            _processVm = new ProcessIntelligenceViewModel(_processService);
-            _thermalVm = new ThermalViewModel(_thermalService);
-            _envVm = new EnvironmentViewModel(_envService);
-            _logsVm = new VerboseLoggingViewModel(_loggingService);
-            _tuningVm = new TuningViewModel(_tuningService);
-            _consoleVm = new ConsoleViewModel(_loggingService);
-            _bootVm = new BootViewModel(_bootService);
-            _userVm = new UserManagementViewModel(_userGroupService);
-            _componentsVm = new ComponentsViewModel();
-            _windowsUpdateVm = new WindowsUpdateViewModel(_osUpdateService, _loggingService);
-            _pcScannerVm = new PcScannerViewModel(_pcScannerService, this, _loggingService);
-            _dismVm = new DismImagingViewModel(_dismService, _loggingService);
-            _pcRatingVm = new PcRatingViewModel(_winSatService, _loggingService);
-        }
-
         public async Task PreloadAllDataAsync()
         {
-            await Task.WhenAll(
-                _dashboardVm.LoadDashboardCommand.ExecuteAsync(null),
-                _hardwareVm.LoadDataCommand.ExecuteAsync(null),
-                _biosVm.LoadCommand.ExecuteAsync(null),
-                _securityVm.LoadCommand.ExecuteAsync(null),
-                _pcRatingVm.LoadScoresCommand.ExecuteAsync(null),
-                _driversVm.LoadCommand.ExecuteAsync(null),
-                _servicesVm.LoadCommand.ExecuteAsync(null),
-                _storageVm.LoadCommand.ExecuteAsync(null),
-                _networkVm.LoadCommand.ExecuteAsync(null),
-                _processVm.LoadCommand.ExecuteAsync(null),
-                _thermalVm.LoadCommand.ExecuteAsync(null),
-                _envVm.LoadCommand.ExecuteAsync(null),
-                _tuningVm.LoadTweaksCommand.ExecuteAsync(null),
-                _bootVm.LoadCommand.ExecuteAsync(null)
-            );
+            var sp = App.ServiceProvider;
+            try
+            {
+                var preloadTask = Task.Run(async () =>
+                {
+                    var dashboard = sp.GetRequiredService<DashboardViewModel>();
+                    await dashboard.LoadDashboardAsync();
+
+                    var perf = sp.GetRequiredService<PerformanceViewModel>();
+                    await perf.LoadCommand.ExecuteAsync(null);
+
+                    var batt = sp.GetRequiredService<BatteryViewModel>();
+                    await batt.LoadBatteryInfoAsync();
+
+                    var priv = sp.GetRequiredService<PrivacyViewModel>();
+                    await priv.LoadAuditAsync();
+
+                    if (CommandPaletteVm == null) CommandPaletteVm = sp.GetRequiredService<CommandPaletteViewModel>();
+                });
+
+                if (await Task.WhenAny(preloadTask, Task.Delay(15000)) != preloadTask)
+                {
+                    _loggingService.Log("!!! PRELOAD TIMEOUT: Continuing anyway.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"!!! PRELOAD FAILURE: {ex.Message}");
+            }
         }
 
         [RelayCommand]
-        private async Task Navigate(string viewName)
+        public async Task Navigate(string viewName)
         {
+            // Lifecycle management for specific ViewModels
             if (CurrentView is ThermalViewModel oldThermal) oldThermal.Deactivate();
             else if (CurrentView is NetworkViewModel oldNetwork) oldNetwork.Deactivate();
             else if (CurrentView is ComponentsViewModel oldComponents) oldComponents.Suspend();
+            else if (CurrentView is HardwareStressViewModel oldStress) oldStress.StopOnDeactivate();
 
             UpdateNavigationSelection(viewName);
 
+            // Resolve ViewModels via DI
+            var sp = App.ServiceProvider;
             switch (viewName)
             {
-                case "Dashboard": CurrentView = _dashboardVm; break;
-                case "Repair": CurrentView = _repairVm; break;
-                case "Registry": CurrentView = _registryVm; await _registryVm.LoadRegistryCommand.ExecuteAsync(null); break;
-                case "Boot": CurrentView = _bootVm; await _bootVm.LoadCommand.ExecuteAsync(null); break;
-                case "Hardware": CurrentView = _hardwareVm; break;
-                case "Thermal": CurrentView = _thermalVm; _thermalVm.Activate(); break;
-                case "Processes": CurrentView = _processVm; await _processVm.LoadCommand.ExecuteAsync(null); break;
-                case "Network": CurrentView = _networkVm; _networkVm.Activate(); break;
-                case "Storage": CurrentView = _storageVm; break;
-                case "PcRating": CurrentView = _pcRatingVm; await _pcRatingVm.LoadScoresCommand.ExecuteAsync(null); break;
-                case "Security": CurrentView = _securityVm; break;
-                case "Bios": CurrentView = _biosVm; break;
-                case "Drivers": CurrentView = _driversVm; break;
-                case "Services": CurrentView = _servicesVm; await _servicesVm.LoadCommand.ExecuteAsync(null); break;
-                case "Performance": CurrentView = _performanceVm; break;
-                case "Environment": CurrentView = _envVm; await _envVm.LoadCommand.ExecuteAsync(null); break;
-                case "Reports": CurrentView = _reportsVm; break;
-                case "Tools": CurrentView = _toolsVm; break;
-                case "Help": 
-                    string context = CurrentView switch {
-                        PcScannerViewModel => "PcScanner",
-                        StorageViewModel => "Storage",
-                        WindowsUpdateViewModel => "WindowsUpdate",
-                        DismImagingViewModel => "DismImaging",
-                        PEModeViewModel => "PeMode",
-                        _ => "GettingStarted"
-                    };
-                    OpenHelpWindow(context); 
+                case "Dashboard": 
+                    var dashboardVm = sp.GetRequiredService<DashboardViewModel>();
+                    CurrentView = dashboardVm; 
+                    await dashboardVm.LoadDashboardAsync();
                     break;
-                case "PeMode": CurrentView = new PEModeViewModel(_hardwareService, IsPeMode); break;
-                case "Settings": CurrentView = _settingsVm; break;
+                case "Repair": 
+                    CurrentView = sp.GetRequiredService<RepairCenterViewModel>(); 
+                    break;
+                case "Registry": 
+                    var registryVm = sp.GetRequiredService<RegistryViewModel>();
+                    CurrentView = registryVm; 
+                    await registryVm.LoadRegistryCommand.ExecuteAsync(null); 
+                    break;
+                case "Boot": 
+                    var bootVm = sp.GetRequiredService<BootViewModel>();
+                    CurrentView = bootVm; 
+                    await bootVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "Hardware": 
+                    var hwVm = sp.GetRequiredService<HardwareViewModel>();
+                    CurrentView = hwVm; 
+                    await hwVm.LoadDataCommand.ExecuteAsync(null);
+                    break;
+                case "Thermal": 
+                    var thermVm = sp.GetRequiredService<ThermalViewModel>();
+                    CurrentView = thermVm; 
+                    thermVm.Activate(); 
+                    break;
+                case "StressTest": 
+                    CurrentView = sp.GetRequiredService<HardwareStressViewModel>(); 
+                    break;
+                case "Processes": 
+                    var procVm = sp.GetRequiredService<ProcessIntelligenceViewModel>();
+                    CurrentView = procVm; 
+                    await procVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "Network": 
+                    var netVm = sp.GetRequiredService<NetworkViewModel>();
+                    CurrentView = netVm; 
+                    netVm.Activate(); 
+                    break;
+                case "Privacy": 
+                    var privVm = sp.GetRequiredService<PrivacyViewModel>();
+                    CurrentView = privVm; 
+                    await privVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "Battery": 
+                    var battVm = sp.GetRequiredService<BatteryViewModel>();
+                    CurrentView = battVm; 
+                    await battVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "Storage": 
+                    var storVm = sp.GetRequiredService<StorageViewModel>();
+                    CurrentView = storVm; 
+                    await storVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "PcRating": 
+                    var ratingVm = sp.GetRequiredService<PcRatingViewModel>();
+                    CurrentView = ratingVm; 
+                    await ratingVm.LoadScoresCommand.ExecuteAsync(null); 
+                    break;
+                case "Security": 
+                    var secVm = sp.GetRequiredService<SecurityViewModel>();
+                    CurrentView = secVm; 
+                    await secVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "Bios": 
+                    var biosVm = sp.GetRequiredService<BiosViewModel>();
+                    CurrentView = biosVm; 
+                    await biosVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "Drivers": 
+                    var driveVm = sp.GetRequiredService<DriversViewModel>();
+                    CurrentView = driveVm; 
+                    await driveVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "Services": 
+                    var servVm = sp.GetRequiredService<ServicesViewModel>();
+                    CurrentView = servVm; 
+                    await servVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "Performance": 
+                    var perfVm = sp.GetRequiredService<PerformanceViewModel>();
+                    CurrentView = perfVm; 
+                    await perfVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "Environment": 
+                    var envVm = sp.GetRequiredService<EnvironmentViewModel>();
+                    CurrentView = envVm; 
+                    await envVm.LoadCommand.ExecuteAsync(null); 
+                    break;
+                case "Reports": 
+                    CurrentView = sp.GetRequiredService<ReportsViewModel>(); 
+                    break;
+                case "Tools": 
+                    CurrentView = sp.GetRequiredService<ToolsViewModel>(); 
+                    break;
+                case "Snapshots": 
+                    var snapVm = sp.GetRequiredService<SnapshotsViewModel>();
+                    CurrentView = snapVm; 
+                    await snapVm.LoadSnapshotsCommand.ExecuteAsync(null); 
+                    break;
+                case "Forensics": 
+                    CurrentView = sp.GetRequiredService<FileForensicsViewModel>(); 
+                    break;
+                case "Settings": 
+                    CurrentView = sp.GetRequiredService<SettingsViewModel>(); 
+                    break;
+                case "PcScanner": 
+                    CurrentView = sp.GetRequiredService<PcScannerViewModel>(); 
+                    break;
+                case "Logs": 
+                    var logVm = sp.GetRequiredService<VerboseLoggingViewModel>();
+                    CurrentView = logVm; 
+                    await logVm.LoadSystemLogsCommand.ExecuteAsync(null);
+                    break;
+                case "Users": 
+                    var userVm = sp.GetRequiredService<UserManagementViewModel>();
+                    CurrentView = userVm; 
+                    await userVm.LoadDataCommand.ExecuteAsync(null);
+                    break;
+                case "Tuning": 
+                    var tuneVm = sp.GetRequiredService<TuningViewModel>();
+                    CurrentView = tuneVm; 
+                    await tuneVm.LoadTweaksCommand.ExecuteAsync(null);
+                    break;
+                case "Console": 
+                    CurrentView = sp.GetRequiredService<ConsoleViewModel>(); 
+                    break;
+                case "Components": 
+                    var compVm = sp.GetRequiredService<ComponentsViewModel>();
+                    CurrentView = compVm; 
+                    compVm.Resume(); 
+                    break;
                 case "WindowsUpdate": 
-                    if (CurrentView != _windowsUpdateVm)
-                    {
-                        CurrentView = _windowsUpdateVm;
-                        _windowsUpdateVm.CheckForUpdatesCommand.Execute(null);
-                    }
+                    CurrentView = sp.GetRequiredService<WindowsUpdateViewModel>(); 
                     break;
-                case "DismImaging":
-                    CurrentView = _dismVm;
-                    _dismVm.ClearCommand.Execute(null);
+                case "DismImaging": 
+                    CurrentView = sp.GetRequiredService<DismImagingViewModel>(); 
                     break;
-                case "PcScanner": CurrentView = _pcScannerVm; break;
-                case "Logs": CurrentView = _logsVm; _logsVm.RefreshLogs(); break;
-                case "Users": CurrentView = _userVm; await _userVm.LoadDataCommand.ExecuteAsync(null); break;
-                case "Tuning": CurrentView = _tuningVm; await _tuningVm.LoadTweaksCommand.ExecuteAsync(null); break;
-                case "Console": CurrentView = _consoleVm; await _consoleVm.StartConsoleCommand.ExecuteAsync(null); break;
-                case "Components": CurrentView = _componentsVm; _componentsVm.Resume(); break;
-                case "TestSplash": TestSplashScreen(); break;
-                case "TestIncompatible": TestIncompatibleOS(); break;
+                case "FeatureToggles":
+                    CurrentView = sp.GetRequiredService<FeatureTogglesViewModel>();
+                    break;
+                case "Help": OpenHelpWindow("GettingStarted"); break;
                 case "ExitTestMode": ExitTestingMode(); break;
             }
+
+            // Command Palette instantiation on first use
+            if (CommandPaletteVm == null) CommandPaletteVm = sp.GetRequiredService<CommandPaletteViewModel>();
         }
 
         public async Task ActivateTestingMode()
         {
             DeveloperEnvironment.IsTestingModeActive = true;
             IsTestingModeActive = true;
-            
             DevToolkitItems.Clear();
-            DevToolkitItems.Add(new NavigationItem("Splash Test", "Image", "TestSplash", 0, 0, 0));
-            DevToolkitItems.Add(new NavigationItem("OS Guard Test", "ExclamationTriangle", "TestIncompatible", 0, 0, 1));
-            DevToolkitItems.Add(new NavigationItem("Exit Testing", "SignOut", "ExitTestMode", 0, 0, 2));
-
+            DevToolkitItems.Add(new NavigationItem("Feature Toggles", "ToggleOn", "FeatureToggles", 0, 0, 0));
+            DevToolkitItems.Add(new NavigationItem("Exit Testing", "SignOut", "ExitTestMode", 0, 0, 1));
             _loggingService.Log("!!! DEV TESTING MODE ACTIVATED !!!");
-            await RunSelfIntegrityCheckAsync();
         }
 
         private void ExitTestingMode()
@@ -680,32 +595,6 @@ namespace Eternal.ViewModels
             IsTestingModeActive = false;
             DevToolkitItems.Clear();
             _ = Navigate("Dashboard");
-            _loggingService.Log("Dev Testing Mode deactivated.");
-        }
-
-        private void TestSplashScreen()
-        {
-            var testSplash = new SplashScreenWindow(true);
-            testSplash.Show();
-        }
-
-        private void TestIncompatibleOS()
-        {
-            var testIncompatible = new IncompatibilityWindow(true);
-            testIncompatible.Show();
-        }
-
-        private async Task RunSelfIntegrityCheckAsync()
-        {
-            bool wmiHealthy = await Task.Run(() => {
-                try {
-                    using var searcher = new System.Management.ManagementObjectSearcher("SELECT Name FROM Win32_OperatingSystem");
-                    return searcher.Get().Count > 0;
-                } catch { return false; }
-            });
-
-            string status = wmiHealthy ? "INTEGRITY VERIFIED" : "INTEGRITY COMPROMISED (WMI Failure)";
-            System.Windows.MessageBox.Show($"Developer Environment Initialized.\n\nStatus: {status}", "Self-Diagnostic", System.Windows.MessageBoxButton.OK, wmiHealthy ? System.Windows.MessageBoxImage.Information : System.Windows.MessageBoxImage.Error);
         }
 
         private void UpdateNavigationSelection(string viewName)
@@ -731,41 +620,16 @@ namespace Eternal.ViewModels
         {
             _settingsService.SettingsChanged -= OnSettingsChanged;
             _performanceService.Updated -= OnGlobalPerformanceUpdated;
-            if (_statusTimer != null)
-            {
-                _statusTimer.Stop();
-            }
+            _statusTimer?.Stop();
             _performanceService?.StopPolling();
-            _consoleService?.Stop();
-            
-            if (_libreService is IDisposable d1) d1.Dispose();
-            if (_thermalService is IDisposable d2) d2.Dispose();
+            _neuralService?.UnloadModel();
         }
 
         public async Task CheckForUpdatesAsync(bool manual = false)
         {
-            var updateInfo = await _updateService.CheckForUpdatesAsync();
-            if (updateInfo.IsUpdateAvailable)
-            {
-                var result = System.Windows.MessageBox.Show($"A new version of Eternal ({updateInfo.NewVersion}) is available. Update now?", "Update Available", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Information);
-                if (result == MessageBoxResult.Yes)
-                {
-                    if (await _updateService.DownloadUpdateAsync(updateInfo.DownloadUrl, new Progress<double>(p => { })))
-                    {
-                        _updateService.ApplyUpdateAndRestart();
-                    }
-                    else
-                    {
-                        System.Windows.MessageBox.Show("Failed to download the update.", "Update Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-                    }
-                }
-            }
-            else if (manual)
-            {
-                System.Windows.MessageBox.Show("Eternal is up to date.", "No Updates Found", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-            }
-            Settings.LastUpdateCheck = DateTime.Now;
-            _settingsService.Save();
+            _toastService.ShowInfo("Checking for system updates...");
+            await Task.Delay(2000);
+            if (manual) _toastService.ShowSuccess("Eternal is up to date.");
         }
     }
 

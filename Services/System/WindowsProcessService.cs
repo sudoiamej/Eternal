@@ -25,8 +25,13 @@ namespace Eternal.Services.System
                         int pid = proc.Id;
                         string name = proc.ProcessName;
                         long mem = 0;
+                        int sessionId = 0;
+                        string statusString = "Running";
+
                         try { mem = proc.WorkingSet64; } catch { }
-                        
+                        try { sessionId = proc.SessionId; } catch { }
+                        try { if (proc.Responding == false) statusString = "Not Responding"; } catch { }
+
                         string path = "Access Denied";
                         if (pid > 4) // Skip System and Idle
                         {
@@ -41,13 +46,15 @@ namespace Eternal.Services.System
                         if (mem > 1024 * 1024 * 1024) impact = "High";
 
                         details.Add(new ProcessDetail(
-                            pid,
-                            name,
-                            0, 
-                            mem,
-                            path,
-                            true, 
-                            impact
+                            PID: pid,
+                            Name: name,
+                            CpuUsage: 0.0,
+                            MemoryBytes: mem,
+                            Path: path,
+                            IsSigned: true,
+                            Impact: impact,
+                            Status: statusString,
+                            SessionId: sessionId
                         ));
                     }
                     catch { }
@@ -94,8 +101,8 @@ namespace Eternal.Services.System
 
                 try
                 {
-                    var proc = Process.GetProcessById(process.Id);
-                    
+                    var proc = Process.GetProcessById(process.PID);
+
                     // 1. Loaded Modules
                     try
                     {
@@ -104,7 +111,7 @@ namespace Eternal.Services.System
                             loadedModules.Add($"{module.ModuleName} ({module.FileName})");
                         }
                     }
-                    catch (Exception ex) { loadedModules.Add($"Error fetching modules: {ex.Message}"); }
+                    catch (Exception ex) { loadedModules.Add($"Error fetching modules: {ex.Message}"); }        
 
                     // 2. Static Imports (PE Parsing)
                     if (File.Exists(process.Path))
@@ -119,18 +126,18 @@ namespace Eternal.Services.System
                     // 3. Heuristics
                     if (process.Path == "Access Denied") heuristics.Add("Process path is hidden or restricted (Possible Rootkit/System Process).");
                     if (process.MemoryBytes > 1024 * 1024 * 1024) heuristics.Add("Extremely high memory footprint (>1GB).");
-                    
+
                     var tempPath = Path.GetTempPath();
                     if (!string.IsNullOrEmpty(process.Path) && process.Path.StartsWith(tempPath, StringComparison.OrdinalIgnoreCase))
                         heuristics.Add("Process is running from a temporary directory (Highly Suspicious).");
 
                     if (loadedModules.Any(m => m.Contains("wininet.dll") || m.Contains("winhttp.dll")))
-                        heuristics.Add("Process has networking capabilities (Loaded wininet/winhttp).");
-                    
+                        heuristics.Add("Process has networking capabilities (Loaded wininet/winhttp).");        
+
                     if (staticImports.Any(i => i.Contains("Advapi32.dll") && (i.Contains("Reg") || i.Contains("Service"))))
                         heuristics.Add("Process interacts with Registry or System Services.");
 
-                    if (heuristics.Count == 0) heuristics.Add("No immediate behavioral anomalies detected.");
+                    if (heuristics.Count == 0) heuristics.Add("No immediate behavioral anomalies detected.");   
 
                 }
                 catch (Exception ex)
@@ -138,7 +145,13 @@ namespace Eternal.Services.System
                     heuristics.Add($"Analysis Error: {ex.Message}");
                 }
 
-                return new ExtendedProcessInfo(process.Id, process.Name, staticImports, loadedModules, heuristics);
+                return new ExtendedProcessInfo(
+                    PID: process.PID, 
+                    Name: process.Name, 
+                    StaticImports: staticImports, 
+                    LoadedModules: loadedModules, 
+                    HeuristicReasons: heuristics
+                );
             });
         }
 
@@ -147,7 +160,7 @@ namespace Eternal.Services.System
             var imports = new List<string>();
             try
             {
-                using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);   
                 using var reader = new BinaryReader(fs);
 
                 // DOS Header
@@ -158,11 +171,11 @@ namespace Eternal.Services.System
 
                 // NT Header
                 if (reader.ReadUInt32() != 0x00004550) return imports; // PE\0\0
-                
+
                 fs.Seek(ntHeaderOffset + 4 + 20 + 96, SeekOrigin.Begin); // Skip FileHeader and OptionalHeader fixed parts to reach Data Directories
                 // OptionalHeader is 96 or 112 bytes before data dirs for PE32/PE32+
                 // Let's use a simpler approach: seek to import directory directly
-                
+
                 // Re-read machine type to detect PE32+
                 fs.Seek(ntHeaderOffset + 4, SeekOrigin.Begin);
                 ushort machine = reader.ReadUInt16();
@@ -178,13 +191,13 @@ namespace Eternal.Services.System
                 // Since this is a lightweight diagnostic tool, we'll use a simplified heuristic or just report success of finding the table.
                 imports.Add($"PE Header detected (Machine: 0x{machine:X})");
                 imports.Add($"Import Directory RVA: 0x{importRva:X}");
-                
+
                 // Add common suspicious imports if found in strings (heuristic fallback)
                 fs.Seek(0, SeekOrigin.Begin);
                 byte[] buffer = new byte[(int)Math.Min(fs.Length, 1024 * 1024)]; // Read first MB
                 fs.ReadExactly(buffer, 0, buffer.Length);
                 string content = Encoding.ASCII.GetString(buffer);
-                
+
                 string[] commonDlls = { "kernel32.dll", "user32.dll", "advapi32.dll", "wininet.dll", "ws2_32.dll", "urlmon.dll", "ntdll.dll" };
                 foreach(var dll in commonDlls)
                 {

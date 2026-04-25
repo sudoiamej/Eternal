@@ -1,0 +1,110 @@
+<UserControl x:Class="Eternal.Views.Helpers.CommandPaletteOverlay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="600">
+    <Grid Background="#AA000000" MouseDown="Grid_MouseDown">
+        <Border VerticalAlignment="Top" Margin="0,100,0,0" Width="600" 
+                Background="{DynamicResource SidebarBrush}" CornerRadius="12"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="40" Direction="0" ShadowDepth="0" Opacity="0.6" Color="Black"/>
+            </Border.Effect>
+            <Grid Margin="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <!-- Search Input -->
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <fa:ImageAwesome Icon="Search" Width="18" Foreground="{DynamicResource AccentBrush}" Margin="10,0,15,0"/>
+                    <TextBox Grid.Column="1" x:Name="SearchBox" 
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             Background="Transparent" BorderThickness="0" Foreground="White"
+                             FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"
+                             CaretBrush="{DynamicResource AccentBrush}"
+                             PreviewKeyDown="SearchBox_PreviewKeyDown">
+                        <TextBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="0"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+                    <TextBlock Grid.Column="1" Text="Search intelligence modules or actions..." 
+                               Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5" 
+                               FontSize="18" VerticalAlignment="Center" IsHitTestVisible="False"
+                               Visibility="{Binding SearchText.Length, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
+                </Grid>
+
+                <Separator Grid.Row="1" Background="{DynamicResource BorderBrush}" Margin="-15,0,-15,15"/>
+
+                <!-- Results List -->
+                <ListBox Grid.Row="2" ItemsSource="{Binding FilteredCommands}" 
+                         SelectedItem="{Binding SelectedCommand}"
+                         Background="Transparent" BorderThickness="0"
+                         MaxHeight="350" VirtualizingStackPanel.IsVirtualizing="True">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Bd" Background="Transparent" CornerRadius="6" Margin="0,2" Padding="12,8">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="#1AFFFFFF"/>
+                                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                                <Setter TargetName="Bd" Property="BorderThickness" Value="1"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <fa:ImageAwesome Icon="{Binding Icon}" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                                <StackPanel Grid.Column="1" Margin="10,0">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="13"/>
+                                    <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+                                </StackPanel>
+                                <Border Grid.Column="2" Background="#151515" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Category}" FontSize="9" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Footer Tips -->
+                <Grid Grid.Row="3" Margin="0,15,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="↑↓" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
+                        <TextBlock Text=" to navigate · " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10"/>
+                        <TextBlock Text="ENTER" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
+                        <TextBlock Text=" to select · " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10"/>
+                        <TextBlock Text="ESC" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
+                        <TextBlock Text=" to close" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10"/>
+                    </StackPanel>
+                    <TextBlock HorizontalAlignment="Right" Text="ETERNAL SEARCH" FontSize="9" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.3"/>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

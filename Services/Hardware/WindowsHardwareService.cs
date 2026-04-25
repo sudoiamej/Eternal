@@ -213,17 +213,58 @@ namespace Eternal.Services.Hardware
         {
             return Task.Run(() =>
             {
-                string manufacturer = "Standard PC";
-                string model = "Virtual/Generic Board";
+                string manufacturer = "Unknown";
+                string model = "Unknown";
 
                 try
                 {
-                    using var searcher = CreateSearcher("select Manufacturer, Product from Win32_BaseBoard");
-                    foreach (var obj in searcher.Get())
+                    // 1. BaseBoard
+                    using (var searcher = CreateSearcher("select Manufacturer, Product from Win32_BaseBoard"))
                     {
-                        manufacturer = obj["Manufacturer"]?.ToString() ?? manufacturer;
-                        model = obj["Product"]?.ToString() ?? model;
-                        return new MotherboardInfo(manufacturer, model);
+                        foreach (var obj in searcher.Get())
+                        {
+                            string? m = obj["Manufacturer"]?.ToString();
+                            string? p = obj["Product"]?.ToString();
+
+                            if (!IsGeneric(m)) manufacturer = m!;
+                            if (!IsGeneric(p)) model = p!;
+                            
+                            if (!IsGeneric(manufacturer) && !IsGeneric(model)) break;
+                        }
+                    }
+
+                    // 2. System Product Fallback
+                    if (IsGeneric(manufacturer) || IsGeneric(model))
+                    {
+                        using (var searcher = CreateSearcher("select Manufacturer, Name from Win32_ComputerSystemProduct"))
+                        {
+                            foreach (var obj in searcher.Get())
+                            {
+                                string? m = obj["Manufacturer"]?.ToString();
+                                string? n = obj["Name"]?.ToString();
+
+                                if (IsGeneric(manufacturer) && !IsGeneric(m)) manufacturer = m!;
+                                if (IsGeneric(model) && !IsGeneric(n)) model = n!;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 3. Computer System Fallback
+                    if (IsGeneric(manufacturer))
+                    {
+                        using (var searcher = CreateSearcher("select Manufacturer, Model from Win32_ComputerSystem"))
+                        {
+                            foreach (var obj in searcher.Get())
+                            {
+                                string? m = obj["Manufacturer"]?.ToString();
+                                string? mod = obj["Model"]?.ToString();
+
+                                if (IsGeneric(manufacturer) && !IsGeneric(m)) manufacturer = m!;
+                                if (IsGeneric(model) && !IsGeneric(mod)) model = mod!;
+                                break;
+                            }
+                        }
                     }
                 }
                 catch { }
@@ -231,13 +272,37 @@ namespace Eternal.Services.Hardware
                 // Fallback to Registry for System Info
                 try
                 {
-                    manufacturer = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemManufacturer", manufacturer)?.ToString() ?? manufacturer;
-                    model = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemProductName", model)?.ToString() ?? model;
+                    if (IsGeneric(manufacturer))
+                        manufacturer = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemManufacturer", manufacturer)?.ToString() ?? manufacturer;
+                    
+                    if (IsGeneric(model))
+                        model = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemProductName", model)?.ToString() ?? model;
                 }
                 catch { }
 
+                // Final cleaning
+                if (IsGeneric(manufacturer)) manufacturer = "Standard PC";
+                if (IsGeneric(model)) model = "Generic Board";
+
                 return new MotherboardInfo(manufacturer, model);
             });
+        }
+
+        private bool IsGeneric(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return true;
+            string v = value.Trim().ToUpper();
+            return v == "UNKNOWN" || 
+                   v == "TO BE FILLED BY O.E.M." || 
+                   v == "SYSTEM MANUFACTURER" || 
+                   v == "SYSTEM PRODUCT NAME" || 
+                   v == "DEFAULT STRING" ||
+                   v == "O.E.M." ||
+                   v == "NOT AVAILABLE" ||
+                   v == "NOT SPECIFIED" ||
+                   v == "NONE" ||
+                   v == "INVALID" ||
+                   v.Contains("GENERIC");
         }
 
         public Task<List<NetworkAdapterInfo>> GetNetworkAdaptersAsync()
@@ -345,6 +410,50 @@ namespace Eternal.Services.Hardware
 
                 return items;
             });
+        }
+        private List<CancellationTokenSource> _stressCancelTokens = new List<CancellationTokenSource>();
+
+        public void StartStressTest(int threads)
+        {
+            StopStressTest();
+            for (int i = 0; i < threads; i++)
+            {
+                var cts = new CancellationTokenSource();
+                _stressCancelTokens.Add(cts);
+                Task.Run(() => RunHeavyPrimes(cts.Token), cts.Token);
+            }
+        }
+
+        public void StopStressTest()
+        {
+            foreach (var cts in _stressCancelTokens)
+            {
+                cts.Cancel();
+                cts.Dispose();
+            }
+            _stressCancelTokens.Clear();
+        }
+
+        private void RunHeavyPrimes(CancellationToken token)
+        {
+            long number = 1000000;
+            while (!token.IsCancellationRequested)
+            {
+                IsPrime(number++);
+            }
+        }
+
+        private bool IsPrime(long number)
+        {
+            if (number <= 1) return false;
+            if (number == 2) return true;
+            if (number % 2 == 0) return false;
+            var boundary = (long)Math.Floor(Math.Sqrt(number));
+            for (long i = 3; i <= boundary; i += 2)
+            {
+                if (number % i == 0) return false;
+            }
+            return true;
         }
     }
 }

@@ -30,6 +30,9 @@ namespace Eternal.Services.System
                                 Description = user.Description ?? string.Empty,
                                 IsEnabled = user.Enabled ?? false,
                                 IsLockedOut = user.IsAccountLockedOut(),
+                                PasswordNeverExpires = user.PasswordNeverExpires,
+                                UserCannotChangePassword = user.UserCannotChangePassword,
+                                MustChangePasswordAtNextLogon = true, // If we got here in some contexts, but let's be more precise
                                 LastLogon = user.LastLogon,
                                 Sid = user.Sid.ToString(),
                                 Groups = user.GetGroups().Select(g => g.Name).ToList()
@@ -77,17 +80,27 @@ namespace Eternal.Services.System
             });
         }
 
-        public Task<bool> CreateUserAsync(string username, string password, string fullName, string description)
+        public Task<bool> CreateUserAsync(string username, string password, string fullName, string description, bool mustChangePassword, bool cannotChangePassword, bool passwordNeverExpires, bool disabled)
         {
             return Task.Run(() =>
             {
                 try
                 {
                     using var context = new PrincipalContext(ContextType.Machine);
-                    using var user = new UserPrincipal(context, username, password, true);
+                    using var user = new UserPrincipal(context, username, password, !disabled);
                     user.DisplayName = fullName;
                     user.Description = description;
+                    user.PasswordNeverExpires = passwordNeverExpires;
+                    user.UserCannotChangePassword = cannotChangePassword;
+                    
                     user.Save();
+
+                    if (mustChangePassword)
+                    {
+                        user.ExpirePasswordNow();
+                        user.Save();
+                    }
+
                     return true;
                 }
                 catch { return false; }
@@ -144,6 +157,54 @@ namespace Eternal.Services.System
                     if (user != null)
                     {
                         user.SetPassword(newPassword);
+                        user.Save();
+                        return true;
+                    }
+                    return false;
+                }
+                catch { return false; }
+            });
+        }
+
+        public Task<bool> UnlockUserAccountAsync(string username)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    using var context = new PrincipalContext(ContextType.Machine);
+                    using var user = UserPrincipal.FindByIdentity(context, username);
+                    if (user != null)
+                    {
+                        user.UnlockAccount();
+                        user.Save();
+                        return true;
+                    }
+                    return false;
+                }
+                catch { return false; }
+            });
+        }
+
+        public Task<bool> UpdateUserPropertiesAsync(string username, UserAccount properties)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    using var context = new PrincipalContext(ContextType.Machine);
+                    using var user = UserPrincipal.FindByIdentity(context, username);
+                    if (user != null)
+                    {
+                        user.DisplayName = properties.FullName;
+                        user.Description = properties.Description;
+                        user.Enabled = properties.IsEnabled;
+                        user.PasswordNeverExpires = properties.PasswordNeverExpires;
+                        user.UserCannotChangePassword = properties.UserCannotChangePassword;
+                        
+                        if (properties.MustChangePasswordAtNextLogon)
+                            user.ExpirePasswordNow();
+                        
                         user.Save();
                         return true;
                     }
@@ -227,6 +288,24 @@ namespace Eternal.Services.System
                     return false;
                 }
                 catch { return false; }
+            });
+        }
+
+        public Task<List<string>> GetGroupMembersAsync(string groupName)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    using var context = new PrincipalContext(ContextType.Machine);
+                    using var group = GroupPrincipal.FindByIdentity(context, groupName);
+                    if (group != null)
+                    {
+                        return group.GetMembers().Select(m => m.SamAccountName).ToList();
+                    }
+                }
+                catch { }
+                return new List<string>();
             });
         }
     }

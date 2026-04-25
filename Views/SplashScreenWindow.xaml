@@ -88,7 +88,7 @@
 
             <!-- Footer -->
             <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,20" Opacity="0.4">
-                <TextBlock Text="© 2026 ETERNAL ANALYTICS • VERSION 2.5.0-M3" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource TextDisabledBrush}"/>
+                <TextBlock Text="© 2026 ETERNAL ANALYTICS • VERSION 2.5.0-M4" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource TextDisabledBrush}"/>
             </StackPanel>
         </Grid>
     </Border>

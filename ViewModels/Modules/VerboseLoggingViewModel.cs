@@ -15,7 +15,8 @@ namespace Eternal.ViewModels.Modules
     {
         private readonly ILoggingService _loggingService;
 
-        public ObservableCollection<LogEntry> LogEntries { get; } = new ObservableCollection<LogEntry>();
+        public ObservableCollection<LogEntry> ActionLogEntries { get; } = new ObservableCollection<LogEntry>();
+        public ObservableCollection<LogEntry> EventViewerEntries { get; } = new ObservableCollection<LogEntry>();
         
         [ObservableProperty] private bool _isBusy;
 
@@ -25,7 +26,7 @@ namespace Eternal.ViewModels.Modules
             
             RefreshLogs();
 
-            // 2. Real-time Log Stream
+            // 1. App Action Stream
             _loggingService.NewLogAdded += (s, entry) =>
             {
                 var app = System.Windows.Application.Current;
@@ -33,27 +34,26 @@ namespace Eternal.ViewModels.Modules
 
                 app.Dispatcher.Invoke(() =>
                 {
-                    // Always keep stream at top
-                    LogEntries.Insert(0, entry);
-                    if (LogEntries.Count > 2000) LogEntries.RemoveAt(LogEntries.Count - 1);
+                    ActionLogEntries.Insert(0, entry);
+                    if (ActionLogEntries.Count > 2000) ActionLogEntries.RemoveAt(ActionLogEntries.Count - 1);
                 });
             };
 
-            // 3. Deferred System Event Load (to avoid blocking UI init)
+            // 2. Initial Windows Event Load
             _ = Task.Run(async () => 
             {
-                await Task.Delay(1000); 
+                await Task.Delay(500); 
                 await LoadSystemLogsAsync();
             });
         }
 
         public void RefreshLogs()
         {
-            LogEntries.Clear();
+            ActionLogEntries.Clear();
             var initialLogs = _loggingService.Logs.OrderByDescending(l => l.Timestamp);
             foreach (var log in initialLogs)
             {
-                LogEntries.Add(log);
+                ActionLogEntries.Add(log);
             }
         }
 
@@ -73,25 +73,10 @@ namespace Eternal.ViewModels.Modules
 
                 await app.Dispatcher.InvokeAsync(() =>
                 {
-                    // Merge and unique-ify based on message + timestamp
-                    var currentMessages = new HashSet<string>(LogEntries.Select(l => $"{l.Timestamp.Ticks}_{l.Message}"));
-                    
-                    bool addedAny = false;
+                    EventViewerEntries.Clear();
                     foreach (var log in systemLogs)
                     {
-                        if (!currentMessages.Contains($"{log.Timestamp.Ticks}_{log.Message}"))
-                        {
-                            LogEntries.Add(log);
-                            addedAny = true;
-                        }
-                    }
-
-                    if (addedAny)
-                    {
-                        // Maintain strict reverse chronological order
-                        var sorted = LogEntries.OrderByDescending(l => l.Timestamp).ToList();
-                        LogEntries.Clear();
-                        foreach (var log in sorted) LogEntries.Add(log);
+                        EventViewerEntries.Add(log);
                     }
                 });
             }
@@ -102,7 +87,8 @@ namespace Eternal.ViewModels.Modules
         private void ClearLogs()
         {
             _loggingService.Clear();
-            LogEntries.Clear();
+            ActionLogEntries.Clear();
+            EventViewerEntries.Clear();
         }
     }
 }

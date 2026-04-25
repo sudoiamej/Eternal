@@ -113,7 +113,7 @@
                             <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" FontSize="12" FontWeight="Medium"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <TextBlock Text="V2.5.0-M1 CORE" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5" FontSize="9" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <TextBlock Text="V2.5.0-M4 CORE" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5" FontSize="9" VerticalAlignment="Center" Margin="0,0,15,0"/>
                             <fa:ImageAwesome Icon="Spinner" Spin="{Binding IsBusy}" Width="12" Foreground="{DynamicResource AccentBrush}" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </StackPanel>
                     </Grid>

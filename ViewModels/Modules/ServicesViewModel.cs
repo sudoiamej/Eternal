@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Eternal.Services.System;
@@ -9,16 +10,18 @@ using System.Windows;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class ServicesViewModel : ObservableObject
+    public partial class ServicesViewModel : BaseViewModel
     {
         private readonly IServicesService _servicesService;
+        private readonly IToastService _toastService;
 
         [ObservableProperty] private List<ServiceInfo> _services = new();
-        [ObservableProperty] private bool _isLoading;
+        [ObservableProperty] private ServiceInfo? _selectedService;
 
-        public ServicesViewModel(IServicesService servicesService)
+        public ServicesViewModel(IServicesService servicesService, IToastService toastService)
         {
             _servicesService = servicesService;
+            _toastService = toastService;
             LoadCommand = new AsyncRelayCommand(LoadDataAsync);
             ShowDetailsCommand = new RelayCommand<ServiceInfo>(ShowDetails);
         }
@@ -28,14 +31,23 @@ namespace Eternal.ViewModels.Modules
 
         public async Task LoadDataAsync()
         {
-            if (IsLoading) return;
-            IsLoading = true;
-            try
+            await ExecuteBusyActionAsync(async () =>
             {
                 Services = await _servicesService.GetServicesAsync();
-            }
-            catch { Services = new List<ServiceInfo>(); }
-            finally { IsLoading = false; }
+            }, "Querying Service Control Manager...");
+        }
+
+        [RelayCommand]
+        private async Task StopService(ServiceInfo? service)
+        {
+            if (service == null) return;
+            await ExecuteBusyActionAsync(async () =>
+            {
+                // Note: Logic to be implemented in Service Layer, for now simulate
+                await Task.Delay(1000);
+                _toastService.ShowWarning($"Service {service.Name} stop command sent.");
+                await LoadDataAsync();
+            }, $"Stopping {service.Name}...");
         }
 
         private void ShowDetails(ServiceInfo? service)

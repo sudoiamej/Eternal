@@ -7,6 +7,8 @@ namespace Eternal.Services.System
 {
     public interface IEnvironmentService
     {
+        bool IsPeMode { get; }
+        string SystemDrive { get; }
         Task<List<EnvVar>> GetVariablesAsync();
         Task<bool> SetVariableAsync(string name, string value);
     }
@@ -15,6 +17,17 @@ namespace Eternal.Services.System
 
     public class WindowsEnvironmentService : IEnvironmentService
     {
+        public bool IsPeMode { get; }
+        public string SystemDrive { get; }
+
+        public WindowsEnvironmentService()
+        {
+            IsPeMode = global::System.IO.Directory.Exists(@"X:\Windows\System32") || 
+                       global::System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName.StartsWith("X:", StringComparison.OrdinalIgnoreCase) == true;
+            
+            SystemDrive = IsPeMode ? "X:" : "C:";
+        }
+
         public Task<List<EnvVar>> GetVariablesAsync()
         {
             return Task.Run(() =>

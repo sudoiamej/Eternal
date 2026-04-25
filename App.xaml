@@ -16,6 +16,10 @@
             <helpers:IntToBooleanConverter x:Key="IntToBooleanConverter"/>
             <helpers:MultiBooleanToVisibilityConverter x:Key="MultiBooleanToVisibilityConverter"/>
             <helpers:NumericValueConverter x:Key="NumericValueConverter"/>
+            <helpers:TrustLevelToBrushConverter x:Key="TrustLevelToBrushConverter"/>
+            <helpers:TrustLevelToColorConverter x:Key="TrustLevelToColorConverter"/>
+            <helpers:SeverityToBrushConverter x:Key="SeverityToBrushConverter"/>
+            <helpers:BooleanToIconConverter x:Key="BooleanToIconConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
