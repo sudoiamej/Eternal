@@ -13,9 +13,20 @@ namespace Eternal.Services.System
     public class WindowsOsUpdateService : IOsUpdateService
     {
         private const string UpdateRegistryPath = @"SOFTWARE\Microsoft\WindowsUpdate\UX\Settings";
+        private readonly ISettingsService _settingsService;
+
+        public WindowsOsUpdateService(ISettingsService settingsService)
+        {
+            _settingsService = settingsService;
+        }
 
         public async Task<List<WindowsUpdateItem>> GetAvailableUpdatesAsync()
         {
+            if (_settingsService.Current.SimulateUpdateFailure)
+            {
+                await Task.Delay(1000);
+                throw new Exception("SIMULATED_FAILURE: Windows Update Search Engine reported error 0x80244017.");
+            }
             return await Task.Run<List<WindowsUpdateItem>>(() =>
             {
                 var updates = new List<WindowsUpdateItem>();
@@ -192,6 +203,16 @@ namespace Eternal.Services.System
 
                     if (updatesToInstall.Count == 0) return true;
 
+                    // 0. Accept EULA if required
+                    for (int i = 0; i < updatesToInstall.Count; i++)
+                    {
+                        dynamic update = updatesToInstall.Item(i);
+                        if (!update.EulaAccepted)
+                        {
+                            try { update.AcceptEula(); } catch { }
+                        }
+                    }
+
                     // 1. Download Phase (0-50%)
                     dynamic downloader = session.CreateUpdateDownloader();
                     downloader.Updates = updatesToInstall;
@@ -205,9 +226,26 @@ namespace Eternal.Services.System
                     }
                     downloader.EndDownload(downloadJob);
 
+                    // 1.5 Verify downloads and prepare for installation
+                    dynamic updatesToInstallFinal = Activator.CreateInstance(updateCollType)!;
+                    for (int i = 0; i < updatesToInstall.Count; i++)
+                    {
+                        dynamic update = updatesToInstall.Item(i);
+                        if (update.IsDownloaded)
+                        {
+                            updatesToInstallFinal.Add(update);
+                        }
+                        else
+                        {
+                            Debug.WriteLine($"Update {update.Identity.UpdateID} failed to download.");
+                        }
+                    }
+
+                    if (updatesToInstallFinal.Count == 0) return false;
+
                     // 2. Install Phase (50-100%)
                     dynamic installer = session.CreateUpdateInstaller();
-                    installer.Updates = updatesToInstall;
+                    installer.Updates = updatesToInstallFinal;
                     dynamic installJob = installer.BeginInstall(null, null, null);
 
                     while (!installJob.IsCompleted)

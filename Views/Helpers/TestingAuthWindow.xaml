@@ -4,7 +4,8 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         Title="Developer Access" Height="280" Width="350"
         WindowStyle="None" AllowsTransparency="True"
-        WindowStartupLocation="CenterOwner" Background="Transparent">
+        WindowStartupLocation="CenterOwner" Background="Transparent"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="12" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
         <Grid Margin="30">
             <Grid.RowDefinitions>

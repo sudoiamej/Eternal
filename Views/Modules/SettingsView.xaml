@@ -216,7 +216,10 @@
                         <TextBlock Text="ABOUT ETERNAL" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
                         <Grid>
                             <StackPanel>
-                                <TextBlock Text="{Binding AppVersion, StringFormat='Version: {0}'}" FontWeight="Bold" Foreground="White"/>
+                                <Button Command="{Binding VersionClickedCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
+                                        Background="Transparent" BorderThickness="0" HorizontalAlignment="Left" Padding="0" Margin="0">
+                                    <TextBlock Text="{Binding AppVersion, StringFormat='Version: {0}'}" FontWeight="Bold" Foreground="White"/>
+                                </Button>
                                 <TextBlock Text="Compatible with: Windows 10 &amp; 11 (64-bit)" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                             <StackPanel HorizontalAlignment="Right">
@@ -229,6 +232,12 @@
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="Reset Defaults" Command="{Binding ResetDefaultsCommand}" Style="{StaticResource IconButton}" Padding="20,10" Margin="0,0,10,0"/>
+                    <Button Command="{Binding ClearAllDataCommand}" Style="{StaticResource IconButton}" Padding="20,10" Margin="0,0,10,0" BorderBrush="{DynamicResource CriticalBrush}">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="Trash" Width="12" Margin="0,0,10,0" Foreground="{DynamicResource CriticalBrush}"/>
+                            <TextBlock Text="Reset All Application Data" Foreground="{DynamicResource CriticalBrush}"/>
+                        </StackPanel>
+                    </Button>
                     <Button Command="{Binding SaveConfigCommand}" Style="{StaticResource PrimaryAction}" Padding="25,10">
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Save" Width="12" Margin="0,0,10,0" Foreground="White"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>

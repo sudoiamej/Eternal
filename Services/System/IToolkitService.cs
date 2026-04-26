@@ -10,6 +10,9 @@ namespace Eternal.Services.System
         Task<bool> ResetNetworkStackAsync();
         Task<bool> RunSfcScanAsync();
         Task<bool> RunDismRepairAsync();
+        Task<bool> ResetWindowsUpdateAsync();
+        Task<bool> ClearEventLogsAsync();
+        Task<bool> OptimizeBootPerformanceAsync();
         Task<string?> DetectOfflineWindowsDriveAsync();
         Task<bool> MountOfflineRegistryAsync(string driveLetter);
         Task<bool> UnmountOfflineRegistryAsync();

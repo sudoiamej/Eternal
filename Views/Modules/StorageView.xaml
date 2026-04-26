@@ -107,7 +107,7 @@
                                                                             <fa:ImageAwesome Icon="Lock" Width="8" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="{Binding IsBoot, Converter={StaticResource VisibilityConverter}}"/>
                                                                         </Grid>
                                                                         <TextBlock Text="{Binding Label}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
-                                                                        <ProgressBar Value="{Binding FreeSpace}" Maximum="{Binding TotalSize}" Height="3" Margin="0,8,0,5" Background="#20FFFFFF" Foreground="{DynamicResource AccentBrush}"/>
+                                                                        <ProgressBar Value="{Binding FreeSpace, Mode=OneWay}" Maximum="{Binding TotalSize}" Height="3" Margin="0,8,0,5" Background="#20FFFFFF" Foreground="{DynamicResource AccentBrush}"/>
                                                                         <TextBlock Text="{Binding TotalSize, Converter={StaticResource SizeConverter}}" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
                                                                     </StackPanel>
                                                                 </Border>
@@ -154,6 +154,29 @@
                             </Grid>
                             
                             <Separator Background="{DynamicResource BorderBrush}" Margin="0,5,0,20"/>
+
+                            <!-- Space Usage -->
+                            <TextBlock Text="SPACE USAGE" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            <Border Background="#0DFFFFFF" Padding="15" CornerRadius="6" Margin="0,0,0,20">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,10">
+                                        <TextBlock Text="Used / Total" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <TextBlock Text="{Binding SelectedPartition.UsedSpace, Converter={StaticResource SizeConverter}}" FontWeight="Bold" Foreground="White"/>
+                                            <TextBlock Text=" / " Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="{Binding SelectedPartition.TotalSize, Converter={StaticResource SizeConverter}}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    
+                                    <ProgressBar Value="{Binding SelectedPartition.UsedSpace, Mode=OneWay}" Maximum="{Binding SelectedPartition.TotalSize}" 
+                                                 Height="8" Background="#20FFFFFF" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10"/>
+                                    
+                                    <Grid>
+                                        <TextBlock Text="Free Space:" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding SelectedPartition.FreeSpace, Converter={StaticResource SizeConverter}}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
 
                             <!-- Assign Letter -->
                             <TextBlock Text="ASSIGN DRIVE LETTER" Style="{StaticResource Caption}" Margin="0,0,0,10"/>

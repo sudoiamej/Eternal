@@ -17,6 +17,8 @@ namespace Eternal.ViewModels.Modules
         private readonly IToastService _toastService;
         private readonly IEnvironmentService _envService;
 
+        [ObservableProperty] private bool _isLoading;
+
         public ObservableCollection<PhysicalDisk> PhysicalDisks { get; } = new ObservableCollection<PhysicalDisk>();
         
         [ObservableProperty] private PartitionInfo? _selectedPartition;
@@ -82,6 +84,7 @@ namespace Eternal.ViewModels.Modules
 
         public async Task LoadDataAsync()
         {
+            IsLoading = true;
             await ExecuteBusyActionAsync(async () =>
             {
                 var disks = await _storageService.GetPhysicalDisksAsync();
@@ -95,6 +98,7 @@ namespace Eternal.ViewModels.Modules
                     SelectedPartition = match;
                 }
             }, "Mapping Storage Topology...");
+            IsLoading = false;
         }
 
         private bool IsProtectedVolume(string? driveLetter)

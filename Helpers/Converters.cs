@@ -211,4 +211,52 @@ namespace Eternal.Helpers
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
+
+    public class NumericComparisonConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double val && parameter is string param)
+            {
+                if (param.StartsWith(">") && double.TryParse(param.Substring(1), out double thresh))
+                    return val > thresh;
+            }
+            return false;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class CategoryToIconConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is ProcessCategory cat)
+            {
+                return cat switch
+                {
+                    ProcessCategory.Apps => FontAwesome.WPF.FontAwesomeIcon.WindowRestore,
+                    ProcessCategory.Background => FontAwesome.WPF.FontAwesomeIcon.Cog,
+                    ProcessCategory.Windows => FontAwesome.WPF.FontAwesomeIcon.Windows,
+                    _ => FontAwesome.WPF.FontAwesomeIcon.Question
+                };
+            }
+            return FontAwesome.WPF.FontAwesomeIcon.Question;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class ProportionalHeightConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double val && double.TryParse(parameter as string, out double max))
+            {
+                // Assuming val is 0-100 or similar, scale to height. 
+                // Adjust factor based on typical Mbps expectations.
+                return Math.Min(max, val * (max / 50.0)); 
+            }
+            return 2.0; // Min visible bar
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
 }

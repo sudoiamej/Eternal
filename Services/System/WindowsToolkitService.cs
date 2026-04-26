@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Eternal.Services.System
 {
@@ -83,16 +84,17 @@ namespace Eternal.Services.System
 
         public async Task<bool> RebuildIconCacheAsync()
         {
-            return await Task.Run(() =>
+            return await Task.Run(async () =>
             {
                 try
                 {
                     // Kill Explorer
                     foreach (var proc in Process.GetProcessesByName("explorer"))
                     {
-                        proc.Kill();
-                        proc.WaitForExit();
+                        try { proc.Kill(); proc.WaitForExit(); } catch { }
                     }
+
+                    await Task.Delay(1000); // Wait for handle releases
 
                     string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                     string cachePath = Path.Combine(localAppData, "IconCache.db");
@@ -128,6 +130,56 @@ namespace Eternal.Services.System
         public async Task<bool> RunDismRepairAsync()
         {
             return await RunCommandAsAdmin("dism", "/online /cleanup-image /restorehealth");
+        }
+
+        public async Task<bool> ResetWindowsUpdateAsync()
+        {
+            return await Task.Run(async () =>
+            {
+                try
+                {
+                    // Use powershell for reliable service control
+                    await RunCommandAsAdmin("powershell.exe", "-Command \"Stop-Service wuauserv, cryptSvc, bits, msiserver -Force\"");
+                    
+                    await Task.Delay(2000); // Grace period for file handles
+
+                    string windir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                    string sdPath = Path.Combine(windir, "SoftwareDistribution");
+                    string crPath = Path.Combine(windir, "System32", "catroot2");
+
+                    // Rename with retry logic
+                    void RenameFolder(string path)
+                    {
+                        if (!Directory.Exists(path)) return;
+                        string newPath = path + ".old_" + DateTime.Now.Ticks;
+                        for (int i = 0; i < 3; i++)
+                        {
+                            try { Directory.Move(path, newPath); break; }
+                            catch { Task.Delay(1000).Wait(); }
+                        }
+                    }
+
+                    RenameFolder(sdPath);
+                    RenameFolder(crPath);
+
+                    // Restart services
+                    await RunCommandAsAdmin("powershell.exe", "-Command \"Start-Service wuauserv, cryptSvc, bits, msiserver\"");
+
+                    return true;
+                }
+                catch { return false; }
+            });
+        }
+
+        public async Task<bool> ClearEventLogsAsync()
+        {
+            // Optimization: Run as single script block for speed
+            return await RunCommandAsAdmin("powershell.exe", "-Command \"Get-WinEvent -ListLog * | ForEach-Object { [System.Diagnostics.Eventing.Reader.EventLogSession]::GlobalSession.ClearLog($_.LogName) }\"");
+        }
+
+        public async Task<bool> OptimizeBootPerformanceAsync()
+        {
+            return await RunCommandAsAdmin("defrag", "C: /B");
         }
 
         public async Task<string?> DetectOfflineWindowsDriveAsync()

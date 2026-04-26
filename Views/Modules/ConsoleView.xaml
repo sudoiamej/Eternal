@@ -123,17 +123,26 @@
                             </ListBox.ItemContainerStyle>
                         </ListBox>
 
-                        <!-- Add Tab Dropdown -->
-                        <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <Button Style="{StaticResource IconButton}" Padding="10" VerticalAlignment="Stretch">
+                        <!-- Add Tab Dropdown (HCI: Windows Terminal Pattern) -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5,0,0,0">
+                            <Button Command="{Binding NewTabCommand}" CommandParameter="{Binding AvailableProfiles[0]}"
+                                    Style="{StaticResource IconButton}" Padding="8,10" VerticalAlignment="Stretch" ToolTip="New Tab (PowerShell)">
                                 <fa:ImageAwesome Icon="Plus" Width="10" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            </Button>
+                            <Button x:Name="AddTabMenuButton" Click="AddTabMenuButton_Click"
+                                    Style="{StaticResource IconButton}" Padding="4,10" VerticalAlignment="Stretch" ToolTip="Choose Profile">
+                                <fa:ImageAwesome Icon="ChevronDown" Width="8" Foreground="{DynamicResource TextDisabledBrush}"/>
                                 <Button.ContextMenu>
-                                    <ContextMenu Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource BorderBrush}">
-                                        <MenuItem Header="New PowerShell Session" Command="{Binding NewTabAsyncCommand}" CommandParameter="{Binding AvailableProfiles[0]}">
-                                            <MenuItem.Icon><fa:ImageAwesome Icon="Terminal" Width="12" Foreground="{StaticResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome></MenuItem.Icon>
+                                    <ContextMenu x:Name="ProfileMenu" Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource BorderBrush}">
+                                        <MenuItem Header="New PowerShell Session" Command="{Binding NewTabCommand}" CommandParameter="{Binding AvailableProfiles[0]}">
+                                            <MenuItem.Icon><fa:ImageAwesome Icon="Terminal" Width="12" Foreground="{StaticResource AccentBrush}"/></MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="New Command Prompt" Command="{Binding NewTabAsyncCommand}" CommandParameter="{Binding AvailableProfiles[1]}">
-                                            <MenuItem.Icon><fa:ImageAwesome Icon="Code" Width="12" Foreground="{StaticResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome></MenuItem.Icon>
+                                        <MenuItem Header="New Command Prompt" Command="{Binding NewTabCommand}" CommandParameter="{Binding AvailableProfiles[1]}">
+                                            <MenuItem.Icon><fa:ImageAwesome Icon="Code" Width="12" Foreground="{StaticResource AccentBrush}"/></MenuItem.Icon>
+                                        </MenuItem>
+                                        <Separator Background="{StaticResource BorderBrush}"/>
+                                        <MenuItem Header="Command Reference" Click="CommandReference_Click">
+                                            <MenuItem.Icon><fa:ImageAwesome Icon="Book" Width="12" Foreground="{StaticResource InfoBrush}"/></MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>
                                 </Button.ContextMenu>
@@ -155,7 +164,8 @@
 
                                             <!-- Output -->
                                             <ListBox x:Name="SessionOutputList" ItemsSource="{Binding OutputLines}" Background="Transparent" BorderThickness="0" 
-                                                     ScrollViewer.VerticalScrollBarVisibility="Auto" Padding="15" VirtualizingStackPanel.IsVirtualizing="True">
+                                                     ScrollViewer.VerticalScrollBarVisibility="Auto" Padding="15" VirtualizingStackPanel.IsVirtualizing="True"
+                                                     Loaded="SessionOutputList_Loaded" MinHeight="100">
                                                 <ListBox.ItemTemplate>
                                                     <DataTemplate>
                                                         <TextBlock Text="{Binding}" Foreground="#E0E0E0" FontSize="12" FontFamily="Consolas" TextWrapping="Wrap" Opacity="0.9"/>

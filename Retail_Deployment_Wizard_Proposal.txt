@@ -1,0 +1,22 @@
+# PROPOSAL: ETERNAL RETAIL DEPLOYMENT WIZARD
+
+## Objective
+Create a module within the Dev Preview project that can selectively deploy functional updates and core UI shells to an external "Retail Preview" target project folder. This automates the migration process via a simplified checklist interface.
+
+## Proposed Features for Deployment
+* [ ] Core UI Template (Migrate the 'Templated UI' shell)
+* [ ] OS Compatibility Guard (IncompatibilityWindow & startup checks)
+* [ ] Testing Mode & Developer Access (Secret shortcut logic)
+* [ ] Simulation Hooks (Safe mode logic for WindowsCreatorService)
+* [ ] Retail Branding (Automated removal of Dev Preview labels)
+
+## How it works
+1. The user selects a target folder (the duplicate Retail project).
+2. The wizard validates the project structure at that path.
+3. The user checks the desired features.
+4. Clicking "Execute Deployment" performs the file copying and text patching on the target project, leaving the source project untouched.
+
+## Targeted Files
+* Views/Helpers/DeploymentWizardWindow.xaml
+* ViewModels/Modules/DeploymentWizardViewModel.cs
+* Models/DeploymentModels.cs

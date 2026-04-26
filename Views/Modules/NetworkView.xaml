@@ -57,31 +57,16 @@
                             <TextBlock Grid.Row="1" Text="{Binding DownloadMbps, StringFormat='{}{0:F2} Mbps'}" FontSize="28" FontWeight="Black" Margin="0,0,0,15"/>
                             
                             <!-- Download Sparkline -->
-                            <ItemsControl Grid.Row="2" ItemsSource="{Binding DownloadHistory}" VerticalAlignment="Bottom">
+                            <ItemsControl Grid.Row="2" ItemsSource="{Binding DownloadHistory}" VerticalAlignment="Bottom" ClipToBounds="True">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <UniformGrid Columns="60" Rows="1"/>
+                                        <UniformGrid Columns="60" Rows="1" VerticalAlignment="Bottom"/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="{DynamicResource SuccessBrush}" Opacity="0.4" Margin="0.5,0" VerticalAlignment="Bottom">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="Height" Value="{Binding}"/>
-                                                    <Style.Triggers>
-                                                        <!-- Scale visual height for the 60px area -->
-                                                        <DataTrigger Binding="{Binding Converter={StaticResource VisibilityConverter}}" Value="Visible">
-                                                            <Setter Property="RenderTransform">
-                                                                <Setter.Value>
-                                                                    <ScaleTransform ScaleY="2"/>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                        </Border>
+                                        <Border Background="{DynamicResource SuccessBrush}" Opacity="0.4" Margin="0.5,0" VerticalAlignment="Bottom"
+                                                Height="{Binding Converter={StaticResource ProportionalHeightConverter}, ConverterParameter='60'}"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -102,26 +87,16 @@
                             <TextBlock Grid.Row="1" Text="{Binding UploadMbps, StringFormat='{}{0:F2} Mbps'}" FontSize="28" FontWeight="Black" Margin="0,0,0,15"/>
 
                             <!-- Upload Sparkline -->
-                            <ItemsControl Grid.Row="2" ItemsSource="{Binding UploadHistory}" VerticalAlignment="Bottom">
+                            <ItemsControl Grid.Row="2" ItemsSource="{Binding UploadHistory}" VerticalAlignment="Bottom" ClipToBounds="True">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <UniformGrid Columns="60" Rows="1"/>
+                                        <UniformGrid Columns="60" Rows="1" VerticalAlignment="Bottom"/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="{DynamicResource InfoBrush}" Opacity="0.4" Margin="0.5,0" VerticalAlignment="Bottom">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="Height" Value="{Binding}"/>
-                                                    <Setter Property="RenderTransform">
-                                                        <Setter.Value>
-                                                            <ScaleTransform ScaleY="2"/>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style>
-                                            </Border.Style>
-                                        </Border>
+                                        <Border Background="{DynamicResource InfoBrush}" Opacity="0.4" Margin="0.5,0" VerticalAlignment="Bottom"
+                                                Height="{Binding Converter={StaticResource ProportionalHeightConverter}, ConverterParameter='60'}"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -260,7 +235,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn Header="PID" Binding="{Binding ProcessId}" Width="60">
+                            <DataGridTextColumn Header="PID" Binding="{Binding PID}" Width="60">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -284,7 +259,3 @@
         </ScrollViewer>
     </Border>
 </UserControl>
-
-
-
-

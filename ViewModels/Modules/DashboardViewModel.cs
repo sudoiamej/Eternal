@@ -111,7 +111,7 @@ namespace Eternal.ViewModels.Modules
                     _lastTrustScore = await trustTask;
                     TrustScoreIndex = _lastTrustScore.OverallIndex.ToString();
                     TrustScoreExplanation = _lastTrustScore.Explanation;
-                    TrustLevel = _lastTrustScore.Status;
+                    TrustLevel = _lastTrustScore.Level;
                     
                     StartupScore = _lastTrustScore.StartupScore;
                     DriverScore = _lastTrustScore.DriverScore;

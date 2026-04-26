@@ -1,0 +1,134 @@
+<UserControl x:Class="Eternal.Views.Modules.FlagsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             mc:Ignorable="d" d:DesignHeight="700" d:DesignWidth="800">
+    <Border Padding="40">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
+                <TextBlock Text="ETERNAL › TESTING MODE › KERNEL" Style="{StaticResource HeaderBreadcrumb}"/>
+                <TextBlock Text="Eternal DevFlags Lab" Style="{StaticResource H1}" Margin="0"/>
+                <TextBlock Text="Modify critical engine behavior. These flags bypass standard safety checks or force specific execution paths for debugging purposes."
+                           Foreground="{DynamicResource WarningBrush}" FontSize="13" TextWrapping="Wrap" Margin="0,10,0,0" FontWeight="Bold"/>
+            </StackPanel>
+
+            <!-- Flags List -->
+            <ScrollViewer Grid.Row="1" Margin="0,20,0,0" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                        <StackPanel>
+                            <!-- Performance Flags -->
+                            <TextBlock Text="PERFORMANCE ENGINE" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            
+                            <Grid Margin="0,0,0,20">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="ClockOutline" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,15,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Enable Background Polling" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="Toggles the 1-second performance monitoring timer (CPU/RAM/Disk)." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <ToggleButton IsChecked="{Binding EnableWmiPolling}" Style="{StaticResource ModernSwitch}" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Bolt" Width="14" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,15,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Use Native Memory Polling" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="Uses Kernel32 P/Invoke instead of WMI for RAM telemetry." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <ToggleButton IsChecked="{Binding UseNativeMemoryPolling}" Style="{StaticResource ModernSwitch}" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                        <StackPanel>
+                            <!-- Security & Simulation Flags -->
+                            <TextBlock Text="EXECUTION &amp; PRIVILEGE" Style="{StaticResource Caption}" Margin="0,0,0,15" Foreground="{DynamicResource CriticalBrush}"/>
+                            
+                            <Grid Margin="0,0,0,20">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Shield" Width="14" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,15,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Bypass Admin Requirements" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="Simulate administrative privilege for all toolkit operations." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <ToggleButton IsChecked="{Binding BypassAdminCheck}" Style="{StaticResource ModernSwitch}" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,20">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Lock" Width="14" Foreground="{DynamicResource WarningBrush}" Margin="0,0,15,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Safe Execution Mode" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="Destructive actions (Registry, Dism, Services) will only simulate success." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <ToggleButton IsChecked="{Binding SafeExecutionMode}" Style="{StaticResource ModernSwitch}" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Medkit" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,15,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Force WinPE Interface" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="Forces the application to hide retail features and use recovery layout." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <ToggleButton IsChecked="{Binding ForcePeMode}" Style="{StaticResource ModernSwitch}" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,10">
+                        <StackPanel>
+                            <!-- Debugging Flags -->
+                            <TextBlock Text="DIAGNOSTICS &amp; INFRASTRUCTURE" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
+                            
+                            <Grid Margin="0,0,0,20">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="List" Width="14" Foreground="{DynamicResource TextBrush}" Margin="0,0,15,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Verbose Service Logging" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="Enables low-level trace logs for all background services." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <ToggleButton IsChecked="{Binding VerboseServiceLogging}" Style="{StaticResource ModernSwitch}" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource WarningBrush}" Margin="0,0,15,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Simulate Update Failures" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="Forces the GitHub and OS update engines to report fake errors." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <ToggleButton IsChecked="{Binding SimulateUpdateFailure}" Style="{StaticResource ModernSwitch}" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Actions -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Command="{Binding ResetFlagsCommand}" Content="RESTORE ENGINE DEFAULTS" Style="{StaticResource SecondaryButton}" Margin="0,0,15,0"/>
+                <Button Command="{Binding SaveFlagsCommand}" Content="COMMIT SYSTEM CHANGES" Style="{StaticResource PrimaryButton}" Background="{DynamicResource CriticalBrush}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

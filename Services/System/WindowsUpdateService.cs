@@ -13,18 +13,25 @@ namespace Eternal.Services.System
     public class WindowsUpdateService : IUpdateService
     {
         private readonly HttpClient _httpClient;
+        private readonly ISettingsService _settingsService;
         private readonly string _repoOwner = "eternal-intelligence";
         private readonly string _repoName = "eternal";
         private string? _downloadPath;
 
-        public WindowsUpdateService()
+        public WindowsUpdateService(ISettingsService settingsService)
         {
+            _settingsService = settingsService;
             _httpClient = new HttpClient();
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "Eternal-App-Updater");
         }
 
         public async Task<UpdateInfo> CheckForUpdatesAsync()
         {
+            if (_settingsService.Current.SimulateUpdateFailure)
+            {
+                await Task.Delay(1000);
+                throw new Exception("SIMULATED_FAILURE: GitHub API reported 403 Rate Limit Exceeded.");
+            }
             try
             {
                 var url = $"https://api.github.com/repos/{_repoOwner}/{_repoName}/releases/latest";

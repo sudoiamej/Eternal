@@ -20,7 +20,10 @@ namespace Eternal.Services.Storage
     }
 
     public record PhysicalDisk(string DeviceID, string Model, string Interface, long Size, string Status, string Serial, int Index, List<PartitionInfo> Partitions);
-    public record PartitionInfo(string DriveLetter, string Label, long TotalSize, long FreeSpace, string FileSystem, string Type, int Index, bool IsBoot);
+    public record PartitionInfo(string DriveLetter, string Label, long TotalSize, long FreeSpace, string FileSystem, string Type, int Index, bool IsBoot)
+    {
+        public long UsedSpace => TotalSize - FreeSpace;
+    }
 
     public class WindowsStorageService : IStorageService
     {

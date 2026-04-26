@@ -97,7 +97,15 @@ namespace Eternal.ViewModels.Modules
             AvailableProfiles.Add(new ConsoleProfile { Name = "PowerShell", Executable = "powershell.exe", Icon = "Terminal" });
             AvailableProfiles.Add(new ConsoleProfile { Name = "Command Prompt", Executable = "cmd.exe", Icon = "Code" });
             
-            // Future: Detect WSL, Git Bash, etc.
+            // Detect Git Bash
+            string gitBash = @"C:\Program Files\Git\bin\bash.exe";
+            if (System.IO.File.Exists(gitBash))
+                AvailableProfiles.Add(new ConsoleProfile { Name = "Git Bash", Executable = gitBash, Icon = "Git" });
+
+            // Detect WSL
+            string wsl = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "wsl.exe");
+            if (System.IO.File.Exists(wsl))
+                AvailableProfiles.Add(new ConsoleProfile { Name = "WSL (Linux)", Executable = wsl, Icon = "Linux" });
         }
 
         private void InitializeMacros()

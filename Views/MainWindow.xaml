@@ -11,6 +11,8 @@
         xmlns:converters="clr-namespace:Eternal.Helpers"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="720" Width="1280"
+        MinWidth="1024" MinHeight="600"
+        SizeChanged="Window_SizeChanged"
         Style="{StaticResource ModernWindow}"
         WindowStartupLocation="CenterScreen"
         Icon="pack://application:,,,/Assets/icon.ico"
@@ -95,6 +97,7 @@
         <DataTemplate DataType="{x:Type vmm:FileForensicsViewModel}"><vmv:FileForensicsView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:AdvisorViewModel}"><vmv:AdvisorPane/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:FeatureTogglesViewModel}"><vmv:FeatureTogglesView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:FlagsViewModel}"><vmv:FlagsView/></DataTemplate>
     </Window.Resources>
 
     <Grid RenderTransformOrigin="0.5,0.5">
@@ -161,27 +164,22 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                    <!-- Neural Toggle -->
-                    <ToggleButton IsChecked="{Binding IsAdvisorOpen}" Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Margin="0,0,20,0" ToolTip="Neural Advisor (Local Phi-3)">
-                        <fa:ImageAwesome Icon="Bolt" Width="14" Foreground="{DynamicResource AccentBrush}"/>
-                    </ToggleButton>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                        <fa:ImageAwesome Icon="Microchip" Foreground="{DynamicResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0"/>
-                        <TextBlock Text="CPU: " Foreground="{DynamicResource TextSecondaryBrush}"/>
-                        <TextBlock Text="{Binding CpuUsage}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" Margin="0,0,8,0"/>
-                        <ProgressBar Value="{Binding CpuUsageValue}" Width="40" Style="{StaticResource GlowingProgressBar}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0" VerticalAlignment="Center">
+                        <fa:ImageAwesome Icon="Microchip" Foreground="{DynamicResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="CPU: " Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CpuUsage}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <ProgressBar Value="{Binding CpuUsageValue}" Width="40" Style="{StaticResource GlowingProgressBar}" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                        <fa:ImageAwesome Icon="Tasks" Foreground="{DynamicResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0"/>
-                        <TextBlock Text="RAM: " Foreground="{DynamicResource TextSecondaryBrush}"/>
-                        <TextBlock Text="{Binding RamUsage}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" Margin="0,0,8,0"/>
-                        <ProgressBar Value="{Binding RamUsageValue}" Width="40" Style="{StaticResource GlowingProgressBar}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0" VerticalAlignment="Center">
+                        <fa:ImageAwesome Icon="Tasks" Foreground="{DynamicResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="RAM: " Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding RamUsage}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <ProgressBar Value="{Binding RamUsageValue}" Width="40" Style="{StaticResource GlowingProgressBar}" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="ClockOutline" Foreground="{DynamicResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0"/>
-                        <TextBlock Text="Uptime: " Foreground="{DynamicResource TextSecondaryBrush}"/>
-                        <TextBlock Text="{Binding Uptime}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <fa:ImageAwesome Icon="ClockOutline" Foreground="{DynamicResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Uptime: " Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Uptime}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
             </Grid>
@@ -192,7 +190,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar Drawer -->
@@ -415,41 +412,7 @@
             </Border>
 
             <!-- Main Content Area -->
-            <helpers:TransitioningContentControl Grid.Column="1" Content="{Binding CurrentView}"/>
-
-            <!-- Neural Advisor Drawer (Right) -->
-            <Border Grid.Column="2" Width="0" x:Name="AdvisorDrawer">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="30" Direction="180" ShadowDepth="0" Opacity="0.5" Color="Black"/>
-                </Border.Effect>
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsAdvisorOpen}" Value="True">
-                                <DataTrigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="Width" To="400" Duration="0:0:0.4">
-                                                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </DataTrigger.EnterActions>
-                                <DataTrigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="Width" To="0" Duration="0:0:0.3">
-                                                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseIn"/></DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </DataTrigger.ExitActions>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-                <vmv:AdvisorPane DataContext="{Binding AdvisorVm}" Width="400"/>
-            </Border>
+            <ContentControl Grid.Column="1" Content="{Binding CurrentView}"/>
         </Grid>
 
         <!-- Global Toast Notifications Overlay -->

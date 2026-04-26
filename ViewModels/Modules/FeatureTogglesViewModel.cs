@@ -14,15 +14,19 @@ namespace Eternal.ViewModels.Modules
         public string Name { get; }
         public string ViewName { get; }
         public string Category { get; }
+        public bool IsHardDisabled { get; }
+        public string DisabledReason { get; }
 
         [ObservableProperty] private bool _isEnabled;
 
-        public FeatureToggleItem(string name, string viewName, string category, bool isEnabled)
+        public FeatureToggleItem(string name, string viewName, string category, bool isEnabled, bool isHardDisabled = false, string reason = "")
         {
             Name = name;
             ViewName = viewName;
             Category = category;
-            IsEnabled = isEnabled;
+            IsEnabled = isHardDisabled ? false : isEnabled;
+            IsHardDisabled = isHardDisabled;
+            DisabledReason = reason;
         }
     }
 
@@ -78,13 +82,16 @@ namespace Eternal.ViewModels.Modules
 
             // Support
             AddFeature("Eternal Console", "Console", "Support", disabled);
-            AddFeature("File Forensics", "Forensics", "Support", disabled);
             AddFeature("Time Machine", "Snapshots", "Support", disabled);
             AddFeature("DISM Imaging", "DismImaging", "Support", disabled);
             AddFeature("Windows Update", "WindowsUpdate", "Support", disabled);
             AddFeature("Settings", "Settings", "Support", disabled);
             AddFeature("System Logs", "Logs", "Support", disabled);
             AddFeature("PE Mode", "PeMode", "Support", disabled);
+
+            // Permanently Disabled by Developer
+            AddDisabledFeature("Neural Advisor", "Advisor", "Intelligence", "Disabled by Developer");
+            AddDisabledFeature("File Forensics", "Forensics", "Security", "Disabled by Developer");
         }
 
         private void AddFeature(string name, string viewName, string category, List<string> disabled)
@@ -92,10 +99,19 @@ namespace Eternal.ViewModels.Modules
             Features.Add(new FeatureToggleItem(name, viewName, category, !disabled.Contains(viewName)));
         }
 
+        private void AddDisabledFeature(string name, string viewName, string category, string reason)
+        {
+            Features.Add(new FeatureToggleItem(name, viewName, category, false, true, reason));
+        }
+
         [RelayCommand]
         private void SaveToggles()
         {
-            var disabled = Features.Where(f => !f.IsEnabled).Select(f => f.ViewName).ToList();
+            var disabled = Features.Where(f => !f.IsEnabled && !f.IsHardDisabled).Select(f => f.ViewName).ToList();
+            
+            // Note: We don't save hard-disabled ones to the config list because they are hard-disabled anyway,
+            // but we could if we wanted the logic to be more persistent.
+            
             _settingsService.Current.DisabledFeatures = disabled;
             _settingsService.Save();
             
@@ -105,7 +121,10 @@ namespace Eternal.ViewModels.Modules
         [RelayCommand]
         private void ResetToAll()
         {
-            foreach (var f in Features) f.IsEnabled = true;
+            foreach (var f in Features)
+            {
+                if (!f.IsHardDisabled) f.IsEnabled = true;
+            }
             SaveToggles();
         }
     }

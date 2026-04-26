@@ -21,6 +21,21 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private string _lastScanTime = "N/A";
         [ObservableProperty] private string _machineId = "Unknown";
 
+        private int _versionClickCount = 0;
+
+        [RelayCommand]
+        private void VersionClicked()
+        {
+            _versionClickCount++;
+            if (_versionClickCount >= 5)
+            {
+                _versionClickCount = 0;
+                var aboutWin = new Eternal.Views.Helpers.AboutVersionWindow();
+                aboutWin.Owner = System.Windows.Application.Current.MainWindow;
+                aboutWin.ShowDialog();
+            }
+        }
+
         public string SelectedTheme
         {
             get => Settings.Theme;
@@ -87,6 +102,56 @@ namespace Eternal.ViewModels.Modules
             UpdateStartupRegistration();
             _settingsService.Save();
             System.Windows.MessageBox.Show("Settings restored to factory defaults.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        [RelayCommand]
+        private void ClearAllData()
+        {
+            var confirm = System.Windows.MessageBox.Show(
+                "CRITICAL: This will reset all settings and PERMANENTLY DELETE all local application data, logs, and cached telemetry.\n\n" +
+                "The application will close after this operation.\n\nProceed?",
+                "Factory Reset & Data Purge",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (confirm == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    // 1. Reset settings to default in memory
+                    Settings = new AppSettings();
+                    
+                    // 2. Clear startup registration
+                    Settings.RunAtStartup = false;
+                    UpdateStartupRegistration();
+
+                    // 3. Delete the local app data directory
+                    string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                    string folder = Path.Combine(appData, "EternalAnalytics");
+                    
+                    if (Directory.Exists(folder))
+                    {
+                        // Note: settings.json is usually in use if we don't handle it carefully, 
+                        // but since we are about to exit, we can try to delete everything else
+                        // and the file itself if possible.
+                        foreach (var file in Directory.GetFiles(folder))
+                        {
+                            try { File.Delete(file); } catch { }
+                        }
+                        foreach (var dir in Directory.GetDirectories(folder))
+                        {
+                            try { Directory.Delete(dir, true); } catch { }
+                        }
+                    }
+
+                    System.Windows.MessageBox.Show("Data purge complete. The application will now exit.", "Reset Successful", MessageBoxButton.OK, MessageBoxImage.Information);
+                    System.Windows.Application.Current.Shutdown();
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"Purge failed: {ex.Message}", "Reset Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         [RelayCommand]

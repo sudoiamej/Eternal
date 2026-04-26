@@ -32,6 +32,8 @@ namespace Eternal.Models
             _title = title;
             _icon = icon;
 
+            OutputLines.Add($"[SYSTEM] Initializing {title} session environment...");
+
             _consoleService.OutputReceived += (s, line) =>
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>

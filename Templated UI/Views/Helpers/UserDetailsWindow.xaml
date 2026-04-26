@@ -1,0 +1,69 @@
+<Window x:Class="Eternal.Views.Helpers.UserDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="User Properties" Height="500" Width="450"
+        Style="{StaticResource ModernWindow}"
+        WindowStartupLocation="CenterOwner">
+    <Border Padding="20">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+                <Ellipse Width="40" Height="40" Fill="{DynamicResource AccentBrush}" Margin="0,0,15,0"/>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock x:Name="UsernameTitle" Text="Username" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock x:Name="SidTitle" Text="SID: S-1-5-..." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <TabControl Grid.Row="1" Style="{StaticResource ModernTabControl}">
+                <TabItem Header="GENERAL">
+                    <StackPanel Margin="0,15,0,0">
+                        <TextBlock Text="Full name:" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
+                        <TextBox x:Name="FullNameBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+
+                        <TextBlock Text="Description:" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
+                        <TextBox x:Name="DescriptionBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+
+                        <Separator Background="{DynamicResource BorderBrush}" Margin="0,5,0,15"/>
+
+                        <CheckBox x:Name="MustChangeCheck" Content="User must change password at next logon" Foreground="White" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="CannotChangeCheck" Content="User cannot change password" Foreground="White" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="NeverExpiresCheck" Content="Password never expires" Foreground="White" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="DisabledCheck" Content="Account is disabled" Foreground="White" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="LockedCheck" Content="Account is locked out" Foreground="White" IsEnabled="False"/>
+                        <Button x:Name="UnlockButton" Content="Unlock Account" Click="Unlock_Click" Style="{StaticResource StandardButton}" HorizontalAlignment="Left" Margin="25,5,0,0" Visibility="Collapsed"/>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="MEMBER OF">
+                    <Grid Margin="0,15,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <ListBox x:Name="GroupsList" Background="#10FFFFFF" BorderBrush="{DynamicResource BorderBrush}" Foreground="White" Margin="0,0,0,10">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" Margin="5"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Add..." Click="AddGroup_Click" Style="{StaticResource StandardButton}" Width="80" Margin="0,0,10,0"/>
+                            <Button Content="Remove" Click="RemoveGroup_Click" Style="{StaticResource StandardButton}" Width="80"/>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="OK" Click="Ok_Click" Width="80" Style="{StaticResource PrimaryButton}" Margin="0,0,10,0"/>
+                <Button Content="Cancel" Click="Cancel_Click" Width="80" Style="{StaticResource StandardButton}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

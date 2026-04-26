@@ -8,96 +8,95 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Eternal.ViewModels.Modules
 {
-    public record CommandItem(string Name, string Description, string Icon, string ViewName, string Category);
-
     public partial class CommandPaletteViewModel : ObservableObject
     {
-        private List<CommandItem> _allCommands = new List<CommandItem>();
-
-        [ObservableProperty] private string _searchText = "";
         [ObservableProperty] private bool _isOpen;
-        
-        public ObservableCollection<CommandItem> FilteredCommands { get; } = new ObservableCollection<CommandItem>();
+        [ObservableProperty] private string _searchText = string.Empty;
         [ObservableProperty] private CommandItem? _selectedCommand;
+        
+        public ObservableCollection<CommandItem> FilteredCommands { get; } = new();
+        private readonly List<CommandItem> _allCommands = new();
 
         public CommandPaletteViewModel()
         {
-            // Note: We don't initialize commands in the constructor anymore 
-            // to avoid circular dependency with MainViewModel during DI resolution.
+            InitializeCommands();
         }
 
-        private void EnsureCommandsInitialized()
+        private void InitializeCommands()
         {
-            if (_allCommands.Count > 0) return;
-
-            var mainVm = App.ServiceProvider.GetRequiredService<MainViewModel>();
             _allCommands.Clear();
             
-            // 1. Navigation Modules
-            AddFromNav(mainVm.SystemItems, "Module");
-            AddFromNav(mainVm.TelemetryItems, "Module");
-            AddFromNav(mainVm.MonitoringItems, "Module");
-            AddFromNav(mainVm.SupportItems, "Module");
+            // Core
+            _allCommands.Add(new CommandItem("Dashboard", "Overview of system health and telemetry", "Dashboard", "Dashboard", "System"));
+            _allCommands.Add(new CommandItem("Settings", "Configure application behavior and appearance", "Gear", "Settings", "System"));
             
-            // 2. Intelligence & Diagnostics (Deep Features)
+            // Intelligence
             _allCommands.Add(new CommandItem("PC Scanner", "Run full system intelligence scan", "Search", "PcScanner", "Intelligence"));
             _allCommands.Add(new CommandItem("Sentinel Privacy", "Windows telemetry and permission audit", "EyeSlash", "Privacy", "Security"));
             _allCommands.Add(new CommandItem("Battery Lab", "Advanced ACPI battery diagnostics", "Bolt", "Battery", "Hardware"));
-            _allCommands.Add(new CommandItem("File Forensics", "Cryptographic integrity and signature check", "FileTextOutline", "Forensics", "Security"));
             _allCommands.Add(new CommandItem("WinSAT Rating", "Benchmark Windows Experience Index", "Trophy", "PcRating", "Performance"));
-            _allCommands.Add(new CommandItem("Registry Intelligence", "Deep audit of registry health", "List", "Registry", "Intelligence"));
-            _allCommands.Add(new CommandItem("Eternal Doctor", "Automated system repair center", "Medkit", "Repair", "Repair"));
-            _allCommands.Add(new CommandItem("Time Machine", "Analyze system state drift", "ClockOutline", "Snapshots", "Forensics"));
-            _allCommands.Add(new CommandItem("Stress Hub", "CPU stability and thermal lab", "Flash", "StressTest", "Performance"));
             
-            // 3. System Actions
-            _allCommands.Add(new CommandItem("Clear Temp Files", "Purge Windows temporary file cache", "TrashOutline", "Dashboard", "Maintenance"));
-            _allCommands.Add(new CommandItem("Purge RAM", "Release standby memory list", "Leaf", "Dashboard", "Maintenance"));
-            _allCommands.Add(new CommandItem("Flush DNS", "Clear the DNS resolver cache", "Refresh", "Network", "Network"));
-            _allCommands.Add(new CommandItem("Reset Network", "Reset network stack to defaults", "Wifi", "Network", "Network"));
-            _allCommands.Add(new CommandItem("Check for Updates", "Manually check for Eternal updates", "Refresh", "Settings", "System"));
-            _allCommands.Add(new CommandItem("System Restore", "Create a system restore point", "History", "Tuning", "Safety"));
-            _allCommands.Add(new CommandItem("Uptime Audit", "Check system boot and live duration", "ClockOutline", "Dashboard", "System"));
-        }
+            // Hardware
+            _allCommands.Add(new CommandItem("Hardware", "Detailed hardware and sensor telemetry", "Microchip", "Hardware", "Hardware"));
+            _allCommands.Add(new CommandItem("Stress Test", "CPU prime-based stability verification", "Flash", "StressTest", "Hardware"));
+            _allCommands.Add(new CommandItem("Thermal", "Real-time temperature and fan monitoring", "ThermometerThreeQuarters", "Thermal", "Hardware"));
+            _allCommands.Add(new CommandItem("Components", "Interactive hardware component diagnostics", "Laptop", "Components", "Hardware"));
+            _allCommands.Add(new CommandItem("BIOS / UEFI", "Firmware and secure boot information", "InfoCircle", "Bios", "Hardware"));
+            
+            // System
+            _allCommands.Add(new CommandItem("Eternal Doctor", "Automated system repair and diagnostics", "Stethoscope", "Repair", "System"));
+            _allCommands.Add(new CommandItem("Registry", "Direct Windows Registry hive management", "Book", "Registry", "System"));
+            _allCommands.Add(new CommandItem("Tools", "Power-user system maintenance toolkit", "Wrench", "Tools", "System"));
+            _allCommands.Add(new CommandItem("Boot Records", "BCD and startup configuration audit", "List", "Boot", "System"));
+            _allCommands.Add(new CommandItem("Storage", "Disk management and partition analysis", "HddOutline", "Storage", "System"));
+            
+            // Monitoring
+            _allCommands.Add(new CommandItem("Processes", "Process intelligence and security analysis", "Tasks", "Processes", "Monitoring"));
+            _allCommands.Add(new CommandItem("Performance", "Live CPU, RAM and Disk IO tracking", "LineChart", "Performance", "Monitoring"));
+            _allCommands.Add(new CommandItem("Services", "System services and background task control", "Server", "Services", "Monitoring"));
+            _allCommands.Add(new CommandItem("User Accounts", "Local user and group administration", "Users", "Users", "Monitoring"));
+            _allCommands.Add(new CommandItem("Network", "Active connections and adapter telemetry", "Globe", "Network", "Monitoring"));
+            _allCommands.Add(new CommandItem("Security", "Defender status and firewall validation", "Shield", "Security", "Monitoring"));
+            _allCommands.Add(new CommandItem("Drivers", "Kernel driver and signature verification", "ListAlt", "Drivers", "Monitoring"));
+            _allCommands.Add(new CommandItem("Environment", "Environment variable and path management", "Code", "Environment", "Monitoring"));
+            
+            // Support
+            _allCommands.Add(new CommandItem("Eternal Console", "Integrated multi-tab diagnostic console", "Terminal", "Console", "Support"));
+            _allCommands.Add(new CommandItem("Time Machine", "System restore and backup management", "ClockOutline", "Snapshots", "Support"));
+            _allCommands.Add(new CommandItem("DISM Imaging", "Windows image servicing and repair", "Archive", "DismImaging", "Support"));
+            _allCommands.Add(new CommandItem("Windows Update", "System update and patch management", "Refresh", "WindowsUpdate", "Support"));
+            _allCommands.Add(new CommandItem("System Logs", "Windows event log and trace analysis", "Bars", "Logs", "Support"));
+            _allCommands.Add(new CommandItem("Help", "Getting started and user documentation", "QuestionCircle", "Help", "Support"));
+            _allCommands.Add(new CommandItem("PE Mode", "Pre-installation environment layout", "Medkit", "PeMode", "Support"));
 
-        private void AddFromNav(IEnumerable<NavigationItem> items, string category)
-        {
-            if (items == null) return;
-            foreach (var item in items)
-            {
-                _allCommands.Add(new CommandItem(item.Name, $"Navigate to {item.Name} module", item.Icon, item.ViewName, category));
-            }
+            // Developer
+            _allCommands.Add(new CommandItem("Feature Toggles", "Enable or disable application modules", "ToggleOn", "FeatureToggles", "Developer"));
+            _allCommands.Add(new CommandItem("DevFlags Lab", "Critical engine behavior and simulation flags", "Flag", "Flags", "Developer"));
+            
+            OnSearchTextChanged("");
         }
 
         partial void OnSearchTextChanged(string value)
         {
-            EnsureCommandsInitialized();
             FilteredCommands.Clear();
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                foreach (var cmd in _allCommands.Take(15)) FilteredCommands.Add(cmd);
-                return;
-            }
+            var filtered = string.IsNullOrWhiteSpace(value) 
+                ? _allCommands 
+                : _allCommands.Where(c => c.Name.Contains(value, StringComparison.OrdinalIgnoreCase) || 
+                                          c.Description.Contains(value, StringComparison.OrdinalIgnoreCase) ||
+                                          c.Category.Contains(value, StringComparison.OrdinalIgnoreCase));
 
-            var results = _allCommands
-                .Where(c => c.Name.Contains(value, StringComparison.OrdinalIgnoreCase) || 
-                            c.Description.Contains(value, StringComparison.OrdinalIgnoreCase) ||
-                            c.Category.Contains(value, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(c => c.Name.StartsWith(value, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
-                .ThenBy(c => c.Category.StartsWith(value, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
-                .Take(20);
-
-            foreach (var res in results) FilteredCommands.Add(res);
+            foreach (var cmd in filtered) FilteredCommands.Add(cmd);
             SelectedCommand = FilteredCommands.FirstOrDefault();
         }
 
         [RelayCommand]
-        public void ExecuteSelected()
+        public void ExecuteSelected(CommandItem? item = null)
         {
-            if (SelectedCommand == null) return;
+            var target = item ?? SelectedCommand;
+            if (target == null) return;
 
             var mainVm = App.ServiceProvider.GetRequiredService<MainViewModel>();
-            mainVm.NavigateCommand.Execute(SelectedCommand.ViewName);
+            mainVm.NavigateCommand.Execute(target.ViewName);
             Close();
         }
 
@@ -115,4 +114,6 @@ namespace Eternal.ViewModels.Modules
             IsOpen = false;
         }
     }
+
+    public record CommandItem(string Name, string Description, string Icon, string ViewName, string Category);
 }

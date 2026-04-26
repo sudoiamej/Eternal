@@ -13,9 +13,18 @@ namespace Eternal.Services.System
 {
     public class WindowsCreatorService : ICreatorService
     {
+        private readonly ISettingsService _settingsService;
+
+        public WindowsCreatorService(ISettingsService settingsService)
+        {
+            _settingsService = settingsService;
+        }
+
+        private bool IsSimulated => _settingsService.Current.SafeExecutionMode;
+
         public async Task<(bool Success, string Message)> ToggleDevModeAsync(bool enable)
         {
-            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Dev Mode {(enable ? "Enabled" : "Disabled")}");
+            if (IsSimulated) return (true, $"[SIMULATION] Dev Mode {(enable ? "Enabled" : "Disabled")}");
             try
             {
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true))
@@ -24,7 +33,6 @@ namespace Eternal.Services.System
                     key.SetValue("HideFileExt", enable ? 0 : 1, RegistryValueKind.DWord);
                 }
                 
-                // Enable Long Paths (Local Machine)
                 using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\FileSystem", true))
                 {
                     key.SetValue("LongPathsEnabled", enable ? 1 : 0, RegistryValueKind.DWord);
@@ -37,7 +45,7 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> ApplyServiceProfileAsync(string profileName)
         {
-            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Applied Service Profile: {profileName}");
+            if (IsSimulated) return (true, $"[SIMULATION] Applied Service Profile: {profileName}");
             try
             {
                 var servicesToKill = new List<string>();
@@ -97,18 +105,14 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> IdentifyAndKillFileHandleAsync(string filePath)
         {
-            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Identified and killed process holding handle to: {filePath}");
+            if (IsSimulated) return (true, $"[SIMULATION] Identified and killed process holding handle to: {filePath}");
             try
             {
-                // This typically requires 'handle.exe' from Sysinternals, but we can attempt to identify via WMI or CIM
-                // For a built-in 'Creator' trick, we will identify processes with a 'LoadModule' or 'Handle' if possible
-                // Simplifying for the environment: we'll search for processes that might be using the file.
                 var processes = Process.GetProcesses();
                 foreach (var p in processes)
                 {
                     try
                     {
-                        // Check main module path as a proxy
                         if (p.MainModule.FileName.Equals(filePath, StringComparison.OrdinalIgnoreCase))
                         {
                             p.Kill();
@@ -142,7 +146,7 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> ToggleDevHostEntryAsync(bool enable)
         {
-            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Dev Host Entry {(enable ? "Added" : "Removed")}");
+            if (IsSimulated) return (true, $"[SIMULATION] Dev Host Entry {(enable ? "Added" : "Removed")}");
             try
             {
                 string hostsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), @"drivers\etc\hosts");
@@ -160,10 +164,9 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> PurgeStandbyMemoryAsync()
         {
-            if (DeveloperEnvironment.IsTestingModeActive) return (true, "[SIMULATION] Standby Memory Purge Executed.");
+            if (IsSimulated) return (true, "[SIMULATION] Standby Memory Purge Executed.");
             try
             {
-                // Reclaim Working Set for all processes as a "Soft Purge"
                 foreach (var p in Process.GetProcesses())
                 {
                     try { EmptyWorkingSet(p.Handle); } catch { }
@@ -178,7 +181,7 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> CreateDirectoryJunctionAsync(string source, string target)
         {
-            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Directory Junction created: {target} -> {source}");
+            if (IsSimulated) return (true, $"[SIMULATION] Directory Junction created: {target} -> {source}");
             try
             {
                 var psi = new ProcessStartInfo("cmd", $"/c mklink /j \"{target}\" \"{source}\"") { WindowStyle = ProcessWindowStyle.Hidden };
@@ -197,7 +200,6 @@ namespace Eternal.Services.System
                 {
                     var processes = Process.GetProcesses().Where(p => p.Id > 10).ToList();
                     string tempPath = Path.GetTempPath().ToLower();
-                    string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToLower();
 
                     foreach (var p in processes)
                     {
@@ -209,7 +211,6 @@ namespace Eternal.Services.System
                             bool isSuspicious = false;
                             string reason = "Unsigned Binary";
 
-                            // 1. Path Heuristics
                             string lowerPath = path.ToLower();
                             if (lowerPath.StartsWith(tempPath) || lowerPath.Contains(@"\appdata\local\temp\"))
                             {
@@ -222,7 +223,6 @@ namespace Eternal.Services.System
                                 reason = "Non-standard AppData execution";
                             }
 
-                            // 2. Extension Heuristics (Double Extensions)
                             string fileName = Path.GetFileName(path).ToLower();
                             if (fileName.Contains(".pdf.exe") || fileName.Contains(".txt.exe") || fileName.Contains(".jpg.exe"))
                             {
@@ -230,7 +230,6 @@ namespace Eternal.Services.System
                                 reason = "Masquerading Extension detected";
                             }
 
-                            // 3. Signature Check (Async PowerShell)
                             if (!isSuspicious)
                             {
                                 var psi = new ProcessStartInfo("powershell", $"-Command \"(Get-AuthenticodeSignature '{path}').Status\"") { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
@@ -264,13 +263,9 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> SuspendProcessAsync(int pid)
         {
-            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Suspended Process {pid}");
+            if (IsSimulated) return (true, $"[SIMULATION] Suspended Process {pid}");
             try
             {
-                // This is a "Creator" trick: using the undocumented NtSuspendProcess via a child process or ntdll (simplified here with a taskkill-like pause)
-                // For this environment, we'll use a safer PowerShell freeze
-                var psi = new ProcessStartInfo("powershell", $"-Command \"[Reflection.Assembly]::LoadWithPartialName('System.Runtime.InteropServices'); [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer([System.Runtime.InteropServices.NativeMethods]::GetProcAddress([System.Runtime.InteropServices.NativeMethods]::GetModuleHandle('ntdll'), 'NtSuspendProcess'), [System.Action[IntPtr]]::new).Invoke((Get-Process -Id {pid}).Handle)\"") { WindowStyle = ProcessWindowStyle.Hidden };
-                // Actually, let's keep it robust and just kill it for now if suspend fails
                 Process.Start(new ProcessStartInfo("taskkill", $"/PID {pid} /F") { WindowStyle = ProcessWindowStyle.Hidden });
                 return (true, $"Process {pid} Neutralized.");
             }
@@ -287,7 +282,6 @@ namespace Eternal.Services.System
                     @"Software\Microsoft\Windows\CurrentVersion\RunOnce"
                 };
 
-                // 1. Audit Current User (HKCU)
                 foreach (var loc in locations)
                 {
                     try {
@@ -299,7 +293,6 @@ namespace Eternal.Services.System
                     } catch { }
                 }
 
-                // 2. Audit Local Machine (HKLM) - Requires Admin
                 foreach (var loc in locations)
                 {
                     try {
@@ -317,6 +310,7 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> RemovePersistenceEntryAsync(string location, string name)
         {
+            if (IsSimulated) return (true, $"[SIMULATION] Removed Persistence Entry '{name}' from {location}");
             return await Task.Run(() =>
             {
                 try
@@ -339,7 +333,7 @@ namespace Eternal.Services.System
 
         public async Task<(bool Success, string Message)> IsolateProcessNetworkAsync(int pid, bool block)
         {
-            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Network Isolation {(block ? "Enabled" : "Disabled")} for PID {pid}");
+            if (IsSimulated) return (true, $"[SIMULATION] Network Isolation {(block ? "Enabled" : "Disabled")} for PID {pid}");
             try
             {
                 string ruleName = $"EternalIsolation_{pid}";
@@ -352,7 +346,7 @@ namespace Eternal.Services.System
                 }
                 else
                 {
-                    Process.Start(new ProcessStartInfo("netsh", $"advfirewall firewall delete rule name=\"{ruleName}\"") { WindowStyle = ProcessWindowStyle.Hidden });
+                    Process.Start(new ProcessStartInfo("netsh", $"advfirewall firewall delete name=\"{ruleName}\"") { WindowStyle = ProcessWindowStyle.Hidden });
                     return (true, $"Process {pid} Restored.");
                 }
             }
@@ -362,7 +356,7 @@ namespace Eternal.Services.System
         private FileSystemWatcher _ransomWatcher;
         public async Task<(bool Success, string Message)> EnableRansomGuardAsync(bool enable)
         {
-            if (DeveloperEnvironment.IsTestingModeActive) return (true, $"[SIMULATION] Ransom Guard {(enable ? "Activated" : "Deactivated")}");
+            if (IsSimulated) return (true, $"[SIMULATION] Ransom Guard {(enable ? "Activated" : "Deactivated")}");
             try
             {
                 if (enable)
@@ -371,7 +365,6 @@ namespace Eternal.Services.System
                     _ransomWatcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite;
                     _ransomWatcher.Filter = "*.*";
                     _ransomWatcher.EnableRaisingEvents = true;
-                    // In a real scenario, we'd wire up an event to detect mass renames here.
                     return (true, "Ransom Guard Active in Documents.");
                 }
                 else

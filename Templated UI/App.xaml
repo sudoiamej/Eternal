@@ -1,0 +1,27 @@
+<Application x:Class="Eternal.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:helpers="clr-namespace:Eternal.Helpers">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Styles/Themes/Dark.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Styles/Colors.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <helpers:ValueToVisibilityConverter x:Key="VisibilityConverter"/>
+            <helpers:BooleanToStatusConverter x:Key="BooleanToStatusConverter"/>
+            <helpers:SizeFormatterConverter x:Key="SizeConverter"/>
+            <helpers:InvertBooleanConverter x:Key="InvertBooleanConverter"/>
+            <helpers:IntToBooleanConverter x:Key="IntToBooleanConverter"/>
+            <helpers:MultiBooleanToVisibilityConverter x:Key="MultiBooleanToVisibilityConverter"/>
+            <helpers:NumericValueConverter x:Key="NumericValueConverter"/>
+            <helpers:TrustLevelToBrushConverter x:Key="TrustLevelToBrushConverter"/>
+            <helpers:TrustLevelToColorConverter x:Key="TrustLevelToColorConverter"/>
+            <helpers:SeverityToBrushConverter x:Key="SeverityToBrushConverter"/>
+            <helpers:BooleanToIconConverter x:Key="BooleanToIconConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
+
+

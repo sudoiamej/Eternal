@@ -20,6 +20,7 @@ namespace Eternal.Models
         public string Name { get; set; } = string.Empty;
         public string Icon { get; set; } = string.Empty;
         public HardwareComponentType Type { get; set; }
+        [ObservableProperty] private string _status = "Standby";
         [ObservableProperty] private bool _isSelected;
         [ObservableProperty] private bool _isVisible = true;
 
@@ -44,6 +45,12 @@ namespace Eternal.Models
             KeyCode = code;
             Width = width;
         }
+    }
+
+    public class CameraGroup
+    {
+        public string DisplayName { get; set; } = string.Empty;
+        public string DeviceId { get; set; } = string.Empty;
     }
 
     public class UsbEvent

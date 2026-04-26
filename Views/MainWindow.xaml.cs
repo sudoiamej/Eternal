@@ -25,7 +25,7 @@ namespace Eternal.Views
             {
                 var authWindow = new Eternal.Views.Helpers.TestingAuthWindow();
                 authWindow.Owner = this;
-                if (authWindow.ShowDialog() == true && authWindow.IsAuthorized)
+                if (authWindow.ShowDialog() == true)
                 {
                     var vm = this.DataContext as MainViewModel;
                     vm?.ActivateTestingMode();
@@ -47,6 +47,18 @@ namespace Eternal.Views
             
             _notifyIcon.ContextMenuStrip = contextMenu;
             _notifyIcon.DoubleClick += (s, e) => ShowWindow();
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.NewSize.Width < 1200)
+            {
+                if (MenuToggle.IsChecked == true) MenuToggle.IsChecked = false;
+            }
+            else
+            {
+                if (MenuToggle.IsChecked == false) MenuToggle.IsChecked = true;
+            }
         }
 
         private void ShowWindow()

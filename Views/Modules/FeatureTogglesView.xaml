@@ -25,12 +25,26 @@
             <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0">
                 <DataGrid ItemsSource="{Binding Features}" AutoGenerateColumns="False" IsReadOnly="True"
                           Background="Transparent" BorderThickness="0" RowBackground="Transparent" GridLinesVisibility="None">
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsHardDisabled}" Value="True">
+                                    <Setter Property="Opacity" Value="0.4"/>
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="STATE" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ToggleButton IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                                  Style="{StaticResource ModernSwitch}" HorizontalAlignment="Center">
+                                                  IsEnabled="{Binding IsHardDisabled, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"
+                                                  Style="{StaticResource ModernSwitch}" HorizontalAlignment="Center"
+                                                  ToolTip="{Binding DisabledReason}">
                                         <ToggleButton.LayoutTransform>
                                             <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
                                         </ToggleButton.LayoutTransform>
@@ -59,13 +73,13 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="VIEW IDENTIFIER" Binding="{Binding ViewName}" Width="*">
+                        <DataGridTextColumn Header="STATUS / REASON" Binding="{Binding DisabledReason}" Width="*">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
-                                    <Setter Property="FontFamily" Value="Consolas"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                    <Setter Property="FontStyle" Value="Italic"/>
                                     <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="Opacity" Value="0.6"/>
+                                    <Setter Property="FontSize" Value="11"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>

@@ -31,16 +31,32 @@ namespace Eternal.Services.System
                             RedirectStandardOutput = true,
                             RedirectStandardError = true,
                             CreateNoWindow = true,
-                            StandardOutputEncoding = Encoding.UTF8
+                            StandardOutputEncoding = Encoding.Default,
+                            WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 3) // Typically C:\
                         },
                         EnableRaisingEvents = true
                     };
 
-                    _process.OutputDataReceived += (s, e) => { if (e.Data != null) OutputReceived?.Invoke(this, e.Data); };
-                    _process.ErrorDataReceived += (s, e) => { if (e.Data != null) OutputReceived?.Invoke(this, "[ERROR] " + e.Data); };
+                    _process.OutputDataReceived += (s, e) => { 
+                        if (e.Data != null) {
+                            Debug.WriteLine($"Console Process Output: {e.Data}");
+                            OutputReceived?.Invoke(this, e.Data); 
+                        }
+                    };
+                    _process.ErrorDataReceived += (s, e) => { 
+                        if (e.Data != null) {
+                            Debug.WriteLine($"Console Process Error: {e.Data}");
+                            OutputReceived?.Invoke(this, "[ERROR] " + e.Data); 
+                        }
+                    };
                     _process.Exited += (s, e) => Exited?.Invoke(this, EventArgs.Empty);
 
-                    _process.Start();
+                    if (!_process.Start())
+                    {
+                        OutputReceived?.Invoke(this, "[FATAL] Process failed to start.");
+                        return;
+                    }
+
                     _process.BeginOutputReadLine();
                     _process.BeginErrorReadLine();
                 }

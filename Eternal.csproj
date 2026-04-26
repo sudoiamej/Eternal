@@ -23,6 +23,10 @@
     <PublishTrimmed>false</PublishTrimmed>
     <DebugType>none</DebugType>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    
+    <!-- GC & Runtime Optimization -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,6 +43,11 @@
     <EmbeddedResource Remove="DevPreview_UpdatePackage\**" />
     <None Remove="DevPreview_UpdatePackage\**" />
     <Page Remove="DevPreview_UpdatePackage\**" />
+
+    <Compile Remove="Templated UI\**" />
+    <EmbeddedResource Remove="Templated UI\**" />
+    <None Remove="Templated UI\**" />
+    <Page Remove="Templated UI\**" />
   </ItemGroup>
 
   <ItemGroup>

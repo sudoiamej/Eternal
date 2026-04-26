@@ -20,6 +20,9 @@
             <helpers:TrustLevelToColorConverter x:Key="TrustLevelToColorConverter"/>
             <helpers:SeverityToBrushConverter x:Key="SeverityToBrushConverter"/>
             <helpers:BooleanToIconConverter x:Key="BooleanToIconConverter"/>
+            <helpers:NumericComparisonConverter x:Key="NumericComparisonConverter"/>
+            <helpers:CategoryToIconConverter x:Key="CategoryToIconConverter"/>
+            <helpers:ProportionalHeightConverter x:Key="ProportionalHeightConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

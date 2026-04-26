@@ -6,159 +6,175 @@
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:Models="clr-namespace:Eternal.Models"
              mc:Ignorable="d" d:DesignHeight="720" d:DesignWidth="1100">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="380"/>
-        </Grid.ColumnDefinitions>
+    <Grid Background="{DynamicResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="35"/>   <!-- Column Headers -->
+            <RowDefinition Height="*"/>    <!-- Data Tree -->
+        </Grid.RowDefinitions>
 
-        <!-- Left: Process Topology (Data) -->
-        <Border Grid.Column="0" Padding="40" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+        <!-- 1. Header Section -->
+        <Border Grid.Row="0" Padding="25,20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <StackPanel Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
+                <StackPanel>
                     <TextBlock Text="ETERNAL › ACTIVE MONITORING" Style="{StaticResource HeaderBreadcrumb}"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Process Intelligence" Style="{StaticResource H1}" Margin="0"/>
-                        
-                        <Button Grid.Column="1" Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh Process Map" VerticalAlignment="Center">
-                            <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"/>
-                        </Button>
-                    </Grid>
+                    <TextBlock Text="Process Intelligence" Style="{StaticResource H1}" Margin="0"/>
                 </StackPanel>
 
-                <TreeView Grid.Row="1" ItemsSource="{Binding ProcessGroups}" 
-                          Background="Transparent" BorderThickness="0"
-                          VirtualizingStackPanel.IsVirtualizing="True">
-                    <TreeView.Resources>
-                        <HierarchicalDataTemplate DataType="{x:Type Models:ProcessGroup}" ItemsSource="{Binding Processes}">
-                            <Grid Margin="0,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="100"/>
-                                </Grid.ColumnDefinitions>
-                                
-                                <Border Grid.Column="0" Padding="8,4" CornerRadius="4" HorizontalAlignment="Left">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background" Value="#1AFFFFFF"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Impact}" Value="High">
-                                                    <Setter Property="Background" Value="#33F44336"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Impact}" Value="Medium">
-                                                    <Setter Property="Background" Value="#33FFC107"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <TextBlock Text="{Binding Impact}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                </Border>
-
-                                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                </StackPanel>
-
-                                <TextBlock Grid.Column="2" Text="{Binding TotalMemory, Converter={StaticResource SizeConverter}}" FontFamily="Consolas" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBlock Grid.Column="3" Text="{Binding Count, StringFormat='({0} instances)'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center"/>
-                            </Grid>
-                        </HierarchicalDataTemplate>
-
-                        <DataTemplate DataType="{x:Type Models:ProcessDetail}">
-                            <Grid Margin="0,2" HorizontalAlignment="Stretch">
-                                <Grid.InputBindings>
-                                    <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding DataContext.ShowDetailsCommand, RelativeSource={RelativeSource AncestorType=TreeView}}" CommandParameter="{Binding}"/>
-                                </Grid.InputBindings>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="100"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding PID}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="White" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="2" Text="{Binding MemoryUsage}" FontFamily="Consolas" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                
-                                <Button Grid.Column="3" Command="{Binding DataContext.ShowDetailsCommand, RelativeSource={RelativeSource AncestorType=TreeView}}" 
-                                        CommandParameter="{Binding}" Style="{StaticResource IconButton}">
-                                    <fa:ImageAwesome Icon="InfoCircle" Width="10" Foreground="{DynamicResource AccentBrush}"/>
-                                </Button>
-                            </Grid>
-                        </DataTemplate>
-                    </TreeView.Resources>
-                </TreeView>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding TotalProcessCount, StringFormat='Processes: {0}'}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                    <Button Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh Process Map">
+                        <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"/>
+                    </Button>
+                </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Right: Management Pane (HCI Rule 6: Logical Mapping) -->
-        <Border Grid.Column="1" Padding="30" Background="{DynamicResource SidebarBrush}">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <TextBlock Text="PROCESS FORENSICS" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
-                    
-                    <Border Background="{DynamicResource CardBrush}" Padding="20" CornerRadius="8" Margin="0,0,0,25">
-                        <StackPanel>
-                            <TextBlock Text="SECURITY CONSTRAINTS" Style="{StaticResource Caption}" Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,10"/>
-                            <CheckBox x:Name="SafetyLock" Content="Unlock Advanced Actions" 
-                                      Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,0,0,20"/>
-
-                            <Button Command="{Binding DataContext.NeutralizeProcessCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                    CommandParameter="{Binding SelectedProcess.PID}"
-                                    IsEnabled="{Binding IsChecked, ElementName=SafetyLock}"
-                                    Style="{StaticResource StandardButton}" Background="{DynamicResource WarningBrush}" Margin="0,0,0,10">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Pause" Width="12" Foreground="White" Margin="0,0,12,0"/>
-                                    <TextBlock Text="SUSPEND PROCESS" FontSize="11" FontWeight="Bold"/>
-                                </StackPanel>
-                            </Button>
-
-                            <Button Command="{Binding DataContext.IsolateNetworkCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                    CommandParameter="{Binding SelectedProcess.PID}"
-                                    IsEnabled="{Binding IsChecked, ElementName=SafetyLock}"
-                                    Style="{StaticResource StandardButton}" Background="{DynamicResource CriticalBrush}" Margin="0,0,0,15">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Globe" Width="12" Foreground="White" Margin="0,0,12,0"/>
-                                    <TextBlock Text="ISOLATE NETWORK" FontSize="11" FontWeight="Bold"/>
-                                </StackPanel>
-                            </Button>
-
-                            <Separator Background="{DynamicResource BorderBrush}" Margin="0,5,0,15"/>
-
-                            <Button Command="{Binding DataContext.AdvisorVm.AskNeuralisCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                    CommandParameter="{Binding SelectedProcess.Name, StringFormat='Analyze this process for potential malware or performance issues: {0}'}"
-                                    Style="{StaticResource PrimaryButton}" Background="{DynamicResource AccentBrush}">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Bolt" Width="12" Foreground="White" Margin="0,0,12,0"/>
-                                    <TextBlock Text="ANALYZE WITH NEURALIS" FontSize="11" FontWeight="Bold"/>
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-                    </Border>
-
-                    <TextBlock Text="DIAGNOSTIC HINT" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
-                    <Border Background="#0DFFFFFF" Padding="20" CornerRadius="8">
-                        <TextBlock Text="Double-click a sub-process to view deep memory allocations and digital signatures." 
-                                   FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Opacity="0.7"/>
-                    </Border>
-                </StackPanel>
-            </ScrollViewer>
+        <!-- 2. Column Headers (Aligned with TreeView) -->
+        <Border Grid.Row="1" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Grid.IsSharedSizeScope="True">
+            <Grid Margin="15,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="350" SharedSizeGroup="NameCol"/>
+                    <ColumnDefinition Width="80" SharedSizeGroup="PidCol"/>
+                    <ColumnDefinition Width="100" SharedSizeGroup="StatusCol"/>
+                    <ColumnDefinition Width="100" SharedSizeGroup="CpuCol"/>
+                    <ColumnDefinition Width="120" SharedSizeGroup="MemoryCol"/>
+                    <ColumnDefinition Width="120" SharedSizeGroup="DiskCol"/>
+                    <ColumnDefinition Width="120" SharedSizeGroup="NetworkCol"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Name" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="PID" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Status" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="CPU" Style="{StaticResource Caption}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Text="Memory" Style="{StaticResource Caption}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="5" Text="Disk" Style="{StaticResource Caption}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="6" Text="Network" Style="{StaticResource Caption}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Grid>
         </Border>
 
+        <!-- 3. Main Data Tree -->
+        <TreeView Grid.Row="2" ItemsSource="{Binding Categories}" 
+                  Background="Transparent" BorderThickness="0"
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  Grid.IsSharedSizeScope="True">
+            <TreeView.Resources>
+                <!-- Level 1: Category (Apps, Background, etc) -->
+                <HierarchicalDataTemplate DataType="{x:Type Models:CategoryGroup}" ItemsSource="{Binding Groups}">
+                    <Border Background="#12FFFFFF" Margin="-20,0,0,0" Padding="15,8" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="{Binding Category, Converter={StaticResource CategoryToIconConverter}}" Width="12" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0"/>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding TotalCount, StringFormat=' ({0})'}" Foreground="{DynamicResource TextDisabledBrush}" FontSize="11" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </HierarchicalDataTemplate>
+
+                <!-- Level 2: Application Group (e.g. Chrome) -->
+                <HierarchicalDataTemplate DataType="{x:Type Models:ProcessGroup}" ItemsSource="{Binding Processes}">
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="350" SharedSizeGroup="NameCol"/>
+                            <ColumnDefinition Width="80" SharedSizeGroup="PidCol"/>
+                            <ColumnDefinition Width="100" SharedSizeGroup="StatusCol"/>
+                            <ColumnDefinition Width="100" SharedSizeGroup="CpuCol"/>
+                            <ColumnDefinition Width="120" SharedSizeGroup="MemoryCol"/>
+                            <ColumnDefinition Width="120" SharedSizeGroup="DiskCol"/>
+                            <ColumnDefinition Width="120" SharedSizeGroup="NetworkCol"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <TextBlock Text="{Binding Name}" Foreground="White" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Count, StringFormat='({0})'}" Foreground="{DynamicResource TextDisabledBrush}" FontSize="10" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Aggregate Totals -->
+                        <Border Grid.Column="3" Background="#10FFFFFF" Margin="1">
+                            <TextBlock Text="{Binding TotalCpu, StringFormat='{}{0:F1}%'}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                        </Border>
+                        <Border Grid.Column="4" Background="#10FFFFFF" Margin="1">
+                            <TextBlock Text="{Binding TotalMemory, Converter={StaticResource SizeConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                        </Border>
+                    </Grid>
+                </HierarchicalDataTemplate>
+
+                <!-- Level 3: Individual Process PID -->
+                <DataTemplate DataType="{x:Type Models:ProcessDetail}">
+                    <Grid Margin="0,1" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=TreeView}}">
+                        <Grid.ContextMenu>
+                            <ContextMenu Background="{StaticResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}">
+                                <MenuItem Header="End Task" Command="{Binding PlacementTarget.Tag.KillProcessCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}">
+                                    <MenuItem.Icon><fa:ImageAwesome Icon="Times" Foreground="{DynamicResource CriticalBrush}" Width="12"/></MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="Properties" Command="{Binding PlacementTarget.Tag.ShowDetailsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}">
+                                    <MenuItem.Icon><fa:ImageAwesome Icon="InfoCircle" Foreground="{DynamicResource InfoBrush}" Width="12"/></MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </Grid.ContextMenu>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="350" SharedSizeGroup="NameCol"/>
+                            <ColumnDefinition Width="80" SharedSizeGroup="PidCol"/>
+                            <ColumnDefinition Width="100" SharedSizeGroup="StatusCol"/>
+                            <ColumnDefinition Width="100" SharedSizeGroup="CpuCol"/>
+                            <ColumnDefinition Width="120" SharedSizeGroup="MemoryCol"/>
+                            <ColumnDefinition Width="120" SharedSizeGroup="DiskCol"/>
+                            <ColumnDefinition Width="120" SharedSizeGroup="NetworkCol"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.7" Margin="10,0,0,0"/>
+                        <TextBlock Grid.Column="1" Text="{Binding PID}" Foreground="{DynamicResource TextDisabledBrush}" FontSize="10" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="{Binding Status}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center"/>
+
+                        <!-- Live Metrics with Heatmap colors -->
+                        <Border Grid.Column="3" Margin="1">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CpuUsage, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>10'}" Value="True">
+                                            <Setter Property="Background" Value="#33FF9800"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CpuUsage, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>50'}" Value="True">
+                                            <Setter Property="Background" Value="#66F44336"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Text="{Binding CpuUsage, StringFormat='{}{0:F1}%'}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="11"/>
+                        </Border>
+
+                        <Border Grid.Column="4" Margin="1">
+                            <TextBlock Text="{Binding MemoryUsage}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+                        </Border>
+
+                        <Border Grid.Column="5" Margin="1">
+                            <TextBlock Text="{Binding DiskUsage}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Opacity="0.6"/>
+                        </Border>
+
+                        <Border Grid.Column="6" Margin="1">
+                            <TextBlock Text="{Binding NetworkUsage}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Opacity="0.6"/>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </TreeView.Resources>
+
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#1AFFFFFF"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TreeView.ItemContainerStyle>
+        </TreeView>
+
         <!-- Loading Overlay -->
-        <Border Grid.ColumnSpan="2" Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+        <Border Grid.Row="1" Grid.RowSpan="2" Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
-                <TextBlock Text="{Binding StatusMessage}" FontSize="18" Foreground="{DynamicResource TextBrush}"/>
+                <TextBlock Text="SYNCING KERNEL PROCESSES..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
             </StackPanel>
         </Border>
     </Grid>

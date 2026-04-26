@@ -1,0 +1,53 @@
+<Window x:Class="Eternal.Views.Helpers.EnvVarEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        Title="Modify Environment Variable" Height="320" Width="400"
+        WindowStyle="None" AllowsTransparency="True"
+        WindowStartupLocation="CenterOwner" Background="Transparent"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+    <Border Background="{DynamicResource SidebarBrush}" CornerRadius="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+        <Grid Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                <fa:ImageAwesome Icon="Code" Width="20" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                <TextBlock x:Name="HeaderTitle" Text="EDIT VARIABLE" Style="{StaticResource Caption}" Foreground="White"/>
+            </StackPanel>
+
+            <!-- Input Fields -->
+            <StackPanel Grid.Row="1">
+                <TextBlock Text="VARIABLE NAME" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,5"/>
+                <TextBox x:Name="NameInput" Padding="10" Background="{DynamicResource CardBrush}" 
+                         Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                         FontSize="13" Margin="0,0,0,15"/>
+
+                <TextBlock Text="VALUE" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,5"/>
+                <TextBox x:Name="ValueInput" Padding="10" Background="{DynamicResource CardBrush}" 
+                         Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                         FontSize="13" Margin="0,0,0,15" TextWrapping="Wrap" AcceptsReturn="True" Height="60"/>
+
+                <TextBlock Text="VARIABLE SCOPE" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+                <StackPanel x:Name="ScopePanel" Orientation="Horizontal" Margin="0,0,0,15">
+                    <RadioButton x:Name="UserScopeRadio" Content="User Variable" IsChecked="True" Foreground="White" FontSize="11" Margin="0,0,20,0"/>
+                    <RadioButton x:Name="SystemScopeRadio" Content="System Variable (Admin)" Foreground="White" FontSize="11"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Actions -->
+            <Grid Grid.Row="2" Margin="0,15,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="CANCEL" Style="{StaticResource SecondaryButton}" Margin="0,0,5,0" Click="Cancel_Click"/>
+                <Button Grid.Column="1" Content="COMMIT" Style="{StaticResource PrimaryButton}" Margin="5,0,0,0" Click="Save_Click"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

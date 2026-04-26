@@ -119,7 +119,7 @@ namespace Eternal.ViewModels.Modules
                         success = await _toolkitService.MountOfflineRegistryAsync(targetDrive);
                         break;
                     case "pe_bcd_repair":
-                        success = await RunCommand("bcdboot", $@"{targetDrive}:\Windows /s {targetDrive}:");
+                        success = await RunCommand("bcdboot", $@"{targetDrive}:\Windows /s {targetDrive}:", true);
                         break;
                     case "internet_slow":
                         await _toolkitService.FlushDnsAsync();
@@ -149,15 +149,15 @@ namespace Eternal.ViewModels.Modules
 
         private async Task<bool> RestartService(string serviceName)
         {
-            // Simplified for prototype, would use _servicesService in real scenario
-            return await Task.Run(() =>
+            return await Task.Run(async () =>
             {
                 try
                 {
+                    // Use powershell to handle multiple commands and ensure they wait
                     var psi = new System.Diagnostics.ProcessStartInfo
                     {
-                        FileName = "net",
-                        Arguments = $"stop {serviceName} && net start {serviceName}",
+                        FileName = "powershell.exe",
+                        Arguments = $"-Command \"Stop-Service {serviceName} -Force; Start-Service {serviceName}\"",
                         Verb = "runas",
                         CreateNoWindow = true,
                         UseShellExecute = true
@@ -170,7 +170,7 @@ namespace Eternal.ViewModels.Modules
             });
         }
 
-        private async Task<bool> RunCommand(string fileName, string args)
+        private async Task<bool> RunCommand(string fileName, string args, bool elevated = false)
         {
             return await Task.Run(() =>
             {
@@ -181,7 +181,8 @@ namespace Eternal.ViewModels.Modules
                         FileName = fileName,
                         Arguments = args,
                         CreateNoWindow = true,
-                        UseShellExecute = false
+                        UseShellExecute = elevated,
+                        Verb = elevated ? "runas" : ""
                     };
                     var process = System.Diagnostics.Process.Start(psi);
                     process?.WaitForExit();

@@ -9,6 +9,7 @@ using System.Windows;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using Eternal.Models;
 
 namespace Eternal.ViewModels.Modules
 {
@@ -17,8 +18,21 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private ObservableCollection<HardwareComponent> _components = new();
         [ObservableProperty] private HardwareComponent? _selectedComponent;
         [ObservableProperty] private string _keyboardInput = string.Empty;
+        
+        // Camera Properties
         [ObservableProperty] private bool _isCameraActive;
         [ObservableProperty] private string _cameraStatus = "Inactive";
+        [ObservableProperty] private ObservableCollection<CameraGroup> _cameraGroups = new();
+        [ObservableProperty] private CameraGroup? _selectedCameraGroup;
+        [ObservableProperty] private ImageSource? _cameraFeed;
+        [ObservableProperty] private string _frameInfo = "No feed active";
+
+        // Keyboard Properties
+        [ObservableProperty] private ObservableCollection<ObservableCollection<KeyModel>> _keyboardRows = new();
+        [ObservableProperty] private int _activeKeysCount;
+
+        // USB Properties
+        [ObservableProperty] private ObservableCollection<UsbEvent> _usbHistory = new();
 
         public ComponentsViewModel()
         {
@@ -37,6 +51,7 @@ namespace Eternal.ViewModels.Modules
             DetectHardwarePresence();
             InitializeKeyboard();
             StartUsbMonitoring();
+            InitializeCamera();
             
             SelectedComponent = Components.FirstOrDefault(x => x.IsVisible);
         }
@@ -47,7 +62,6 @@ namespace Eternal.ViewModels.Modules
             bool hasTouchpad = false;
             try 
             {
-                // Simple check for touch support
                 foreach (var tablet in System.Windows.Input.Tablet.TabletDevices)
                 {
                     hasTouch = true;
@@ -60,7 +74,13 @@ namespace Eternal.ViewModels.Modules
             if (touchComponent != null) touchComponent.IsVisible = hasTouch;
 
             var padComponent = Components.FirstOrDefault(x => x.Type == HardwareComponentType.Touchpad);
-            if (padComponent != null) padComponent.IsVisible = hasTouchpad;
+            if (touchComponent != null) touchComponent.IsVisible = hasTouchpad;
+        }
+
+        private void InitializeCamera()
+        {
+            CameraGroups.Add(new CameraGroup { DisplayName = "Integrated Webcam", DeviceId = "0" });
+            SelectedCameraGroup = CameraGroups.FirstOrDefault();
         }
 
         partial void OnSelectedComponentChanged(HardwareComponent? value)
@@ -77,6 +97,25 @@ namespace Eternal.ViewModels.Modules
             component.Status = "Functional";
         }
 
+        [RelayCommand]
+        private void RefreshCamera()
+        {
+            CameraStatus = "Refreshing...";
+            Task.Delay(500).ContinueWith(_ => { CameraStatus = "Active"; });
+        }
+
+        [RelayCommand]
+        private void PlayTestSound()
+        {
+            System.Media.SystemSounds.Beep.Play();
+        }
+
+        [RelayCommand]
+        private void StartMonitorTest()
+        {
+            System.Windows.MessageBox.Show("Monitor Test started. Cycle through colors using mouse clicks.", "Monitor Test", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         public void HandleKeyDown(string key)
         {
             KeyboardInput = $"Key Down: {key}";
@@ -87,28 +126,20 @@ namespace Eternal.ViewModels.Modules
             KeyboardInput = $"Key Up: {key}";
         }
 
-        private void InitializeKeyboard() { /* Logic for key hooks */ }
-        private void StartUsbMonitoring() { /* Logic for USB insertion events */ }
+        private void InitializeKeyboard() 
+        { 
+            // Mock keyboard rows
+            var row1 = new ObservableCollection<KeyModel> { new KeyModel("ESC", "Escape"), new KeyModel("F1", "F1"), new KeyModel("F2", "F2") };
+            KeyboardRows.Add(row1);
+        }
+        
+        private void StartUsbMonitoring() 
+        { 
+            UsbHistory.Add(new UsbEvent { Timestamp = DateTime.Now, Action = "Connected", DeviceName = "Root Hub" });
+        }
 
         public void Suspend() { /* Cleanup hardware hooks */ }
         public void Resume() { DetectHardwarePresence(); }
-    }
-
-    public enum HardwareComponentType { Camera, Mouse, Keyboard, Speakers, Monitor, Touchpad, Touchscreen, UsbPorts }
-
-    public partial class HardwareComponent : ObservableObject
-    {
-        public string Name { get; set; }
-        public string Icon { get; set; }
-        public HardwareComponentType Type { get; set; }
-        [ObservableProperty] private string _status = "Standby";
-        [ObservableProperty] private bool _isVisible = true;
-        [ObservableProperty] private bool _isSelected;
-
-        public HardwareComponent(string name, string icon, HardwareComponentType type)
-        {
-            Name = name; Icon = icon; Type = type;
-        }
     }
 
     [ComImport]

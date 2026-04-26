@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Management;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,12 +9,37 @@ namespace Eternal.Services.System
 {
     public class WindowsPerformanceService : IPerformanceService
     {
+        private readonly ISettingsService _settingsService;
         private PerformanceCounter _cpuCounter;
         private PerformanceCounter _diskCounter;
         private bool _isInitialized = false;
         private global::System.Threading.Timer _pollingTimer;
         private int _isUpdating = 0;
         private readonly EnumerationOptions _wmiOptions = new EnumerationOptions { Timeout = TimeSpan.FromSeconds(5) };
+
+        public WindowsPerformanceService(ISettingsService settingsService)
+        {
+            _settingsService = settingsService;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private struct MEMORYSTATUSEX
+        {
+            public uint dwLength;
+            public uint dwMemoryLoad;
+            public ulong ullTotalPhys;
+            public ulong ullAvailPhys;
+            public ulong ullTotalPageFile;
+            public ulong ullAvailPageFile;
+            public ulong ullTotalVirtual;
+            public ulong ullAvailVirtual;
+            public ulong ullAvailExtendedVirtual;
+            public void Init() { dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX)); }
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
 
         public event EventHandler<PerformanceSnapshot> Updated;
         public PerformanceSnapshot CurrentSnapshot { get; private set; } = new PerformanceSnapshot(0, 0, 0, 0);
@@ -49,6 +75,7 @@ namespace Eternal.Services.System
 
         private async Task DoUpdateAsync()
         {
+            if (!_settingsService.Current.EnableWmiPolling) return;
             if (Interlocked.CompareExchange(ref _isUpdating, 1, 0) != 0) return;
             try
             {
@@ -76,13 +103,23 @@ namespace Eternal.Services.System
                 float ramPercent = 0;
                 try
                 {
-                    using var searcher = CreateSearcher("select TotalVisibleMemorySize, FreePhysicalMemory from Win32_OperatingSystem");
-                    foreach (var obj in searcher.Get())
+                    var memStatus = new MEMORYSTATUSEX();
+                    memStatus.Init();
+                    if (GlobalMemoryStatusEx(ref memStatus))
                     {
-                        ulong total = global::System.Convert.ToUInt64(obj["TotalVisibleMemorySize"]);
-                        ulong free = global::System.Convert.ToUInt64(obj["FreePhysicalMemory"]);
-                        ramPercent = (float)(1.0 - (double)free / total) * 100;
-                        break;
+                        ramPercent = memStatus.dwMemoryLoad;
+                    }
+                    else
+                    {
+                        // Fallback to WMI if P/Invoke fails (rare)
+                        using var searcher = CreateSearcher("select TotalVisibleMemorySize, FreePhysicalMemory from Win32_OperatingSystem");
+                        foreach (var obj in searcher.Get())
+                        {
+                            ulong total = global::System.Convert.ToUInt64(obj["TotalVisibleMemorySize"]);
+                            ulong free = global::System.Convert.ToUInt64(obj["FreePhysicalMemory"]);
+                            ramPercent = (float)(1.0 - (double)free / total) * 100;
+                            break;
+                        }
                     }
                 }
                 catch { }

@@ -170,7 +170,7 @@
                                                 <fa:ImageAwesome Grid.Column="0" Icon="ExclamationTriangle" Width="16" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Top" Margin="0,4,15,0"/>
                                                 <StackPanel Grid.Column="1">
                                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                                        <TextBlock Text="{Binding ProcessName}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextBrush}"/>
+                                                        <TextBlock Text="{Binding Issue}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextBrush}"/>
                                                         <TextBlock Text=" · " Foreground="{DynamicResource TextSecondaryBrush}" Margin="5,0"/>
                                                         <TextBlock Text="{Binding Component}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="12"/>
                                                     </StackPanel>

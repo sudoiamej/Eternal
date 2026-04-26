@@ -1,0 +1,32 @@
+<UserControl x:Class="Eternal.Views.Helpers.ErrorCard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="400">
+    <Border Style="{StaticResource StandardCard}" BorderBrush="{DynamicResource CriticalBrush}">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                <fa:ImageAwesome Icon="ExclamationTriangle" Foreground="{DynamicResource CriticalBrush}" Width="18" Margin="0,0,12,0"/>
+                <TextBlock Text="Operation Failed" FontSize="16" FontWeight="SemiBold"/>
+            </StackPanel>
+
+            <TextBlock x:Name="ErrorMessageText" Text="The system was unable to retrieve data." 
+                       TextWrapping="Wrap" Margin="0,0,0,20"/>
+
+            <Expander Header="View Technical Details" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,20">
+                <Border Background="#11000000" Padding="10" Margin="0,10,0,0">
+                    <TextBlock x:Name="ErrorDetailText" Text="Access Denied (WMI Exception: 0x80041003)" 
+                               FontSize="12" FontFamily="Consolas" TextWrapping="Wrap"/>
+                </Border>
+            </Expander>
+
+            <Button x:Name="RetryButton" Content="Retry Scan" Style="{StaticResource PrimaryAction}" 
+                    HorizontalAlignment="Right"/>
+        </StackPanel>
+    </Border>
+</UserControl>
+
+
