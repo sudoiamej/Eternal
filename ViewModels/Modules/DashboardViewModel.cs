@@ -8,6 +8,7 @@ using Eternal.Models;
 using Eternal.Services.Hardware;
 using Eternal.Services.System;
 using Eternal.Services.Security;
+using Eternal.ViewModels;
 using Eternal.Views.Helpers;
 
 namespace Eternal.ViewModels.Modules

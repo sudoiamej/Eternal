@@ -4,19 +4,18 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using Eternal.Services.Hardware;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class PEModeViewModel : ObservableObject
+    public partial class PEModeViewModel : BaseViewModel
     {
         private readonly IHardwareService _hardwareService;
 
         [ObservableProperty] private bool _isInPeMode;
-        [ObservableProperty] private string _statusMessage = string.Empty;
         [ObservableProperty] private string _systemDriveStatus = "Checking...";
         [ObservableProperty] private string _bootRecordStatus = "Checking...";
         [ObservableProperty] private string _memoryStatus = "Checking...";
-        [ObservableProperty] private bool _isLoading;
 
         public PEModeViewModel(IHardwareService hardwareService, bool isInPeMode)
         {
@@ -34,8 +33,8 @@ namespace Eternal.ViewModels.Modules
 
         private async Task RunDiagnosticsAsync()
         {
-            if (IsLoading) return;
-            IsLoading = true;
+            if (IsBusy) return;
+            IsBusy = true;
             try
             {
                 await Task.Delay(500); 
@@ -54,7 +53,7 @@ namespace Eternal.ViewModels.Modules
                 BootRecordStatus = "Unavailable";
                 MemoryStatus = "Error";
             }
-            finally { IsLoading = false; }
+            finally { IsBusy = false; }
         }
 
         [RelayCommand]

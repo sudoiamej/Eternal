@@ -48,7 +48,6 @@ namespace Eternal.Views
             var timerTask = Task.Delay(3000);
 
             // Initialize the Main ViewModel first (via DI)
-            StatusText.Text = "Initializing Eternal Intelligence...";
             var mainVm = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<MainViewModel>(App.ServiceProvider);
             await Task.Delay(500); 
 
@@ -63,18 +62,13 @@ namespace Eternal.Views
                 }
             }
 
-            StatusText.Text = "Synchronizing System Telemetry...";
             // Fully await preloading before continuing to ensure Dashboard is ready immediately
             await mainVm.PreloadAllDataAsync();
             
             // Trigger initial navigation after construction and preload are complete
             await mainVm.Navigate("Dashboard");
 
-            StatusText.Text = "Mapping System Architecture...";
-
             await Task.Delay(500);
-
-            StatusText.Text = "Finalizing Secure Interface...";
 
             // Ensure we stay visible for at least the branding timer
             await timerTask;
@@ -85,8 +79,17 @@ namespace Eternal.Views
                 return;
             }
 
-            // Create MainWindow but don't let it create its own MainViewModel
-            var mainWindow = new MainWindow();
+            // Launch the correct window based on user preference
+            Window mainWindow;
+            if (mainVm.Settings.UseLegacyUI)
+            {
+                mainWindow = new LegacyMainWindow();
+            }
+            else
+            {
+                mainWindow = new MainWindow();
+            }
+
             mainWindow.DataContext = mainVm;
             mainVm.StartTimers(); // Start real-time status bar
 

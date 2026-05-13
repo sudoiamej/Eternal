@@ -18,7 +18,7 @@ namespace Eternal.ViewModels.Modules
         private readonly IProcessService _processService;
         private DispatcherTimer? _refreshTimer;
 
-        public ObservableCollection<CategoryGroup> Categories { get; } = new();
+        public ObservableCollection<ProcessDetail> FlatProcesses { get; } = new();
         [ObservableProperty] private int _totalProcessCount;
         [ObservableProperty] private ProcessDetail? _selectedProcess;
 
@@ -29,8 +29,6 @@ namespace Eternal.ViewModels.Modules
             ShowDetailsCommand = new AsyncRelayCommand<ProcessDetail>(ShowDetails);
             SelectProcessCommand = new RelayCommand<ProcessDetail>(SelectProcess);
             KillProcessCommand = new AsyncRelayCommand<ProcessDetail>(KillProcess);
-            
-            StartPolling();
         }
 
         public IAsyncRelayCommand LoadCommand { get; }
@@ -43,93 +41,75 @@ namespace Eternal.ViewModels.Modules
             SelectedProcess = process;
         }
 
-        private void StartPolling()
+        public override void Activate()
         {
+            if (_refreshTimer != null) return;
             _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
             _refreshTimer.Tick += async (s, e) => await LoadDataAsync();
             _refreshTimer.Start();
+            _ = LoadDataAsync();
+        }
+
+        public override void Deactivate()
+        {
+            _refreshTimer?.Stop();
+            _refreshTimer = null;
+            base.Deactivate(); // Triggers ReleaseMemory
+        }
+
+        public override void ReleaseMemory()
+        {
+            FlatProcesses.Clear();
+            SelectedProcess = null;
         }
 
         public async Task LoadDataAsync()
         {
-            var rawProcesses = await _processService.GetRunningProcessesAsync();
-            
-            // 2-Tier Grouping: Category -> Application Name -> PIDs
-            var groupedData = rawProcesses
-                .GroupBy(p => p.Category)
-                .OrderBy(g => g.Key)
-                .Select(cg => new {
-                    Category = cg.Key,
-                    Groups = cg.GroupBy(p => p.Name)
-                               .Select(ag => new { Name = ag.Key, Procs = ag.ToList() })
-                               .ToList()
-                }).ToList();
-
-            System.Windows.Application.Current.Dispatcher.Invoke(() => 
+            // Perform collection on background thread
+            var result = await Task.Run(async () => 
             {
-                // 1. Reconcile Categories
-                foreach (var catData in groupedData)
+                var raw = await _processService.GetRunningProcessesAsync();
+                var sortedRaw = raw.OrderByDescending(d => d.CpuUsage).ThenByDescending(d => d.MemoryBytes).ToList();
+                return new { RawCount = raw.Count, Data = sortedRaw };
+            });
+
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => 
+            {
+                // Optimization: Use Dictionary for O(1) lookups during reconciliation
+                var processMap = FlatProcesses.ToDictionary(p => p.PID);
+                var currentPids = result.Data.Select(p => p.PID).ToHashSet();
+
+                // 1. Remove dead processes
+                for (int i = FlatProcesses.Count - 1; i >= 0; i--)
                 {
-                    var existingCat = Categories.FirstOrDefault(c => c.Category == catData.Category);
-                    if (existingCat == null)
+                    if (!currentPids.Contains(FlatProcesses[i].PID))
                     {
-                        var newCat = new CategoryGroup(catData.Category, Enumerable.Empty<ProcessGroup>());
-                        Categories.Add(newCat);
-                        existingCat = newCat;
-                    }
-
-                    // 2. Reconcile Groups within Category
-                    var currentGroups = existingCat.Groups.ToList();
-                    var newGroupNames = catData.Groups.Select(g => g.Name).ToHashSet();
-
-                    // Remove dead groups
-                    foreach (var oldG in currentGroups.Where(g => !newGroupNames.Contains(g.Name)))
-                        existingCat.Groups.Remove(oldG);
-
-                    // Add/Update groups
-                    foreach (var gData in catData.Groups)
-                    {
-                        var existingGroup = existingCat.Groups.FirstOrDefault(g => g.Name == gData.Name);
-                        if (existingGroup == null)
-                        {
-                            existingGroup = new ProcessGroup(gData.Name, Enumerable.Empty<ProcessDetail>(), catData.Category);
-                            existingCat.Groups.Add(existingGroup);
-                        }
-
-                        // 3. Reconcile Processes within Group
-                        var currentProcs = existingGroup.Processes.ToList();
-                        var newPids = gData.Procs.Select(p => p.PID).ToHashSet();
-
-                        // Remove dead processes
-                        foreach (var oldP in currentProcs.Where(p => !newPids.Contains(p.PID)))
-                            existingGroup.Processes.Remove(oldP);
-
-                        // Add or Update processes
-                        foreach (var pData in gData.Procs)
-                        {
-                            var existingProc = existingGroup.Processes.FirstOrDefault(p => p.PID == pData.PID);
-                            if (existingProc == null)
-                            {
-                                existingGroup.Processes.Add(pData);
-                            }
-                            else
-                            {
-                                // Update properties for live heatmap
-                                existingProc.CpuUsage = pData.CpuUsage;
-                                existingProc.MemoryBytes = pData.MemoryBytes;
-                                existingProc.DiskBytesPerSec = pData.DiskBytesPerSec;
-                                existingProc.NetworkBytesPerSec = pData.NetworkBytesPerSec;
-                                existingProc.Status = pData.Status;
-                                existingProc.Impact = pData.Impact;
-                            }
-                        }
+                        FlatProcesses.RemoveAt(i);
                     }
                 }
 
-                TotalProcessCount = rawProcesses.Count;
+                // 2. Add or Update processes
+                foreach (var pData in result.Data)
+                {
+                    if (!processMap.TryGetValue(pData.PID, out var existingProc))
+                    {
+                        FlatProcesses.Add(pData);
+                    }
+                    else
+                    {
+                        // Update properties for live heatmap/telemetry
+                        existingProc.CpuUsage = pData.CpuUsage;
+                        existingProc.MemoryBytes = pData.MemoryBytes;
+                        existingProc.DiskBytesPerSec = pData.DiskBytesPerSec;
+                        existingProc.NetworkBytesPerSec = pData.NetworkBytesPerSec;
+                        existingProc.Status = pData.Status;
+                        existingProc.Impact = pData.Impact;
+                    }
+                }
+
+                TotalProcessCount = result.RawCount;
             });
         }
-
         private async Task KillProcess(ProcessDetail? process)
         {
             if (process == null) return;

@@ -1,12 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.Generic;
+using CommunityToolkit.Mvvm.Input;
 using System.Threading.Tasks;
 using Eternal.Services.Security;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class SecurityViewModel : ObservableObject
+    public partial class SecurityViewModel : BaseViewModel
     {
+
         private readonly ISecurityService _securityService;
 
         [ObservableProperty] private List<StartupProgram> _startups = new();
@@ -14,7 +16,6 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private List<BitLockerStatus> _bitLockerVolumes = new();
         [ObservableProperty] private REAgentStatus? _reAgent;
         [ObservableProperty] private DefenderStatus _defender;
-        [ObservableProperty] private bool _isLoading;
 
         public SecurityViewModel(ISecurityService securityService)
         {

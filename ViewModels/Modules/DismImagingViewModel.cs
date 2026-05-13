@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.Win32;
 using Eternal.Models;
 using Eternal.Services.System;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class DismImagingViewModel : ObservableObject
+    public partial class DismImagingViewModel : BaseViewModel
     {
         private readonly IDismService _dismService;
         private readonly ILoggingService _loggingService;
 
         [ObservableProperty] private string _selectedFilePath = string.Empty;
         [ObservableProperty] private WimFileDetails? _wimDetails;
-        [ObservableProperty] private bool _isLoading;
 
         public DismImagingViewModel(IDismService dismService, ILoggingService loggingService)
         {
@@ -44,26 +44,24 @@ namespace Eternal.ViewModels.Modules
         {
             if (string.IsNullOrEmpty(SelectedFilePath)) return;
 
-            IsLoading = true;
-            _loggingService.Log($"DISM: Analyzing image file {SelectedFilePath}");
-            
-            try
+            await ExecuteBusyActionAsync(async () =>
             {
-                WimDetails = await _dismService.GetImageInfoAsync(SelectedFilePath);
-                if (WimDetails == null || WimDetails.Images.Count == 0)
+                _loggingService.Log($"DISM: Analyzing image file {SelectedFilePath}");
+                
+                try
                 {
-                    System.Windows.MessageBox.Show("Failed to read image information. Ensure the file is a valid .wim or .esd file.", "DISM Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    WimDetails = await _dismService.GetImageInfoAsync(SelectedFilePath);
+                    if (WimDetails == null || WimDetails.Images.Count == 0)
+                    {
+                        System.Windows.MessageBox.Show("Failed to read image information. Ensure the file is a valid .wim or .esd file.", "DISM Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Log($"DISM Error: {ex.Message}");
-                System.Windows.MessageBox.Show($"Error reading image: {ex.Message}", "DISM Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+                catch (Exception ex)
+                {
+                    _loggingService.Log($"DISM Error: {ex.Message}");
+                    System.Windows.MessageBox.Show($"Error reading image: {ex.Message}", "DISM Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }, "Analyzing Image...");
         }
 
         [RelayCommand]

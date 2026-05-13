@@ -16,12 +16,11 @@
     <Product>Eternal System Intelligence</Product>
     <Description>System Intelligence and Diagnostics Suite</Description>
     
-    <!-- Single File Standalone Configuration -->
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Publish Configuration -->
+    <PublishSingleFile>false</PublishSingleFile>
+    <SelfContained>false</SelfContained>
     <PublishTrimmed>false</PublishTrimmed>
-    <DebugType>none</DebugType>
+    <DebugType>embedded</DebugType>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     
     <!-- GC & Runtime Optimization -->
@@ -43,11 +42,13 @@
     <EmbeddedResource Remove="DevPreview_UpdatePackage\**" />
     <None Remove="DevPreview_UpdatePackage\**" />
     <Page Remove="DevPreview_UpdatePackage\**" />
+    <ApplicationDefinition Remove="DevPreview_UpdatePackage\**" />
 
     <Compile Remove="Templated UI\**" />
     <EmbeddedResource Remove="Templated UI\**" />
     <None Remove="Templated UI\**" />
     <Page Remove="Templated UI\**" />
+    <ApplicationDefinition Remove="Templated UI\**" />
   </ItemGroup>
 
   <ItemGroup>

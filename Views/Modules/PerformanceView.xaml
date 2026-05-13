@@ -5,196 +5,185 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:vm="clr-namespace:Eternal.ViewModels.Modules"
-             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1100">
     
     <UserControl.Resources>
-        <Style TargetType="TextBlock" x:Key="HistoryTitleStyle" BasedOn="{StaticResource Caption}">
-            <Setter Property="Text" Value="CPU LOAD HISTORY (60 SECONDS)"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Ram}">
-                    <Setter Property="Text" Value="RAM USAGE HISTORY (60 SECONDS)"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Disk}">
-                    <Setter Property="Text" Value="DISK ACTIVE HISTORY (60 SECONDS)"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
+        <!-- Spatial Entrance Animation -->
+        <Storyboard x:Key="EntranceAnim">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="20" To="0" Duration="0:0:0.8">
+                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
 
-        <Style TargetType="TextBlock" x:Key="HistoryDescriptionStyle">
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-            <Setter Property="Text" Value="Real-time processor utilization trend"/>
+        <Style TargetType="TextBlock" x:Key="HistoryTitleStyle" BasedOn="{StaticResource Caption}">
+            <Setter Property="Text" Value="PROCESSOR LOAD TREND (60 SECONDS)"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Ram}">
-                    <Setter Property="Text" Value="Real-time physical memory consumption trend"/>
+                    <Setter Property="Text" Value="MEMORY CONSUMPTION TREND (60 SECONDS)"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Disk}">
-                    <Setter Property="Text" Value="Real-time disk input/output activity trend"/>
+                    <Setter Property="Text" Value="DISK THROUGHPUT TREND (60 SECONDS)"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
-    <Border Padding="40">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- Header -->
-                    <RowDefinition Height="Auto"/> <!-- Vitals Grid -->
-                    <RowDefinition Height="*"/>    <!-- History/Trends -->
-                </Grid.RowDefinitions>
+    <Grid RenderTransformOrigin="0.5,0.5">
+        <Grid.RenderTransform>
+            <TranslateTransform Y="0"/>
+        </Grid.RenderTransform>
 
-                <!-- 1. Unified Header -->
-                <Grid Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
-                            <TextBlock Text=" › " Style="{StaticResource Caption}"/>
-                            <TextBlock Text="LIVE TELEMETRY" Style="{StaticResource Caption}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Performance Monitor" Style="{StaticResource H1}" Margin="0"/>
-                            <Ellipse Width="8" Height="8" Fill="{DynamicResource SuccessBrush}" Margin="15,0,0,12" VerticalAlignment="Center">
-                                <Ellipse.Style>
-                                    <Style TargetType="Ellipse">
-                                        <Style.Triggers>
-                                            <EventTrigger RoutedEvent="Loaded">
-                                                <BeginStoryboard>
-                                                    <Storyboard RepeatBehavior="Forever" AutoReverse="True">
-                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1.0" To="0.2" Duration="0:0:1"/>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Ellipse.Style>
-                            </Ellipse>
-                        </StackPanel>
+        <Border Padding="35">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- 1. Header Section -->
+                    <StackPanel Style="{StaticResource ModuleHeaderStyle}" Margin="0,0,0,35">
+                        <TextBlock Text="ETERNAL › LIVE TELEMETRY ARCHIVE" Style="{StaticResource HeaderBreadcrumb}"/>
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Performance Sentry" Style="{StaticResource H1}" Margin="0" FontSize="32" FontWeight="Black"/>
+                                <Border Background="#1000FFAA" CornerRadius="10" Padding="12,4" Margin="25,0,0,12" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="6" Height="6" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0">
+                                            <Ellipse.Triggers>
+                                                <EventTrigger RoutedEvent="Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0.3" Duration="0:0:1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Ellipse.Triggers>
+                                        </Ellipse>
+                                        <TextBlock Text="REAL-TIME" FontSize="9" FontWeight="Black" Foreground="{DynamicResource SuccessBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <Button HorizontalAlignment="Right" Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Recalibrate Sensors">
+                                <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"/>
+                            </Button>
+                        </Grid>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,5">
-                        <Button Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Manual Recalibration">
-                            <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                        </Button>
-                    </StackPanel>
-                </Grid>
 
-                <!-- 2. Core Vitals -->
-                <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,30">
-                    <Border Cursor="Hand">
-                        <Border.Style>
-                            <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Cpu}">
-                                        <Setter Property="Background" Value="#1A2B88D8"/>
-                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <Border.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding SelectHistoryCommand}" CommandParameter="{x:Static vm:HistoryType.Cpu}"/>
-                        </Border.InputBindings>
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="CPU LOAD" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                            <TextBlock Text="{Binding CurrentCpu, StringFormat='{}{0:F0}%'}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                            <ProgressBar Value="{Binding CurrentCpu}" Height="3" Width="100" Margin="0,10,0,0" Background="#1AFFFFFF" Foreground="{DynamicResource AccentBrush}" BorderThickness="0"/>
-                        </StackPanel>
-                    </Border>
-                    
-                    <Border Cursor="Hand">
-                        <Border.Style>
-                            <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Ram}">
-                                        <Setter Property="Background" Value="#1A007ACC"/>
-                                        <Setter Property="BorderBrush" Value="{DynamicResource InfoBrush}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <Border.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding SelectHistoryCommand}" CommandParameter="{x:Static vm:HistoryType.Ram}"/>
-                        </Border.InputBindings>
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="RAM USAGE" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                            <TextBlock Text="{Binding CurrentRam, StringFormat='{}{0:F0}%'}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                            <ProgressBar Value="{Binding CurrentRam}" Height="3" Width="100" Margin="0,10,0,0" Background="#1AFFFFFF" Foreground="{DynamicResource InfoBrush}" BorderThickness="0"/>
-                        </StackPanel>
-                    </Border>
-                    
-                    <Border Cursor="Hand">
-                        <Border.Style>
-                            <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Disk}">
-                                        <Setter Property="Background" Value="#1AFFC107"/>
-                                        <Setter Property="BorderBrush" Value="{DynamicResource WarningBrush}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <Border.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding SelectHistoryCommand}" CommandParameter="{x:Static vm:HistoryType.Disk}"/>
-                        </Border.InputBindings>
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="DISK ACTIVE" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                            <TextBlock Text="{Binding CurrentDisk, StringFormat='{}{0:F0}%'}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                            <ProgressBar Value="{Binding CurrentDisk}" Height="3" Width="100" Margin="0,10,0,0" Background="#1AFFFFFF" Foreground="{DynamicResource WarningBrush}" BorderThickness="0"/>
-                        </StackPanel>
-                    </Border>
-                </UniformGrid>
-
-                <!-- 3. Trend Visualization -->
-                <Border Grid.Row="2" Style="{StaticResource StandardCard}" Padding="30">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        
-                        <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                            <TextBlock Style="{StaticResource HistoryTitleStyle}"/>
-                            <TextBlock Style="{StaticResource HistoryDescriptionStyle}"/>
-                        </StackPanel>
-
-                        <ItemsControl Grid.Row="1" VerticalAlignment="Bottom" Height="150" ClipToBounds="True">
-                            <ItemsControl.Style>
-                                <Style TargetType="ItemsControl">
-                                    <Setter Property="ItemsSource" Value="{Binding CpuHistory}"/>
+                    <!-- 2. Core Vital Tiles (HCI: Immediate Feedback) -->
+                    <UniformGrid Columns="3" Margin="0,0,0,30">
+                        <Border Cursor="Hand" Margin="0,0,15,0">
+                            <Border.Style>
+                                <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Ram}">
-                                            <Setter Property="ItemsSource" Value="{Binding RamHistory}"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Disk}">
-                                            <Setter Property="ItemsSource" Value="{Binding DiskHistory}"/>
+                                        <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Cpu}">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                            <Setter Property="Background" Value="#15FFFFFF"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </ItemsControl.Style>
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid Columns="60" Rows="1"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid VerticalAlignment="Bottom" Height="150">
-                                        <Border Margin="0.5,0" Opacity="0.6" VerticalAlignment="Bottom">
+                            </Border.Style>
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SelectHistoryCommand}" CommandParameter="{x:Static vm:HistoryType.Cpu}"/>
+                            </Border.InputBindings>
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="CPU LOAD" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,0,0,15" Opacity="0.7"/>
+                                <TextBlock Text="{Binding CurrentCpu, StringFormat='{}{0:F0}%'}" FontSize="42" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+                                <ProgressBar Value="{Binding CurrentCpu}" Style="{StaticResource GlowingProgressBar}" Width="120" Margin="0,15,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Cursor="Hand" Margin="7.5,0">
+                            <Border.Style>
+                                <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Ram}">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource InfoBrush}"/>
+                                            <Setter Property="Background" Value="#15FFFFFF"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SelectHistoryCommand}" CommandParameter="{x:Static vm:HistoryType.Ram}"/>
+                            </Border.InputBindings>
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="RAM USAGE" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,0,0,15" Opacity="0.7"/>
+                                <TextBlock Text="{Binding CurrentRam, StringFormat='{}{0:F0}%'}" FontSize="42" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+                                <ProgressBar Value="{Binding CurrentRam}" Style="{StaticResource GlowingProgressBar}" Foreground="{DynamicResource InfoBrush}" Width="120" Margin="0,15,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Cursor="Hand" Margin="15,0,0,0">
+                            <Border.Style>
+                                <Style TargetType="Border" BasedOn="{StaticResource StandardCard}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Disk}">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource WarningBrush}"/>
+                                            <Setter Property="Background" Value="#15FFFFFF"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SelectHistoryCommand}" CommandParameter="{x:Static vm:HistoryType.Disk}"/>
+                            </Border.InputBindings>
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="DISK ACTIVE" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,0,0,15" Opacity="0.7"/>
+                                <TextBlock Text="{Binding CurrentDisk, StringFormat='{}{0:F0}%'}" FontSize="42" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+                                <ProgressBar Value="{Binding CurrentDisk}" Style="{StaticResource GlowingProgressBar}" Foreground="{DynamicResource WarningBrush}" Width="120" Margin="0,15,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <!-- 3. Trend Analytics (Spatial Layering) -->
+                    <Border Style="{StaticResource StandardCard}" Padding="40">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="250"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Grid.Row="0" Margin="0,0,0,35">
+                                <TextBlock Style="{StaticResource HistoryTitleStyle}" FontSize="12"/>
+                                <TextBlock Text="Dynamic sensor trend calculated via kernel delta pooling." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Opacity="0.6" FontWeight="Bold" Margin="0,8,0,0"/>
+                            </StackPanel>
+
+                            <ItemsControl Grid.Row="1" VerticalAlignment="Bottom" Height="220" ClipToBounds="True">
+                                <ItemsControl.Style>
+                                    <Style TargetType="ItemsControl">
+                                        <Setter Property="ItemsSource" Value="{Binding CpuHistory}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Ram}">
+                                                <Setter Property="ItemsSource" Value="{Binding RamHistory}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Disk}">
+                                                <Setter Property="ItemsSource" Value="{Binding DiskHistory}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ItemsControl.Style>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="60" Rows="1" VerticalAlignment="Bottom"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="1,0" VerticalAlignment="Bottom" CornerRadius="3">
                                             <Border.Style>
                                                 <Style TargetType="Border">
                                                     <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                                    <Setter Property="Opacity" Value="0.6"/>
                                                     <Setter Property="Height" Value="{Binding}"/>
                                                     <Setter Property="RenderTransform">
-                                                        <Setter.Value>
-                                                            <ScaleTransform ScaleY="1.5"/>
-                                                        </Setter.Value>
+                                                        <Setter.Value><ScaleTransform ScaleY="2.0"/></Setter.Value>
                                                     </Setter>
                                                     <Setter Property="RenderTransformOrigin" Value="0.5,1"/>
                                                     <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Opacity" Value="1.0"/>
+                                                            <Setter Property="Effect">
+                                                                <Setter.Value><DropShadowEffect Color="White" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/></Setter.Value>
+                                                            </Setter>
+                                                        </Trigger>
                                                         <DataTrigger Binding="{Binding DataContext.SelectedHistory, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static vm:HistoryType.Ram}">
                                                             <Setter Property="Background" Value="{DynamicResource InfoBrush}"/>
                                                         </DataTrigger>
@@ -205,29 +194,32 @@
                                                 </Style>
                                             </Border.Style>
                                         </Border>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
-                        <Grid Grid.Row="1" IsHitTestVisible="False" Opacity="0.1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Border Grid.Row="0" BorderBrush="{DynamicResource TextBrush}" BorderThickness="0,0,0,1"/>
-                            <Border Grid.Row="1" BorderBrush="{DynamicResource TextBrush}" BorderThickness="0,0,0,1"/>
-                            <Border Grid.Row="2" BorderBrush="{DynamicResource TextBrush}" BorderThickness="0,0,0,1"/>
+                            <!-- Grid Lines -->
+                            <Grid Grid.Row="1" IsHitTestVisible="False" Opacity="0.05">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/><RowDefinition Height="*"/><RowDefinition Height="*"/><RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" BorderBrush="White" BorderThickness="0,0,0,1"/>
+                                <Border Grid.Row="1" BorderBrush="White" BorderThickness="0,0,0,1"/>
+                                <Border Grid.Row="2" BorderBrush="White" BorderThickness="0,0,0,1"/>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Border>
-            </Grid>
-        </ScrollViewer>
-    </Border>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Loading Feedback -->
+        <Border Background="#80000000" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+            <Border.Effect><BlurEffect Radius="25"/></Border.Effect>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,25"/>
+                <TextBlock Text="CALIBRATING SENSORS..." FontSize="14" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
 </UserControl>
-
-
-
-

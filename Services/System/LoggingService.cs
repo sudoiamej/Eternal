@@ -32,9 +32,10 @@ namespace Eternal.Services.System
 
         public void Log(string message, string level = "INFO")
         {
-            if (!_settings.Current.IsVerboseLoggingEnabled) return;
+            // Only return if verbose is disabled AND the level is not INFO, WARN, or ERROR
+            if (!_settings.Current.IsVerboseLoggingEnabled && level != "INFO" && level != "WARN" && level != "ERROR") return;
 
-            var entry = new LogEntry(DateTime.Now, message, level);
+            var entry = new LogEntry(DateTime.Now, "Application", message, level);
             
             lock (_logs)
             {
@@ -82,25 +83,29 @@ namespace Eternal.Services.System
                                 {
                                     EventLogEntryType.Error => "ERROR",
                                     EventLogEntryType.Warning => "WARN",
+                                    EventLogEntryType.Information => "INFO",
+                                    EventLogEntryType.SuccessAudit => "SUCCESS",
+                                    EventLogEntryType.FailureAudit => "FAILURE",
                                     _ => "INFO"
                                 };
 
                                 events.Add(new LogEntry(
                                     entry.TimeGenerated,
-                                    $"[{entry.Source}] {entry.Message}",
+                                    entry.Source,
+                                    entry.Message,
                                     level
                                 ));
                             }
                         }
                         catch (Exception ex)
                         {
-                            events.Add(new LogEntry(DateTime.Now, $"Failed to read {name} log: {ex.Message}", "WARN"));
+                            events.Add(new LogEntry(DateTime.Now, "LogService", $"Failed to read {name} log: {ex.Message}", "WARN"));
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    events.Add(new LogEntry(DateTime.Now, $"Critical failure in system log fetch: {ex.Message}", "ERROR"));
+                    events.Add(new LogEntry(DateTime.Now, "LogService", $"Critical failure in system log fetch: {ex.Message}", "ERROR"));
                 }
                 return events.OrderByDescending(e => e.Timestamp).Take(count).ToList();
             });

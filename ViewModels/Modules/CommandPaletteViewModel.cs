@@ -5,10 +5,11 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class CommandPaletteViewModel : ObservableObject
+    public partial class CommandPaletteViewModel : BaseViewModel
     {
         [ObservableProperty] private bool _isOpen;
         [ObservableProperty] private string _searchText = string.Empty;
@@ -70,6 +71,7 @@ namespace Eternal.ViewModels.Modules
             _allCommands.Add(new CommandItem("PE Mode", "Pre-installation environment layout", "Medkit", "PeMode", "Support"));
 
             // Developer
+            _allCommands.Add(new CommandItem("Unsafe Mode", "Request developer-level diagnostic authorization", "Terminal", "UnsafeMode", "Developer"));
             _allCommands.Add(new CommandItem("Feature Toggles", "Enable or disable application modules", "ToggleOn", "FeatureToggles", "Developer"));
             _allCommands.Add(new CommandItem("DevFlags Lab", "Critical engine behavior and simulation flags", "Flag", "Flags", "Developer"));
             
@@ -79,13 +81,24 @@ namespace Eternal.ViewModels.Modules
         partial void OnSearchTextChanged(string value)
         {
             FilteredCommands.Clear();
-            var filtered = string.IsNullOrWhiteSpace(value) 
-                ? _allCommands 
-                : _allCommands.Where(c => c.Name.Contains(value, StringComparison.OrdinalIgnoreCase) || 
-                                          c.Description.Contains(value, StringComparison.OrdinalIgnoreCase) ||
-                                          c.Category.Contains(value, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                foreach (var cmd in _allCommands) FilteredCommands.Add(cmd);
+            }
+            else
+            {
+                var terms = value.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var matches = _allCommands.Where(c => 
+                {
+                    string searchable = $"{c.Name} {c.Description} {c.Category}".ToLower();
+                    return terms.All(t => searchable.Contains(t));
+                })
+                .OrderByDescending(c => c.Name.StartsWith(value, StringComparison.OrdinalIgnoreCase))
+                .ThenBy(c => c.Name);
 
-            foreach (var cmd in filtered) FilteredCommands.Add(cmd);
+                foreach (var cmd in matches) FilteredCommands.Add(cmd);
+            }
+            
             SelectedCommand = FilteredCommands.FirstOrDefault();
         }
 
@@ -95,9 +108,11 @@ namespace Eternal.ViewModels.Modules
             var target = item ?? SelectedCommand;
             if (target == null) return;
 
+            // Close first to avoid UI focus issues during navigation
+            IsOpen = false;
+
             var mainVm = App.ServiceProvider.GetRequiredService<MainViewModel>();
             mainVm.NavigateCommand.Execute(target.ViewName);
-            Close();
         }
 
         [RelayCommand]

@@ -17,8 +17,6 @@ namespace Eternal.ViewModels.Modules
         public ObservableCollection<EnvVar> UserVariables { get; } = new();
         public ObservableCollection<EnvVar> SystemVariables { get; } = new();
 
-        [ObservableProperty] private bool _isLoading;
-
         public EnvironmentViewModel(IEnvironmentService envService)
         {
             _envService = envService;

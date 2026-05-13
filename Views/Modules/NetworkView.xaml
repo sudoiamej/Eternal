@@ -4,258 +4,207 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
-             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="1000">
-    <Border Padding="40">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- Header -->
-                    <RowDefinition Height="Auto"/> <!-- Bandwidth Dashboard -->
-                    <RowDefinition Height="Auto"/> <!-- Interfaces -->
-                    <RowDefinition Height="*"/>    <!-- Connections -->
-                </Grid.RowDefinitions>
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1200">
 
-                <!-- 1. Unified Header -->
-                <Grid Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="ETERNAL" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
-                            <TextBlock Text=" › " Style="{StaticResource Caption}"/>
-                            <TextBlock Text="CONNECTIVITY TELEMETRY" Style="{StaticResource Caption}"/>
-                        </StackPanel>
-                        <TextBlock Text="Network Intelligence" Style="{StaticResource H1}" Margin="0"/>
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,5">
-                        <Button Command="{Binding LoadCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Scan Network Map">
-                            <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                        </Button>
-                    </StackPanel>
-                </Grid>
+    <UserControl.Resources>
+        <!-- Spatial Entrance Animation -->
+        <Storyboard x:Key="EntranceAnim">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="20" To="0" Duration="0:0:0.8">
+                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </UserControl.Resources>
 
-                <!-- 2. Real-time Bandwidth Dashboard -->
-                <Grid Grid.Row="1" Margin="0,0,0,25">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+    <Grid RenderTransformOrigin="0.5,0.5">
+        <Grid.RenderTransform>
+            <TranslateTransform Y="0"/>
+        </Grid.RenderTransform>
 
-                    <Border Grid.Column="0" Style="{StaticResource StandardCard}" Margin="0,0,10,0" Padding="25">
+        <Border Padding="35">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- 1. Header Section -->
+                    <StackPanel Style="{StaticResource ModuleHeaderStyle}" Margin="0,0,0,35">
+                        <TextBlock Text="ETERNAL › CONNECTIVITY ARCHITECTURE" Style="{StaticResource HeaderBreadcrumb}"/>
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="60"/>
-                            </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                                <fa:ImageAwesome Icon="Download" Width="14" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                <TextBlock Text="DOWNLOAD THROUGHPUT" Style="{StaticResource Caption}"/>
-                            </StackPanel>
-                            <TextBlock Grid.Row="1" Text="{Binding DownloadMbps, StringFormat='{}{0:F2} Mbps'}" FontSize="28" FontWeight="Black" Margin="0,0,0,15"/>
+                            <TextBlock Text="Network Intelligence" Style="{StaticResource H1}" Margin="0" FontSize="32" FontWeight="Black"/>
                             
-                            <!-- Download Sparkline -->
-                            <ItemsControl Grid.Row="2" ItemsSource="{Binding DownloadHistory}" VerticalAlignment="Bottom" ClipToBounds="True">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <UniformGrid Columns="60" Rows="1" VerticalAlignment="Bottom"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="{DynamicResource SuccessBrush}" Opacity="0.4" Margin="0.5,0" VerticalAlignment="Bottom"
-                                                Height="{Binding Converter={StaticResource ProportionalHeightConverter}, ConverterParameter='60'}"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                            <Button HorizontalAlignment="Right" Command="{Binding LoadCommand}" 
+                                    IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" 
+                                    Style="{StaticResource IconButton}" ToolTip="Scan Network Map">
+                                <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsLoading}"/>
+                            </Button>
                         </Grid>
-                    </Border>
+                    </StackPanel>
 
-                    <Border Grid.Column="1" Style="{StaticResource StandardCard}" Margin="10,0,0,0" Padding="25">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="60"/>
-                            </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                                <fa:ImageAwesome Icon="Upload" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                <TextBlock Text="UPLOAD THROUGHPUT" Style="{StaticResource Caption}"/>
-                            </StackPanel>
-                            <TextBlock Grid.Row="1" Text="{Binding UploadMbps, StringFormat='{}{0:F2} Mbps'}" FontSize="28" FontWeight="Black" Margin="0,0,0,15"/>
+                    <!-- 2. Real-time Throughput (HCI: Immediate Feedback) -->
+                    <Grid Margin="0,0,0,30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                            <!-- Upload Sparkline -->
-                            <ItemsControl Grid.Row="2" ItemsSource="{Binding UploadHistory}" VerticalAlignment="Bottom" ClipToBounds="True">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <UniformGrid Columns="60" Rows="1" VerticalAlignment="Bottom"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="{DynamicResource InfoBrush}" Opacity="0.4" Margin="0.5,0" VerticalAlignment="Bottom"
-                                                Height="{Binding Converter={StaticResource ProportionalHeightConverter}, ConverterParameter='60'}"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Grid>
-                    </Border>
-                </Grid>
-                
-                <!-- 3. Interface Cards -->
-                <StackPanel Grid.Row="2" Margin="0,0,0,25">
-                    <TextBlock Text="ACTIVE INTERFACES" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                    <ItemsControl ItemsSource="{Binding Adapters}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="2"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                        <Border Grid.Column="0" Style="{StaticResource StandardCard}" Margin="0,0,10,0" Padding="30">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="80"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                                    <fa:ImageAwesome Icon="Download" Width="14" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,12,0"/>
+                                    <TextBlock Text="DOWNLOAD THROUGHPUT" Style="{StaticResource Caption}" Opacity="0.7"/>
+                                </StackPanel>
+                                <TextBlock Grid.Row="1" Text="{Binding DownloadMbps, StringFormat='{}{0:F2} Mbps'}" FontSize="36" FontWeight="Black" Foreground="White" Margin="0,0,0,20"/>
+                                
+                                <ItemsControl Grid.Row="2" ItemsSource="{Binding DownloadHistory}" VerticalAlignment="Bottom" Height="80" ClipToBounds="True">
+                                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="60" Rows="1" VerticalAlignment="Bottom"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource SuccessBrush}" Opacity="0.3" Margin="1,0" VerticalAlignment="Bottom" CornerRadius="2"
+                                                    Height="{Binding Converter={StaticResource ProportionalHeightConverter}, ConverterParameter='80'}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource StandardCard}" Margin="10,0,0,0" Padding="30">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="80"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                                    <fa:ImageAwesome Icon="Upload" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,12,0"/>
+                                    <TextBlock Text="UPLOAD THROUGHPUT" Style="{StaticResource Caption}" Opacity="0.7"/>
+                                </StackPanel>
+                                <TextBlock Grid.Row="1" Text="{Binding UploadMbps, StringFormat='{}{0:F2} Mbps'}" FontSize="36" FontWeight="Black" Foreground="White" Margin="0,0,0,20"/>
+
+                                <ItemsControl Grid.Row="2" ItemsSource="{Binding UploadHistory}" VerticalAlignment="Bottom" Height="80" ClipToBounds="True">
+                                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="60" Rows="1" VerticalAlignment="Bottom"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource InfoBrush}" Opacity="0.3" Margin="1,0" VerticalAlignment="Bottom" CornerRadius="2"
+                                                    Height="{Binding Converter={StaticResource ProportionalHeightConverter}, ConverterParameter='80'}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    
+                    <!-- 3. Active Interface Cards -->
+                    <TextBlock Text="HARDWARE INTERFACES" Style="{StaticResource Caption}" Margin="10,0,0,20" Opacity="0.6"/>
+                    <ItemsControl ItemsSource="{Binding Adapters}" Margin="0,0,0,30">
+                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource StandardCard}" Margin="0,0,10,10" Height="90" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0,0,0,3">
+                                <Border Style="{StaticResource StandardCard}" Margin="0,0,15,15" Padding="25" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0,0,0,2">
                                     <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <fa:ImageAwesome Icon="Globe" Width="20" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top" Margin="0,4,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <fa:ImageAwesome Icon="Globe" Width="18" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top" Margin="0,2,20,0"/>
                                         <StackPanel Grid.Column="1">
-                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Text="{Binding IpAddress, StringFormat='IPv4: {0}'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                            <TextBlock Text="{Binding Name}" FontWeight="Black" FontSize="14" Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding IpAddress, StringFormat='{}IPv4: {0}'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" FontWeight="Bold" Margin="0,5,0,0"/>
                                         </StackPanel>
-                                        <TextBlock Grid.Column="2" Text="{Binding MacAddress}" VerticalAlignment="Bottom" FontSize="10" FontFamily="Consolas" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.7"/>
+                                        <Border Grid.Column="2" Background="#10FFFFFF" Padding="10,4" CornerRadius="6" VerticalAlignment="Bottom">
+                                            <TextBlock Text="{Binding MacAddress}" FontSize="9" FontFamily="Consolas" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="Black"/>
+                                        </Border>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </StackPanel>
 
-                <!-- 4. Connection Sentry -->
-                <Grid Grid.Row="3">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Text="CONNECTION SENTRY (TCP/UDP MAP)" Style="{StaticResource Caption}" Margin="0,0,0,12" Grid.Row="0"/>
-                    
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Connections}" AutoGenerateColumns="False" 
-                              IsReadOnly="True" Background="Transparent" BorderThickness="0" 
-                              RowBackground="Transparent" GridLinesVisibility="None"
-                              Foreground="{DynamicResource TextBrush}" CanUserAddRows="False"
-                              VirtualizingStackPanel.IsVirtualizing="True"
-                              VirtualizingStackPanel.VirtualizationMode="Recycling"
-                              Height="400">
-                        <DataGrid.Resources>
-                            <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                                <Setter Property="Padding" Value="10,5"/>
-                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-                            </Style>
-                        </DataGrid.Resources>
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="PROTO" Binding="{Binding Protocol}" Width="60">
-                                <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="FontWeight" Value="Bold"/>
-                                        <Setter Property="FontSize" Value="10"/>
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                    </Style>
-                                </DataGridTextColumn.ElementStyle>
-                            </DataGridTextColumn>
-                            
-                            <DataGridTextColumn Header="LOCAL ADDRESS" Binding="{Binding LocalAddress}" Width="1.5*">
-                                <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="FontFamily" Value="Consolas"/>
-                                        <Setter Property="FontSize" Value="11"/>
-                                    </Style>
-                                </DataGridTextColumn.ElementStyle>
-                            </DataGridTextColumn>
+                    <!-- 4. Connection Sentry (TCP/UDP MAP) -->
+                    <TextBlock Text="CONNECTION SENTRY" Style="{StaticResource Caption}" Margin="10,0,0,20" Opacity="0.6"/>
+                    <Border Style="{StaticResource StandardCard}" Padding="5">
+                        <DataGrid ItemsSource="{Binding Connections}" AutoGenerateColumns="False" 
+                                  IsReadOnly="True" Background="Transparent" BorderThickness="0" 
+                                  RowBackground="Transparent" GridLinesVisibility="None"
+                                  Foreground="White" CanUserAddRows="False"
+                                  VirtualizingStackPanel.IsVirtualizing="True"
+                                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                  MinHeight="400">
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#0DFFFFFF"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                    <Setter Property="Padding" Value="15,10"/>
+                                    <Setter Property="FontWeight" Value="Black"/>
+                                    <Setter Property="FontSize" Value="10"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                                </Style>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Margin" Value="0,1"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#08FFFFFF"/></Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="PROTO" Binding="{Binding Protocol}" Width="80">
+                                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="FontWeight" Value="Black"/><Setter Property="FontSize" Value="11"/><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="Margin" Value="15,0"/></Style></DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                
+                                <DataGridTextColumn Header="LOCAL ADDRESS" Binding="{Binding LocalAddress}" Width="1.5*">
+                                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="12"/><Setter Property="VerticalAlignment" Value="Center"/></Style></DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
 
-                            <DataGridTextColumn Header="REMOTE ADDRESS" Binding="{Binding RemoteAddress}" Width="1.5*">
-                                <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="FontFamily" Value="Consolas"/>
-                                        <Setter Property="FontSize" Value="11"/>
-                                        <Setter Property="Foreground" Value="{DynamicResource AccentSecondaryBrush}"/>
-                                    </Style>
-                                </DataGridTextColumn.ElementStyle>
-                            </DataGridTextColumn>
+                                <DataGridTextColumn Header="REMOTE ADDRESS" Binding="{Binding RemoteAddress}" Width="1.5*">
+                                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="12"/><Setter Property="Foreground" Value="{DynamicResource AccentSecondaryBrush}"/><Setter Property="VerticalAlignment" Value="Center"/></Style></DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
 
-                            <DataGridTemplateColumn Header="STATE" Width="120">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Border Padding="6,2" CornerRadius="2" HorizontalAlignment="Left">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="#1AFFFFFF"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding State}" Value="ESTABLISHED">
-                                                            <Setter Property="Background" Value="#1A4CAF50"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding State}" Value="LISTENING">
-                                                            <Setter Property="Background" Value="#1A2196F3"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                            <TextBlock Text="{Binding State}" FontSize="10" FontWeight="Bold">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                <DataGridTemplateColumn Header="STATE" Width="140">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Padding="10,4" CornerRadius="8" HorizontalAlignment="Left" Margin="5">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="#1AFFFFFF"/>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding State}" Value="ESTABLISHED">
-                                                                <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding State}" Value="LISTENING">
-                                                                <Setter Property="Foreground" Value="{DynamicResource InfoBrush}"/>
-                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding State}" Value="ESTABLISHED"><Setter Property="Background" Value="#1A00FFAA"/></DataTrigger>
+                                                            <DataTrigger Binding="{Binding State}" Value="LISTENING"><Setter Property="Background" Value="#1A00CCFF"/></DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding State}" FontSize="10" FontWeight="Black">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding State}" Value="ESTABLISHED"><Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/></DataTrigger>
+                                                                <DataTrigger Binding="{Binding State}" Value="LISTENING"><Setter Property="Foreground" Value="{DynamicResource InfoBrush}"/></DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Header="PROCESS" Binding="{Binding ProcessName}" Width="*">
-                                <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="FontWeight" Value="SemiBold"/>
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                    </Style>
-                                </DataGridTextColumn.ElementStyle>
-                            </DataGridTextColumn>
+                                <DataGridTextColumn Header="PROCESS" Binding="{Binding ProcessName}" Width="*">
+                                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="FontWeight" Value="Black"/><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="FontSize" Value="12"/></Style></DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
 
-                            <DataGridTextColumn Header="PID" Binding="{Binding PID}" Width="60">
-                                <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                                        <Setter Property="FontSize" Value="10"/>
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                    </Style>
-                                </DataGridTextColumn.ElementStyle>
-                            </DataGridTextColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-
-                <!-- Loading Overlay -->
-                <Border Grid.RowSpan="4" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}" Margin="-40">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                        <TextBlock Text="Mapping Network Sentry..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </ScrollViewer>
-    </Border>
+        <!-- Loading Overlay (Spatial Focus) -->
+        <Border Background="#80000000" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}">
+            <Border.Effect><BlurEffect Radius="25"/></Border.Effect>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,25"/>
+                <TextBlock Text="INTERCEPTING TRAFFIC..." FontSize="14" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
 </UserControl>

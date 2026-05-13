@@ -5,9 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="600">
-    <Grid Background="#AA000000" MouseDown="Grid_MouseDown">
+    <Grid Background="#EE000000" MouseDown="Grid_MouseDown">
         <Border VerticalAlignment="Top" Margin="0,100,0,0" Width="600" 
-                Background="{DynamicResource SidebarBrush}" CornerRadius="12"
+                Background="#151515" CornerRadius="12"
                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="40" Direction="0" ShadowDepth="0" Opacity="0.6" Color="Black"/>
@@ -38,8 +38,8 @@
                             </Style>
                         </TextBox.Resources>
                     </TextBox>
-                    <TextBlock Grid.Column="1" Text="Search intelligence modules or actions..." 
-                               Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5" 
+                    <TextBlock Grid.Column="1" Text="Type to search modules..." 
+                               Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.8" 
                                FontSize="18" VerticalAlignment="Center" IsHitTestVisible="False"
                                Visibility="{Binding SearchText.Length, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
                 </Grid>
@@ -61,9 +61,12 @@
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="#1AFFFFFF"/>
+                                                <Setter TargetName="Bd" Property="Background" Value="#25FFFFFF"/>
                                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                                                 <Setter TargetName="Bd" Property="BorderThickness" Value="1"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="#15FFFFFF"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -84,12 +87,12 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <fa:ImageAwesome Icon="{Binding Icon}" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                                <fa:ImageAwesome Icon="{Binding Icon}" Width="14" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center"/>
                                 <StackPanel Grid.Column="1" Margin="10,0">
                                     <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="13"/>
                                     <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
                                 </StackPanel>
-                                <Border Grid.Column="2" Background="#151515" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                                <Border Grid.Column="2" Background="#222" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding Category}" FontSize="9" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                 </Border>
                             </Grid>
@@ -100,14 +103,14 @@
                 <!-- Footer Tips -->
                 <Grid Grid.Row="3" Margin="0,15,0,0">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="↑↓" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
-                        <TextBlock Text=" to navigate · " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10"/>
-                        <TextBlock Text="ENTER" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
-                        <TextBlock Text=" to select · " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10"/>
-                        <TextBlock Text="ESC" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
-                        <TextBlock Text=" to close" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10"/>
+                        <TextBlock Text="↑↓" Foreground="{DynamicResource AccentBrush}" FontWeight="Black"/>
+                        <TextBlock Text=" NAVIGATE  ·  " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" FontWeight="Black"/>
+                        <TextBlock Text="ENTER" Foreground="{DynamicResource AccentBrush}" FontWeight="Black"/>
+                        <TextBlock Text=" SELECT  ·  " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" FontWeight="Black"/>
+                        <TextBlock Text="ESC" Foreground="{DynamicResource AccentBrush}" FontWeight="Black"/>
+                        <TextBlock Text=" CLOSE" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" FontWeight="Black"/>
                     </StackPanel>
-                    <TextBlock HorizontalAlignment="Right" Text="ETERNAL SEARCH" FontSize="9" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.3"/>
+                    <TextBlock HorizontalAlignment="Right" Text="ETERNAL NEURAL SEARCH" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" Opacity="0.5"/>
                 </Grid>
             </Grid>
         </Border>

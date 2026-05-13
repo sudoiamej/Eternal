@@ -36,7 +36,9 @@
 
                 <DataGrid Grid.Row="1" ItemsSource="{Binding Drivers}" SelectedItem="{Binding SelectedDriver}" 
                           AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" 
-                          HeadersVisibility="Column" GridLinesVisibility="None">
+                          HeadersVisibility="Column" GridLinesVisibility="None"
+                          VirtualizingStackPanel.IsVirtualizing="True"
+                          VirtualizingStackPanel.VirtualizationMode="Recycling">
                     <DataGrid.InputBindings>
                         <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding ShowDetailsCommand}" CommandParameter="{Binding SelectedDriver}"/>
                     </DataGrid.InputBindings>

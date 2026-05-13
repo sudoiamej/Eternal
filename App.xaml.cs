@@ -5,82 +5,105 @@ using Microsoft.Extensions.DependencyInjection;
 using Eternal.Services.Hardware;
 using Eternal.Services.System;
 using Eternal.Services.Security;
-using Eternal.Services.Storage;
 using Eternal.Services.Network;
+using Eternal.Services.Storage;
 using Eternal.ViewModels;
 using Eternal.ViewModels.Modules;
-using Eternal.Views;
+
+// Use aliases to resolve WinForms vs WPF ambiguity
+using Application = System.Windows.Application;
 
 namespace Eternal
 {
-    public partial class App : System.Windows.Application
+    public partial class App : Application
     {
         public static IServiceProvider ServiceProvider { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
-
-            var serviceCollection = new ServiceCollection();
-            ConfigureServices(serviceCollection);
-            ServiceProvider = serviceCollection.BuildServiceProvider();
-
-            this.DispatcherUnhandledException += (s, ex) => {
-                System.Windows.MessageBox.Show($"Eternal Intelligence encountered a critical interface error:\n\n{ex.Exception.Message}", "Security Exception", MessageBoxButton.OK, MessageBoxImage.Error);
-                ex.Handled = true;
-            };
-
             try
             {
-                var splash = new SplashScreenWindow();
-                splash.Show();
+                var serviceCollection = new ServiceCollection();
+                ConfigureServices(serviceCollection);
+
+                ServiceProvider = serviceCollection.BuildServiceProvider();
+
+                // 1. Dispatcher Exceptions (UI Thread) - Already Handled but reinforced
+                this.DispatcherUnhandledException += (s, ex) => {
+                    global::System.Diagnostics.Debug.WriteLine($"CRITICAL DISPATCHER ERROR: {ex.Exception.Message}");
+                    ex.Handled = true;
+                };
+
+                // 2. Background Thread Exceptions
+                AppDomain.CurrentDomain.UnhandledException += (s, ex) => {
+                    var message = (ex.ExceptionObject as Exception)?.Message ?? "Unknown System Error";
+                    global::System.Diagnostics.Debug.WriteLine($"BACKGROUND EXCEPTION: {message}");
+                    // In .NET 5+, we log but don't terminate unless fatal
+                };
+
+                // 3. Async Task Exceptions (Unobserved)
+                TaskScheduler.UnobservedTaskException += (s, ex) => {
+                    global::System.Diagnostics.Debug.WriteLine($"UNOBSERVED TASK ERROR: {ex.Exception.Message}");
+                    ex.SetObserved(); // Mark as handled to prevent process teardown
+                };
+
+                // Entry point is now the Splash Screen which handles async initialization
+                var splashScreen = new Views.SplashScreenWindow();
+                splashScreen.Show();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Startup Failure: {ex.Message}", "Critical Initialization", MessageBoxButton.OK, MessageBoxImage.Error);
-                Shutdown();
+                string details = ex.ToString();
+                if (ex.InnerException != null) details += "\n\nInner: " + ex.InnerException.ToString();
+                
+                global::System.Diagnostics.Debug.WriteLine($"BOOT FAILURE: {ex.Message}");
+                // Instead of Shutdown, we attempt to show the Splash or an Incompatibility window if possible
+                // for recovery. If essential services are missing, Windows will eventually kill it.
             }
+
+            base.OnStartup(e);
         }
 
         private void ConfigureServices(IServiceCollection services)
         {
-            // Core Infrastructure
-            services.AddSingleton<ISettingsService, SettingsService>();
-            services.AddSingleton<ILoggingService, WindowsLoggingService>();
-            services.AddSingleton<IEnvironmentService, WindowsEnvironmentService>();
-            services.AddSingleton<IToastService, ToastNotificationService>();
+            // Services - Hardware
+            services.AddSingleton<ILibreHardwareService, WindowsLibreHardwareService>();
+            services.AddSingleton<IHardwareService, WindowsHardwareService>();
+            services.AddSingleton<IBatteryService, WindowsBatteryService>();
+            services.AddSingleton<INetworkService, WindowsNetworkService>();
+            services.AddSingleton<IStorageService, WindowsStorageService>();
+            services.AddSingleton<IDisplayService, WindowsDisplayService>();
 
-            // System Services
+            // Services - System
+            services.AddSingleton<ILoggingService, WindowsLoggingService>();
             services.AddSingleton<IPerformanceService, WindowsPerformanceService>();
+            services.AddSingleton<ISettingsService, SettingsService>();
+            services.AddSingleton<ICreatorService, WindowsCreatorService>();
+            services.AddSingleton<IKnowledgeBaseService, WindowsKnowledgeBaseService>();
+            services.AddSingleton<IToastService, ToastNotificationService>();
+            services.AddSingleton<IIntelligenceService, WindowsIntelligenceService>();
+            services.AddSingleton<IRegistryService, WindowsRegistryService>();
+            services.AddSingleton<ITuningService, WindowsTuningService>();
+            services.AddSingleton<IBootService, WindowsBootService>();
+            services.AddSingleton<IServicesService, WindowsServicesService>();
+            services.AddSingleton<IProcessService, WindowsProcessService>();
+            services.AddSingleton<IThermalService, WindowsThermalService>();
+            services.AddSingleton<IWinSatService, WindowsWinSatService>();
+            services.AddSingleton<IBiosService, WindowsBiosService>();
+            services.AddSingleton<ISnapshotService, WindowsSnapshotService>();
+            services.AddSingleton<IDismService, WindowsDismService>();
+            services.AddSingleton<IPcScannerService, WindowsPcScannerService>();
+            services.AddSingleton<IEnvironmentService, WindowsEnvironmentService>();
             services.AddSingleton<IUpdateService, WindowsUpdateService>();
             services.AddSingleton<IOsUpdateService, WindowsOsUpdateService>();
-            services.AddSingleton<IToolkitService, WindowsToolkitService>();
-            services.AddSingleton<IProcessService, WindowsProcessService>();
-            services.AddSingleton<IStorageService, WindowsStorageService>();
-            services.AddSingleton<INetworkService, WindowsNetworkService>();
-            services.AddSingleton<IHardwareService, WindowsHardwareService>();
-            services.AddSingleton<ILibreHardwareService, WindowsLibreHardwareService>();
-            services.AddSingleton<IBiosService, WindowsBiosService>();
-            services.AddSingleton<IBootService, WindowsBootService>();
-            services.AddSingleton<ICreatorService, WindowsCreatorService>();
-            services.AddSingleton<IDriversService, WindowsDriversService>();
-            services.AddSingleton<IServicesService, WindowsServicesService>();
-            services.AddSingleton<IThermalService, WindowsThermalService>();
-            services.AddSingleton<ITuningService, WindowsTuningService>();
-            services.AddSingleton<IConsoleService, WindowsConsoleService>();
-            services.AddSingleton<IRegistryService, WindowsRegistryService>();
-            services.AddSingleton<IUserGroupService, WindowsUserGroupService>();
-            services.AddSingleton<IPcScannerService, WindowsPcScannerService>();
-            services.AddSingleton<IDismService, WindowsDismService>();
-            services.AddSingleton<IWinSatService, WindowsWinSatService>();
-            services.AddSingleton<ISnapshotService, WindowsSnapshotService>();
-            services.AddSingleton<IIntelligenceService, WindowsIntelligenceService>();
-            
-            // Security Services
-            services.AddSingleton<ISecurityService, WindowsSecurityService>();
-            services.AddSingleton<IPrivacyService, WindowsPrivacyService>();
-            services.AddSingleton<IBatteryService, WindowsBatteryService>();
             services.AddSingleton<IFileForensicsService, WindowsFileForensicsService>();
+            services.AddSingleton<IPrivacyService, WindowsPrivacyService>();
+            services.AddSingleton<INeuralAdvisorService, WindowsIntelligenceEngine>();
+            services.AddSingleton<IToolkitService, WindowsToolkitService>();
+            services.AddSingleton<ISecurityService, WindowsSecurityService>();
+            services.AddSingleton<IDriversService, WindowsDriversService>();
+            services.AddSingleton<IUserGroupService, WindowsUserGroupService>();
+            services.AddSingleton<IFeatureIntegrityService, WindowsFeatureIntegrityService>();
 
             // ViewModels - Core (Singleton)
             services.AddSingleton<MainViewModel>();
@@ -122,6 +145,9 @@ namespace Eternal
             services.AddSingleton<FileForensicsViewModel>();
             services.AddSingleton<FeatureTogglesViewModel>();
             services.AddSingleton<FlagsViewModel>();
+            services.AddSingleton<DisplayViewModel>();
+            services.AddSingleton<AdvisorViewModel>();
+            services.AddSingleton<TestingViewModel>();
             
             bool isPe = System.IO.Directory.Exists(@"X:\Windows\System32");
             services.AddSingleton<PEModeViewModel>(sp => new PEModeViewModel(sp.GetRequiredService<IHardwareService>(), isPe));

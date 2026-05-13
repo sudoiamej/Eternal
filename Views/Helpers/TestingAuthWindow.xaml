@@ -25,9 +25,10 @@
 
             <!-- PIN Input -->
             <StackPanel Grid.Row="1">
-                <PasswordBox x:Name="PinInput" Padding="12" Background="{DynamicResource CardBrush}" 
-                             Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"
-                             FontSize="14" HorizontalContentAlignment="Center" MaxLength="8"
+                <PasswordBox x:Name="PinInput" Style="{StaticResource ModernPasswordBox}" 
+                             FontSize="22" FontWeight="Black" PasswordChar="●"
+                             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                             Padding="10,15" MaxLength="8"
                              KeyDown="PinInput_KeyDown"/>
                 <TextBlock x:Name="ErrorText" Text="Invalid Access Code" Foreground="{DynamicResource CriticalBrush}" 
                            FontSize="10" Margin="0,5,0,0" Visibility="Collapsed" HorizontalAlignment="Center"/>

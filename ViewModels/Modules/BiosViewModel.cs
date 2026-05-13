@@ -2,16 +2,16 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Eternal.Services.System;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class BiosViewModel : ObservableObject
+    public partial class BiosViewModel : BaseViewModel
     {
         private readonly IBiosService _biosService;
 
         [ObservableProperty] private BiosInfo _bios;
         [ObservableProperty] private UefiStatus _uefi;
-        [ObservableProperty] private bool _isLoading;
 
         public BiosViewModel(IBiosService biosService)
         {
@@ -23,14 +23,11 @@ namespace Eternal.ViewModels.Modules
 
         private async Task LoadDataAsync()
         {
-            if (IsLoading) return;
-            IsLoading = true;
-            try {
+            await ExecuteBusyActionAsync(async () =>
+            {
                 Bios = await _biosService.GetBiosInfoAsync();
                 Uefi = await _biosService.GetUefiStatusAsync();
-            } 
-            catch { }
-            finally { IsLoading = false; }
+            }, "Loading BIOS Information...");
         }
     }
 }

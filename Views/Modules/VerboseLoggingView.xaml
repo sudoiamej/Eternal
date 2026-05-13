@@ -91,6 +91,17 @@
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
+                                <DataGridTextColumn Header="SOURCE" Binding="{Binding Source}" Width="100">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                            <Setter Property="FontSize" Value="9"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Padding" Value="12,4"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
                                 <DataGridTextColumn Header="MESSAGE" Binding="{Binding Message}" Width="*">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
@@ -166,8 +177,14 @@
                                                                     <DataTrigger Binding="{Binding Level}" Value="ERROR">
                                                                         <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
                                                                     </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Level}" Value="FAILURE">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                                    </DataTrigger>
                                                                     <DataTrigger Binding="{Binding Level}" Value="WARN">
                                                                         <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Level}" Value="SUCCESS">
+                                                                        <Setter Property="Foreground" Value="#4CAF50"/>
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
@@ -177,6 +194,16 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="SOURCE" Binding="{Binding Source}" Width="100">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                                <Setter Property="FontSize" Value="9"/>
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                                <Setter Property="Padding" Value="12,4"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
                                     <DataGridTextColumn Header="MESSAGE" Binding="{Binding Message}" Width="*">
                                         <DataGridTextColumn.ElementStyle>
                                             <Style TargetType="TextBlock">

@@ -120,18 +120,18 @@
 
                             <Border Grid.Column="0" Width="64" Height="64" Background="{DynamicResource CardBrush}" CornerRadius="32" Margin="0,0,25,0">
                                 <fa:ImageAwesome Icon="Search" Width="28" Foreground="{DynamicResource AccentBrush}" 
-                                                 Spin="{Binding IsScanning}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                 Spin="{Binding IsBusy}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             </Border>
 
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding ScanStatus}" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="{Binding StatusMessage}" FontSize="18" FontWeight="Bold" Foreground="White"/>
                                 <ProgressBar Height="6" Margin="0,15,40,0" Value="{Binding ScanProgress}" 
                                              Style="{StaticResource GlowingProgressBar}"
-                                             Visibility="{Binding IsScanning, Converter={StaticResource VisibilityConverter}}"/>
+                                             Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}"/>
                             </StackPanel>
 
 
-                            <Button Grid.Column="2" Command="{Binding StartScanCommand}" IsEnabled="{Binding IsScanning, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"
+                            <Button Grid.Column="2" Command="{Binding StartScanCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBooleanConverter}}"
                                     Content="START FULL SCAN" Style="{StaticResource PrimaryAction}" Padding="30,12"/>
                         </Grid>
                     </Border>

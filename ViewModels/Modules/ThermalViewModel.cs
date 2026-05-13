@@ -5,15 +5,17 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using Eternal.Services.System;
 
+using Eternal.ViewModels;
+
 namespace Eternal.ViewModels.Modules
 {
-    public partial class ThermalViewModel : ObservableObject
+    public partial class ThermalViewModel : BaseViewModel
     {
         private readonly IThermalService _thermalService;
         private readonly DispatcherTimer _timer;
+        private bool _isActive;
 
         [ObservableProperty] private ThermalSnapshot _data;
-        [ObservableProperty] private bool _isLoading;
         [ObservableProperty] private string _cpuTempText = "Detecting...";
         [ObservableProperty] private string _gpuTempText = "Detecting...";
         [ObservableProperty] private string _cpuPowerText = "0 W";
@@ -32,15 +34,18 @@ namespace Eternal.ViewModels.Modules
             _timer.Tick += async (s, e) => await UpdateThermalDataAsync();
         }
 
-        public void Activate()
+        public override void Activate()
         {
+            _isActive = true;
             _timer.Start();
             _ = LoadDataAsync(); // Trigger immediate update
         }
 
-        public void Deactivate()
+        public override void Deactivate()
         {
+            _isActive = false;
             _timer.Stop();
+            base.Deactivate();
         }
 
         public CommunityToolkit.Mvvm.Input.IAsyncRelayCommand LoadCommand { get; }
@@ -49,6 +54,7 @@ namespace Eternal.ViewModels.Modules
 
         public async Task LoadDataAsync() 
         {
+            if (!_isActive) return;
             IsLoading = true;
             try { await UpdateThermalDataAsync(); }
             finally { IsLoading = false; }
@@ -56,11 +62,14 @@ namespace Eternal.ViewModels.Modules
 
         private async Task UpdateThermalDataAsync()
         {
-            if (_isUpdatingData) return;
+            if (_isUpdatingData || !_isActive) return;
             _isUpdatingData = true;
             try 
             {
                 var snapshot = await _thermalService.GetThermalDataAsync();
+                
+                if (!_isActive) return;
+
                 Data = snapshot;
 
                 // Formatting
@@ -75,8 +84,11 @@ namespace Eternal.ViewModels.Modules
             }
             catch 
             {
-                CpuTempText = "Error Reading Sensors";
-                ConclusionText = "Telemetry service unavailable or access denied.";
+                if (_isActive)
+                {
+                    CpuTempText = "Error Reading Sensors";
+                    ConclusionText = "Telemetry service unavailable or access denied.";
+                }
             }
             finally
             {

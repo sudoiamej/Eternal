@@ -2,6 +2,8 @@ using System;
 using System.Management;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Win32;
+using Eternal.Helpers;
 
 namespace Eternal.Services.System
 {
@@ -19,39 +21,72 @@ namespace Eternal.Services.System
             if (!string.IsNullOrEmpty(_cachedFingerprint)) return _cachedFingerprint;
 
             StringBuilder sb = new StringBuilder();
+            bool useNative = OsHelper.IsWindows11OrGreater();
 
-            // 1. Motherboard UUID (Most stable)
-            try
+            // 1. Machine GUID (Native Registry - Extremely stable & fast)
+            if (useNative)
             {
-                using var searcher = new ManagementObjectSearcher("SELECT UUID FROM Win32_ComputerSystemProduct");
-                foreach (var obj in searcher.Get())
+                try
                 {
-                    sb.Append(obj["UUID"]?.ToString());
+                    using var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Cryptography");
+                    sb.Append(key?.GetValue("MachineGuid")?.ToString());
                 }
+                catch { }
             }
-            catch { }
 
-            // 2. CPU ID
-            try
+            // 2. Motherboard UUID (WMI Fallback/Secondary)
+            if (sb.Length == 0 || !useNative)
             {
-                using var searcher = new ManagementObjectSearcher("SELECT ProcessorId FROM Win32_Processor");
-                foreach (var obj in searcher.Get())
+                try
                 {
-                    sb.Append(obj["ProcessorId"]?.ToString());
+                    using var searcher = new ManagementObjectSearcher("SELECT UUID FROM Win32_ComputerSystemProduct");
+                    foreach (var obj in searcher.Get())
+                    {
+                        sb.Append(obj["UUID"]?.ToString());
+                    }
                 }
+                catch { }
             }
-            catch { }
 
-            // 3. System Drive Serial
-            try
+            // 3. CPU Identification (Native Registry Fallback)
+            if (useNative)
             {
-                using var searcher = new ManagementObjectSearcher("SELECT SerialNumber FROM Win32_DiskDrive WHERE Index = 0");
-                foreach (var obj in searcher.Get())
+                try
                 {
-                    sb.Append(obj["SerialNumber"]?.ToString());
+                    using var key = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0");
+                    sb.Append(key?.GetValue("ProcessorNameString")?.ToString());
+                    sb.Append(key?.GetValue("Identifier")?.ToString());
                 }
+                catch { }
             }
-            catch { }
+            
+            // 4. CPU ID (WMI Fallback)
+            if (sb.Length < 20) // Only if we still need more entropy
+            {
+                try
+                {
+                    using var searcher = new ManagementObjectSearcher("SELECT ProcessorId FROM Win32_Processor");
+                    foreach (var obj in searcher.Get())
+                    {
+                        sb.Append(obj["ProcessorId"]?.ToString());
+                    }
+                }
+                catch { }
+            }
+
+            // 5. System Drive Serial (WMI - last resort)
+            if (sb.Length < 10)
+            {
+                try
+                {
+                    using var searcher = new ManagementObjectSearcher("SELECT SerialNumber FROM Win32_DiskDrive WHERE Index = 0");
+                    foreach (var obj in searcher.Get())
+                    {
+                        sb.Append(obj["SerialNumber"]?.ToString());
+                    }
+                }
+                catch { }
+            }
 
             string rawData = sb.ToString();
             if (string.IsNullOrEmpty(rawData)) rawData = Environment.MachineName + Environment.UserName;

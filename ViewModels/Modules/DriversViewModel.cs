@@ -69,8 +69,9 @@ namespace Eternal.ViewModels.Modules
         {
             if (OemInfo == null) return;
 
-            var dummyDriver = new DriverInfo("System Support", "", "", OemInfo.Vendor, "", true, "");
-            string url = Eternal.Helpers.DriverLinkHelper.GenerateOfficialSupportLink(dummyDriver, OemInfo);
+            // Create a generic driver reference to trigger OEM-level link generation
+            var oemReference = new DriverInfo("System Support", "", "", OemInfo.Vendor, "", true, "");
+            string url = Eternal.Helpers.DriverLinkHelper.GenerateOfficialSupportLink(oemReference, OemInfo);
             
             _toastService.ShowInfo($"Opening {OemInfo.Vendor} support page...");
             try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); } catch { }

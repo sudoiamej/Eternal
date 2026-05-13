@@ -9,7 +9,10 @@ namespace Eternal.Views.Helpers
         public TestingAuthWindow()
         {
             InitializeComponent();
-            PinInput.Focus();
+            this.Loaded += (s, e) => {
+                PinInput.Focus();
+                Keyboard.Focus(PinInput);
+            };
         }
 
         private void Authorize_Click(object sender, RoutedEventArgs e)

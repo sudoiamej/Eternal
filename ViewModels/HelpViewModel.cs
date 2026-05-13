@@ -10,14 +10,13 @@ using Eternal.Services.System;
 
 namespace Eternal.ViewModels
 {
-    public partial class HelpViewModel : ObservableObject
+    public partial class HelpViewModel : BaseViewModel
     {
         private readonly IKnowledgeBaseService _kbService;
         private List<HelpArticle> _allArticles = new();
 
         [ObservableProperty] private string _searchQuery = string.Empty;
         [ObservableProperty] private HelpArticle? _selectedArticle;
-        [ObservableProperty] private bool _isLoading;
 
         public ObservableCollection<HelpArticle> FilteredArticles { get; } = new();
 

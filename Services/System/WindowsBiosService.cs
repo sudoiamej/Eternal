@@ -3,6 +3,7 @@ using System.Management;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
+using Eternal.Helpers;
 
 namespace Eternal.Services.System
 {
@@ -24,22 +25,53 @@ namespace Eternal.Services.System
                 string version = "Unknown";
                 string date = "Unknown";
 
-                try
+                bool useNative = OsHelper.IsWindows11OrGreater();
+
+                // 1. Primary: Registry Fallback (Native Registry - bypasses WMI)
+                if (useNative)
                 {
-                    using var searcher = CreateSearcher("select Manufacturer, SMBIOSBIOSVersion, ReleaseDate from Win32_BIOS");
-                    foreach (var obj in searcher.Get())
+                    try
                     {
-                        vendor = obj["Manufacturer"]?.ToString() ?? vendor;
-                        version = obj["SMBIOSBIOSVersion"]?.ToString() ?? version;
-                        date = obj["ReleaseDate"]?.ToString() ?? date;
-                        if (date.Length >= 8)
+                        using var biosKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\BIOS");
+                        if (biosKey != null)
                         {
-                            date = $"{date.Substring(0, 4)}-{date.Substring(4, 2)}-{date.Substring(6, 2)}";
+                            vendor = biosKey.GetValue("BIOSVendor")?.ToString() ?? vendor;
+                            version = biosKey.GetValue("BIOSVersion")?.ToString() ?? version;
+                            date = biosKey.GetValue("BIOSReleaseDate")?.ToString() ?? date;
                         }
-                        break;
+                    }
+                    catch { }
+                }
+
+                // 2. Secondary: WMI (Robust Fallback for Win10 or Registry issues)
+                if (vendor == "Unknown" || version == "Unknown" || !useNative)
+                {
+                    try
+                    {
+                        using var searcher = CreateSearcher("select Manufacturer, SMBIOSBIOSVersion, ReleaseDate from Win32_BIOS");
+                        using var collection = searcher.Get();
+                        foreach (ManagementObject obj in collection)
+                        {
+                            using (obj)
+                            {
+                                vendor = obj["Manufacturer"]?.ToString() ?? vendor;
+                                version = obj["SMBIOSBIOSVersion"]?.ToString() ?? version;
+                                
+                                // Only update date if it was still unknown or if we're explicitly favoring WMI formatting
+                                string? wmiDate = obj["ReleaseDate"]?.ToString();
+                                if (wmiDate != null && wmiDate.Length >= 8)
+                                {
+                                    date = $"{wmiDate.Substring(0, 4)}-{wmiDate.Substring(4, 2)}-{wmiDate.Substring(6, 2)}";
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        global::System.Diagnostics.Debug.WriteLine($"WMI BIOS Scan Error: {ex.Message}");
                     }
                 }
-                catch { }
 
                 return new BiosInfo(vendor, version, date);
             });
@@ -77,21 +109,31 @@ namespace Eternal.Services.System
                     try
                     {
                         using var searcher = CreateSearcher("select IsEnabled_InitialValue, IsActivated_InitialValue, IsOwned_InitialValue, SpecVersion, ManufacturerId from Win32_Tpm", @"Root\CIMV2\Security\MicrosoftTpm");
-                        foreach (var obj in searcher.Get())
+                        using var collection = searcher.Get();
+                        foreach (ManagementObject obj in collection)
                         {
-                            bool isEnabled = global::System.Convert.ToBoolean(obj["IsEnabled_InitialValue"] ?? false);
-                            bool isActive = global::System.Convert.ToBoolean(obj["IsActivated_InitialValue"] ?? false);
-                            bool isOwned = global::System.Convert.ToBoolean(obj["IsOwned_InitialValue"] ?? false);
-                            string specVersion = obj["SpecVersion"]?.ToString() ?? "Unknown";
-                            string manufacturer = obj["ManufacturerId"]?.ToString() ?? "Unknown";
-                            string status = isEnabled && isActive && isOwned ? "Ready for use" : (isEnabled ? "Enabled (Needs Ownership)" : "Inactive");
-                            tpm = new TpmInfo(true, specVersion, GetTpmManufacturer(manufacturer), status, manufacturer);
-                            break;
+                            using (obj)
+                            {
+                                bool isEnabled = global::System.Convert.ToBoolean(obj["IsEnabled_InitialValue"] ?? false);
+                                bool isActive = global::System.Convert.ToBoolean(obj["IsActivated_InitialValue"] ?? false);
+                                bool isOwned = global::System.Convert.ToBoolean(obj["IsOwned_InitialValue"] ?? false);
+                                string specVersion = obj["SpecVersion"]?.ToString() ?? "Unknown";
+                                string manufacturer = obj["ManufacturerId"]?.ToString() ?? "Unknown";
+                                string status = isEnabled && isActive && isOwned ? "Ready for use" : (isEnabled ? "Enabled (Needs Ownership)" : "Inactive");
+                                tpm = new TpmInfo(true, specVersion, GetTpmManufacturer(manufacturer), status, manufacturer);
+                                break;
+                            }
                         }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        global::System.Diagnostics.Debug.WriteLine($"WMI TPM Scan Error: {ex.Message}");
+                    }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    global::System.Diagnostics.Debug.WriteLine($"UEFI Status Overall Scan Error: {ex.Message}");
+                }
                 return new UefiStatus(isUefi, secureBoot, tpm);
             });
         }

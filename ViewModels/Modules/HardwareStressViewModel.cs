@@ -5,10 +5,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Eternal.Services.Hardware;
 using Eternal.Services.System;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class HardwareStressViewModel : ObservableObject
+    public partial class HardwareStressViewModel : BaseViewModel
     {
         private readonly IHardwareService _hardwareService;
         private readonly ILoggingService _loggingService;

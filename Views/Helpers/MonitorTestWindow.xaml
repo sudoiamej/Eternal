@@ -1,0 +1,11 @@
+<Window x:Class="Eternal.Views.Helpers.MonitorTestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Monitor Test" WindowStyle="None" WindowState="Maximized" 
+        Topmost="True" Cursor="None" MouseDown="Window_MouseDown" KeyDown="Window_KeyDown">
+    <Grid x:Name="MainGrid" Background="Red">
+        <TextBlock x:Name="InfoText" Text="Click to cycle colors. Press ESC to exit." 
+                   VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="20"
+                   Foreground="White" FontSize="16" Opacity="0.5"/>
+    </Grid>
+</Window>

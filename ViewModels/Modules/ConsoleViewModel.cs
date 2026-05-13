@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using Eternal.Services.System;
 using Eternal.Models;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class ConsoleViewModel : ObservableObject
+    public partial class ConsoleViewModel : BaseViewModel
     {
         private readonly ILoggingService _loggingService;
 
@@ -20,7 +21,6 @@ namespace Eternal.ViewModels.Modules
         public List<ConsoleProfile> AvailableProfiles { get; } = new List<ConsoleProfile>();
         
         [ObservableProperty] private ConsoleSession? _selectedSession;
-        [ObservableProperty] private bool _isBusy;
 
         public ConsoleViewModel(ILoggingService loggingService)
         {

@@ -4,17 +4,29 @@ using System.Threading.Tasks;
 
 namespace Eternal.ViewModels
 {
-    public partial class BaseViewModel : ObservableObject
+    public partial class BaseViewModel : ObservableObject, IMemoryOptimizable
     {
         [ObservableProperty] private bool _isBusy;
+        [ObservableProperty] private bool _isLoading;
         [ObservableProperty] private string _statusMessage = "Ready";
+        [ObservableProperty] private bool _isFocusModeActive;
+
+        public virtual void Activate() { }
+        public virtual void Deactivate() 
+        {
+            // By default, when a view is deactivated, we check if we should release memory
+            ReleaseMemory();
+        }
+
+        public virtual void ReleaseMemory() { }
 
         protected async Task ExecuteBusyActionAsync(Func<Task> action, string? busyMessage = null)
         {
-            if (IsBusy) return;
+            if (IsBusy || IsLoading) return;
 
             string originalStatus = StatusMessage;
             IsBusy = true;
+            IsLoading = true;
             if (busyMessage != null) StatusMessage = busyMessage;
 
             try
@@ -29,6 +41,7 @@ namespace Eternal.ViewModels
             finally
             {
                 IsBusy = false;
+                IsLoading = false;
                 if (busyMessage != null) StatusMessage = "Complete";
             }
         }

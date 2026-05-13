@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 using Eternal.Models;
 using Eternal.Services.System;
 
+using Eternal.ViewModels;
+
 namespace Eternal.ViewModels.Modules
 {
-    public partial class WindowsUpdateViewModel : ObservableObject
+    public partial class WindowsUpdateViewModel : BaseViewModel
     {
         private readonly IOsUpdateService _updateService;
         private readonly ILoggingService _loggingService;

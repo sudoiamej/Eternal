@@ -26,7 +26,8 @@ namespace Eternal.Services.System
                 IsMemoryEnabled = true,
                 IsMotherboardEnabled = true,
                 IsStorageEnabled = true,
-                IsNetworkEnabled = true
+                IsNetworkEnabled = true,
+                IsBatteryEnabled = true
             };
             _visitor = new UpdateVisitor();
             try

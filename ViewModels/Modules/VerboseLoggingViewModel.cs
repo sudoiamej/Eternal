@@ -9,9 +9,11 @@ using Eternal.Models;
 using Eternal.Services.System;
 using System;
 
+using Eternal.ViewModels;
+
 namespace Eternal.ViewModels.Modules
 {
-    public partial class VerboseLoggingViewModel : ObservableObject
+    public partial class VerboseLoggingViewModel : BaseViewModel
     {
         private readonly ILoggingService _loggingService;
 
@@ -23,27 +25,36 @@ namespace Eternal.ViewModels.Modules
         public VerboseLoggingViewModel(ILoggingService loggingService)
         {
             _loggingService = loggingService;
-            
+        }
+
+        public override void Activate()
+        {
             RefreshLogs();
-
-            // 1. App Action Stream
-            _loggingService.NewLogAdded += (s, entry) =>
-            {
-                var app = System.Windows.Application.Current;
-                if (app == null) return;
-
-                app.Dispatcher.Invoke(() =>
-                {
-                    ActionLogEntries.Insert(0, entry);
-                    if (ActionLogEntries.Count > 2000) ActionLogEntries.RemoveAt(ActionLogEntries.Count - 1);
-                });
-            };
-
+            _loggingService.NewLogAdded += OnNewLogAdded;
+            
             // 2. Initial Windows Event Load
             _ = Task.Run(async () => 
             {
                 await Task.Delay(500); 
                 await LoadSystemLogsAsync();
+            });
+        }
+
+        public override void Deactivate()
+        {
+            _loggingService.NewLogAdded -= OnNewLogAdded;
+            base.Deactivate();
+        }
+
+        private void OnNewLogAdded(object? sender, LogEntry entry)
+        {
+            var app = System.Windows.Application.Current;
+            if (app == null) return;
+
+            app.Dispatcher.Invoke(() =>
+            {
+                ActionLogEntries.Insert(0, entry);
+                if (ActionLogEntries.Count > 2000) ActionLogEntries.RemoveAt(ActionLogEntries.Count - 1);
             });
         }
 

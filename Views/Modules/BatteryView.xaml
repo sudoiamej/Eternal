@@ -5,99 +5,178 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:helpers="clr-namespace:Eternal.Views.Helpers"
-             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="1000">
-    <Border Padding="40">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1100">
 
-            <!-- Header -->
-            <StackPanel Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}">
-                <TextBlock Text="ETERNAL › HARDWARE TELEMETRY" Style="{StaticResource HeaderBreadcrumb}"/>
-                <TextBlock Text="Advanced Battery Lab" Style="{StaticResource H1}" Margin="0"/>
-            </StackPanel>
+    <UserControl.Resources>
+        <!-- Spatial Entrance Animation -->
+        <Storyboard x:Key="EntranceAnim">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="20" To="0" Duration="0:0:0.8">
+                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </UserControl.Resources>
 
-            <Grid Grid.Row="1" Margin="0,20,0,0">
-                <!-- No Battery Placeholder -->
-                <Border Visibility="{Binding NoBatteryDetected, Converter={StaticResource VisibilityConverter}}" 
-                        Style="{StaticResource StandardCard}" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="50">
-                    <StackPanel HorizontalAlignment="Center">
-                        <fa:ImageAwesome Icon="Bolt" Width="48" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.3" Margin="0,0,0,20"/>
-                        <TextBlock Text="NO BATTERY DETECTED" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                        <TextBlock Text="This module is designed for portable systems. No ACPI battery interface was found." 
-                                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,0" TextAlignment="Center"/>
-                    </StackPanel>
-                </Border>
+    <Grid RenderTransformOrigin="0.5,0.5">
+        <Grid.RenderTransform>
+            <TranslateTransform Y="0"/>
+        </Grid.RenderTransform>
 
-                <!-- Battery Data -->
-                <Grid Visibility="{Binding NoBatteryDetected, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="400"/>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="320"/>
+        </Grid.ColumnDefinitions>
 
-                    <!-- Left: Visual Health -->
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="HARDWARE HEALTH" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                        <Border Style="{StaticResource StandardCard}" Padding="30">
-                            <StackPanel>
-                                <Grid HorizontalAlignment="Center" Margin="0,0,0,30">
-                                    <helpers:RadialGauge Value="{Binding Battery.WearLevel}" Width="180" Height="180" StrokeThickness="15" 
-                                                       Stroke="{DynamicResource CriticalBrush}" GlowColor="{DynamicResource CriticalColor}">
-                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                            <TextBlock Text="{Binding Battery.WearLevel, StringFormat='{}{0:F1}%'}" FontSize="32" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
-                                            <TextBlock Text="WEAR LEVEL" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
-                                        </StackPanel>
-                                    </helpers:RadialGauge>
-                                </Grid>
-                                
-                                <ProgressBar Value="{Binding Battery.ChargeLevel}" Height="10" Style="{StaticResource GlowingProgressBar}" Margin="0,0,0,10"/>
-                                <Grid>
-                                    <TextBlock Text="Current Charge" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                    <TextBlock Text="{Binding Battery.ChargeLevel, StringFormat='{}{0}%'}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+        <!-- Left: Visual Energy Intelligence (HCI: Visibility of Status) -->
+        <Border Grid.Column="0" Padding="35" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Header -->
+                    <RowDefinition Height="*"/>    <!-- Energy Core -->
+                </Grid.RowDefinitions>
 
-                    <!-- Right: Technical Specs -->
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="ACPI SPECIFICATIONS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                        <Border Style="{StaticResource StandardCard}" Padding="25">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,15">
-                                    <TextBlock Text="Device Name" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                    <TextBlock Text="{Binding Battery.DeviceName}" HorizontalAlignment="Right" Foreground="White" FontWeight="Bold"/>
-                                </Grid>
-                                <Grid Margin="0,0,0,15">
-                                    <TextBlock Text="Chemistry" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                    <TextBlock Text="{Binding Battery.Chemistry}" HorizontalAlignment="Right" Foreground="White"/>
-                                </Grid>
-                                <Separator Background="{DynamicResource BorderBrush}" Margin="0,5,0,15"/>
-                                <Grid Margin="0,0,0,15">
-                                    <TextBlock Text="Design Capacity" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                    <TextBlock Text="{Binding Battery.DesignCapacity, StringFormat='{}{0} mWh'}" HorizontalAlignment="Right" Foreground="White"/>
-                                </Grid>
-                                <Grid Margin="0,0,0,15">
-                                    <TextBlock Text="Full Charge Capacity" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                    <TextBlock Text="{Binding Battery.FullChargeCapacity, StringFormat='{}{0} mWh'}" HorizontalAlignment="Right" Foreground="White"/>
-                                </Grid>
-                                <Grid Margin="0,0,0,15">
-                                    <TextBlock Text="Cycle Count" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                    <TextBlock Text="{Binding Battery.CycleCount}" HorizontalAlignment="Right" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
-                                </Grid>
-                                <Grid>
-                                    <TextBlock Text="Power Source" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                    <TextBlock Text="{Binding Battery.PowerSource}" HorizontalAlignment="Right" Foreground="{DynamicResource SuccessBrush}" FontWeight="Bold"/>
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+                <StackPanel Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}" Margin="0,0,0,40">
+                    <TextBlock Text="ETERNAL › POWER ARCHITECTURE AUDIT" Style="{StaticResource HeaderBreadcrumb}"/>
+                    <Grid>
+                        <TextBlock Text="Battery Intelligence Lab" Style="{StaticResource H1}" Margin="0" FontSize="32" FontWeight="Black"/>
+                        <Button HorizontalAlignment="Right" Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Re-poll ACPI Bus">
+                            <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"/>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Central Energy Core -->
+                <Grid Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <!-- Layered Ambient Glows -->
+                    <Ellipse Width="350" Height="350" Fill="{DynamicResource AccentBrush}" Opacity="0.03">
+                        <Ellipse.Effect><BlurEffect Radius="100"/></Ellipse.Effect>
+                    </Ellipse>
+                    
+                    <helpers:RadialGauge Value="{Binding Battery.ChargeLevel}" 
+                                       Stroke="{DynamicResource AccentBrush}"
+                                       GlowColor="{DynamicResource AccentColor}"
+                                       StrokeThickness="20" Width="280" Height="280">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding Battery.ChargeLevel, StringFormat='{}{0}%'}" FontSize="72" FontWeight="Black" Foreground="White">
+                                <TextBlock.Effect><DropShadowEffect BlurRadius="20" Opacity="0.5"/></TextBlock.Effect>
+                            </TextBlock>
+                            <TextBlock Text="{Binding Battery.ChargingState}" FontSize="10" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" Margin="0,-5,0,0" Opacity="0.8"/>
+                        </StackPanel>
+                    </helpers:RadialGauge>
                 </Grid>
+
+                <!-- Status Legend -->
+                <StackPanel Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Orientation="Horizontal">
+                    <Border Background="#10FFFFFF" CornerRadius="12" Padding="15,6" Margin="0,0,15,0">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="Bolt" Width="10" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Battery.PowerSource}" Foreground="White" FontSize="11" FontWeight="Black" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#10FFFFFF" CornerRadius="12" Padding="15,6">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="ClockOutline" Width="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Battery.EstimatedTimeRemaining, StringFormat='{}{0:h\\h\\ m\\m} REMAINING'}" Foreground="White" FontSize="11" FontWeight="Black" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
             </Grid>
-        </Grid>
-    </Border>
+        </Border>
+
+        <!-- Right: Contextual Telemetry Rail (HCI: Progressive Disclosure) -->
+        <Border Grid.Column="1" Padding="30" Background="{DynamicResource SidebarBrush}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="BATTERY HEALTH INTELLIGENCE" Style="{StaticResource Caption}" Margin="0,0,0,25" Opacity="0.7"/>
+
+                    <!-- Wear Level Card -->
+                    <Border Style="{StaticResource StandardCard}" Padding="25" Margin="0,0,0,25">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,15">
+                                <TextBlock Text="CELL INTEGRITY" FontSize="10" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" Opacity="0.8"/>
+                                <TextBlock Text="{Binding HealthStatus}" HorizontalAlignment="Right" FontWeight="Black" Foreground="{DynamicResource SuccessBrush}" FontSize="10"/>
+                            </Grid>
+                            
+                            <TextBlock Text="{Binding Battery.WearLevel, StringFormat='{}{0:F1}% WEAR'}" FontSize="32" FontWeight="Black" Foreground="White" Margin="0,0,0,10"/>
+                            <TextBlock Text="{Binding HealthRecommendation}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" TextWrapping="Wrap" LineHeight="16" FontWeight="Bold"/>
+
+                            <Border Background="#10FFFFFF" Height="1" Margin="0,20,0,20" Opacity="0.5"/>
+                            
+                            <Grid Margin="0,0,0,12">
+                                <TextBlock Text="Charge Cycles" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding Battery.CycleCount}" HorizontalAlignment="Right" FontWeight="Black" Foreground="White"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Current Capacity" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding Battery.CurrentCapacity, StringFormat='{}{0} mWh'}" HorizontalAlignment="Right" FontWeight="Black" Foreground="White"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Thermal & Power Diagnostics -->
+                    <TextBlock Text="LIVE SENSOR TELEMETRY" Style="{StaticResource Caption}" Margin="0,10,0,20" Opacity="0.7"/>
+                    
+                    <Border Style="{StaticResource StandardCard}" Padding="25" Margin="0,0,0,15">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="TEMPERATURE" Style="{StaticResource Caption}" FontSize="9" Opacity="0.5"/>
+                                <TextBlock Text="{Binding Battery.Temperature, StringFormat='{}{0:F1}°C'}" FontSize="24" FontWeight="Black" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="VOLTAGE" Style="{StaticResource Caption}" FontSize="9" Opacity="0.5"/>
+                                <TextBlock Text="{Binding Battery.Voltage, StringFormat='{}{0:F2} V'}" FontSize="24" FontWeight="Black" Foreground="White"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource StandardCard}" Padding="25" Margin="0,0,0,30">
+                        <StackPanel>
+                            <TextBlock Text="POWER THROUGHPUT" Style="{StaticResource Caption}" FontSize="9" Opacity="0.5" Margin="0,0,0,15"/>
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="Current Draw" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding Battery.ChargeRateWattage, StringFormat='{}{0:F2} W'}" HorizontalAlignment="Right" FontWeight="Black" Foreground="White"/>
+                            </Grid>
+                            
+                            <ItemsControl ItemsSource="{Binding WattageHistory}" VerticalAlignment="Bottom" Height="50" ClipToBounds="True">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="30" Rows="1" VerticalAlignment="Bottom"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource AccentBrush}" Opacity="0.4" Margin="1,0" VerticalAlignment="Bottom" CornerRadius="2">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Height" Value="{Binding}"/>
+                                                    <!-- Simple proportional multiplier for W to Pixels -->
+                                                    <Setter Property="RenderTransform">
+                                                        <Setter.Value><ScaleTransform ScaleY="1.5"/></Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </Border.Style>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Optimization Action -->
+                    <Button Command="{Binding OptimizeChargingCommand}" Style="{StaticResource PrimaryAction}" Height="60">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="Shield" Width="14" Foreground="White" Margin="0,0,15,0"/>
+                            <TextBlock Text="OPTIMIZE CELL LIFESPAN" FontWeight="Black" FontSize="12"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Loading Overlay -->
+        <Border Grid.ColumnSpan="2" Background="#80000000" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+            <Border.Effect><BlurEffect Radius="25"/></Border.Effect>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,25"/>
+                <TextBlock Text="QUERYING ACPI INTERFACE..." FontSize="14" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
 </UserControl>

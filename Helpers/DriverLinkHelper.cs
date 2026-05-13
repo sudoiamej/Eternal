@@ -17,10 +17,14 @@ namespace Eternal.Helpers
             try {
                 using (var searcher = new System.Management.ManagementObjectSearcher("select Product from Win32_BaseBoard"))
                 {
-                    foreach (var obj in searcher.Get())
+                    using var collection = searcher.Get();
+                    foreach (var obj in collection)
                     {
-                        model = obj["Product"]?.ToString() ?? "";
-                        break;
+                        using (obj)
+                        {
+                            model = obj["Product"]?.ToString() ?? "";
+                            break;
+                        }
                     }
                 }
             } catch { }

@@ -29,7 +29,7 @@
                         <TextBlock Text="BIOS / UEFI Intelligence" Style="{StaticResource H1}" Margin="0"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,5">
-                        <Button Command="{Binding LoadCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Query Firmware Info">
+                        <Button Command="{Binding LoadCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Query Firmware Info">
                             <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </Button>
                     </StackPanel>
@@ -146,7 +146,7 @@
                 </StackPanel>
 
                 <!-- Loading Overlay (HCI Rule 7: Status) -->
-                <Border Grid.RowSpan="3" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}" Margin="-40">
+                <Border Grid.RowSpan="3" Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}" Margin="-40">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <TextBlock Text="Auditing Firmware Foundation..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
@@ -156,7 +156,3 @@
         </ScrollViewer>
     </Border>
 </UserControl>
-
-
-
-

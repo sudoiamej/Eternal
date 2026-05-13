@@ -6,9 +6,11 @@ using System.Windows;
 using Eternal.Models;
 using Eternal.Services.System;
 
+using Eternal.ViewModels;
+
 namespace Eternal.ViewModels.Modules
 {
-    public partial class TuningViewModel : ObservableObject
+    public partial class TuningViewModel : BaseViewModel
     {
         private readonly ITuningService _tuningService;
 

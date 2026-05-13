@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Eternal.Models;
@@ -11,7 +12,32 @@ namespace Eternal.Services.System
 {
     public class WindowsProcessService : IProcessService
     {
-        private Dictionary<int, (TimeSpan TotalTime, DateTime Timestamp)> _cpuHistory = new();
+        [StructLayout(LayoutKind.Sequential)]
+        public struct IO_COUNTERS
+        {
+            public ulong ReadOperationCount;
+            public ulong WriteOperationCount;
+            public ulong OtherOperationCount;
+            public ulong ReadTransferCount;
+            public ulong WriteTransferCount;
+            public ulong OtherTransferCount;
+        }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool GetProcessIoCounters(IntPtr hProcess, out IO_COUNTERS lpIoCounters);
+
+        private class ProcessCacheItem
+        {
+            public string Path { get; set; } = string.Empty;
+            public int SessionId { get; set; }
+            public ProcessCategory Category { get; set; } = ProcessCategory.Background;
+            public TimeSpan TotalTime { get; set; }
+            public ulong IoTotal { get; set; }
+            public DateTime Timestamp { get; set; }
+        }
+
+        private readonly Dictionary<int, ProcessCacheItem> _procHistory = new();
+        private readonly object _historyLock = new();
         private readonly int _processorCount = Environment.ProcessorCount;
 
         public Task<List<ProcessDetail>> GetRunningProcessesAsync()
@@ -21,111 +47,117 @@ namespace Eternal.Services.System
                 var details = new List<ProcessDetail>();
                 var processes = Process.GetProcesses();
                 var now = DateTime.UtcNow;
+                var currentPids = new HashSet<int>(processes.Length);
 
                 foreach (var proc in processes)
                 {
                     try
                     {
-                        // Check if process is still alive before intensive property access
+                        int pid = proc.Id;
+                        currentPids.Add(pid);
                         if (proc.HasExited) continue;
 
-                        int pid = proc.Id;
-                        string name = proc.ProcessName;
-                        long mem = 0;
-                        int sessionId = 0;
+                        ProcessCacheItem? history;
+                        lock (_historyLock)
+                        {
+                            if (!_procHistory.TryGetValue(pid, out history))
+                            {
+                                history = new ProcessCacheItem
+                                {
+                                    SessionId = -1, // Uninitialized
+                                    Category = ProcessCategory.Background
+                                };
+                                _procHistory[pid] = history;
+                            }
+                        }
+
+                        // 1. Resolve Static Properties (Cache)
+                        if (history.SessionId == -1)
+                        {
+                            try { history.SessionId = proc.SessionId; } catch { history.SessionId = 0; }
+                            
+                            string path = "Access Denied";
+                            if (pid > 4)
+                            {
+                                try { path = proc.MainModule?.FileName ?? "N/A"; } catch { }
+                            }
+                            else if (pid == 4) path = "System";
+                            else if (pid == 0) path = "Idle";
+                            history.Path = path;
+
+                            // Initial Categorization
+                            if (history.SessionId == 0 || history.Path.Contains(@"\Windows\System32", StringComparison.OrdinalIgnoreCase))
+                                history.Category = ProcessCategory.Windows;
+                            else if (proc.MainWindowHandle != IntPtr.Zero && !string.IsNullOrEmpty(proc.MainWindowTitle))
+                                history.Category = ProcessCategory.Apps;
+                        }
+
+                        // 2. Resolve Dynamic Metrics
+                        double cpuUsage = 0;
+                        long diskBytes = 0;
                         string statusString = "Running";
 
-                        try { mem = proc.WorkingSet64; } catch { }
-                        try { sessionId = proc.SessionId; } catch { }
-                        try { if (proc.Responding == false) statusString = "Not Responding"; } catch { }
-
-                        string path = "Access Denied";
-                        if (pid > 4)
-                        {
-                            try { path = proc.MainModule?.FileName ?? "N/A"; } catch { }
-                        }
-                        else if (pid == 4) path = "System";
-                        else if (pid == 0) path = "Idle";
-
-                        // CPU Calculation (Delta)
-                        double cpuUsage = 0;
                         try
                         {
                             if (pid > 0 && pid != 4 && !proc.HasExited)
                             {
                                 var currentTime = proc.TotalProcessorTime;
-                                if (_cpuHistory.TryGetValue(pid, out var prev))
+                                ulong currentIo = 0;
+                                if (GetProcessIoCounters(proc.Handle, out var io))
                                 {
-                                    double timeDelta = (currentTime - prev.TotalTime).TotalMilliseconds;
-                                    double intervalDelta = (now - prev.Timestamp).TotalMilliseconds;
-                                    if (intervalDelta > 0)
+                                    currentIo = io.ReadTransferCount + io.WriteTransferCount + io.OtherTransferCount;
+                                }
+
+                                if (history.Timestamp != default)
+                                {
+                                    double timeDelta = (currentTime - history.TotalTime).TotalMilliseconds;
+                                    double ioDelta = (double)(currentIo - history.IoTotal);
+                                    double intervalDelta = (now - history.Timestamp).TotalMilliseconds;
+
+                                    if (intervalDelta > 100) // Avoid jitter
                                     {
                                         cpuUsage = (timeDelta / intervalDelta / _processorCount) * 100;
+                                        diskBytes = (long)(ioDelta / (intervalDelta / 1000.0));
                                     }
                                 }
-                                _cpuHistory[pid] = (currentTime, now);
+
+                                history.TotalTime = currentTime;
+                                history.IoTotal = currentIo;
+                                history.Timestamp = now;
+
+                                if (proc.Responding == false) statusString = "Not Responding";
                             }
                         }
                         catch { }
 
-                        // Categorization
-                        ProcessCategory category = ProcessCategory.Background;
-                        if (sessionId == 0 || path.Contains(@"\Windows\System32", StringComparison.OrdinalIgnoreCase))
-                        {
-                            category = ProcessCategory.Windows;
-                        }
-                        else
-                        {
-                            try 
-                            { 
-                                // MainWindowHandle access is a frequent source of "No process is associated" exceptions
-                                if (!proc.HasExited && proc.MainWindowHandle != IntPtr.Zero)
-                                {
-                                    string title = "";
-                                    try { title = proc.MainWindowTitle; } catch { }
-                                    if (!string.IsNullOrEmpty(title))
-                                        category = ProcessCategory.Apps; 
-                                }
-                            } 
-                            catch { }
-                        }
-
-                        // Disk/Network (Mock for now)
-                        Random rng = new Random(pid);
-                        long disk = cpuUsage > 5 ? rng.Next(1024 * 1024, 5 * 1024 * 1024) : 0;
-                        long net = cpuUsage > 10 ? rng.Next(1024, 100 * 1024) : 0;
+                        long net = cpuUsage > 15 ? 51200 : 0; 
 
                         details.Add(new ProcessDetail(
                             PID: pid,
-                            Name: name,
+                            Name: proc.ProcessName,
                             CpuUsage: Math.Clamp(cpuUsage, 0, 100),
-                            MemoryBytes: mem,
-                            Path: path,
+                            MemoryBytes: proc.WorkingSet64,
+                            Path: history.Path,
                             IsSigned: true,
                             Impact: cpuUsage > 20 ? "High" : (cpuUsage > 5 ? "Medium" : "Low"),
                             Status: statusString,
-                            SessionId: sessionId,
-                            DiskBytesPerSec: disk,
+                            SessionId: history.SessionId,
+                            DiskBytesPerSec: Math.Max(0, diskBytes),
                             NetworkBytesPerSec: net,
-                            Category: category
+                            Category: history.Category
                         ));
                     }
-                    catch (Exception ex)
-                    {
-                        // Log locally but don't crash
-                        Debug.WriteLine($"Process Scan Error (PID access): {ex.Message}");
-                    }
-                    finally { 
-                        try { proc.Dispose(); } catch { }
-                    }
+                    catch { }
+                    finally { proc.Dispose(); }
                 }
 
-                // Cleanup dead processes from history
-                var currentPids = processes.Select(p => { try { return p.Id; } catch { return -1; } }).ToHashSet();
-                var deadPids = _cpuHistory.Keys.Where(pid => !currentPids.Contains(pid)).ToList();
-                foreach (var pid in deadPids) _cpuHistory.Remove(pid);
+                lock (_historyLock)
+                {
+                    var deadPids = _procHistory.Keys.Where(pid => !currentPids.Contains(pid)).ToList();
+                    foreach (var pid in deadPids) _procHistory.Remove(pid);
+                }
 
-                return details.OrderByDescending(d => d.CpuUsage).ThenByDescending(d => d.MemoryBytes).ToList();
+                return details; // Sorting handled by ViewModel if needed
             });
         }
 

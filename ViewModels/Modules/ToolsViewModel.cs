@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using Eternal.Services.System;
 
+using Eternal.ViewModels;
+
 namespace Eternal.ViewModels.Modules
 {
-    public partial class ToolsViewModel : ObservableObject
+    public partial class ToolsViewModel : BaseViewModel
     {
         private readonly IToolkitService _toolkitService;
 

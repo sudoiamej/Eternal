@@ -16,16 +16,30 @@
                     <StackPanel>
                         <TextBlock Text="APPEARANCE &amp; THEME" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
 
-                        <Grid Margin="0,0,0,20">
+                        <!-- Legacy Theme Selector -->
+                        <Grid Margin="0,0,0,20" Visibility="{Binding Settings.UseLegacyUI, Converter={StaticResource VisibilityConverter}}">
                             <StackPanel>
                                 <TextBlock Text="Interface Theme" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBlock Text="Select a global visual style for the application." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Select a global visual style for the legacy interface." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                             <ComboBox SelectedValue="{Binding SelectedTheme}" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <system:String>Dark</system:String>
-                                <system:String>Light</system:String>
                                 <system:String>Gray</system:String>
                                 <system:String>HighContrast</system:String>
+                            </ComboBox>
+                        </Grid>
+
+                        <!-- Modern Gradiency Selector -->
+                        <Grid Margin="0,0,0,20" Visibility="{Binding Settings.UseLegacyUI, Converter={StaticResource VisibilityConverter}, ConverterParameter='Inverse'}">
+                            <StackPanel>
+                                <TextBlock Text="Modern Background Gradiency" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Select a neural background profile for the modern workspace." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ComboBox SelectedValue="{Binding SelectedGradiency}" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <system:String>Deep Space</system:String>
+                                <system:String>Nebula</system:String>
+                                <system:String>Aurora</system:String>
+                                <system:String>Crimson Flow</system:String>
                             </ComboBox>
                         </Grid>
 

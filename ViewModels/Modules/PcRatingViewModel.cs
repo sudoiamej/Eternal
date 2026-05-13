@@ -5,17 +5,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Eternal.Models;
 using Eternal.Services.System;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class PcRatingViewModel : ObservableObject
+    public partial class PcRatingViewModel : BaseViewModel
     {
         private readonly IWinSatService _winSatService;
         private readonly ILoggingService _loggingService;
 
         [ObservableProperty] private WinSatScore? _currentScore;
-        [ObservableProperty] private bool _isAssessing;
-        [ObservableProperty] private string _statusMessage = "Ready to assess PC performance.";
         [ObservableProperty] private string _cpuExplanation = "Processing calculations per second.";
         [ObservableProperty] private string _memoryExplanation = "Memory operations per second.";
         [ObservableProperty] private string _graphicsExplanation = "Desktop performance for Windows Aero.";
@@ -47,7 +46,7 @@ namespace Eternal.ViewModels.Modules
         [RelayCommand]
         public async Task RunAssessmentAsync()
         {
-            if (IsAssessing) return;
+            if (IsBusy) return;
 
             var confirm = System.Windows.MessageBox.Show(
                 "Running a formal assessment will stress your hardware and take several minutes. Your screen may flicker.\n\nProceed?", 
@@ -55,7 +54,7 @@ namespace Eternal.ViewModels.Modules
 
             if (confirm == System.Windows.MessageBoxResult.No) return;
 
-            IsAssessing = true;
+            IsBusy = true;
             StatusMessage = "Formal assessment in progress... check the console window.";
             _loggingService.Log("WinSAT: Starting formal assessment.");
 
@@ -74,7 +73,7 @@ namespace Eternal.ViewModels.Modules
             }
             finally
             {
-                IsAssessing = false;
+                IsBusy = false;
             }
         }
 

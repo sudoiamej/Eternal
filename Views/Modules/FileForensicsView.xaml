@@ -97,7 +97,7 @@
                         BorderThickness="2" CornerRadius="15" Background="#0AFFFFFF" 
                         AllowDrop="True" Drop="FileZone_Drop" DragOver="FileZone_DragOver">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <fa:ImageAwesome Icon="FileTextO" Width="64" Foreground="{DynamicResource AccentBrush}" Opacity="0.5" Margin="0,0,0,25"/>
+                        <fa:ImageAwesome Icon="FileTextOutline" Width="64" Foreground="{DynamicResource AccentBrush}" Opacity="0.5" Margin="0,0,0,25"/>
                         <TextBlock Text="DRAG &amp; DROP FILE TO ANALYZE" FontSize="20" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
                         <TextBlock Text="Verifying MD5, SHA256 and Authenticode Signatures" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,0"/>
                     </StackPanel>

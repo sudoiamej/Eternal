@@ -5,176 +5,300 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:Models="clr-namespace:Eternal.Models"
-             mc:Ignorable="d" d:DesignHeight="720" d:DesignWidth="1100">
-    <Grid Background="{DynamicResource BackgroundBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> <!-- Header -->
-            <RowDefinition Height="35"/>   <!-- Column Headers -->
-            <RowDefinition Height="*"/>    <!-- Data Tree -->
-        </Grid.RowDefinitions>
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1200">
 
-        <!-- 1. Header Section -->
-        <Border Grid.Row="0" Padding="25,20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
-            <Grid>
-                <StackPanel>
-                    <TextBlock Text="ETERNAL › ACTIVE MONITORING" Style="{StaticResource HeaderBreadcrumb}"/>
-                    <TextBlock Text="Process Intelligence" Style="{StaticResource H1}" Margin="0"/>
+    <UserControl.Resources>
+        <!-- Spatial Entrance Animation -->
+        <Storyboard x:Key="EntranceAnim">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="20" To="0" Duration="0:0:0.8">
+                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <!-- Grouping logic for the DataGrid -->
+        <CollectionViewSource x:Key="ProcessGroups" Source="{Binding FlatProcesses}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Category"/>
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+    </UserControl.Resources>
+
+    <Grid RenderTransformOrigin="0.5,0.5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/> <!-- Spatial Detail Rail -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Main Workspace: Process Map -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Header -->
+                <RowDefinition Height="*"/>    <!-- Data Grid -->
+            </Grid.RowDefinitions>
+
+            <!-- 1. Header -->
+            <StackPanel Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}" Margin="10,25,10,15">
+                <TextBlock Text="ETERNAL › ACTIVE WORKSPACE" Style="{StaticResource HeaderBreadcrumb}"/>
+                <Grid>
+                    <TextBlock Text="Process Intelligence Map" Style="{StaticResource H1}" Margin="0" FontSize="32" FontWeight="Black"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Border Background="#10FFFFFF" CornerRadius="15" Padding="18,6" Margin="0,0,20,0">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:ImageAwesome Icon="Cube" Width="10" Foreground="{DynamicResource AccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding TotalProcessCount, StringFormat='{}NODES: {0}'}" Foreground="White" FontSize="11" FontWeight="Black" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <Button Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Sync Kernel Data">
+                            <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}">
+                                <fa:ImageAwesome.Effect>
+                                    <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                                </fa:ImageAwesome.Effect>
+                            </fa:ImageAwesome>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <!-- 2. Main Data Grid -->
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Source={StaticResource ProcessGroups}}" 
+                      SelectedItem="{Binding SelectedProcess}"
+                      AutoGenerateColumns="False" IsReadOnly="True" 
+                      Background="Transparent" BorderThickness="0" Margin="10,0"
+                      RowBackground="Transparent" GridLinesVisibility="None"
+                      HeadersVisibility="Column" SelectionMode="Single"
+                      VirtualizingStackPanel.IsVirtualizing="True"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling"
+                      CanUserSortColumns="True">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#08FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#15FFFFFF"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                        <Setter Property="Padding" Value="10,0"/>
+                        <Setter Property="FontSize" Value="10"/>
+                        <Setter Property="FontWeight" Value="Black"/>
+                        <Setter Property="Height" Value="35"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <Border Background="#10FFFFFF" Margin="0,15,0,8" Padding="25,12" CornerRadius="18" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="{Binding Name, Converter={StaticResource CategoryToIconConverter}}" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,15,0"/>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Black" Foreground="White" FontSize="15" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding ItemCount, StringFormat='{} ({0})'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.5"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </DataGrid.GroupStyle>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="PROCESS IDENTITY" Binding="{Binding Name}" Width="3*">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="10,8"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="PID" Binding="{Binding PID}" Width="80">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}"/>
+                                <Setter Property="FontSize" Value="10"/>
+                                <Setter Property="FontWeight" Value="Black"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="STATE" Binding="{Binding Status}" Width="100">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                <Setter Property="FontSize" Value="10"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Opacity" Value="0.8"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTemplateColumn Header="LOAD" Width="100" SortMemberPath="CpuUsage">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Margin="4" CornerRadius="4">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CpuUsage, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>10'}" Value="True">
+                                                    <Setter Property="Background" Value="#25FF9800"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding CpuUsage, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>50'}" Value="True">
+                                                    <Setter Property="Background" Value="#40F44336"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding CpuUsage, StringFormat='{}{0:F1}%'}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="11" FontWeight="Black"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="FOOTPRINT" Binding="{Binding MemoryUsage}" Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                <Setter Property="FontSize" Value="11"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="I/O BURST" Binding="{Binding DiskUsage}" Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                <Setter Property="FontSize" Value="11"/>
+                                <Setter Property="Opacity" Value="0.5"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="NET TRAFFIC" Binding="{Binding NetworkUsage}" Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                <Setter Property="FontSize" Value="11"/>
+                                <Setter Property="Opacity" Value="0.5"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- SPATIAL LAYER 4: Detail Rail (Contextual Overlay) -->
+        <Border Grid.Column="1" x:Name="DetailRail" Width="0" Background="{DynamicResource SidebarBrush}" 
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0"
+                Visibility="{Binding SelectedProcess, Converter={StaticResource VisibilityConverter}}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedProcess, Converter={StaticResource VisibilityConverter}}" Value="Visible">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Width" To="320" Duration="0:0:0.4">
+                                            <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding SelectedProcess}" Value="{x:Null}">
+                            <Setter Property="Width" Value="0"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            
+            <Grid Width="320" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Header -->
+                    <RowDefinition Height="*"/>    <!-- Content -->
+                    <RowDefinition Height="Auto"/> <!-- Actions -->
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                    <Grid>
+                        <TextBlock Text="NODE FORENSICS" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+                        <Button Command="{Binding SelectProcessCommand}" CommandParameter="{x:Null}" HorizontalAlignment="Right" Style="{StaticResource IconButton}">
+                            <fa:ImageAwesome Icon="Times" Width="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        </Button>
+                    </Grid>
+                    <TextBlock Text="{Binding SelectedProcess.Name}" FontSize="24" FontWeight="Black" Foreground="White" Margin="0,12,0,0" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding SelectedProcess.PID, StringFormat='{}SYSTEM PROCESS PID: {0}'}" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" Opacity="0.8"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding TotalProcessCount, StringFormat='Processes: {0}'}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,20,0"/>
-                    <Button Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh Process Map">
-                        <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"/>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- Live Telemetry Card -->
+                        <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20" Padding="20">
+                            <StackPanel>
+                                <TextBlock Text="LIVE TELEMETRY" Style="{StaticResource Caption}" Margin="0,0,0,15" Opacity="0.7"/>
+                                <Grid Margin="0,0,0,12">
+                                    <TextBlock Text="CPU LOAD" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding SelectedProcess.CpuUsage, StringFormat='{}{0:F1}%'}" HorizontalAlignment="Right" FontWeight="Black" Foreground="White"/>
+                                </Grid>
+                                <ProgressBar Value="{Binding SelectedProcess.CpuUsage}" Style="{StaticResource GlowingProgressBar}" Height="4" Margin="0,0,0,15"/>
+
+                                <Grid Margin="0,0,0,12">
+                                    <TextBlock Text="MEMORY FOOTPRINT" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding SelectedProcess.MemoryUsage}" HorizontalAlignment="Right" FontWeight="Black" Foreground="White"/>
+                                </Grid>
+                                <Border Background="#10FFFFFF" Height="4" CornerRadius="2"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Path Card -->
+                        <Border Style="{StaticResource StandardCard}" Padding="20">
+                            <StackPanel>
+                                <TextBlock Text="EXECUTABLE PATH" Style="{StaticResource Caption}" Margin="0,0,0,12" Opacity="0.7"/>
+                                <TextBlock Text="{Binding SelectedProcess.Path}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" TextWrapping="Wrap" FontWeight="Bold" LineHeight="16"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Actions -->
+                <StackPanel Grid.Row="2" Margin="0,15,0,0">
+                    <Button Command="{Binding KillProcessCommand}" CommandParameter="{Binding SelectedProcess}" Style="{StaticResource PrimaryAction}" Background="#20FF3366" BorderBrush="{DynamicResource CriticalBrush}" Height="50">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="Times" Width="14" Foreground="White" Margin="0,0,12,0"/>
+                            <TextBlock Text="TERMINATE PROCESS" FontWeight="Black" FontSize="11"/>
+                        </StackPanel>
                     </Button>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- 2. Column Headers (Aligned with TreeView) -->
-        <Border Grid.Row="1" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Grid.IsSharedSizeScope="True">
-            <Grid Margin="15,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="350" SharedSizeGroup="NameCol"/>
-                    <ColumnDefinition Width="80" SharedSizeGroup="PidCol"/>
-                    <ColumnDefinition Width="100" SharedSizeGroup="StatusCol"/>
-                    <ColumnDefinition Width="100" SharedSizeGroup="CpuCol"/>
-                    <ColumnDefinition Width="120" SharedSizeGroup="MemoryCol"/>
-                    <ColumnDefinition Width="120" SharedSizeGroup="DiskCol"/>
-                    <ColumnDefinition Width="120" SharedSizeGroup="NetworkCol"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Name" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="PID" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="Status" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="3" Text="CPU" Style="{StaticResource Caption}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <TextBlock Grid.Column="4" Text="Memory" Style="{StaticResource Caption}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <TextBlock Grid.Column="5" Text="Disk" Style="{StaticResource Caption}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <TextBlock Grid.Column="6" Text="Network" Style="{StaticResource Caption}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            </Grid>
-        </Border>
-
-        <!-- 3. Main Data Tree -->
-        <TreeView Grid.Row="2" ItemsSource="{Binding Categories}" 
-                  Background="Transparent" BorderThickness="0"
-                  VirtualizingStackPanel.IsVirtualizing="True"
-                  Grid.IsSharedSizeScope="True">
-            <TreeView.Resources>
-                <!-- Level 1: Category (Apps, Background, etc) -->
-                <HierarchicalDataTemplate DataType="{x:Type Models:CategoryGroup}" ItemsSource="{Binding Groups}">
-                    <Border Background="#12FFFFFF" Margin="-20,0,0,0" Padding="15,8" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="{Binding Category, Converter={StaticResource CategoryToIconConverter}}" Width="12" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0"/>
-                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="13"/>
-                            <TextBlock Text="{Binding TotalCount, StringFormat=' ({0})'}" Foreground="{DynamicResource TextDisabledBrush}" FontSize="11" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
-                </HierarchicalDataTemplate>
-
-                <!-- Level 2: Application Group (e.g. Chrome) -->
-                <HierarchicalDataTemplate DataType="{x:Type Models:ProcessGroup}" ItemsSource="{Binding Processes}">
-                    <Grid Margin="0,2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="350" SharedSizeGroup="NameCol"/>
-                            <ColumnDefinition Width="80" SharedSizeGroup="PidCol"/>
-                            <ColumnDefinition Width="100" SharedSizeGroup="StatusCol"/>
-                            <ColumnDefinition Width="100" SharedSizeGroup="CpuCol"/>
-                            <ColumnDefinition Width="120" SharedSizeGroup="MemoryCol"/>
-                            <ColumnDefinition Width="120" SharedSizeGroup="DiskCol"/>
-                            <ColumnDefinition Width="120" SharedSizeGroup="NetworkCol"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}" Foreground="White" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Count, StringFormat='({0})'}" Foreground="{DynamicResource TextDisabledBrush}" FontSize="10" Margin="8,0,0,0" VerticalAlignment="Center"/>
-                        </StackPanel>
-
-                        <!-- Aggregate Totals -->
-                        <Border Grid.Column="3" Background="#10FFFFFF" Margin="1">
-                            <TextBlock Text="{Binding TotalCpu, StringFormat='{}{0:F1}%'}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
-                        </Border>
-                        <Border Grid.Column="4" Background="#10FFFFFF" Margin="1">
-                            <TextBlock Text="{Binding TotalMemory, Converter={StaticResource SizeConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
-                        </Border>
-                    </Grid>
-                </HierarchicalDataTemplate>
-
-                <!-- Level 3: Individual Process PID -->
-                <DataTemplate DataType="{x:Type Models:ProcessDetail}">
-                    <Grid Margin="0,1" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=TreeView}}">
-                        <Grid.ContextMenu>
-                            <ContextMenu Background="{StaticResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}">
-                                <MenuItem Header="End Task" Command="{Binding PlacementTarget.Tag.KillProcessCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}">
-                                    <MenuItem.Icon><fa:ImageAwesome Icon="Times" Foreground="{DynamicResource CriticalBrush}" Width="12"/></MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem Header="Properties" Command="{Binding PlacementTarget.Tag.ShowDetailsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}">
-                                    <MenuItem.Icon><fa:ImageAwesome Icon="InfoCircle" Foreground="{DynamicResource InfoBrush}" Width="12"/></MenuItem.Icon>
-                                </MenuItem>
-                            </ContextMenu>
-                        </Grid.ContextMenu>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="350" SharedSizeGroup="NameCol"/>
-                            <ColumnDefinition Width="80" SharedSizeGroup="PidCol"/>
-                            <ColumnDefinition Width="100" SharedSizeGroup="StatusCol"/>
-                            <ColumnDefinition Width="100" SharedSizeGroup="CpuCol"/>
-                            <ColumnDefinition Width="120" SharedSizeGroup="MemoryCol"/>
-                            <ColumnDefinition Width="120" SharedSizeGroup="DiskCol"/>
-                            <ColumnDefinition Width="120" SharedSizeGroup="NetworkCol"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.7" Margin="10,0,0,0"/>
-                        <TextBlock Grid.Column="1" Text="{Binding PID}" Foreground="{DynamicResource TextDisabledBrush}" FontSize="10" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="2" Text="{Binding Status}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center"/>
-
-                        <!-- Live Metrics with Heatmap colors -->
-                        <Border Grid.Column="3" Margin="1">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CpuUsage, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>10'}" Value="True">
-                                            <Setter Property="Background" Value="#33FF9800"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding CpuUsage, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>50'}" Value="True">
-                                            <Setter Property="Background" Value="#66F44336"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <TextBlock Text="{Binding CpuUsage, StringFormat='{}{0:F1}%'}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="11"/>
-                        </Border>
-
-                        <Border Grid.Column="4" Margin="1">
-                            <TextBlock Text="{Binding MemoryUsage}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
-                        </Border>
-
-                        <Border Grid.Column="5" Margin="1">
-                            <TextBlock Text="{Binding DiskUsage}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Opacity="0.6"/>
-                        </Border>
-
-                        <Border Grid.Column="6" Margin="1">
-                            <TextBlock Text="{Binding NetworkUsage}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Opacity="0.6"/>
-                        </Border>
-                    </Grid>
-                </DataTemplate>
-            </TreeView.Resources>
-
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="TreeViewItem">
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="#1AFFFFFF"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </TreeView.ItemContainerStyle>
-        </TreeView>
-
         <!-- Loading Overlay -->
-        <Border Grid.Row="1" Grid.RowSpan="2" Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+        <Border Grid.ColumnSpan="2" Background="#80000000" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+            <Border.Effect><BlurEffect Radius="25"/></Border.Effect>
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
-                <TextBlock Text="SYNCING KERNEL PROCESSES..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,25"/>
+                <TextBlock Text="SYNCING WORKSPACE STATE..." FontSize="14" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
             </StackPanel>
         </Border>
     </Grid>

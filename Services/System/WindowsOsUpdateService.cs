@@ -22,11 +22,6 @@ namespace Eternal.Services.System
 
         public async Task<List<WindowsUpdateItem>> GetAvailableUpdatesAsync()
         {
-            if (_settingsService.Current.SimulateUpdateFailure)
-            {
-                await Task.Delay(1000);
-                throw new Exception("SIMULATED_FAILURE: Windows Update Search Engine reported error 0x80244017.");
-            }
             return await Task.Run<List<WindowsUpdateItem>>(() =>
             {
                 var updates = new List<WindowsUpdateItem>();
@@ -187,6 +182,7 @@ namespace Eternal.Services.System
                     dynamic session = Activator.CreateInstance(sessionType)!;
                     dynamic searcher = session.CreateUpdateSearcher();
                     
+                    // 0. Refresh update objects
                     dynamic searchResult = searcher.Search("IsInstalled=0 and IsHidden=0");
                     dynamic allUpdates = searchResult.Updates;
                     
@@ -203,7 +199,7 @@ namespace Eternal.Services.System
 
                     if (updatesToInstall.Count == 0) return true;
 
-                    // 0. Accept EULA if required
+                    // 1. EULA Phase
                     for (int i = 0; i < updatesToInstall.Count; i++)
                     {
                         dynamic update = updatesToInstall.Item(i);
@@ -213,20 +209,23 @@ namespace Eternal.Services.System
                         }
                     }
 
-                    // 1. Download Phase (0-50%)
+                    // 2. Download Phase (0-50%)
                     dynamic downloader = session.CreateUpdateDownloader();
                     downloader.Updates = updatesToInstall;
                     dynamic downloadJob = downloader.BeginDownload(null, null, null);
 
                     while (!downloadJob.IsCompleted)
                     {
-                        dynamic dlProgress = downloadJob.GetProgress();
-                        progress.Report(dlProgress.PercentComplete * 0.5);
+                        try 
+                        {
+                            dynamic dlProgress = downloadJob.GetProgress();
+                            progress.Report(dlProgress.PercentComplete * 0.5);
+                        } catch { }
                         await Task.Delay(1000);
                     }
                     downloader.EndDownload(downloadJob);
 
-                    // 1.5 Verify downloads and prepare for installation
+                    // 3. Install Phase (50-100%)
                     dynamic updatesToInstallFinal = Activator.CreateInstance(updateCollType)!;
                     for (int i = 0; i < updatesToInstall.Count; i++)
                     {
@@ -235,29 +234,28 @@ namespace Eternal.Services.System
                         {
                             updatesToInstallFinal.Add(update);
                         }
-                        else
-                        {
-                            Debug.WriteLine($"Update {update.Identity.UpdateID} failed to download.");
-                        }
                     }
 
                     if (updatesToInstallFinal.Count == 0) return false;
 
-                    // 2. Install Phase (50-100%)
                     dynamic installer = session.CreateUpdateInstaller();
                     installer.Updates = updatesToInstallFinal;
                     dynamic installJob = installer.BeginInstall(null, null, null);
 
                     while (!installJob.IsCompleted)
                     {
-                        dynamic instProgress = installJob.GetProgress();
-                        progress.Report(50 + (instProgress.PercentComplete * 0.5));
+                        try
+                        {
+                            dynamic instProgress = installJob.GetProgress();
+                            progress.Report(50 + (instProgress.PercentComplete * 0.5));
+                        } catch { }
                         await Task.Delay(1000);
                     }
-                    installer.EndInstall(installJob);
-
+                    
+                    dynamic installResult = installer.EndInstall(installJob);
                     progress.Report(100);
-                    return true;
+                    
+                    return (int)installResult.ResultCode == 2; // 2 = orCucceeded
                 }
                 catch (Exception ex)
                 {

@@ -6,14 +6,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Eternal.Services.System;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
     public enum HistoryType { Cpu, Ram, Disk }
 
-    public partial class PerformanceViewModel : ObservableObject, IDisposable
+    public partial class PerformanceViewModel : BaseViewModel, IDisposable
     {
         private readonly IPerformanceService _performanceService;
+        private bool _isActive = false;
 
         [ObservableProperty] private float _currentCpu;
         [ObservableProperty] private float _currentRam;
@@ -29,13 +31,27 @@ namespace Eternal.ViewModels.Modules
             _performanceService = performanceService;
             LoadCommand = new AsyncRelayCommand(UpdateAsync);
             SelectHistoryCommand = new RelayCommand<HistoryType>(type => SelectedHistory = type);
-            
-            // Subscribe to global updates to stay in sync with the status bar
+        }
+
+        public void Activate()
+        {
+            if (_isActive) return;
+            _isActive = true;
             _performanceService.Updated += OnPerformanceUpdated;
+            _ = UpdateAsync();
+        }
+
+        public void Deactivate()
+        {
+            if (!_isActive) return;
+            _isActive = false;
+            _performanceService.Updated -= OnPerformanceUpdated;
         }
 
         private void OnPerformanceUpdated(object? sender, PerformanceSnapshot snap)
         {
+            if (!_isActive) return;
+
             var app = System.Windows.Application.Current;
             if (app == null) return;
 
@@ -53,7 +69,7 @@ namespace Eternal.ViewModels.Modules
 
         public void Dispose()
         {
-            _performanceService.Updated -= OnPerformanceUpdated;
+            Deactivate();
         }
 
         private void UpdateHistory(ObservableCollection<float> history, float value)

@@ -23,10 +23,11 @@
                             <TextBlock Text="SELECT CAMERA" VerticalAlignment="Center" Style="{StaticResource Caption}" Margin="0,0,15,0"/>
                             <ComboBox ItemsSource="{Binding CameraGroups}" SelectedItem="{Binding SelectedCameraGroup}" Width="250" DisplayMemberPath="DisplayName"/>
                         </StackPanel>
-                        <Button Command="{Binding RefreshCameraCommand}" HorizontalAlignment="Right" Style="{StaticResource SecondaryButton}">
+                        <Button Command="{Binding ToggleCameraCommand}" HorizontalAlignment="Right" Style="{StaticResource SecondaryButton}">
                             <StackPanel Orientation="Horizontal">
-                                <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                <TextBlock Text="Refresh Feed"/>
+                                <fa:ImageAwesome Icon="{Binding IsCameraActive, Converter={StaticResource CategoryToIconConverter}, ConverterParameter='Camera'}" 
+                                                Width="12" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding IsCameraActive, Converter={StaticResource BooleanToStatusConverter}, ConverterParameter='Camera'}"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -174,7 +175,9 @@
                 </Border>
 
                 <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0">
-                    <DataGrid ItemsSource="{Binding UsbHistory}" AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0">
+                    <DataGrid ItemsSource="{Binding UsbHistory}" AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0"
+                              VirtualizingStackPanel.IsVirtualizing="True"
+                              VirtualizingStackPanel.VirtualizationMode="Recycling">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="TIME" Binding="{Binding Timestamp, StringFormat='HH:mm:ss'}" Width="100"/>
                             <DataGridTemplateColumn Header="ACTION" Width="120">

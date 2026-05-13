@@ -11,32 +11,31 @@
     <Window.Triggers>
         <EventTrigger RoutedEvent="Window.Loaded">
             <BeginStoryboard>
+                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                    <PointAnimation Storyboard.TargetName="BgGradient" Storyboard.TargetProperty="Center" From="0.5,0.4" To="0.6,0.5" Duration="0:0:15"/>
+                    <ColorAnimation Storyboard.TargetName="BgStop2" Storyboard.TargetProperty="Color" To="#1A1030" Duration="0:0:10"/>
+                </Storyboard>
+            </BeginStoryboard>
+            <BeginStoryboard>
                 <Storyboard>
-                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseOut"/>
-                        </DoubleAnimation.EasingFunction>
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
+                    <DoubleAnimation Storyboard.TargetName="MainScale" Storyboard.TargetProperty="ScaleX" From="1.02" To="1.0" Duration="0:0:0.8">
+                        <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
-                    <DoubleAnimation Storyboard.TargetName="MainScale" Storyboard.TargetProperty="ScaleX" From="0.95" To="1.0" Duration="0:0:0.8">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseOut"/>
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                    <DoubleAnimation Storyboard.TargetName="MainScale" Storyboard.TargetProperty="ScaleY" From="0.95" To="1.0" Duration="0:0:0.8">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseOut"/>
-                        </DoubleAnimation.EasingFunction>
+                    <DoubleAnimation Storyboard.TargetName="MainScale" Storyboard.TargetProperty="ScaleY" From="1.02" To="1.0" Duration="0:0:0.8">
+                        <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
                 </Storyboard>
             </BeginStoryboard>
         </EventTrigger>
     </Window.Triggers>
 
-    <Border CornerRadius="20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+    <Border CornerRadius="24" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" ClipToBounds="True">
         <Border.Background>
-            <RadialGradientBrush Center="0.5,0.4" GradientOrigin="0.5,0.4" RadiusX="0.8" RadiusY="0.8">
-                <GradientStop Color="#0F0F0F" Offset="1"/>
-                <GradientStop Color="#1A1A1A" Offset="0"/>
+            <RadialGradientBrush x:Name="BgGradient" Center="0.5,0.4" GradientOrigin="0.5,0.4" RadiusX="1.2" RadiusY="1.2">
+                <GradientStop x:Name="BgStop1" Color="#05050A" Offset="0"/>
+                <GradientStop x:Name="BgStop2" Color="#0D0D1A" Offset="0.5"/>
+                <GradientStop x:Name="BgStop3" Color="#1A1A30" Offset="1"/>
             </RadialGradientBrush>
         </Border.Background>
 
@@ -45,50 +44,69 @@
                 <ScaleTransform x:Name="MainScale" ScaleX="1" ScaleY="1"/>
             </Grid.RenderTransform>
 
+            <!-- Glass Overlay -->
+            <Border Background="#05FFFFFF" CornerRadius="24"/>
+
             <!-- Branded Content -->
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,40">
-                <Image Source="/Assets/logo.png" Width="90" Margin="0,0,0,25">
-                    <Image.Effect>
-                        <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="30" ShadowDepth="0" Opacity="0.6"/>
-                    </Image.Effect>
-                </Image>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,50">
+                <Grid Margin="0,0,0,30">
+                    <Image Source="/Assets/logo.png" Width="90" Height="90">
+                        <Image.Effect>
+                            <DropShadowEffect Color="{DynamicResource CriticalColor}" BlurRadius="50" ShadowDepth="0" Opacity="0.5"/>
+                        </Image.Effect>
+                    </Image>
+                    <!-- Pulse Glow behind logo -->
+                    <Ellipse Width="70" Height="70" Fill="{DynamicResource CriticalBrush}" Opacity="0.1">
+                        <Ellipse.Effect><BlurEffect Radius="35"/></Ellipse.Effect>
+                        <Ellipse.Triggers>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.05" To="0.2" Duration="0:0:2" AutoReverse="True"/>
+                                        <DoubleAnimation Storyboard.TargetProperty="Width" From="70" To="100" Duration="0:0:2" AutoReverse="True"/>
+                                        <DoubleAnimation Storyboard.TargetProperty="Height" From="70" To="100" Duration="0:0:2" AutoReverse="True"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Ellipse.Triggers>
+                    </Ellipse>
+                </Grid>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock Text="ETERNAL" FontSize="36" FontWeight="Black" Foreground="{DynamicResource TextBrush}"/>
-                    <Border Background="#444444" CornerRadius="4" VerticalAlignment="Top" Margin="10,5,0,0" Padding="6,2">
-                        <TextBlock Text="TERMINATING" FontSize="10" FontWeight="Black" Foreground="#FFFFFF"/>
+                    <TextBlock Text="ETERNAL" FontSize="42" FontWeight="Black" Foreground="White">
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Color="Black" Opacity="0.5"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                    <Border Background="{DynamicResource CriticalBrush}" CornerRadius="6" VerticalAlignment="Top" Margin="15,8,0,0" Padding="10,3" BorderBrush="#40FFFFFF" BorderThickness="1">
+                        <TextBlock Text="TERMINATING" FontSize="10" FontWeight="Black" Foreground="White"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="SECURING SYSTEM ARCHITECTURE" FontSize="10" FontWeight="Bold" 
+                <TextBlock Text="SECURING SYSTEM ARCHITECTURE" FontSize="11" FontWeight="Black" 
                            Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" 
-                           Margin="0,5,0,0" Opacity="0.6"/>
+                           Margin="0,8,0,0" Opacity="0.6"/>
             </StackPanel>
 
             <!-- Shutdown Progress (HCI: Continuous Feedback) -->
-            <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,50" Width="300">
-                <TextBlock x:Name="StatusText" Text="Encrypting local session logs..." 
-                           FontSize="10" FontWeight="Medium" Foreground="{DynamicResource TextSecondaryBrush}" 
-                           HorizontalAlignment="Center" Margin="0,0,0,12"/>
+            <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,60" Width="340">
+                <TextBlock x:Name="StatusText" Text="PURGING VOLATILE TELEMETRY..." 
+                           FontSize="10" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" 
+                           HorizontalAlignment="Center" Margin="0,0,0,15" Opacity="0.7"/>
                 
                 <Grid>
-                    <ProgressBar Height="2" IsIndeterminate="True" Background="#1FFFFFFF" Foreground="{DynamicResource SuccessBrush}" BorderThickness="0"/>
-                    <!-- Subtle Success Glow for the shutdown bar -->
-                    <Border Height="2" Background="{DynamicResource SuccessBrush}" Opacity="0.3">
-                        <Border.Effect>
-                            <BlurEffect Radius="10"/>
-                        </Border.Effect>
-                    </Border>
+                    <ProgressBar Height="4" IsIndeterminate="True" Background="#10FFFFFF" Style="{StaticResource GlowingProgressBar}" BorderThickness="0" Foreground="{DynamicResource CriticalBrush}"/>
                 </Grid>
                 
                 <TextBlock x:Name="DetailText" Text="Finalizing integrity report and closing background workers." 
-                           FontSize="8" Foreground="{DynamicResource TextDisabledBrush}" 
-                           HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.7"/>
+                           FontSize="9" Foreground="{DynamicResource TextDisabledBrush}" 
+                           HorizontalAlignment="Center" Margin="0,15,0,0" Opacity="0.5" FontWeight="Bold"/>
             </StackPanel>
 
-
-            <TextBlock Text="ETERNAL SYSTEM INTELLIGENCE • SECURE DISCONNECT" FontSize="8" FontWeight="Bold" 
-                       Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Bottom" 
-                       HorizontalAlignment="Center" Margin="0,0,0,20" Opacity="0.3"/>
+            <!-- Footer Info -->
+            <Grid VerticalAlignment="Bottom" Margin="30,20">
+                <TextBlock Text="SYSTEM DISCONNECT" FontSize="9" FontWeight="Black" Foreground="{DynamicResource TextDisabledBrush}" Opacity="0.4" HorizontalAlignment="Left"/>
+                <TextBlock Text="SECURE EXIT" FontSize="9" FontWeight="Black" Foreground="{DynamicResource TextDisabledBrush}" Opacity="0.4" HorizontalAlignment="Right"/>
+            </Grid>
         </Grid>
     </Border>
 </Window>

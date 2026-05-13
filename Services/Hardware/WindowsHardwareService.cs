@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Management;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Runtime.InteropServices;
 using LibreHardwareMonitor.Hardware;
 using Eternal.Services.System;
+using Eternal.Models;
+using Eternal.Helpers;
 
 namespace Eternal.Services.Hardware
 {
@@ -12,6 +16,25 @@ namespace Eternal.Services.Hardware
     {
         private readonly ILibreHardwareService _libreService;
         private readonly EnumerationOptions _wmiOptions;
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private struct MEMORYSTATUSEX
+        {
+            public uint dwLength;
+            public uint dwMemoryLoad;
+            public ulong ullTotalPhys;
+            public ulong ullAvailPhys;
+            public ulong ullTotalPageFile;
+            public ulong ullAvailPageFile;
+            public ulong ullTotalVirtual;
+            public ulong ullAvailVirtual;
+            public ulong ullAvailExtendedVirtual;
+            public void Init() { dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX)); }
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
 
         public WindowsHardwareService(ILibreHardwareService libreService)
         {
@@ -27,40 +50,54 @@ namespace Eternal.Services.Hardware
             return Task.Run(() =>
             {
                 string name = "Unknown CPU";
-                int cores = Environment.ProcessorCount / 2; // Rough estimate
+                int cores = Environment.ProcessorCount / 2; // Default heuristic
                 int threads = Environment.ProcessorCount;
                 string arch = Environment.Is64BitOperatingSystem ? "x64" : "x86";
                 string freq = "N/A";
 
-                try
-                {
-                    // 1. Try WMI first
-                    using var searcher = CreateSearcher("select Name, NumberOfCores, NumberOfLogicalProcessors, Architecture, MaxClockSpeed from Win32_Processor");
-                    foreach (var obj in searcher.Get())
-                    {
-                        name = obj["Name"]?.ToString() ?? name;
-                        cores = global::System.Convert.ToInt32(obj["NumberOfCores"] ?? 0);
-                        threads = global::System.Convert.ToInt32(obj["NumberOfLogicalProcessors"] ?? 0);
-                        arch = GetArchitecture(global::System.Convert.ToInt32(obj["Architecture"] ?? 0));
-                        freq = $"{obj["MaxClockSpeed"]} MHz";
-                        return new CpuInfo(name, cores, threads, arch, freq);
-                    }
-                }
-                catch { }
+                bool useNative = OsHelper.IsWindows11OrGreater();
 
-                // 2. Fallback to Registry (Almost always works in PE)
-                try
+                // 1. Primary for Windows 11: Native Registry (Fast, non-deprecated)
+                if (useNative)
                 {
-                    using (var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0"))
+                    try
                     {
+                        using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0");
                         if (key != null)
                         {
                             name = key.GetValue("ProcessorNameString")?.ToString() ?? name;
-                            freq = $"{key.GetValue("~MHz")} MHz";
+                            var mhz = key.GetValue("~MHz");
+                            if (mhz != null) freq = $"{mhz} MHz";
                         }
                     }
+                    catch { }
                 }
-                catch { }
+
+                // 2. Secondary/Fallback: WMI (Robust details)
+                if (name == "Unknown CPU" || !useNative)
+                {
+                    try
+                    {
+                        using var searcher = CreateSearcher("select Name, NumberOfCores, NumberOfLogicalProcessors, Architecture, MaxClockSpeed from Win32_Processor");
+                        using var collection = searcher.Get();
+                        foreach (ManagementObject obj in collection)
+                        {
+                            using (obj)
+                            {
+                                name = obj["Name"]?.ToString() ?? name;
+                                cores = global::System.Convert.ToInt32(obj["NumberOfCores"] ?? cores);
+                                threads = global::System.Convert.ToInt32(obj["NumberOfLogicalProcessors"] ?? threads);
+                                arch = GetArchitecture(global::System.Convert.ToInt32(obj["Architecture"] ?? 0));
+                                freq = $"{obj["MaxClockSpeed"]} MHz";
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        global::System.Diagnostics.Debug.WriteLine($"WMI CPU Scan Error: {ex.Message}");
+                    }
+                }
 
                 return new CpuInfo(name, cores, threads, arch, freq);
             });
@@ -98,16 +135,23 @@ namespace Eternal.Services.Hardware
                 try
                 {
                     using var searcher = CreateSearcher("select Name, DriverVersion, AdapterRAM from Win32_VideoController");
-                    foreach (var obj in searcher.Get())
+                    using var collection = searcher.Get();
+                    foreach (ManagementObject obj in collection)
                     {
-                        name = obj["Name"]?.ToString() ?? name;
-                        driver = obj["DriverVersion"]?.ToString() ?? driver;
-                        long bytes = global::System.Convert.ToInt64(obj["AdapterRAM"] ?? 0);
-                        vram = $"{bytes / (1024 * 1024)} MB";
-                        break;
+                        using (obj)
+                        {
+                            name = obj["Name"]?.ToString() ?? name;
+                            driver = obj["DriverVersion"]?.ToString() ?? driver;
+                            long bytes = global::System.Convert.ToInt64(obj["AdapterRAM"] ?? 0);
+                            vram = $"{bytes / (1024 * 1024)} MB";
+                            break;
+                        }
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    global::System.Diagnostics.Debug.WriteLine($"WMI GPU Scan Error: {ex.Message}");
+                }
 
                 try
                 {
@@ -132,7 +176,10 @@ namespace Eternal.Services.Hardware
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    global::System.Diagnostics.Debug.WriteLine($"Libre GPU Scan Error: {ex.Message}");
+                }
 
                 return new GpuInfo(name, driver, vram, util, temp, coreClock, memClock, cores);
             });
@@ -143,29 +190,54 @@ namespace Eternal.Services.Hardware
             return Task.Run(() =>
             {
                 long totalBytes = 0;
+                long availBytes = 0;
                 int slots = 0;
                 string speed = "Unknown";
 
+                bool useNative = OsHelper.IsWindows11OrGreater();
+
+                // 1. Current Usage & Total via P/Invoke (Extremely reliable)
                 try
                 {
-                    using var searcher = CreateSearcher("select Capacity, Speed from Win32_PhysicalMemory");
-                    foreach (var obj in searcher.Get())
+                    var memStatus = new MEMORYSTATUSEX();
+                    memStatus.Init();
+                    if (GlobalMemoryStatusEx(ref memStatus))
                     {
-                        totalBytes += global::System.Convert.ToInt64(obj["Capacity"] ?? 0);
-                        slots++;
-                        speed = $"{obj["Speed"]} MHz";
+                        totalBytes = (long)memStatus.ullTotalPhys;
+                        availBytes = (long)memStatus.ullAvailPhys;
                     }
                 }
                 catch { }
 
-                // Fallback for RAM size
-                if (totalBytes == 0)
+                // 2. Supplemental details (Slots, Speed) via WMI
+                try
                 {
-                    // Basic fallback using GC or Environment
-                    totalBytes = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
+                    using var searcher = CreateSearcher("select Capacity, Speed from Win32_PhysicalMemory");
+                    using var collection = searcher.Get();
+                    foreach (ManagementObject obj in collection)
+                    {
+                        using (obj)
+                        {
+                            if (totalBytes == 0) totalBytes += global::System.Convert.ToInt64(obj["Capacity"] ?? 0);
+                            slots++;
+                            speed = $"{obj["Speed"]} MHz";
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    global::System.Diagnostics.Debug.WriteLine($"WMI RAM Scan Error: {ex.Message}");
                 }
 
-                return new RamInfo($"{totalBytes / (1024 * 1024 * 1024)} GB", "Calculating...", speed, slots, slots);
+                if (totalBytes == 0)
+                {
+                    totalBytes = (long)GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
+                }
+
+                long usedBytes = totalBytes - availBytes;
+                string usedStr = $"{usedBytes / (1024 * 1024 * 1024.0):F1} GB";
+
+                return new RamInfo($"{totalBytes / (1024 * 1024 * 1024)} GB", usedStr, speed, slots, slots);
             });
         }
 
@@ -177,31 +249,45 @@ namespace Eternal.Services.Hardware
                 try
                 {
                     using var searcher = CreateSearcher("select Model, Size, Status, InterfaceType from Win32_DiskDrive");
-                    foreach (var obj in searcher.Get())
+                    using var collection = searcher.Get();
+                    foreach (ManagementObject obj in collection)
                     {
-                        string model = obj["Model"]?.ToString() ?? "Unknown";
-                        long bytes = global::System.Convert.ToInt64(obj["Size"] ?? 0);
-                        string size = $"{bytes / (1024 * 1024 * 1024)} GB";
-                        string health = obj["Status"]?.ToString() ?? "Unknown";
-                        string interfaceType = obj["InterfaceType"]?.ToString() ?? "Unknown";
-                        disks.Add(new DiskInfo(model, size, health, interfaceType));
+                        using (obj)
+                        {
+                            string model = obj["Model"]?.ToString() ?? "Unknown";
+                            long bytes = global::System.Convert.ToInt64(obj["Size"] ?? 0);
+                            string size = $"{bytes / (1024 * 1024 * 1024)} GB";
+                            string health = obj["Status"]?.ToString() ?? "Unknown";
+                            string interfaceType = obj["InterfaceType"]?.ToString() ?? "Unknown";
+                            disks.Add(new DiskInfo(model, size, health, interfaceType));
+                        }
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    global::System.Diagnostics.Debug.WriteLine($"WMI Disk Scan Error: {ex.Message}");
+                }
 
                 // Critical WinPE Fallback: If no physical disks found via WMI, list partitions
                 if (disks.Count == 0)
                 {
-                    foreach (var drive in global::System.IO.DriveInfo.GetDrives())
+                    try
                     {
-                        if (drive.IsReady)
+                        foreach (var drive in global::System.IO.DriveInfo.GetDrives())
                         {
-                            disks.Add(new DiskInfo(
-                                $"{drive.Name} [{drive.VolumeLabel}]", 
-                                $"{drive.TotalSize / (1024 * 1024 * 1024)} GB", 
-                                "Ready", 
-                                drive.DriveType.ToString()));
+                            if (drive.IsReady)
+                            {
+                                disks.Add(new DiskInfo(
+                                    $"{drive.Name} [{drive.VolumeLabel}]", 
+                                    $"{drive.TotalSize / (1024 * 1024 * 1024)} GB", 
+                                    "Ready", 
+                                    drive.DriveType.ToString()));
+                            }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        global::System.Diagnostics.Debug.WriteLine($"Fallback Disk Scan Error: {ex.Message}");
                     }
                 }
 
@@ -216,69 +302,48 @@ namespace Eternal.Services.Hardware
                 string manufacturer = "Unknown";
                 string model = "Unknown";
 
-                try
+                bool useNative = OsHelper.IsWindows11OrGreater();
+
+                // 1. Primary for Win11: Registry (SMBIOS Strings)
+                if (useNative)
                 {
-                    // 1. BaseBoard
-                    using (var searcher = CreateSearcher("select Manufacturer, Product from Win32_BaseBoard"))
+                    try
                     {
-                        foreach (var obj in searcher.Get())
-                        {
-                            string? m = obj["Manufacturer"]?.ToString();
-                            string? p = obj["Product"]?.ToString();
+                        manufacturer = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "BaseBoardManufacturer", manufacturer)?.ToString() ?? manufacturer;
+                        model = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "BaseBoardProduct", model)?.ToString() ?? model;
 
-                            if (!IsGeneric(m)) manufacturer = m!;
-                            if (!IsGeneric(p)) model = p!;
-                            
-                            if (!IsGeneric(manufacturer) && !IsGeneric(model)) break;
-                        }
+                        if (IsGeneric(manufacturer))
+                            manufacturer = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemManufacturer", manufacturer)?.ToString() ?? manufacturer;
+                        
+                        if (IsGeneric(model))
+                            model = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemProductName", model)?.ToString() ?? model;
                     }
+                    catch { }
+                }
 
-                    // 2. System Product Fallback
-                    if (IsGeneric(manufacturer) || IsGeneric(model))
+                // 2. Secondary/Fallback: WMI
+                if (IsGeneric(manufacturer) || IsGeneric(model) || !useNative)
+                {
+                    try
                     {
-                        using (var searcher = CreateSearcher("select Manufacturer, Name from Win32_ComputerSystemProduct"))
+                        using (var searcher = CreateSearcher("select Manufacturer, Product from Win32_BaseBoard"))
                         {
-                            foreach (var obj in searcher.Get())
+                            using var collection = searcher.Get();
+                            foreach (ManagementObject obj in collection)
                             {
-                                string? m = obj["Manufacturer"]?.ToString();
-                                string? n = obj["Name"]?.ToString();
-
-                                if (IsGeneric(manufacturer) && !IsGeneric(m)) manufacturer = m!;
-                                if (IsGeneric(model) && !IsGeneric(n)) model = n!;
-                                break;
+                                using (obj)
+                                {
+                                    string? m = obj["Manufacturer"]?.ToString();
+                                    string? p = obj["Product"]?.ToString();
+                                    if (!IsGeneric(m)) manufacturer = m!;
+                                    if (!IsGeneric(p)) model = p!;
+                                    if (!IsGeneric(manufacturer) && !IsGeneric(model)) break;
+                                }
                             }
                         }
                     }
-
-                    // 3. Computer System Fallback
-                    if (IsGeneric(manufacturer))
-                    {
-                        using (var searcher = CreateSearcher("select Manufacturer, Model from Win32_ComputerSystem"))
-                        {
-                            foreach (var obj in searcher.Get())
-                            {
-                                string? m = obj["Manufacturer"]?.ToString();
-                                string? mod = obj["Model"]?.ToString();
-
-                                if (IsGeneric(manufacturer) && !IsGeneric(m)) manufacturer = m!;
-                                if (IsGeneric(model) && !IsGeneric(mod)) model = mod!;
-                                break;
-                            }
-                        }
-                    }
+                    catch { }
                 }
-                catch { }
-
-                // Fallback to Registry for System Info
-                try
-                {
-                    if (IsGeneric(manufacturer))
-                        manufacturer = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemManufacturer", manufacturer)?.ToString() ?? manufacturer;
-                    
-                    if (IsGeneric(model))
-                        model = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemProductName", model)?.ToString() ?? model;
-                }
-                catch { }
 
                 // Final cleaning
                 if (IsGeneric(manufacturer)) manufacturer = "Standard PC";
@@ -312,18 +377,46 @@ namespace Eternal.Services.Hardware
                 var adapters = new List<NetworkAdapterInfo>();
                 try
                 {
-                    using var searcher = CreateSearcher("select Description, MACAddress, IPAddress from Win32_NetworkAdapterConfiguration where IPEnabled = 'True'");
-                    foreach (var obj in searcher.Get())
+                    // Map Configuration to Adapter for Speed
+                    var speeds = new Dictionary<string, string>();
+                    using (var speedSearcher = CreateSearcher("select Name, Speed from Win32_NetworkAdapter"))
                     {
-                        string name = obj["Description"]?.ToString() ?? "Unknown";
-                        string mac = obj["MACAddress"]?.ToString() ?? "Unknown";
-                        string[] ips = (string[])obj["IPAddress"];
-                        string ip = ips != null && ips.Length > 0 ? ips[0] : "N/A";
-                        
-                        adapters.Add(new NetworkAdapterInfo(name, mac, ip, "Detecting..."));
+                        using var speedCol = speedSearcher.Get();
+                        foreach (ManagementObject sObj in speedCol)
+                        {
+                            using (sObj)
+                            {
+                                string? n = sObj["Name"]?.ToString();
+                                string? s = sObj["Speed"]?.ToString();
+                                if (n != null && s != null)
+                                {
+                                    long bitSpeed = global::System.Convert.ToInt64(s);
+                                    speeds[n] = bitSpeed >= 1000000000 ? $"{bitSpeed / 1000000000.0:F1} Gbps" : $"{bitSpeed / 1000000.0:F0} Mbps";
+                                }
+                            }
+                        }
+                    }
+
+                    using var searcher = CreateSearcher("select Description, MACAddress, IPAddress from Win32_NetworkAdapterConfiguration where IPEnabled = 'True'");
+                    using var collection = searcher.Get();
+                    foreach (ManagementObject obj in collection)
+                    {
+                        using (obj)
+                        {
+                            string name = obj["Description"]?.ToString() ?? "Unknown";
+                            string mac = obj["MACAddress"]?.ToString() ?? "Unknown";
+                            string[] ips = (string[])obj["IPAddress"];
+                            string ip = ips != null && ips.Length > 0 ? ips[0] : "N/A";
+                            
+                            speeds.TryGetValue(name, out var speed);
+                            adapters.Add(new NetworkAdapterInfo(name, mac, ip, speed ?? "Unknown"));
+                        }
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    global::System.Diagnostics.Debug.WriteLine($"WMI Network Scan Error: {ex.Message}");
+                }
                 return adapters;
             });
         }
@@ -337,76 +430,96 @@ namespace Eternal.Services.Hardware
                 // 1. OS Info
                 try {
                     using var searcher = CreateSearcher("select Caption, Version, BuildNumber, Manufacturer, CSName, OSArchitecture, BootDevice, WindowsDirectory, SystemDirectory from Win32_OperatingSystem");
-                    foreach (var obj in searcher.Get()) {
-                        items.Add(new SystemSummaryItem("OS", "OS Name", obj["Caption"]?.ToString()));
-                        items.Add(new SystemSummaryItem("OS", "Version", obj["Version"]?.ToString()));
-                        items.Add(new SystemSummaryItem("OS", "Build Number", obj["BuildNumber"]?.ToString()));
-                        items.Add(new SystemSummaryItem("OS", "OS Manufacturer", obj["Manufacturer"]?.ToString()));
-                        items.Add(new SystemSummaryItem("OS", "System Name", obj["CSName"]?.ToString()));
-                        items.Add(new SystemSummaryItem("OS", "Architecture", obj["OSArchitecture"]?.ToString()));
-                        items.Add(new SystemSummaryItem("OS", "Boot Device", obj["BootDevice"]?.ToString()));
-                        items.Add(new SystemSummaryItem("OS", "Windows Directory", obj["WindowsDirectory"]?.ToString()));
-                        items.Add(new SystemSummaryItem("OS", "System Directory", obj["SystemDirectory"]?.ToString()));
+                    using var collection = searcher.Get();
+                    foreach (ManagementObject obj in collection) {
+                        using (obj)
+                        {
+                            items.Add(new SystemSummaryItem("OS", "OS Name", obj["Caption"]?.ToString()));
+                            items.Add(new SystemSummaryItem("OS", "Version", obj["Version"]?.ToString()));
+                            items.Add(new SystemSummaryItem("OS", "Build Number", obj["BuildNumber"]?.ToString()));
+                            items.Add(new SystemSummaryItem("OS", "OS Manufacturer", obj["Manufacturer"]?.ToString()));
+                            items.Add(new SystemSummaryItem("OS", "System Name", obj["CSName"]?.ToString()));
+                            items.Add(new SystemSummaryItem("OS", "Architecture", obj["OSArchitecture"]?.ToString()));
+                            items.Add(new SystemSummaryItem("OS", "Boot Device", obj["BootDevice"]?.ToString()));
+                            items.Add(new SystemSummaryItem("OS", "Windows Directory", obj["WindowsDirectory"]?.ToString()));
+                            items.Add(new SystemSummaryItem("OS", "System Directory", obj["SystemDirectory"]?.ToString()));
+                        }
                     }
-                } catch { }
+                } catch (Exception ex) { global::System.Diagnostics.Debug.WriteLine($"WMI OS Scan Error: {ex.Message}"); }
 
                 // 2. System Info
                 try {
                     using var searcher = CreateSearcher("select Manufacturer, Model, SystemType, SystemSKUNumber, TotalPhysicalMemory, Domain, UserName from Win32_ComputerSystem");
-                    foreach (var obj in searcher.Get()) {
-                        items.Add(new SystemSummaryItem("System", "System Manufacturer", obj["Manufacturer"]?.ToString()));
-                        items.Add(new SystemSummaryItem("System", "System Model", obj["Model"]?.ToString()));
-                        items.Add(new SystemSummaryItem("System", "System Type", obj["SystemType"]?.ToString()));
-                        items.Add(new SystemSummaryItem("System", "SKU Number", obj["SystemSKUNumber"]?.ToString()));
-                        
-                        ulong totalBytes = global::System.Convert.ToUInt64(obj["TotalPhysicalMemory"] ?? 0);
-                        string memoryStr = (totalBytes / (1024 * 1024 * 1024)).ToString() + " GB";
-                        items.Add(new SystemSummaryItem("System", "Total Physical Memory", memoryStr));
-                        
-                        items.Add(new SystemSummaryItem("System", "Domain", obj["Domain"]?.ToString()));
-                        items.Add(new SystemSummaryItem("System", "User Name", obj["UserName"]?.ToString()));
+                    using var collection = searcher.Get();
+                    foreach (ManagementObject obj in collection) {
+                        using (obj)
+                        {
+                            items.Add(new SystemSummaryItem("System", "System Manufacturer", obj["Manufacturer"]?.ToString()));
+                            items.Add(new SystemSummaryItem("System", "System Model", obj["Model"]?.ToString()));
+                            items.Add(new SystemSummaryItem("System", "System Type", obj["SystemType"]?.ToString()));
+                            items.Add(new SystemSummaryItem("System", "SKU Number", obj["SystemSKUNumber"]?.ToString()));
+                            
+                            ulong totalBytes = global::System.Convert.ToUInt64(obj["TotalPhysicalMemory"] ?? 0);
+                            string memoryStr = (totalBytes / (1024 * 1024 * 1024)).ToString() + " GB";
+                            items.Add(new SystemSummaryItem("System", "Total Physical Memory", memoryStr));
+                            
+                            items.Add(new SystemSummaryItem("System", "Domain", obj["Domain"]?.ToString()));
+                            items.Add(new SystemSummaryItem("System", "User Name", obj["UserName"]?.ToString()));
+                        }
                     }
-                } catch { }
+                } catch (Exception ex) { global::System.Diagnostics.Debug.WriteLine($"WMI ComputerSystem Scan Error: {ex.Message}"); }
 
                 // 3. BIOS Info
                 try {
                     using var searcher = CreateSearcher("select SMBIOSBIOSVersion, SMBIOSMajorVersion, SMBIOSMinorVersion, EmbeddedControllerMajorVersion, EmbeddedControllerMinorVersion from Win32_BIOS");
-                    foreach (var obj in searcher.Get()) {
-                        items.Add(new SystemSummaryItem("Firmware", "BIOS Version/Date", obj["SMBIOSBIOSVersion"]?.ToString()));
-                        
-                        string smbios = (obj["SMBIOSMajorVersion"]?.ToString() ?? "0") + "." + (obj["SMBIOSMinorVersion"]?.ToString() ?? "0");
-                        items.Add(new SystemSummaryItem("Firmware", "SMBIOS Version", smbios));
-                        
-                        string ec = (obj["EmbeddedControllerMajorVersion"]?.ToString() ?? "0") + "." + (obj["EmbeddedControllerMinorVersion"]?.ToString() ?? "0");
-                        items.Add(new SystemSummaryItem("Firmware", "Embedded Controller Version", ec));
-                        
-                        items.Add(new SystemSummaryItem("Firmware", "BIOS Mode", "N/A (See UEFI Module)"));
+                    using var collection = searcher.Get();
+                    foreach (ManagementObject obj in collection) {
+                        using (obj)
+                        {
+                            items.Add(new SystemSummaryItem("Firmware", "BIOS Version/Date", obj["SMBIOSBIOSVersion"]?.ToString()));
+                            
+                            string smbios = (obj["SMBIOSMajorVersion"]?.ToString() ?? "0") + "." + (obj["SMBIOSMinorVersion"]?.ToString() ?? "0");
+                            items.Add(new SystemSummaryItem("Firmware", "SMBIOS Version", smbios));
+                            
+                            string ec = (obj["EmbeddedControllerMajorVersion"]?.ToString() ?? "0") + "." + (obj["EmbeddedControllerMinorVersion"]?.ToString() ?? "0");
+                            items.Add(new SystemSummaryItem("Firmware", "Embedded Controller Version", ec));
+                            
+                            items.Add(new SystemSummaryItem("Firmware", "BIOS Mode", "N/A (See UEFI Module)"));
+                        }
                     }
-                } catch { }
+                } catch (Exception ex) { global::System.Diagnostics.Debug.WriteLine($"WMI BIOS Scan Error: {ex.Message}"); }
 
                 // 4. BaseBoard
                 try {
                     using var searcher = CreateSearcher("select Manufacturer, Product, Version from Win32_BaseBoard");
-                    foreach (var obj in searcher.Get()) {
-                        items.Add(new SystemSummaryItem("Board", "BaseBoard Manufacturer", obj["Manufacturer"]?.ToString()));
-                        items.Add(new SystemSummaryItem("Board", "BaseBoard Product", obj["Product"]?.ToString()));
-                        items.Add(new SystemSummaryItem("Board", "BaseBoard Version", obj["Version"]?.ToString()));
+                    using var collection = searcher.Get();
+                    foreach (ManagementObject obj in collection) {
+                        using (obj)
+                        {
+                            items.Add(new SystemSummaryItem("Board", "BaseBoard Manufacturer", obj["Manufacturer"]?.ToString()));
+                            items.Add(new SystemSummaryItem("Board", "BaseBoard Product", obj["Product"]?.ToString()));
+                            items.Add(new SystemSummaryItem("Board", "BaseBoard Version", obj["Version"]?.ToString()));
+                        }
                     }
-                } catch { }
+                } catch (Exception ex) { global::System.Diagnostics.Debug.WriteLine($"WMI BaseBoard Scan Error: {ex.Message}"); }
 
                 // 5. Processor (Detailed)
                 try {
                     using var searcher = CreateSearcher("select Name, Description, L2CacheSize, L3CacheSize from Win32_Processor");
-                    foreach (var obj in searcher.Get()) {
-                        items.Add(new SystemSummaryItem("Processor", "Name", obj["Name"]?.ToString()));
-                        items.Add(new SystemSummaryItem("Processor", "Description", obj["Description"]?.ToString()));
-                        
-                        string l2 = (obj["L2CacheSize"]?.ToString() ?? "0") + " KB";
-                        string l3 = (obj["L3CacheSize"]?.ToString() ?? "0") + " KB";
-                        items.Add(new SystemSummaryItem("Processor", "L2 Cache Size", l2));
-                        items.Add(new SystemSummaryItem("Processor", "L3 Cache Size", l3));
+                    using var collection = searcher.Get();
+                    foreach (ManagementObject obj in collection) {
+                        using (obj)
+                        {
+                            items.Add(new SystemSummaryItem("Processor", "Name", obj["Name"]?.ToString()));
+                            items.Add(new SystemSummaryItem("Processor", "Description", obj["Description"]?.ToString()));
+                            
+                            string l2 = (obj["L2CacheSize"]?.ToString() ?? "0") + " KB";
+                            string l3 = (obj["L3CacheSize"]?.ToString() ?? "0") + " KB";
+                            items.Add(new SystemSummaryItem("Processor", "L2 Cache Size", l2));
+                            items.Add(new SystemSummaryItem("Processor", "L3 Cache Size", l3));
+                        }
                     }
-                } catch { }
+                } catch (Exception ex) { global::System.Diagnostics.Debug.WriteLine($"WMI Processor Detail Scan Error: {ex.Message}"); }
 
                 return items;
             });

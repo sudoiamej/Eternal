@@ -16,8 +16,7 @@ namespace Eternal.ViewModels.Modules
         private readonly IStorageService _storageService;
         private readonly IToastService _toastService;
         private readonly IEnvironmentService _envService;
-
-        [ObservableProperty] private bool _isLoading;
+        private readonly ILoggingService _loggingService;
 
         public ObservableCollection<PhysicalDisk> PhysicalDisks { get; } = new ObservableCollection<PhysicalDisk>();
         
@@ -31,14 +30,21 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private bool _isReadOnly;
         [ObservableProperty] private bool _isHidden;
         [ObservableProperty] private bool _isPeMode;
+        [ObservableProperty] private bool _isBypassActive;
+
+        partial void OnIsBypassActiveChanged(bool value)
+        {
+            IsFocusModeActive = value;
+        }
 
         public ObservableCollection<string> AvailableDriveLetters { get; } = new ObservableCollection<string>();
 
-        public StorageViewModel(IStorageService storageService, IToastService toastService, IEnvironmentService envService)
+        public StorageViewModel(IStorageService storageService, IToastService toastService, IEnvironmentService envService, ILoggingService loggingService)
         {
             _storageService = storageService;
             _toastService = toastService;
             _envService = envService;
+            _loggingService = loggingService;
             
             IsPeMode = _envService.IsPeMode;
             LoadCommand = new AsyncRelayCommand(LoadDataAsync);
@@ -81,24 +87,37 @@ namespace Eternal.ViewModels.Modules
                 SelectedDisk = PhysicalDisks.FirstOrDefault(d => d.Partitions.Contains(p));
             }
         }
-
         public async Task LoadDataAsync()
         {
-            IsLoading = true;
+            _loggingService.Log("Storage Architecture: Initializing topology mapping...");
+
             await ExecuteBusyActionAsync(async () =>
             {
-                var disks = await _storageService.GetPhysicalDisksAsync();
-                PhysicalDisks.Clear();
-                foreach (var d in disks) PhysicalDisks.Add(d);
-
-                if (SelectedPartition != null)
+                try
                 {
-                    var match = PhysicalDisks.SelectMany(d => d.Partitions)
-                        .FirstOrDefault(p => p.DriveLetter == SelectedPartition.DriveLetter && !string.IsNullOrEmpty(p.DriveLetter));
-                    SelectedPartition = match;
+                    var disks = await _storageService.GetPhysicalDisksAsync();
+                    PhysicalDisks.Clear();
+                    foreach (var d in disks) PhysicalDisks.Add(d);
+
+                    _loggingService.Log($"Storage Architecture: Mapped {disks.Count} physical drives.");
+                    if (disks.Count == 0)
+                    {
+                        _loggingService.Log("Warning: No physical drives detected by WMI. Check permissions.", "WARN");
+                    }
+
+                    if (SelectedPartition != null)
+                    {
+                        var match = PhysicalDisks.SelectMany(d => d.Partitions)
+                            .FirstOrDefault(p => p.DriveLetter == SelectedPartition.DriveLetter && !string.IsNullOrEmpty(p.DriveLetter));
+                        SelectedPartition = match;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Log($"Storage Mapping Error: {ex.Message}", "ERROR");
+                    _toastService.ShowError($"Storage Map Failure: {ex.Message}");
                 }
             }, "Mapping Storage Topology...");
-            IsLoading = false;
         }
 
         private bool IsProtectedVolume(string? driveLetter)

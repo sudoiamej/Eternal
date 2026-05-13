@@ -142,6 +142,8 @@ namespace Eternal.Models
 
     public class AppSettings
     {
+        public bool UseLegacyUI { get; set; } = false;
+        public string NewUiGradiency { get; set; } = "Deep Space";
         public string Theme { get; set; } = "Dark";
         public string ThemeAccentColor { get; set; } = "#0078D7";
         public bool IsAutoUpdateEnabled { get; set; } = true;
@@ -176,5 +178,6 @@ namespace Eternal.Models
 
         // Paths
         public string ExportFolderPath { get; set; } = string.Empty;
+        public DateTime LastUpdateCheck { get; set; } = DateTime.MinValue;
     }
 }

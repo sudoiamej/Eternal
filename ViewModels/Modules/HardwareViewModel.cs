@@ -1,11 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Eternal.Services.Hardware;
+using Eternal.Models;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class HardwareViewModel : ObservableObject
+    public partial class HardwareViewModel : BaseViewModel
     {
         private readonly IHardwareService _hardwareService;
 
@@ -15,7 +18,6 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private List<DiskInfo> _disks;
         [ObservableProperty] private MotherboardInfo _motherboard;
         [ObservableProperty] private List<SystemSummaryItem> _detailedInfo;
-        [ObservableProperty] private bool _isLoading;
         [ObservableProperty] private bool _hasError;
         [ObservableProperty] private string _errorMessage;
         [ObservableProperty] private string _errorDetails;
@@ -30,7 +32,7 @@ namespace Eternal.ViewModels.Modules
 
         private async Task LoadDataAsync()
         {
-            IsLoading = true;
+            IsBusy = true;
             HasError = false;
             try
             {
@@ -59,7 +61,7 @@ namespace Eternal.ViewModels.Modules
             }
             finally
             {
-                IsLoading = false;
+                IsBusy = false;
             }
         }
     }

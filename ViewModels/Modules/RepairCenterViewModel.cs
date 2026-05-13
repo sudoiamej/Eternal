@@ -6,23 +6,22 @@ using System.Threading.Tasks;
 using System.Windows;
 using Eternal.Models;
 using Eternal.Services.System;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class RepairCenterViewModel : ObservableObject
+    public partial class RepairCenterViewModel : BaseViewModel
     {
         private readonly IToolkitService _toolkitService;
         private readonly IServicesService _servicesService;
 
         public ObservableCollection<PCProblem> Problems { get; } = new ObservableCollection<PCProblem>();
         
-        [ObservableProperty] private bool _isBusy;
-        [ObservableProperty] private string _statusMessage = "Select a problem to begin diagnosis.";
-
         public RepairCenterViewModel(IToolkitService toolkitService, IServicesService servicesService)
         {
             _toolkitService = toolkitService;
             _servicesService = servicesService;
+            StatusMessage = "Select a problem to begin diagnosis.";
             InitializeProblems();
         }
 

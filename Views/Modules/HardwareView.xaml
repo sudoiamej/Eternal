@@ -33,7 +33,7 @@
                             <TextBlock Text="Advanced Data" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             <CheckBox IsChecked="{Binding DataContext.IsAdvancedMode, RelativeSource={RelativeSource AncestorType=Window}}" Width="32" Height="18" Style="{StaticResource {x:Static ToolBar.CheckBoxStyleKey}}"/>
                         </StackPanel>
-                        <Button Command="{Binding LoadDataCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Rescan Hardware">
+                        <Button Command="{Binding LoadDataCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Rescan Hardware">
                             <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </Button>
                     </StackPanel>
@@ -237,7 +237,7 @@
         </helpers:ErrorCard>
 
         <!-- Loading Overlay (HCI Rule 5: Feedback System) -->
-        <Border Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}">
+        <Border Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                 <TextBlock Text="Scanning Hardware..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
@@ -245,7 +245,3 @@
         </Border>
     </Grid>
 </UserControl>
-
-
-
-

@@ -47,7 +47,11 @@ namespace Eternal.Helpers
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool b) return b ? "Enabled" : "Disabled";
+            if (parameter is string param && param == "Camera")
+            {
+                return value is bool b && b ? "Stop Feed" : "Start Feed";
+            }
+            if (value is bool val) return val ? "Enabled" : "Disabled";
             return "Unknown";
         }
 
@@ -230,6 +234,38 @@ namespace Eternal.Helpers
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (parameter is string param)
+            {
+                if (param == "Integrity")
+                {
+                    bool healthy = value is bool b && b;
+                    return healthy ? FontAwesome.WPF.FontAwesomeIcon.CheckCircleOutline : FontAwesome.WPF.FontAwesomeIcon.ExclamationCircle;
+                }
+                if (param == "IntegrityBrush")
+                {
+                    bool healthy = value is bool b && b;
+                    return healthy ? System.Windows.Application.Current.Resources["SuccessBrush"] : System.Windows.Application.Current.Resources["CriticalBrush"];
+                }
+                if (param == "Toast")
+                {
+                    if (value is Services.System.ToastSeverity severity)
+                    {
+                        return severity switch
+                        {
+                            Services.System.ToastSeverity.Success => FontAwesome.WPF.FontAwesomeIcon.CheckCircle,
+                            Services.System.ToastSeverity.Warning => FontAwesome.WPF.FontAwesomeIcon.ExclamationTriangle,
+                            Services.System.ToastSeverity.Error => FontAwesome.WPF.FontAwesomeIcon.TimesCircle,
+                            _ => FontAwesome.WPF.FontAwesomeIcon.InfoCircle
+                        };
+                    }
+                    return FontAwesome.WPF.FontAwesomeIcon.InfoCircle;
+                }
+                if (param == "Camera")
+                {
+                    return value is bool b && b ? FontAwesome.WPF.FontAwesomeIcon.StopCircle : FontAwesome.WPF.FontAwesomeIcon.PlayCircle;
+                }
+            }
+
             if (value is ProcessCategory cat)
             {
                 return cat switch
@@ -249,14 +285,35 @@ namespace Eternal.Helpers
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is double val && double.TryParse(parameter as string, out double max))
+            double val = 0;
+            if (value is double d) val = d;
+            else if (value is int i) val = i;
+            else if (value is float f) val = f;
+            else if (value is long l) val = l;
+
+            if (double.TryParse(parameter as string, out double p))
             {
+                // If the parameter is a small multiplier (e.g. 0.1 for Display scaling)
+                if (p < 0.5) return val * p;
+                
+                // Otherwise assume it's a max height for a bar chart (e.g. 80 for Network)
                 // Assuming val is 0-100 or similar, scale to height. 
-                // Adjust factor based on typical Mbps expectations.
-                return Math.Min(max, val * (max / 50.0)); 
+                return Math.Max(2.0, Math.Min(p, val * (p / 50.0))); 
             }
             return 2.0; // Min visible bar
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class EqualityConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values == null || values.Length < 2) return false;
+            if (values[0] == null && values[1] == null) return true;
+            if (values[0] == null || values[1] == null) return false;
+            return values[0].Equals(values[1]);
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

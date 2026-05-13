@@ -12,7 +12,12 @@ namespace Eternal.Views.Helpers
             {
                 if ((bool)e.NewValue)
                 {
-                    SearchBox.Focus();
+                    // Delay slightly to ensure the control is ready for focus
+                    Dispatcher.BeginInvoke(new System.Action(() => 
+                    {
+                        SearchBox.Focus();
+                        Keyboard.Focus(SearchBox);
+                    }), System.Windows.Threading.DispatcherPriority.Input);
                 }
             };
         }

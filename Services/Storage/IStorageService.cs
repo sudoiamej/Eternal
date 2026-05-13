@@ -39,6 +39,25 @@ namespace Eternal.Services.Storage
                 var disks = new List<PhysicalDisk>();
                 try
                 {
+                    // 1. Get all logical disks first for mapping
+                    var logicalDisks = new Dictionary<string, (string Label, long Free, string FS)>();
+                    using (var logSearcher = CreateSearcher("SELECT DeviceID, VolumeName, FreeSpace, FileSystem FROM Win32_LogicalDisk"))
+                    {
+                        foreach (var logObj in logSearcher.Get())
+                        {
+                            string id = logObj["DeviceID"]?.ToString() ?? "";
+                            if (!string.IsNullOrEmpty(id))
+                            {
+                                logicalDisks[id] = (
+                                    logObj["VolumeName"]?.ToString() ?? "Local Disk",
+                                    global::System.Convert.ToInt64(logObj["FreeSpace"] ?? 0),
+                                    logObj["FileSystem"]?.ToString() ?? "Unknown"
+                                );
+                            }
+                        }
+                    }
+
+                    // 2. Get Disk Drives
                     using var diskSearcher = CreateSearcher("select DeviceID, Model, InterfaceType, Size, Status, SerialNumber, Index from Win32_DiskDrive");
                     foreach (var diskObj in diskSearcher.Get())
                     {
@@ -46,10 +65,8 @@ namespace Eternal.Services.Storage
                         int diskIndex = global::System.Convert.ToInt32(diskObj["Index"] ?? 0);
                         var partitions = new List<PartitionInfo>();
 
-                        // Find associated partitions for this disk
-                        string partQuery = $"ASSOCIATORS OF {{Win32_DiskDrive.DeviceID='{deviceId}'}} WHERE AssocClass = Win32_DiskDriveToDiskPartition";
-                        using var partSearcher = CreateSearcher(partQuery);
-                        
+                        // 3. Get Partitions for this disk using a direct query instead of ASSOCIATORS OF
+                        using var partSearcher = CreateSearcher($"SELECT DeviceID, Index, Size, Type, BootPartition FROM Win32_DiskPartition WHERE DiskIndex = {diskIndex}");
                         foreach (var partObj in partSearcher.Get())
                         {
                             string partDeviceId = partObj["DeviceID"]?.ToString() ?? "";
@@ -58,20 +75,31 @@ namespace Eternal.Services.Storage
                             string partType = partObj["Type"]?.ToString() ?? "Unknown";
                             bool isBoot = (bool)(partObj["BootPartition"] ?? false);
 
-                            // Find associated logical disk (drive letter)
+                            // 4. Map Logical Disks to Partitions using Win32_LogicalDiskToPartition
                             string driveLetter = "";
                             string label = "System Reserved / Hidden";
                             long freeSpace = 0;
                             string fs = "N/A";
 
-                            string logQuery = $"ASSOCIATORS OF {{Win32_DiskPartition.DeviceID='{partDeviceId}'}} WHERE AssocClass = Win32_LogicalDiskToPartition";
-                            using var logSearcher = CreateSearcher(logQuery);
-                            foreach (var logObj in logSearcher.Get())
+                            using (var mapSearcher = CreateSearcher($"SELECT Dependent FROM Win32_LogicalDiskToPartition WHERE Antecedent = \"Win32_DiskPartition.DeviceID='{partDeviceId}'\""))
                             {
-                                driveLetter = logObj["DeviceID"]?.ToString() ?? "";
-                                label = logObj["VolumeName"]?.ToString() ?? "Local Disk";
-                                freeSpace = global::System.Convert.ToInt64(logObj["FreeSpace"] ?? 0);
-                                fs = logObj["FileSystem"]?.ToString() ?? "Unknown";
+                                foreach (var mapObj in mapSearcher.Get())
+                                {
+                                    string dep = mapObj["Dependent"]?.ToString() ?? "";
+                                    // Extract drive letter from "Win32_LogicalDisk.DeviceID="C:""
+                                    int start = dep.IndexOf("DeviceID=\"") + 10;
+                                    int end = dep.IndexOf("\"", start);
+                                    if (start > 9 && end > start)
+                                    {
+                                        driveLetter = dep.Substring(start, end - start);
+                                        if (logicalDisks.TryGetValue(driveLetter, out var logInfo))
+                                        {
+                                            label = logInfo.Label;
+                                            freeSpace = logInfo.Free;
+                                            fs = logInfo.FS;
+                                        }
+                                    }
+                                }
                             }
 
                             partitions.Add(new PartitionInfo(driveLetter, label, partSize, freeSpace, fs, partType, partIndex, isBoot));
@@ -88,7 +116,9 @@ namespace Eternal.Services.Storage
                             partitions.OrderBy(p => p.Index).ToList()
                         ));
                     }
-                } catch { }
+                } catch (Exception ex) { 
+                    global::System.Diagnostics.Debug.WriteLine($"Storage Map Error: {ex.Message}");
+                }
                 return disks.OrderBy(d => d.Index).ToList();
             });
         }

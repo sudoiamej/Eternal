@@ -33,26 +33,30 @@ namespace Eternal.Services.System
         {
             try
             {
-                var searcher = new ManagementObjectSearcher("SELECT TotalPhysicalMemory FROM Win32_ComputerSystem");
-                foreach (var obj in searcher.Get())
+                using var searcher = new ManagementObjectSearcher("SELECT TotalPhysicalMemory FROM Win32_ComputerSystem");
+                using var collection = searcher.Get();
+                foreach (ManagementObject obj in collection)
                 {
-                    ulong totalBytes = (ulong)obj["TotalPhysicalMemory"];
-                    double totalGB = totalBytes / 1024.0 / 1024.0 / 1024.0;
+                    using (obj)
+                    {
+                        ulong totalBytes = global::System.Convert.ToUInt64(obj["TotalPhysicalMemory"] ?? 0);
+                        double totalGB = totalBytes / 1024.0 / 1024.0 / 1024.0;
 
-                    if (totalGB < 3.5) // Allow margin for 4GB systems
-                    {
-                        IsHardwareCompatible = false;
-                        CompatibilityMessage = $"Insufficient RAM: {totalGB:F1}GB detected (4GB required for local AI).";
-                    }
-                    else if (totalGB < 7.5)
-                    {
-                        IsHardwareCompatible = true;
-                        CompatibilityMessage = "System meets minimum requirements (4GB), but performance may be limited.";
-                    }
-                    else
-                    {
-                        IsHardwareCompatible = true;
-                        CompatibilityMessage = "System meets requirements for local neural inference.";
+                        if (totalGB < 3.5) // Allow margin for 4GB systems
+                        {
+                            IsHardwareCompatible = false;
+                            CompatibilityMessage = $"Insufficient RAM: {totalGB:F1}GB detected (4GB required for local AI).";
+                        }
+                        else if (totalGB < 7.5)
+                        {
+                            IsHardwareCompatible = true;
+                            CompatibilityMessage = "System meets minimum requirements (4GB), but performance may be limited.";
+                        }
+                        else
+                        {
+                            IsHardwareCompatible = true;
+                            CompatibilityMessage = "System meets requirements for local neural inference.";
+                        }
                     }
                 }
             }
@@ -60,6 +64,7 @@ namespace Eternal.Services.System
             {
                 IsHardwareCompatible = false;
                 CompatibilityMessage = $"Safety Check Error: {ex.Message}";
+                global::System.Diagnostics.Debug.WriteLine($"Neural Engine Compatibility Check Error: {ex.Message}");
             }
         }
 

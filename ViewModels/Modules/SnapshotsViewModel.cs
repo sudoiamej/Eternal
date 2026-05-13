@@ -8,14 +8,15 @@ using CommunityToolkit.Mvvm.Input;
 using Eternal.Models;
 using Eternal.Services.System;
 
+using Eternal.ViewModels;
+
 namespace Eternal.ViewModels.Modules
 {
-    public partial class SnapshotsViewModel : ObservableObject
+    public partial class SnapshotsViewModel : BaseViewModel
     {
         private readonly ISnapshotService _snapshotService;
         private readonly ILoggingService _loggingService;
 
-        [ObservableProperty] private bool _isBusy;
         [ObservableProperty] private string _newSnapshotDescription = "Manual System State Baseline";
         
         public ObservableCollection<SystemSnapshot> Snapshots { get; } = new ObservableCollection<SystemSnapshot>();

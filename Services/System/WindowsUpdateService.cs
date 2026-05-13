@@ -27,11 +27,6 @@ namespace Eternal.Services.System
 
         public async Task<UpdateInfo> CheckForUpdatesAsync()
         {
-            if (_settingsService.Current.SimulateUpdateFailure)
-            {
-                await Task.Delay(1000);
-                throw new Exception("SIMULATED_FAILURE: GitHub API reported 403 Rate Limit Exceeded.");
-            }
             try
             {
                 var url = $"https://api.github.com/repos/{_repoOwner}/{_repoName}/releases/latest";

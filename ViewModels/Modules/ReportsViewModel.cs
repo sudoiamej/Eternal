@@ -5,10 +5,11 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Eternal.Services.Hardware;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class ReportsViewModel : ObservableObject
+    public partial class ReportsViewModel : BaseViewModel
     {
         private readonly IHardwareService _hardwareService;
 

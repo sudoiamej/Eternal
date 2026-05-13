@@ -34,23 +34,26 @@ namespace Eternal.Models
 
             OutputLines.Add($"[SYSTEM] Initializing {title} session environment...");
 
-            _consoleService.OutputReceived += (s, line) =>
-            {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    OutputLines.Add(line);
-                    if (OutputLines.Count > 1000) OutputLines.RemoveAt(0);
-                });
-            };
+            _consoleService.OutputReceived += OnOutputReceived;
+            _consoleService.Exited += OnConsoleExited;
+        }
 
-            _consoleService.Exited += (s, e) =>
+        private void OnOutputReceived(object? sender, string line)
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    OutputLines.Add("[SESSION TERMINATED]");
-                    IsBusy = false;
-                });
-            };
+                OutputLines.Add(line);
+                if (OutputLines.Count > 1000) OutputLines.RemoveAt(0);
+            });
+        }
+
+        private void OnConsoleExited(object? sender, EventArgs e)
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                OutputLines.Add("[SESSION TERMINATED]");
+                IsBusy = false;
+            });
         }
 
         public async Task StartAsync(string executable)
@@ -69,6 +72,8 @@ namespace Eternal.Models
 
         public void Dispose()
         {
+            _consoleService.OutputReceived -= OnOutputReceived;
+            _consoleService.Exited -= OnConsoleExited;
             _consoleService.Stop();
             _consoleService.Dispose();
         }

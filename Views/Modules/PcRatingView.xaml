@@ -49,11 +49,11 @@
                                 <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13" Margin="0,5,0,0"/>
                             </StackPanel>
 
-                            <Button Grid.Column="2" Command="{Binding RunAssessmentCommand}" IsEnabled="{Binding IsAssessing, Converter={StaticResource InvertBooleanConverter}}"
+                            <Button Grid.Column="2" Command="{Binding RunAssessmentCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBooleanConverter}}"
                                     Style="{StaticResource PrimaryAction}" Padding="25,12"
                                     ToolTip="Formal assessments may cause temporary screen flickering and heavy system load. Ensure all work is saved.">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Trophy" Width="14" Foreground="White" Margin="0,0,10,0" Spin="{Binding IsAssessing}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Trophy" Width="14" Foreground="White" Margin="0,0,10,0" Spin="{Binding IsBusy}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="RUN NEW ASSESSMENT" FontWeight="Bold"/>
                                 </StackPanel>
                             </Button>

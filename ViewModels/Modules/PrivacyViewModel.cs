@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using Eternal.Models;
 using Eternal.Services.Security;
 using Eternal.Services.System;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {

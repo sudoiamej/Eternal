@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Management;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Win32;
+using Eternal.Helpers;
 
 namespace Eternal.Services.System
 {
@@ -83,25 +85,62 @@ namespace Eternal.Services.System
                 string model = "Unknown";
                 string serial = "Unknown";
 
+                bool useNative = OsHelper.IsWindows11OrGreater();
+
                 try
                 {
-                    // 1. Primary: ComputerSystemProduct
-                    using (var searcher = new ManagementObjectSearcher("select Manufacturer, Name, IdentifyingNumber from Win32_ComputerSystemProduct"))
+                    // 1. Primary for Windows 11: Registry Fallback (Direct SMBIOS strings)
+                    if (useNative)
                     {
-                        foreach (var obj in searcher.Get())
+                        try
                         {
-                            string? m = obj["Manufacturer"]?.ToString();
-                            string? n = obj["Name"]?.ToString();
-                            string? s = obj["IdentifyingNumber"]?.ToString();
+                            using var biosKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\BIOS");
+                            if (biosKey != null)
+                            {
+                                string? regVendor = biosKey.GetValue("SystemManufacturer")?.ToString();
+                                string? regModel = biosKey.GetValue("SystemProductName")?.ToString();
+                                string? regSerial = biosKey.GetValue("SystemSerialNumber")?.ToString();
+                                
+                                if (!IsGeneric(regVendor)) vendor = regVendor!;
+                                if (!IsGeneric(regModel)) model = regModel!;
+                                if (!IsGeneric(regSerial)) serial = regSerial!;
 
-                            if (!IsGeneric(m)) vendor = m!;
-                            if (!IsGeneric(n)) model = n!;
-                            if (!IsGeneric(s)) serial = s!;
-                            break;
+                                // Deep fallback for custom boards
+                                if (IsGeneric(vendor))
+                                {
+                                    string? bbVendor = biosKey.GetValue("BaseBoardManufacturer")?.ToString();
+                                    if (!IsGeneric(bbVendor)) vendor = bbVendor!;
+                                }
+                                if (IsGeneric(model))
+                                {
+                                    string? bbProduct = biosKey.GetValue("BaseBoardProduct")?.ToString();
+                                    if (!IsGeneric(bbProduct)) model = bbProduct!;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+
+                    // 2. Secondary/Legacy: WMI ComputerSystemProduct
+                    if (IsGeneric(vendor) || IsGeneric(model) || !useNative)
+                    {
+                        using (var searcher = new ManagementObjectSearcher("select Manufacturer, Name, IdentifyingNumber from Win32_ComputerSystemProduct"))
+                        {
+                            foreach (var obj in searcher.Get())
+                            {
+                                string? m = obj["Manufacturer"]?.ToString();
+                                string? n = obj["Name"]?.ToString();
+                                string? s = obj["IdentifyingNumber"]?.ToString();
+
+                                if (IsGeneric(vendor) && !IsGeneric(m)) vendor = m!;
+                                if (IsGeneric(model) && !IsGeneric(n)) model = n!;
+                                if (IsGeneric(serial) && !IsGeneric(s)) serial = s!;
+                                break;
+                            }
                         }
                     }
 
-                    // 2. Secondary: BaseBoard (Motherboard)
+                    // 3. Tertiary: BaseBoard (Motherboard)
                     if (IsGeneric(vendor) || IsGeneric(model))
                     {
                         using (var searcher = new ManagementObjectSearcher("select Manufacturer, Product, SerialNumber from Win32_BaseBoard"))
@@ -120,29 +159,13 @@ namespace Eternal.Services.System
                         }
                     }
 
-                    // 3. Tertiary: ComputerSystem
-                    if (IsGeneric(vendor) || IsGeneric(model))
-                    {
-                        using (var searcher = new ManagementObjectSearcher("select Manufacturer, Model from Win32_ComputerSystem"))
-                        {
-                            foreach (var obj in searcher.Get())
-                            {
-                                string? m = obj["Manufacturer"]?.ToString();
-                                string? mod = obj["Model"]?.ToString();
-                                if (IsGeneric(vendor) && !IsGeneric(m)) vendor = m!;
-                                if (IsGeneric(model) && !IsGeneric(mod)) model = mod!;
-                                break;
-                            }
-                        }
-                    }
-
                     // 4. Intelligence Layer: If vendor is still unknown, infer from model
                     if (IsGeneric(vendor) && !IsGeneric(model))
                     {
                         vendor = InferManufacturer(model);
                     }
 
-                    // 5. BIOS Serial Fallback
+                    // 5. BIOS Serial Fallback (WMI)
                     if (IsGeneric(serial))
                     {
                         using (var searcher = new ManagementObjectSearcher("select SerialNumber from Win32_BIOS"))

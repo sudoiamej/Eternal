@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Windows;
 using Eternal.Models;
 using Eternal.Services.System;
+using Eternal.ViewModels;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -10,7 +11,7 @@ using System.Diagnostics;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class SettingsViewModel : ObservableObject
+    public partial class SettingsViewModel : BaseViewModel
     {
         public MainViewModel Main { get; }
         private readonly ISettingsService _settingsService;
@@ -46,6 +47,20 @@ namespace Eternal.ViewModels.Modules
                     Settings.Theme = value;
                     OnPropertyChanged();
                     Main.ApplyThemeColor(); // This will trigger theme refresh
+                }
+            }
+        }
+
+        public string SelectedGradiency
+        {
+            get => Settings.NewUiGradiency;
+            set
+            {
+                if (Settings.NewUiGradiency != value)
+                {
+                    Settings.NewUiGradiency = value;
+                    OnPropertyChanged();
+                    Main.ApplyThemeColor();
                 }
             }
         }

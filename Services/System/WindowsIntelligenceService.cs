@@ -4,8 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 using Eternal.Models;
 using Eternal.Services.Security;
+using Eternal.Helpers;
 
 namespace Eternal.Services.System
 {
@@ -86,8 +88,22 @@ namespace Eternal.Services.System
         public async Task<TrustScore> CalculateTrustScoreAsync()
         {
             // 1. Defender Status (40 points)
-            int systemFileScore = 100; // Placeholder until file scanning is implemented
-            
+            int systemFileScore = 100;
+            try
+            {
+                // Real Secure Boot check via Registry
+                using (var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\SecureBoot\State"))
+                {
+                    if (key != null)
+                    {
+                        var val = key.GetValue("UEFISecureBootEnabled");
+                        if (val != null && (int)val == 0) systemFileScore = 50; // Secure Boot Disabled
+                    }
+                    else systemFileScore = 0; // Registry key missing/Access denied (Insecure state)
+                }
+            }
+            catch { systemFileScore = 75; } // Heuristic fallback
+
             var defender = await _securityService.GetDefenderStatusAsync();
             int defenderScore = 0;
             if (defender.AntivirusEnabled) defenderScore += 20;
@@ -109,13 +125,45 @@ namespace Eternal.Services.System
                 driverScore = (int)(100 - (unsignedPercent * 100));
             }
 
-            // 4. Network Score (20 points) - Currently static placeholder
-            int networkScore = 95;
+            // 4. Network Score (20 points) - Adaptive Firewall Profile check
+            int networkScore = 100;
+            bool useNative = OsHelper.IsWindows11OrGreater();
+
+            if (useNative)
+            {
+                try
+                {
+                    string[] profiles = { "StandardProfile", "PublicProfile", "DomainProfile" };
+                    foreach (var profile in profiles)
+                    {
+                        var enabled = Registry.GetValue($@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\{profile}", "EnableFirewall", 1);
+                        if (enabled != null && (int)enabled == 0)
+                        {
+                            networkScore -= 33;
+                        }
+                    }
+                }
+                catch { networkScore = 90; }
+            }
+            
+            if (networkScore == 100 || !useNative)
+            {
+                try
+                {
+                    // WMI Fallback/Legacy
+                    var searcher = new ManagementObjectSearcher(@"root\StandardCimv2", "SELECT Enabled FROM MSFT_NetFirewallProfile");
+                    foreach (var obj in searcher.Get())
+                    {
+                        if (obj["Enabled"] != null && (ushort)obj["Enabled"] != 1) // 1 = Enabled
+                        {
+                            networkScore -= 33; // Deduct for each disabled profile (Domain, Private, Public)
+                        }
+                    }
+                }
+                catch { if (!useNative) networkScore = 95; } 
+            }
 
             // Weighted average
-            // Defender (40%), Startup (20%), Drivers (20%), Network/Files (20%)
-            // For simplicity in this UI, we'll keep the 4 categories displayed
-            
             int overall = (int)((defenderScore * 2.5 * 0.4) + (startupScore * 0.2) + (driverScore * 0.2) + (networkScore * 0.2));
 
             TrustLevel level = overall switch

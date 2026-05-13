@@ -2,6 +2,8 @@ using System;
 
 namespace Eternal.Models
 {
+    public enum ChargingState { Discharging, Charging, Full, Bypass, Unknown }
+
     public record BatteryInfo(
         string Status,
         int ChargeLevel,
@@ -12,6 +14,11 @@ namespace Eternal.Models
         int CurrentCapacity,
         int CycleCount,
         string Chemistry,
-        string DeviceName
+        string DeviceName,
+        double Temperature,
+        double Voltage,
+        double ChargeRateWattage,
+        TimeSpan EstimatedTimeRemaining,
+        ChargingState ChargingState
     );
 }

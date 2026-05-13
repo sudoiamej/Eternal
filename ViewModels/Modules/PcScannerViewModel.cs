@@ -7,18 +7,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Eternal.Models;
 using Eternal.Services.System;
+using Eternal.ViewModels;
 
 namespace Eternal.ViewModels.Modules
 {
-    public partial class PcScannerViewModel : ObservableObject
+    public partial class PcScannerViewModel : BaseViewModel
     {
         private readonly IPcScannerService _scannerService;
         private readonly MainViewModel _main;
         private readonly ILoggingService _loggingService;
 
-        [ObservableProperty] private bool _isScanning;
         [ObservableProperty] private int _scanProgress;
-        [ObservableProperty] private string _scanStatus = "Ready to scan system health.";
         [ObservableProperty] private ScannerSortOption _currentSortOption = ScannerSortOption.Default;
         
         private List<ScannerIssue> _allDiscoveredIssues = new();
@@ -36,6 +35,7 @@ namespace Eternal.ViewModels.Modules
             _scannerService = scannerService;
             _main = main;
             _loggingService = loggingService;
+            StatusMessage = "Ready to scan system health.";
         }
 
         partial void OnCurrentSortOptionChanged(ScannerSortOption value) => SortIssues();
@@ -43,11 +43,11 @@ namespace Eternal.ViewModels.Modules
         [RelayCommand]
         private async Task StartScanAsync()
         {
-            if (IsScanning) return;
+            if (IsBusy) return;
 
-            IsScanning = true;
+            IsBusy = true;
             ScanProgress = 0;
-            ScanStatus = "Initializing system health check...";
+            StatusMessage = "Initializing system health check...";
             _loggingService.Log("PC Scanner: Starting comprehensive system scan.");
 
             _allDiscoveredIssues.Clear();
@@ -62,27 +62,27 @@ namespace Eternal.ViewModels.Modules
                 var progress = new Progress<int>(p => 
                 {
                     ScanProgress = p;
-                    if (p < 30) ScanStatus = "Analyzing storage partitions...";
-                    else if (p < 60) ScanStatus = "Auditing process security...";
-                    else if (p < 85) ScanStatus = "Monitoring system performance...";
-                    else ScanStatus = "Finalizing diagnostic report...";
+                    if (p < 30) StatusMessage = "Analyzing storage partitions...";
+                    else if (p < 60) StatusMessage = "Auditing process security...";
+                    else if (p < 85) StatusMessage = "Monitoring system performance...";
+                    else StatusMessage = "Finalizing diagnostic report...";
                 });
 
                 _allDiscoveredIssues = await _scannerService.RunFullScanAsync(progress);
                 SortIssues();
 
                 UpdateCounts();
-                ScanStatus = _allDiscoveredIssues.Any() ? "Scan complete. Issues identified." : "Scan complete. No issues found.";
+                StatusMessage = _allDiscoveredIssues.Any() ? "Scan complete. Issues identified." : "Scan complete. No issues found.";
                 _loggingService.Log($"PC Scanner: Scan finished. Found {_allDiscoveredIssues.Count} issues.");
             }
             catch (Exception ex)
             {
-                ScanStatus = "An error occurred during scanning.";
+                StatusMessage = "An error occurred during scanning.";
                 _loggingService.Log($"PC Scanner Error: {ex.Message}");
             }
             finally
             {
-                IsScanning = false;
+                IsBusy = false;
                 ScanProgress = 100;
             }
         }
@@ -126,7 +126,7 @@ namespace Eternal.ViewModels.Modules
         {
             if (issue.ActionType == ScannerActionType.AutoFix)
             {
-                ScanStatus = $"Applying fix: {issue.Title}...";
+                StatusMessage = $"Applying fix: {issue.Title}...";
                 bool success = await _scannerService.ExecuteFixAsync(issue);
                 
                 if (success)
@@ -134,12 +134,12 @@ namespace Eternal.ViewModels.Modules
                     _allDiscoveredIssues.Remove(issue);
                     RemoveIssue(issue);
                     UpdateCounts();
-                    ScanStatus = "Fix applied successfully.";
+                    StatusMessage = "Fix applied successfully.";
                     _loggingService.Log($"PC Scanner: Auto-fixed '{issue.Title}'.");
                 }
                 else
                 {
-                    ScanStatus = "Failed to apply fix automatically.";
+                    StatusMessage = "Failed to apply fix automatically.";
                 }
             }
             else if (issue.ActionType == ScannerActionType.ManualNavigation)

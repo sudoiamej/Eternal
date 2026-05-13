@@ -23,6 +23,7 @@
             <helpers:NumericComparisonConverter x:Key="NumericComparisonConverter"/>
             <helpers:CategoryToIconConverter x:Key="CategoryToIconConverter"/>
             <helpers:ProportionalHeightConverter x:Key="ProportionalHeightConverter"/>
+            <helpers:EqualityConverter x:Key="EqualityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

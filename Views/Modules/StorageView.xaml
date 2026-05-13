@@ -4,124 +4,215 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
-             mc:Ignorable="d" d:DesignHeight="720" d:DesignWidth="1100">
-    <Grid>
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1200">
+
+    <UserControl.Resources>
+        <!-- Spatial Entrance Animation -->
+        <Storyboard x:Key="EntranceAnim">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="20" To="0" Duration="0:0:0.8">
+                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </UserControl.Resources>
+
+    <Grid RenderTransformOrigin="0.5,0.5">
+        <Grid.RenderTransform>
+            <TranslateTransform Y="0"/>
+        </Grid.RenderTransform>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="380"/>
+            <ColumnDefinition Width="Auto"/> <!-- Spatial Management Rail -->
         </Grid.ColumnDefinitions>
 
-        <!-- Left: Hierarchical Disk Layout (HCI Rule 1: Consistency with DiskMgmt) -->
-        <Border Grid.Column="0" Padding="40" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+        <!-- Left: Hierarchical Disk Layout (HCI: Visibility of System Status) -->
+        <Border Grid.Column="0" Padding="35" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
                     <StackPanel Style="{StaticResource ModuleHeaderStyle}">
-                        <TextBlock Text="ETERNAL › HARDWARE INTELLIGENCE" Style="{StaticResource HeaderBreadcrumb}"/>
+                        <TextBlock Text="ETERNAL › STORAGE ARCHITECTURE" Style="{StaticResource HeaderBreadcrumb}"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Storage Intelligence" Style="{StaticResource H1}" Margin="0"/>
+                            <TextBlock Text="Storage Intelligence" Style="{StaticResource H1}" Margin="0" FontSize="32" FontWeight="Black"/>
                             
-                            <Button Grid.Column="1" Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh Storage Map" VerticalAlignment="Center" Margin="0,0,10,0">
-                                <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsLoading}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <Button Grid.Column="1" Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Remap Topology" VerticalAlignment="Center" Margin="0,0,10,0">
+                                <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsLoading}">
+                                    <fa:ImageAwesome.Effect>
+                                        <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                                    </fa:ImageAwesome.Effect>
+                                </fa:ImageAwesome>
                             </Button>
                         </Grid>
                     </StackPanel>
 
-                    <TextBlock Text="PHYSICAL DISK &amp; PARTITION TOPOLOGY" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                    <TextBlock Text="TOPOLOGY &amp; SECTOR MAPPING" Style="{StaticResource Caption}" Margin="0,0,0,25" Opacity="0.7"/>
                     
                     <ItemsControl ItemsSource="{Binding PhysicalDisks}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,25" Padding="0">
+                                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,30" Padding="0">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/> <!-- Disk Header -->
-                                            <RowDefinition Height="Auto"/> <!-- Partition Layout -->
+                                            <RowDefinition Height="120"/>  <!-- Interactive Partition Bar -->
                                         </Grid.RowDefinitions>
 
-                                        <!-- Disk Header -->
-                                        <Border Grid.Row="0" Background="#15FFFFFF" Padding="15,10" CornerRadius="6,6,0,0">
+                                        <!-- Disk Header (HCI: Semantic Feedback) -->
+                                        <Border Grid.Row="0" Background="#10FFFFFF" Padding="20,15" CornerRadius="20,20,0,0">
                                             <Grid>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <fa:ImageAwesome Icon="HddOutline" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,12,0"/>
-                                                    <TextBlock Text="Disk " FontWeight="Bold" Foreground="White"/>
-                                                    <TextBlock Text="{Binding Index}" FontWeight="Bold" Foreground="White"/>
-                                                    <TextBlock Text=" · " Foreground="{DynamicResource TextSecondaryBrush}" Margin="5,0"/>
-                                                    <TextBlock Text="{Binding Model}" Foreground="White" Opacity="0.9"/>
-                                                    <TextBlock Text=" · " Foreground="{DynamicResource TextSecondaryBrush}" Margin="5,0"/>
-                                                    <TextBlock Text="{Binding Size, Converter={StaticResource SizeConverter}}" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                                    <TextBlock Text=" · " Foreground="{DynamicResource TextSecondaryBrush}" Margin="5,0"/>
-                                                    <TextBlock Text="{Binding Interface}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center"/>
+                                                    <fa:ImageAwesome Icon="HddOutline" Width="18" Foreground="{DynamicResource AccentBrush}" Margin="0,0,15,0" VerticalAlignment="Center">
+                                                        <fa:ImageAwesome.Effect>
+                                                            <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.4"/>
+                                                        </fa:ImageAwesome.Effect>
+                                                    </fa:ImageAwesome>
+                                                    <StackPanel VerticalAlignment="Center">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="PHYSICAL DRIVE " FontWeight="Black" Foreground="White" FontSize="11" Opacity="0.6"/>
+                                                            <TextBlock Text="{Binding Index}" FontWeight="Black" Foreground="White" FontSize="11" Opacity="0.6"/>
+                                                        </StackPanel>
+                                                        <TextBlock Text="{Binding Model}" Foreground="White" FontSize="16" FontWeight="Black" Margin="0,2,0,0"/>
+                                                    </StackPanel>
+                                                    
+                                                    <Border Background="#15FFFFFF" CornerRadius="8" Padding="12,5" Margin="25,0,0,0" VerticalAlignment="Center">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Size, Converter={StaticResource SizeConverter}}" Foreground="White" FontWeight="Bold" FontSize="12"/>
+                                                            <TextBlock Text=" · " Foreground="{DynamicResource TextSecondaryBrush}" Margin="8,0"/>
+                                                            <TextBlock Text="{Binding Interface}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" FontWeight="Black" VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                    </Border>
                                                 </StackPanel>
-                                                <TextBlock HorizontalAlignment="Right" Text="{Binding Status}" FontWeight="Bold" VerticalAlignment="Center">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
-                                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                
+                                                <!-- Health Badge -->
+                                                <Border HorizontalAlignment="Right" VerticalAlignment="Center" Padding="15,6" CornerRadius="12">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#1000FFAA"/>
+                                                            <Setter Property="BorderBrush" Value="#3000FFAA"/>
+                                                            <Setter Property="BorderThickness" Value="1"/>
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding Status}" Value="OK">
-                                                                    <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
-                                                                </DataTrigger>
                                                                 <DataTrigger Binding="{Binding Status}" Value="Predict Failure">
-                                                                    <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                                    <Setter Property="Background" Value="#20FF3366"/>
+                                                                    <Setter Property="BorderBrush" Value="#60FF3366"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
+                                                    </Border.Style>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Ellipse Width="8" Height="8" Margin="0,0,10,0">
+                                                            <Ellipse.Style>
+                                                                <Style TargetType="Ellipse">
+                                                                    <Setter Property="Fill" Value="{DynamicResource SuccessBrush}"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Predict Failure">
+                                                                            <Setter Property="Fill" Value="{DynamicResource CriticalBrush}"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Ellipse.Style>
+                                                        </Ellipse>
+                                                        <TextBlock FontWeight="Black" FontSize="10" Foreground="White" VerticalAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Text" Value="INTEGRITY OPTIMAL"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Predict Failure">
+                                                                            <Setter Property="Text" Value="PREDICTIVE FAILURE"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                </Border>
                                             </Grid>
                                         </Border>
 
-                                        <!-- Partition Visualizer (diskmgmt style blocks) -->
-                                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Partitions}" Margin="15,20">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <StackPanel Orientation="Horizontal"/>
-                                                </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Button Command="{Binding DataContext.SelectPartitionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                            CommandParameter="{Binding}"
-                                                            Background="Transparent" BorderThickness="0" Padding="0" Margin="0,0,5,0">
-                                                        <Button.Template>
-                                                            <ControlTemplate TargetType="Button">
-                                                                <Border x:Name="Bd" BorderThickness="1" CornerRadius="4" Padding="12,10">
-                                                                    <Border.Style>
-                                                                        <Style TargetType="Border">
-                                                                            <Setter Property="Background" Value="#0FFFFFFF"/>
-                                                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-                                                                            <Setter Property="Width" Value="140"/>
-                                                                            <Style.Triggers>
-                                                                                <DataTrigger Binding="{Binding IsBoot}" Value="True">
-                                                                                    <Setter Property="Background" Value="#1A3498DB"/>
-                                                                                </DataTrigger>
-                                                                            </Style.Triggers>
-                                                                        </Style>
-                                                                    </Border.Style>
-                                                                    <StackPanel>
+                                        <!-- Interactive Partition Map (HCI: Recognition over Recall) -->
+                                        <Border Grid.Row="1" Margin="20,10" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Background="#08FFFFFF" ClipToBounds="True">
+                                            <ItemsControl ItemsSource="{Binding Partitions}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <UniformGrid Rows="1"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Button Command="{Binding DataContext.SelectPartitionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding}"
+                                                                Background="Transparent" BorderThickness="0" Padding="0">
+                                                            <Button.Template>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Border x:Name="Bd" BorderThickness="0,0,1,0" BorderBrush="{DynamicResource BorderBrush}" Padding="15,12">
+                                                                        <Border.Style>
+                                                                            <Style TargetType="Border">
+                                                                                <Setter Property="Background" Value="Transparent"/>
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding IsBoot}" Value="True">
+                                                                                        <Setter Property="Background" Value="#0800E5FF"/>
+                                                                                    </DataTrigger>
+                                                                    <DataTrigger Value="True">
+                                                                        <DataTrigger.Binding>
+                                                                            <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                                                <Binding Path="."/>
+                                                                                <Binding Path="DataContext.SelectedPartition" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                                            </MultiBinding>
+                                                                        </DataTrigger.Binding>
+                                                                        <Setter Property="Background" Value="#15FFFFFF"/>
+                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </Border.Style>
                                                                         <Grid>
-                                                                            <TextBlock Text="{Binding DriveLetter}" FontWeight="Black" FontSize="14" Foreground="White"/>
-                                                                            <fa:ImageAwesome Icon="Lock" Width="8" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="{Binding IsBoot, Converter={StaticResource VisibilityConverter}}"/>
+                                                                            <StackPanel VerticalAlignment="Top">
+                                                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                                                                    <TextBlock Text="{Binding DriveLetter}" FontWeight="Black" FontSize="16" Foreground="White"/>
+                                                                                    <fa:ImageAwesome Icon="Lock" Width="10" Foreground="{DynamicResource AccentBrush}" Margin="10,0,0,0" VerticalAlignment="Center" Visibility="{Binding IsBoot, Converter={StaticResource VisibilityConverter}}"/>
+                                                                                </StackPanel>
+                                                                                <TextBlock Text="{Binding Label}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" Opacity="0.8"/>
+                                                                            </StackPanel>
+                                                                            
+                                                                            <StackPanel VerticalAlignment="Bottom">
+                                                                                <Grid Margin="0,0,0,8">
+                                                                                    <TextBlock Text="{Binding TotalSize, Converter={StaticResource SizeConverter}}" FontSize="9" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.6"/>
+                                                                                    <TextBlock Text="{Binding FileSystem}" HorizontalAlignment="Right" FontSize="9" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.6"/>
+                                                                                </Grid>
+                                                                                <ProgressBar Value="{Binding UsedSpace, Mode=OneWay}" Maximum="{Binding TotalSize}" Height="4" Style="{StaticResource GlowingProgressBar}" Background="#10FFFFFF"/>
+                                                                            </StackPanel>
                                                                         </Grid>
-                                                                        <TextBlock Text="{Binding Label}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
-                                                                        <ProgressBar Value="{Binding FreeSpace, Mode=OneWay}" Maximum="{Binding TotalSize}" Height="3" Margin="0,8,0,5" Background="#20FFFFFF" Foreground="{DynamicResource AccentBrush}"/>
-                                                                        <TextBlock Text="{Binding TotalSize, Converter={StaticResource SizeConverter}}" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                                                                    </Border>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                                            <Setter TargetName="Bd" Property="Background" Value="#15FFFFFF"/>
+                                                                        </Trigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Button.Template>
+                                                            <Button.ToolTip>
+                                                                <ToolTip Background="{StaticResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="15">
+                                                                    <StackPanel>
+                                                                        <TextBlock Text="{Binding Label}" FontWeight="Black" Foreground="White" FontSize="14" Margin="0,0,0,5"/>
+                                                                        <TextBlock Text="{Binding Type}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,0,0,10"/>
+                                                                        <Grid Width="200">
+                                                                            <TextBlock Text="Capacity:" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+                                                                            <TextBlock Text="{Binding TotalSize, Converter={StaticResource SizeConverter}}" HorizontalAlignment="Right" Foreground="White" FontWeight="Bold" FontSize="11"/>
+                                                                        </Grid>
+                                                                        <Grid Width="200" Margin="0,5,0,0">
+                                                                            <TextBlock Text="Free Space:" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+                                                                            <TextBlock Text="{Binding FreeSpace, Converter={StaticResource SizeConverter}}" HorizontalAlignment="Right" Foreground="{DynamicResource SuccessBrush}" FontWeight="Bold" FontSize="11"/>
+                                                                        </Grid>
                                                                     </StackPanel>
-                                                                </Border>
-                                                                <ControlTemplate.Triggers>
-                                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                                        <Setter TargetName="Bd" Property="Background" Value="#20FFFFFF"/>
-                                                                    </Trigger>
-                                                                </ControlTemplate.Triggers>
-                                                            </ControlTemplate>
-                                                        </Button.Template>
-                                                    </Button>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
+                                                                </ToolTip>
+                                                            </Button.ToolTip>
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Border>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -131,109 +222,171 @@
             </ScrollViewer>
         </Border>
 
-        <!-- Right: Management Pane -->
-        <Border Grid.Column="1" Padding="30" Background="{DynamicResource SidebarBrush}">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <TextBlock Text="PARTITION PROPERTIES" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
-                    
-                    <Border Visibility="{Binding SelectedPartition, Converter={StaticResource VisibilityConverter}}" Background="{DynamicResource CardBrush}" Padding="20" CornerRadius="8" Margin="0,0,0,20">
-                        <StackPanel>
-                            <!-- Drive Details -->
-                            <Grid Margin="0,0,0,15">
-                                <TextBlock Text="Mount Point:" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                <TextBlock Text="{Binding SelectedPartition.DriveLetter}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,15">
-                                <TextBlock Text="File System:" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                <TextBlock Text="{Binding SelectedPartition.FileSystem}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,15">
-                                <TextBlock Text="Partition Type:" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                <TextBlock Text="{Binding SelectedPartition.Type}" HorizontalAlignment="Right" FontSize="11" Foreground="White"/>
-                            </Grid>
-                            
-                            <Separator Background="{DynamicResource BorderBrush}" Margin="0,5,0,20"/>
+        <!-- Right: Spatial Management Rail (HCI: Contextual Focus) -->
+        <Border Grid.Column="1" x:Name="ManagementRail" Background="{DynamicResource SidebarBrush}" 
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0"
+                Visibility="{Binding SelectedPartition, Converter={StaticResource VisibilityConverter}}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Width" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedPartition, Converter={StaticResource VisibilityConverter}}" Value="Visible">
+                            <Setter Property="Width" Value="340"/>
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Width" To="340" Duration="0:0:0.45">
+                                            <DoubleAnimation.EasingFunction><QuarticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding SelectedPartition}" Value="{x:Null}">
+                            <Setter Property="Width" Value="0"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
 
-                            <!-- Space Usage -->
-                            <TextBlock Text="SPACE USAGE" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                            <Border Background="#0DFFFFFF" Padding="15" CornerRadius="6" Margin="0,0,0,20">
-                                <StackPanel>
-                                    <Grid Margin="0,0,0,10">
-                                        <TextBlock Text="Used / Total" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                            <TextBlock Text="{Binding SelectedPartition.UsedSpace, Converter={StaticResource SizeConverter}}" FontWeight="Bold" Foreground="White"/>
-                                            <TextBlock Text=" / " Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                            <TextBlock Text="{Binding SelectedPartition.TotalSize, Converter={StaticResource SizeConverter}}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <Grid Margin="20">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,25">
+                            <TextBlock Text="VOLUME INTELLIGENCE" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+                            <Button Command="{Binding SelectPartitionCommand}" CommandParameter="{x:Null}" HorizontalAlignment="Right" Style="{StaticResource IconButton}">
+                                <fa:ImageAwesome Icon="Times" Width="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </Button>
+                        </Grid>
+
+                        <Border Style="{StaticResource StandardCard}" Margin="0" Padding="20">
+                            <StackPanel>
+                                <!-- Header Info -->
+                                <Grid Margin="0,0,0,20">
+                                    <StackPanel>
+                                        <TextBlock Text="Sector Group Selected" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" Opacity="0.8"/>
+                                        <TextBlock Text="{Binding SelectedPartition.DriveLetter}" FontSize="28" FontWeight="Black" Foreground="White"/>
+                                    </StackPanel>
+                                    <fa:ImageAwesome Icon="FolderOpen" Width="28" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right" Opacity="0.2"/>
+                                </Grid>
+
+                                <!-- Space Dynamics -->
+                                <Border Background="#0DFFFFFF" Padding="15" CornerRadius="12" Margin="0,0,0,25">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,10">
+                                            <TextBlock Text="Footprint Analysis" FontSize="10" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.7"/>
+                                            <TextBlock Text="{Binding SelectedPartition.FileSystem}" HorizontalAlignment="Right" FontSize="10" FontWeight="Black" Foreground="{DynamicResource AccentBrush}"/>
+                                        </Grid>
+
+                                        <ProgressBar Value="{Binding SelectedPartition.UsedSpace, Mode=OneWay}" Maximum="{Binding SelectedPartition.TotalSize}"
+                                                      Height="5" Style="{StaticResource GlowingProgressBar}" Margin="0,0,0,12"/>
+
+                                        <Grid>
+                                            <StackPanel>
+                                                <TextBlock Text="ALLOCATED" FontSize="8" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5"/>
+                                                <TextBlock Text="{Binding SelectedPartition.UsedSpace, Converter={StaticResource SizeConverter}}" FontWeight="Black" Foreground="White" FontSize="12"/>
+                                            </StackPanel>
+                                            <StackPanel HorizontalAlignment="Right">
+                                                <TextBlock Text="AVAILABLE" FontSize="8" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5" TextAlignment="Right"/>
+                                                <TextBlock Text="{Binding SelectedPartition.FreeSpace, Converter={StaticResource SizeConverter}}" FontWeight="Black" Foreground="{DynamicResource SuccessBrush}" FontSize="12" TextAlignment="Right"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                                <!-- Quick Actions -->
+                                <TextBlock Text="CONTEXTUAL ACTIONS" Style="{StaticResource Caption}" Margin="0,0,0,15" Opacity="0.6"/>
+                                
+                                <TextBlock Text="ASSIGN NEW DRIVE LETTER" FontSize="10" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8" Opacity="0.8"/>
+                                <Grid Margin="0,0,0,25">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <ComboBox ItemsSource="{Binding AvailableDriveLetters}" SelectedItem="{Binding NewDriveLetter}"
+                                              Background="#10FFFFFF" Foreground="White" BorderBrush="{DynamicResource BorderBrush}" Padding="10,5"/>
+                                    <Button Grid.Column="1" Command="{Binding ChangeLetterCommand}" Content="ASSIGN" Style="{StaticResource StandardButton}" Margin="10,0,0,0" Padding="15,0" FontSize="10" FontWeight="Black"/>
+                                </Grid>
+
+                                <TextBlock Text="RENAME VOLUME" FontSize="10" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8" Opacity="0.8"/>
+                                <Grid Margin="0,0,0,30">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding NewLabel, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" Tag="Enter label..."/>
+                                    <Button Grid.Column="1" Command="{Binding RenameCommand}" Content="UPDATE" Style="{StaticResource StandardButton}" Margin="10,0,0,0" Padding="15,0" FontSize="10" FontWeight="Black"/>
+                                </Grid>
+
+                                <!-- Safety Interlock (HCI: Error Prevention) -->
+                                <Border Background="#15FF3366" Padding="20" CornerRadius="16" BorderBrush="#30FF3366" BorderThickness="1" Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                            <fa:ImageAwesome Icon="Shield" Width="14" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,10,0"/>
+                                            <TextBlock Text="DESTRUCTIVE OPERATIONS" FontWeight="Black" Foreground="White" FontSize="11"/>
                                         </StackPanel>
+                                        
+                                        <CheckBox x:Name="SafetyLock" Content="BYPASS NEURAL SAFETY INTERLOCK" 
+                                                  IsChecked="{Binding IsBypassActive}"
+                                                  IsEnabled="{Binding IsPeMode, Converter={StaticResource InvertBooleanConverter}}"
+                                                  Foreground="{DynamicResource CriticalBrush}" FontSize="9" FontWeight="Black" Margin="0,0,0,15"/>
+
+                                        <StackPanel Visibility="{Binding IsPeMode, Converter={StaticResource VisibilityConverter}}">
+                                            <TextBlock Text="ENVIRONMENT PROTECTED" FontWeight="Black" Foreground="{DynamicResource WarningBrush}" FontSize="10"/>
+                                            <TextBlock Text="Storage forensics are restricted in current WinPE session." 
+                                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold"/>
+                                        </StackPanel>
+
+                                        <StackPanel IsEnabled="{Binding IsChecked, ElementName=SafetyLock}">
+                                            <Button Command="{Binding FormatCommand}" Style="{StaticResource PrimaryAction}" Background="#20FF3366" BorderBrush="{DynamicResource CriticalBrush}" Margin="0,0,0,10">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fa:ImageAwesome Icon="Eraser" Width="12" Foreground="White" Margin="0,0,10,0"/>
+                                                    <TextBlock Text="FORMAT VOLUME" FontWeight="Black" FontSize="11"/>
+                                                </StackPanel>
+                                            </Button>
+                                            
+                                            <Button Command="{Binding DeletePartitionCommand}" Style="{StaticResource PrimaryAction}" Background="Transparent" BorderBrush="{DynamicResource CriticalBrush}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fa:ImageAwesome Icon="Trash" Width="12" Foreground="White" Margin="0,0,10,0"/>
+                                                    <TextBlock Text="ERASE PARTITION" FontWeight="Black" FontSize="11"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Physical Scan (HCI: Immediate Feedback) -->
+                        <TextBlock Text="PHYSICAL DIAGNOSTICS" Style="{StaticResource Caption}" Margin="0,35,0,15" Opacity="0.7"/>
+                        <Border Style="{StaticResource StandardCard}" Margin="0,0,0,30" Padding="25">
+                            <StackPanel>
+                                <TextBlock Text="Deep Sector Verification" FontWeight="Black" Foreground="White" FontSize="14"/>
+                                <TextBlock Text="Read-verify all sectors on the selected physical drive." 
+                                           FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8,0,20" TextWrapping="Wrap" LineHeight="16" FontWeight="Bold"/>
+                                
+                                <Button Command="{Binding SurfaceTestCommand}" IsEnabled="{Binding IsTestingSurface, Converter={StaticResource InvertBooleanConverter}}"
+                                        Style="{StaticResource StandardButton}" Padding="0,12" Margin="0,0,0,10">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="Search" Width="12" Foreground="White" Margin="0,0,10,0" Spin="{Binding IsTestingSurface}"/>
+                                        <TextBlock Text="INITIALIZE SURFACE SCAN" FontWeight="Black" FontSize="11"/>
+                                    </StackPanel>
+                                </Button>
+                                
+                                <StackPanel Visibility="{Binding IsTestingSurface, Converter={StaticResource VisibilityConverter}}">
+                                    <Grid Margin="0,15,0,8">
+                                        <TextBlock Text="SCANNING SECTORS..." FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}"/>
+                                        <TextBlock Text="{Binding SurfaceTestProgress, StringFormat='{}{0:F1}%'}" HorizontalAlignment="Right" FontSize="9" FontWeight="Black" Foreground="White"/>
                                     </Grid>
-                                    
-                                    <ProgressBar Value="{Binding SelectedPartition.UsedSpace, Mode=OneWay}" Maximum="{Binding SelectedPartition.TotalSize}" 
-                                                 Height="8" Background="#20FFFFFF" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10"/>
-                                    
-                                    <Grid>
-                                        <TextBlock Text="Free Space:" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                        <TextBlock Text="{Binding SelectedPartition.FreeSpace, Converter={StaticResource SizeConverter}}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
-                                    </Grid>
+                                    <ProgressBar Value="{Binding SurfaceTestProgress}" Height="6" Style="{StaticResource GlowingProgressBar}" Background="#10FFFFFF"/>
                                 </StackPanel>
-                            </Border>
-
-                            <!-- Assign Letter -->
-                            <TextBlock Text="ASSIGN DRIVE LETTER" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
-                            <Grid Margin="0,0,0,10">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <ComboBox ItemsSource="{Binding AvailableDriveLetters}" SelectedItem="{Binding NewDriveLetter}"
-                                          Background="{DynamicResource BackgroundBrush}" Foreground="White" BorderBrush="{DynamicResource BorderBrush}"/>
-                                <Button Grid.Column="1" Command="{Binding ChangeLetterCommand}" Content="ASSIGN" Style="{StaticResource SecondaryButton}" Margin="10,0,0,0" Padding="15,0"/>
-                            </Grid>
-
-                            <Separator Background="{DynamicResource BorderBrush}" Margin="0,15,0,20"/>
-
-                            <!-- Destructive Actions -->
-                            <TextBlock Text="DESTRUCTIVE FORENSICS" Style="{StaticResource Caption}" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,0,10"/>
-                            
-                            <CheckBox x:Name="SafetyLock" Content="Unlock Advanced Tools" 
-                                      IsEnabled="{Binding IsPeMode, Converter={StaticResource InvertBooleanConverter}}"
-                                      Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,0,0,15"/>
-
-                            <StackPanel Visibility="{Binding IsPeMode, Converter={StaticResource VisibilityConverter}}">
-                                <TextBlock Text="MANAGEMENT RESTRICTED" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}" FontSize="10"/>
-                                <TextBlock Text="Destructive operations are disabled on recovery media to prevent environment corruption." 
-                                           Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" TextWrapping="Wrap" Margin="0,5,0,15"/>
                             </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
 
-                            <Button Command="{Binding FormatCommand}" Content="FORMAT VOLUME (QUICK)" 
-                                    Style="{StaticResource PrimaryAction}" Background="{DynamicResource CriticalBrush}" Padding="0,10" Margin="0,0,0,10"
-                                    IsEnabled="{Binding IsChecked, ElementName=SafetyLock}"/>
-                            
-                            <Button Command="{Binding DeletePartitionCommand}" Content="DELETE PARTITION" 
-                                    Style="{StaticResource PrimaryAction}" Background="#C0392B" Padding="0,10"
-                                    IsEnabled="{Binding IsChecked, ElementName=SafetyLock}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Visibility="{Binding SelectedPartition, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Background="{DynamicResource CardBrush}" Padding="30" CornerRadius="8" Opacity="0.5" Margin="0,0,0,20">
-                        <TextBlock Text="Select a partition block from the storage map to manage." TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                    </Border>
-
-                    <!-- Disk Diagnostics (Surface Test) -->
-                    <TextBlock Text="PHYSICAL DIAGNOSTICS" Style="{StaticResource Caption}" Margin="0,10,0,15"/>
-                    <Border Background="{DynamicResource CardBrush}" Padding="20" CornerRadius="8">
-                        <StackPanel>
-                            <TextBlock Text="Sector Consistency Scan" FontWeight="Bold" Foreground="White"/>
-                            <TextBlock Text="Read-verify all sectors on the selected physical disk." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,5,0,15" TextWrapping="Wrap"/>
-                            
-                            <Button Command="{Binding SurfaceTestCommand}" IsEnabled="{Binding IsTestingSurface, Converter={StaticResource InvertBooleanConverter}}"
-                                    Content="RUN SURFACE SCAN" Style="{StaticResource SecondaryButton}" Padding="0,10" Margin="0,0,0,10"/>
-                            
-                            <StackPanel Visibility="{Binding IsTestingSurface, Converter={StaticResource VisibilityConverter}}">
-                                <ProgressBar Value="{Binding SurfaceTestProgress}" Height="3" Background="{DynamicResource BorderBrush}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,5"/>
-                                <TextBlock Text="{Binding SurfaceTestProgress, StringFormat='Progress: {0:F0}%'}" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </ScrollViewer>
+        <!-- Loading Feedback -->
+        <Border Grid.ColumnSpan="2" Background="#80000000" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}">
+            <Border.Effect><BlurEffect Radius="25"/></Border.Effect>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,25"/>
+                <TextBlock Text="MAPPING TOPOLOGY..." FontSize="14" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+            </StackPanel>
         </Border>
     </Grid>
 </UserControl>
