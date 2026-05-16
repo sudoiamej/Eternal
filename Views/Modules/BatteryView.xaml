@@ -178,5 +178,20 @@
                 <TextBlock Text="QUERYING ACPI INTERFACE..." FontSize="14" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
             </StackPanel>
         </Border>
+
+        <!-- No Battery Detected Overlay -->
+        <Border Grid.ColumnSpan="2" Background="{DynamicResource MainBackgroundBrush}" Visibility="{Binding NoBatteryDetected, Converter={StaticResource VisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <fa:ImageAwesome Icon="BatteryEmpty" Foreground="{DynamicResource TextSecondaryBrush}" Width="64" Margin="0,0,0,30" Opacity="0.3"/>
+                <TextBlock Text="NO BATTERY ARCHITECTURE DETECTED" FontSize="20" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                <TextBlock Text="This module requires a physical battery via ACPI to provide telemetry." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                <Button Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" Margin="0,30,0,0" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Refresh" Width="12" Margin="0,0,10,0"/>
+                        <TextBlock Text="RE-SCAN BUS" FontWeight="Black" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

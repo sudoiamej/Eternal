@@ -5,7 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:Models="clr-namespace:Eternal.Models"
-             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1200">
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1200"
+             TextOptions.TextFormattingMode="Display"
+             TextOptions.TextRenderingMode="ClearType"
+             UseLayoutRounding="True"
+             SnapsToDevicePixels="True">
 
     <UserControl.Resources>
         <!-- Spatial Entrance Animation -->
@@ -68,9 +72,11 @@
                       Background="Transparent" BorderThickness="0" Margin="10,0"
                       RowBackground="Transparent" GridLinesVisibility="None"
                       HeadersVisibility="Column" SelectionMode="Single"
-                      VirtualizingStackPanel.IsVirtualizing="True"
-                      VirtualizingStackPanel.VirtualizationMode="Recycling"
-                      CanUserSortColumns="True">
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                      CanUserSortColumns="True"
+                      RenderOptions.ClearTypeHint="Enabled">
                 <DataGrid.Resources>
                     <Style TargetType="DataGridRow">
                         <Setter Property="Background" Value="Transparent"/>
@@ -113,18 +119,19 @@
                 </DataGrid.GroupStyle>
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="PROCESS IDENTITY" Binding="{Binding Name}" Width="3*">
+                    <DataGridTextColumn Header="PROCESS IDENTITY" Binding="{Binding Name}" Width="3*" MinWidth="200">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="White"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                                 <Setter Property="VerticalAlignment" Value="Center"/>
                                 <Setter Property="Padding" Value="10,8"/>
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="PID" Binding="{Binding PID}" Width="80">
+                    <DataGridTextColumn Header="PID" Binding="{Binding PID}" Width="0.8*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}"/>
@@ -136,18 +143,19 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="STATE" Binding="{Binding Status}" Width="100">
+                    <DataGridTextColumn Header="STATE" Binding="{Binding Status}" Width="1.2*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                 <Setter Property="FontSize" Value="10"/>
                                 <Setter Property="VerticalAlignment" Value="Center"/>
                                 <Setter Property="Opacity" Value="0.8"/>
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTemplateColumn Header="LOAD" Width="100" SortMemberPath="CpuUsage">
+                    <DataGridTemplateColumn Header="LOAD" Width="1*" SortMemberPath="CpuUsage">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Border Margin="4" CornerRadius="4">
@@ -169,7 +177,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Header="FOOTPRINT" Binding="{Binding MemoryUsage}" Width="120">
+                    <DataGridTextColumn Header="FOOTPRINT" Binding="{Binding MemoryUsage}" Width="1.5*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -181,7 +189,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="I/O BURST" Binding="{Binding DiskUsage}" Width="120">
+                    <DataGridTextColumn Header="I/O BURST" Binding="{Binding DiskUsage}" Width="1.2*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -193,7 +201,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="NET TRAFFIC" Binding="{Binding NetworkUsage}" Width="120">
+                    <DataGridTextColumn Header="NET TRAFFIC" Binding="{Binding NetworkUsage}" Width="1.2*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>

@@ -1,0 +1,44 @@
+# Eternal System Intelligence: Session Summary (2026-05-13)
+
+## Objective
+Finalize the application for its standalone release by focusing on UI stability, hardware telemetry accuracy, Windows 11 optimization, performance tuning, and high-DPI clarity.
+
+## Key Accomplishments
+
+### 1. UI Architecture & Stability
+- **Steady UI Toggling**: Refactored the window management system to allow seamless switching between Modern and Legacy interfaces. Added an `IsSwappingUI` bypass flag to prevent the application from closing during the transition.
+- **UI Persistence**: Implemented `UseLegacyUI` in `AppSettings` to ensure the user's preferred interface is remembered across application restarts.
+- **Optimized Shutdown**: Removed the `ShutdownWindow` and artificial delays, enabling a near-instant exit experience and clean process termination.
+
+### 2. Windows 11 Optimization (WMI Independence)
+- **Adaptive Telemetry Engine**: Introduced `OsHelper` to detect Windows 11 (Build 22000+) and prioritize native Win32 APIs and Registry lookups for core hardware data.
+- **Native Hardware Discovery**: 
+    - CPU: Uses raw SMBIOS Registry strings instead of heavy WMI classes.
+    - RAM: Integrated P/Invoke `GlobalMemoryStatusEx` for high-speed, accurate memory telemetry.
+    - BIOS: Directly reads kernel-mapped BIOS strings from the Registry for higher reliability.
+- **Security Posture**: Updated the firewall monitor to query native Registry parameters, ensuring the Trust Score remains accurate on restricted Windows 11 environments.
+
+### 3. High-Precision Telemetry
+- **Deep Battery Intelligence**: Upgraded the `WindowsBatteryService` to query `root\WMI` classes for actual hardware cycle counts and mWh capacities directly from the firmware.
+- **Display Identity (PnP)**: Implemented native `EnumDisplayDevices` and decoded `WmiMonitorID` EDID strings to show true monitor model names (e.g., "Dell U2723QE") and PnP IDs matching Device Manager.
+- **System Support Identification**: Fixed the "Unknown" identifier issue by implementing a Registry fallback for custom-built and OEM systems.
+
+### 4. Performance & UX Polish
+- **Process Intelligence Refactor**: Converted the hierarchical TreeView into a wide, sortable, and virtualized `DataGrid` with native category grouping and real-time resource heatmaps.
+- **Zero-Lag Navigation**: Implemented an `_isActive` throttling mechanism across all high-frequency polling modules (Thermal, Network, Battery) to eliminate stutter during navigation.
+- **DPI Clarity**: Configured `app.manifest` for `PerMonitorV2` DPI awareness, ensuring a tack-sharp 100% resolution UI on high-DPI displays.
+- **Animated Splash Screen**: Added a glowing logo and a three-layer "Particle Accelerator" clockwise loading animation for a premium startup experience.
+- **Universal Search (Ctrl+K)**: Refactored the Command Palette with solid backgrounds for better readability, robust keyboard focus, and multi-term matching logic.
+
+### 5. Functional Bug Fixes
+- **Camera Feed**: Resolved the "Preview sink not set" error by refactoring the capture engine to use `MediaFrameReader`.
+- **Keyboard Diagnostics**: Fixed input registration to ensure physical key presses light up the virtual keyboard and update N-Key Rollover counts.
+- **Developer Access**: Fixed the passcode input visibility in the "Unsafe Mode" authorization window.
+
+## Final Release Build
+- **Status**: Build Succeeded (Standalone win-x64)
+- **Output**: `dist\Eternal.exe` (Self-contained, single-file executable)
+- **Technical Integrity**: Zero compilation errors, verified memory management, and verified hardware compatibility.
+
+---
+**Build State: GOLD / READY FOR RELEASE**

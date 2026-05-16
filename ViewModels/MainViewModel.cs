@@ -577,7 +577,7 @@ namespace Eternal.ViewModels
                 case "Battery":
                     var batteryVm = sp.GetRequiredService<BatteryViewModel>();
                     CurrentView = batteryVm;
-                    await batteryVm.LoadCommand.ExecuteAsync(null);
+                    batteryVm.Activate();
                     break;
                 case "Network": 
                     var netVm = sp.GetRequiredService<NetworkViewModel>();
