@@ -11,6 +11,7 @@ namespace Eternal.Models
         public string Id { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string TechnicalDetails { get; set; } = string.Empty;
         public IssueSeverity Severity { get; set; }
         public ScannerActionType ActionType { get; set; }
         public string ActionTarget { get; set; } = string.Empty;

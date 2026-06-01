@@ -65,14 +65,20 @@ namespace Eternal.Models
         public int PID { get; }
         public string Name { get; }
         [ObservableProperty] private double _cpuUsage;
-        [ObservableProperty] private long _memoryBytes;
+        [ObservableProperty] 
+        [NotifyPropertyChangedFor(nameof(MemoryUsage))] 
+        private long _memoryBytes;
         public string Path { get; }
         public bool IsSigned { get; }
         [ObservableProperty] private string _impact;
         [ObservableProperty] private string _status;
         public int SessionId { get; }
-        [ObservableProperty] private long _diskBytesPerSec;
-        [ObservableProperty] private long _networkBytesPerSec;
+        [ObservableProperty] 
+        [NotifyPropertyChangedFor(nameof(DiskUsage))] 
+        private long _diskBytesPerSec;
+        [ObservableProperty] 
+        [NotifyPropertyChangedFor(nameof(NetworkUsage))] 
+        private long _networkBytesPerSec;
         public ProcessCategory Category { get; }
 
         public ProcessDetail(int PID, string Name, double CpuUsage, long MemoryBytes, string Path, bool IsSigned, string Impact, string Status, int SessionId, long DiskBytesPerSec = 0, long NetworkBytesPerSec = 0, ProcessCategory Category = ProcessCategory.Background)
@@ -143,6 +149,7 @@ namespace Eternal.Models
     public class AppSettings
     {
         public bool UseLegacyUI { get; set; } = false;
+        public bool UseNeumorphicUI { get; set; } = true;
         public string NewUiGradiency { get; set; } = "Deep Space";
         public string Theme { get; set; } = "Dark";
         public string ThemeAccentColor { get; set; } = "#0078D7";
@@ -150,6 +157,7 @@ namespace Eternal.Models
         public bool MinimizeToTray { get; set; } = true;
         public bool IsAdvancedMode { get; set; } = false;
         public List<string> DisabledFeatures { get; set; } = new();
+        public List<string> PinnedFeatures { get; set; } = new() { "Hardware", "Processes", "Tuning" };
 
         // System Flags (Developer / Testing)
         public bool EnableWmiPolling { get; set; } = true;

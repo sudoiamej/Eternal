@@ -28,7 +28,7 @@
 
         <!-- Left: Hierarchical Disk Layout (HCI: Visibility of System Status) -->
         <Border Grid.Column="0" Padding="35" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" VirtualizingPanel.ScrollUnit="Pixel">
                 <StackPanel>
                     <StackPanel Style="{StaticResource ModuleHeaderStyle}">
                         <TextBlock Text="ETERNAL › STORAGE ARCHITECTURE" Style="{StaticResource HeaderBreadcrumb}"/>
@@ -250,7 +250,7 @@
             </Border.Style>
 
             <Grid Margin="20">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" VirtualizingPanel.ScrollUnit="Pixel">
                     <StackPanel>
                         <Grid Margin="0,0,0,25">
                             <TextBlock Text="VOLUME INTELLIGENCE" Style="{StaticResource Caption}" VerticalAlignment="Center"/>

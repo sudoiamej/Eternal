@@ -1,0 +1,106 @@
+<UserControl x:Class="Eternal.Views.Modules.AppProfilerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1000">
+    <Grid Margin="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="*"/>    <!-- Stats Grid -->
+            <RowDefinition Height="Auto"/> <!-- Actions -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,30">
+            <TextBlock Text="ETERNAL SYSTEM WORKSPACE" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
+            <TextBlock Text="Application Profiler" Style="{StaticResource H1}" Margin="0"/>
+            <TextBlock Text="Monitor internal application resource usage and garbage collection metrics." Foreground="{DynamicResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <!-- Stats Grid -->
+        <UniformGrid Grid.Row="1" Columns="3" VerticalAlignment="Top">
+            <Border Style="{StaticResource StandardCard}">
+                <StackPanel>
+                    <fa:ImageAwesome Icon="Microchip" Width="24" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Left" Margin="0,0,0,15"/>
+                    <TextBlock Text="MANAGED HEAP" Style="{StaticResource Caption}"/>
+                    <TextBlock Text="{Binding ManagedMemoryMb, StringFormat='{}{0:F2} MB'}" FontSize="32" FontWeight="Black" Foreground="White"/>
+                    <TextBlock Text="Total memory used by .NET objects." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource StandardCard}">
+                <StackPanel>
+                    <fa:ImageAwesome Icon="Cube" Width="24" Foreground="{DynamicResource InfoBrush}" HorizontalAlignment="Left" Margin="0,0,0,15"/>
+                    <TextBlock Text="WORKING SET" Style="{StaticResource Caption}"/>
+                    <TextBlock Text="{Binding WorkingSetMb, StringFormat='{}{0:F2} MB'}" FontSize="32" FontWeight="Black" Foreground="White"/>
+                    <TextBlock Text="Total physical memory mapped to process." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource StandardCard}">
+                <StackPanel>
+                    <fa:ImageAwesome Icon="Exchange" Width="24" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Left" Margin="0,0,0,15"/>
+                    <TextBlock Text="GC MODE" Style="{StaticResource Caption}"/>
+                    <TextBlock Text="{Binding GcMode}" FontSize="32" FontWeight="Black" Foreground="White"/>
+                    <TextBlock Text="Current Garbage Collection strategy." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource StandardCard}">
+                <StackPanel>
+                    <fa:ImageAwesome Icon="Sitemap" Width="24" Foreground="{DynamicResource WarningBrush}" HorizontalAlignment="Left" Margin="0,0,0,15"/>
+                    <TextBlock Text="THREADS" Style="{StaticResource Caption}"/>
+                    <TextBlock Text="{Binding ThreadCount}" FontSize="32" FontWeight="Black" Foreground="White"/>
+                    <TextBlock Text="Active threads in application pool." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource StandardCard}">
+                <StackPanel>
+                    <fa:ImageAwesome Icon="Key" Width="24" Foreground="{DynamicResource CriticalBrush}" HorizontalAlignment="Left" Margin="0,0,0,15"/>
+                    <TextBlock Text="HANDLES" Style="{StaticResource Caption}"/>
+                    <TextBlock Text="{Binding HandleCount}" FontSize="32" FontWeight="Black" Foreground="White"/>
+                    <TextBlock Text="Open system resource handles." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource StandardCard}">
+                <StackPanel>
+                    <fa:ImageAwesome Icon="History" Width="24" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Left" Margin="0,0,0,15"/>
+                    <TextBlock Text="GC COLLECTIONS" Style="{StaticResource Caption}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Gen0Collections}" FontSize="24" FontWeight="Bold" Foreground="White" ToolTip="Generation 0"/>
+                        <TextBlock Text=" / " FontSize="24" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text="{Binding Gen1Collections}" FontSize="24" FontWeight="Bold" Foreground="White" ToolTip="Generation 1"/>
+                        <TextBlock Text=" / " FontSize="24" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text="{Binding Gen2Collections}" FontSize="24" FontWeight="Bold" Foreground="White" ToolTip="Generation 2 (Full)"/>
+                    </StackPanel>
+                    <TextBlock Text="Gen 0 / Gen 1 / Gen 2" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Actions -->
+        <Border Grid.Row="2" Style="{StaticResource StandardCard}" Background="#10FFFFFF">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="INTERNAL HOUSEKEEPING" Style="{StaticResource Caption}" Foreground="{DynamicResource WarningBrush}"/>
+                    <TextBlock Text="Forcing a Garbage Collection will suspend the app briefly but may reduce RAM usage." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                </StackPanel>
+                <Button Grid.Column="1" Command="{Binding ForceGCCommand}" Style="{StaticResource PrimaryButton}" Padding="20,10" Width="180">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Trash" Width="12" Foreground="Black" Margin="0,0,10,0"/>
+                        <TextBlock Text="FORCE GC PURGE" FontSize="11" FontWeight="Black"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

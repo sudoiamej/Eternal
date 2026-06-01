@@ -1,0 +1,89 @@
+<UserControl x:Class="Eternal.Views.Modules.WmiExplorerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1000">
+    <Grid Margin="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="Auto"/> <!-- Input -->
+            <RowDefinition Height="*"/>    <!-- Results -->
+            <RowDefinition Height="Auto"/> <!-- Footer -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,30">
+            <TextBlock Text="ETERNAL SYSTEM WORKSPACE" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
+            <TextBlock Text="WMI Query Explorer" Style="{StaticResource H1}" Margin="0"/>
+            <TextBlock Text="Run raw WMI queries against the local machine. Use SQL-like syntax." Foreground="{DynamicResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <!-- Input Area -->
+        <Border Grid.Row="1" Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource ModernTextBox}" 
+                         Height="45" VerticalContentAlignment="Center" FontSize="14"
+                         FontFamily="Consolas"/>
+                <Button Grid.Column="1" Command="{Binding ExecuteQueryCommand}" 
+                        Style="{StaticResource PrimaryButton}" Margin="15,0,0,0" Width="120">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Play" Width="12" Foreground="Black" Margin="0,0,10,0"/>
+                        <TextBlock Text="EXECUTE" FontSize="11" FontWeight="Black"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Results Area -->
+        <Border Grid.Row="2" Style="{StaticResource StandardCard}" Padding="5">
+            <Grid>
+                <DataGrid ItemsSource="{Binding Results}" 
+                          Style="{StaticResource NeuDataGrid}"
+                          AutoGenerateColumns="True"
+                          HeadersVisibility="Column"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Auto">
+                    <!-- DataGrid defaults to auto-generating columns from DataTable -->
+                </DataGrid>
+
+                <!-- Busy Overlay -->
+                <Border Background="#AA000000" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}" CornerRadius="15">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <fa:ImageAwesome Icon="Spinner" Spin="True" Width="48" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,20"/>
+                        <TextBlock Text="Executing WMI Query..." Foreground="White" FontWeight="Bold"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Error Overlay -->
+                <Border Background="#AA330000" Visibility="{Binding ErrorMessage, Converter={StaticResource VisibilityConverter}}" CornerRadius="15">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20">
+                        <fa:ImageAwesome Icon="ExclamationTriangle" Width="48" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,0,20"/>
+                        <TextBlock Text="WMI Query Error" Foreground="White" FontWeight="Black" FontSize="18" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="#FFCCCC" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0"/>
+                        <Button Content="DISMISS" Command="{Binding ExecuteQueryCommand}" Style="{StaticResource StandardButton}" Margin="0,20,0,0" Width="100"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Footer -->
+        <Grid Grid.Row="3" Margin="0,15,0,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Execution Time: " Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <TextBlock Text="{Binding ExecutionTime}" Foreground="{DynamicResource TextBrush}" FontWeight="Bold"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Rows Returned: " Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <TextBlock Text="{Binding Results.Rows.Count}" Foreground="{DynamicResource TextBrush}" FontWeight="Bold"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

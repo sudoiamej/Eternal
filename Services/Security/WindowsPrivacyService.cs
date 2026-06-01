@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Win32;
@@ -94,6 +95,40 @@ namespace Eternal.Services.Security
                 if (!await ApplyPolicyAsync(p.Id)) allSuccess = false;
             }
             return allSuccess;
+        }
+
+        public async Task<(bool Success, string Message, int ClearedFilesCount)> ClearTelemetryCacheAsync()
+        {
+            return await Task.Run(() =>
+            {
+                int count = 0;
+                string dirPath = @"C:\ProgramData\Microsoft\Diagnosis\ETMLogs";
+                try
+                {
+                    if (Directory.Exists(dirPath))
+                    {
+                        var files = Directory.GetFiles(dirPath, "*.etl", SearchOption.AllDirectories);
+                        foreach (var file in files)
+                        {
+                            try
+                            {
+                                File.Delete(file);
+                                count++;
+                            }
+                            catch (Exception ex)
+                            {
+                                 global::System.Diagnostics.Debug.WriteLine($"Failed to delete {file}: {ex.Message}");
+                            }
+                        }
+                        return (true, $"Telemetry logs cleared. Swept {count} diagnostic trace files.", count);
+                    }
+                    return (true, "No active telemetry trace logs found under ETMLogs.", 0);
+                }
+                catch (Exception ex)
+                {
+                    return (false, $"Failed to clear telemetry logs: {ex.Message}", 0);
+                }
+            });
         }
     }
 }

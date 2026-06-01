@@ -110,6 +110,15 @@
                                     <TextBlock Text="SEARCH FOR UPDATES" FontSize="11" FontWeight="Bold"/>
                                 </StackPanel>
                             </Button>
+
+                            <Button Command="{Binding ExportDriverCommand}" 
+                                    CommandParameter="{Binding SelectedDriver}"
+                                    Style="{StaticResource SecondaryButton}" Margin="0,0,0,10" HorizontalAlignment="Stretch">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="FileArchiveOutline" Width="12" Foreground="White" Margin="0,0,10,0"/>
+                                    <TextBlock Text="BACK UP DRIVER (ZIP)" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
                             
                             <Button Command="{Binding ShowDetailsCommand}" 
                                     CommandParameter="{Binding SelectedDriver}"

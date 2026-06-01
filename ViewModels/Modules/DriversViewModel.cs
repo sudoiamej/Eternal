@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Eternal.Services.System;
 using Eternal.Models;
@@ -94,6 +95,30 @@ namespace Eternal.ViewModels.Modules
             var detailWin = new DetailWindow(driver.Name, "DRIVER PROPERTIES", properties);
             detailWin.Owner = System.Windows.Application.Current.MainWindow;
             detailWin.ShowDialog();
+        }
+
+        [RelayCommand]
+        private async Task ExportDriver(DriverInfo? driver)
+        {
+            if (driver == null) return;
+            
+            await ExecuteBusyActionAsync(async () =>
+            {
+                string exportDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ExportedDrivers");
+                string targetZip = Path.Combine(exportDir, $"{driver.Name.Replace(" ", "_")}_backup.zip");
+
+                bool success = await _driversService.ExportDriverPackageAsync(driver.Name, targetZip);
+                if (success)
+                {
+                    _toastService.ShowSuccess($"Driver backed up successfully to: {targetZip}");
+                    _loggingService.Log($"Driver Backup: Exported package for {driver.Name}");
+                    try { Process.Start(new ProcessStartInfo(exportDir) { UseShellExecute = true }); } catch { }
+                }
+                else
+                {
+                    _toastService.ShowError($"Failed to export driver package.");
+                }
+            }, $"Exporting {driver.Name}...");
         }
     }
 }

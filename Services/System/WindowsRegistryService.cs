@@ -104,9 +104,8 @@ namespace Eternal.Services.System
 
         public WindowsRegistryService()
         {
-            var version = Environment.OSVersion.Version;
-            _isWin11 = version.Build >= 22000;
-            _isWin10 = version.Major == 10 && version.Build < 22000;
+            _isWin11 = Eternal.Helpers.OsHelper.IsWindows11OrGreater();
+            _isWin10 = Eternal.Helpers.OsHelper.IsWindows10OrGreater() && !_isWin11;
         }
 
         public Task<List<RegistryTweakDefinition>> GetCommonTweaksAsync()

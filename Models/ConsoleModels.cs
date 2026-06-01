@@ -40,7 +40,7 @@ namespace Eternal.Models
 
         private void OnOutputReceived(object? sender, string line)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            _ = System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 OutputLines.Add(line);
                 if (OutputLines.Count > 1000) OutputLines.RemoveAt(0);
@@ -49,7 +49,7 @@ namespace Eternal.Models
 
         private void OnConsoleExited(object? sender, EventArgs e)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            _ = System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 OutputLines.Add("[SESSION TERMINATED]");
                 IsBusy = false;

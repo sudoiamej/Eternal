@@ -75,9 +75,9 @@ namespace Eternal.ViewModels.Modules
 
             await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => 
             {
-                // Optimization: Use Dictionary for O(1) lookups during reconciliation
-                var processMap = FlatProcesses.ToDictionary(p => p.PID);
-                var currentPids = result.Data.Select(p => p.PID).ToHashSet();
+                // Enforce PID uniqueness to prevent duplicate key errors and UI listing duplication
+                var uniqueData = result.Data.GroupBy(p => p.PID).Select(g => g.First()).ToList();
+                var currentPids = uniqueData.Select(p => p.PID).ToHashSet();
 
                 // 1. Remove dead processes
                 for (int i = FlatProcesses.Count - 1; i >= 0; i--)
@@ -88,12 +88,24 @@ namespace Eternal.ViewModels.Modules
                     }
                 }
 
-                // 2. Add or Update processes
-                foreach (var pData in result.Data)
+                // Optimization: Use Dictionary for O(1) lookups during reconciliation with safe overwrite logic
+                var processMap = new Dictionary<int, ProcessDetail>();
+                foreach (var p in FlatProcesses)
                 {
-                    if (!processMap.TryGetValue(pData.PID, out var existingProc))
+                    processMap[p.PID] = p;
+                }
+
+                // 2. Add or Update processes
+                foreach (var pData in uniqueData)
+                {
+                    if (!processMap.TryGetValue(pData.PID, out var existingProc) || existingProc.Name != pData.Name)
                     {
+                        if (existingProc != null)
+                        {
+                            FlatProcesses.Remove(existingProc);
+                        }
                         FlatProcesses.Add(pData);
+                        processMap[pData.PID] = pData; // Keep map synchronized during execution loop
                     }
                     else
                     {
@@ -108,6 +120,9 @@ namespace Eternal.ViewModels.Modules
                 }
 
                 TotalProcessCount = result.RawCount;
+
+                // Force CollectionView to refresh to maintain active sorting/grouping in the UI
+                System.Windows.Data.CollectionViewSource.GetDefaultView(FlatProcesses)?.Refresh();
             });
         }
         private async Task KillProcess(ProcessDetail? process)

@@ -1,0 +1,501 @@
+================================================================================
+  ______ _______ ______ ______ __   _  ______             
+  |_____|    |    |_____/ |_____/ | \ | |_____| |      
+  |_____|    |    |    \_ |    \_ |  \| |     | |_____ 
+                                                      
+                  SYSTEM INTELLIGENCE & UTILITY SUITE
+                     ARCHITECTURE BLUEPRINT & SPEC
+================================================================================
+Version: 2.5.0 "Milestone 4"
+Authors: Eternal System Engineers & Coding Assistants
+Namespace: Eternal (WPF / .NET 10.0-windows Architecture)
+Target Workspace: C:\Users\ethan\desktop\FileDesktop\projects\Eternal
+================================================================================
+
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+1. APPLICATION OVERVIEW & TARGET AUDIENCE DESIGN
+2. ARCHITECTURAL & MVVM PATTERN IMPLEMENTATION
+3. SYSTEM SUBSYSTEMS DEEP DIVE
+4. ENTITY RELATIONSHIP DIAGRAM (ERD) - SCHEMAS & PERSISTENCE
+5. DETAILED OPERATION FLOWCHARTS
+   5.1. Boot Editor Adjustment & Constraints Pipeline
+   5.2. Forensic Entropy & Import Signature Scan Pipeline
+   5.3. Precision Stress Testing & Emergency Thermal Failsafe Loop
+   5.4. Sentinel Privacy Telemetry Cleaner & Feedback Loop
+   5.5. Multi-Dimensional High-DPI Adaptation Pipeline
+6. HCI INTEGRATION STANDARDS (DON NORMAN FRAMEWORK)
+
+
+================================================================================
+1. APPLICATION OVERVIEW & TARGET AUDIENCE DESIGN
+================================================================================
+Eternal is a state-of-the-art Windows system intelligence, forensic analysis, 
+and maintenance suite built using WPF (.NET 10.0). The system is engineered to 
+interact directly with bare-metal Windows architectures, system configuration 
+stores, the Registry, active process memory structures, and hardware sensors.
+
+The application serves three distinct user categories (Audience Segments):
+
+1.1. NON-TECHNICAL USERS ("System Physician")
+- Simplified Conceptual Model: Abstracted metrics (e.g. 0-100 "Trust Score") 
+  that turn complex security variables into immediate cognitive feedback.
+- Guided Actions: Danger zones are locked out or wrapped in confirmation screens 
+  to prevent accidental registry or boot record corruption.
+- Visual Peace of Mind: Hearts, glowing visual auroras, and clear status 
+  gauges remove standard CLI anxiety.
+
+1.2. INTERMEDIATE USERS ("Power Dashboard")
+- Expanded Telemetry: Direct access to thermal readings, raw voltage metrics, 
+  and hardware performance states.
+- Performance Optimizations: Multi-process grouping, memory heap compaction, 
+  and SCM Delayed-Startup management.
+
+1.3. FORENSICS & ADMINISTRATIVE EXPERTS ("Forensic Toolset")
+- Shannon Entropy calculations to expose binary encryption/obfuscation.
+- Import signature tracking for Windows Injection APIs (e.g. VirtualAlloc).
+- Boot BCD record modifications via low-level Windows registry & bcdedit hooks.
+- Direct process digital signature verification bypassing slow shell loops.
+
+
+================================================================================
+2. ARCHITECTURAL & MVVM PATTERN IMPLEMENTATION
+================================================================================
+The application is structured strictly according to the Model-View-ViewModel (MVVM) 
+design pattern to enforce a clean separation of concerns:
+
+                         +---------------------+
+                         |      App.xaml       |
+                         | (Composition Root)  |
+                         +---------------------+
+                                    |
+            Instantiates and Registers Services / ViewModels
+                                    |
+                                    v
+                         +---------------------+
+                         |  Dependency Inject  |
+                         |  (ServiceProvider)  |
+                         +---------------------+
+                                    |
+         +--------------------------+--------------------------+
+         |                                                     |
+         v                                                     v
++------------------+     Binds DataContext via XAML     +------------------+
+|      Views       |----------------------------------->|    ViewModels    |
+| (UI Layer, XAML) |<-----------------------------------|  (State & Cmds)  |
++------------------+         Updates Properties         +------------------+
+         ^                                                     |
+         |                                                     | Invokes
+         |                                                     v
+         |               Fires Updates/Callbacks        +------------------+
+         +----------------------------------------------|     Services     |
+                                                        |  (System APIs)   |
+                                                        +------------------+
+
+2.1. COMPOSITION ROOT (App.xaml.cs)
+All viewmodels and system services are registered inside App.xaml.cs using a 
+central Dependency Injection (DI) system. Services are registered with their 
+interfaces (e.g. `IBootService` mapped to `WindowsBootService`) to promote 
+loose coupling and simplify testing.
+
+2.2. DATA BINDING AND NOTIFICATIONS
+ViewModels inherit from a base BindableBase or ViewModelBase class implementing 
+`INotifyPropertyChanged`. Custom commands implement `ICommand` (such as RelayCommand) 
+to route visual interactions directly from XAML to code-behind logic without 
+tight coupling.
+
+2.3. EXPLICIT SYSTEM NAMESPACE DECLARATIONS
+Due to overlapping project namespaces (e.g., Eternal.Services.System), all standard 
+C# system-level calls (like System.Diagnostics.Process or System.IO.File) are 
+prefixed with global qualifiers (e.g. `global::System.IO` or `global::System.Diagnostics`) 
+to prevent MSBuild clashing (MC3024 / CS0234 compiler warnings).
+
+
+================================================================================
+3. SYSTEM SUBSYSTEMS DEEP DIVE
+================================================================================
+
+3.1. BOOT ARCHITECTURE EDITOR
+- Service: `WindowsBootService` (implementing `IBootService`)
+- ViewModel: `BootViewModel`
+- Mechanics: Direct parsing of the Windows BCD (Boot Configuration Data) store 
+  using administrative WMI wrappers (`root\WMI\BcdStore`) or `bcdedit.exe` execution.
+- Features: Adjusts system boot timeouts, toggles Safe Boot states for registered 
+  loaders, and allows safe loader deletions.
+- Critical Constraints: Programmatically checks for `{current}` and `{bootmgr}` 
+  GUID keys, strictly disabling delete actions for these records to ensure 
+  the operating system remains bootable.
+
+3.2. SENTINEL PRIVACY AUDITER
+- Service: `WindowsPrivacyService` (implementing `IPrivacyService`)
+- ViewModel: `PrivacyViewModel`
+- Mechanics: Directly queries Windows telemetry registry keys, ETW (Event Tracing 
+  for Windows) channels, and diagnostic logging folders.
+- Telemetry Sweeper: Scans directory `C:\ProgramData\Microsoft\Diagnosis\ETMLogs` 
+  and safely purges active diagnostic trace files (`.etl`). 
+- Interactive Gauge: Uses a custom radial gauge displaying continuous percentage 
+  updates during file scrubbing to satisfy Norman's "System Status Visibility."
+
+3.3. FORENSIC ENTROPY ANALYZER
+- Service: `WindowsFileForensicsService` (implementing `IFileForensicsService`)
+- ViewModel: `FileForensicsViewModel`
+- Shannon Entropy: Computes the logarithmic distribution of byte values in a stream 
+  (from 0.0 to 8.0). Values exceeding 7.2 represent highly ordered bytes, signaling 
+  custom encryption, packing, or obfuscation common in malware.
+- API Scan: Direct in-memory parsing of portable executable structures (PE imports) 
+  scanning for known loader injection routines: `VirtualAlloc`, `VirtualAllocEx`, 
+  `WriteProcessMemory`, `CreateRemoteThread`, and `QueueUserAPC`.
+
+3.4. PRECISION STRESS BENCHMARK
+- Service: `WindowsThermalService` (implementing `IThermalService`)
+- ViewModel: `HardwareStressViewModel`
+- Engine: Uses multi-threaded worker pools executing complex cryptographic 
+  computations. Supports flat load profiles and cyclical Cosine duty-cycle patterns.
+- Thermal Safety Shield: Runs an asynchronous daemon polling hardware sensors 
+  every 500ms. If CPU package temperature hits or exceeds 88 degrees C, the daemon 
+  forces an emergency interrupt of all stress worker threads and returns a visual 
+  Thermal Throttling Halt status.
+
+3.5. DRIVER PACKAGE ARCHIVER
+- Service: `WindowsDriversService` (implementing `IDriversService`)
+- ViewModel: `DriversViewModel`
+- Packaging Loop: Queries the Windows SCM for active device drivers. Filters out 
+  standard hardware architectures and copies target active `.sys` files.
+- Export Packaging: Compiles a diagnostic `driver_manifest.txt` describing 
+  driver versions, hashes, and loaded memory offsets, zipping them directly 
+  into a compressed ZIP archive in the base app directory.
+
+3.6. SERVICES OPTIMIZER
+- Service: `WindowsServicesService` (implementing `IServicesService`)
+- ViewModel: `ServicesViewModel`
+- Mechanics: Interfaces directly with the Windows Service Control Manager (SCM).
+- SCM Boot Delay: Configures service boot properties via standard Win32 APIs 
+  or registry hooks by modifying `DelayedAutostart = 1` inside:
+  `HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>`. This delays non-essential 
+  startup processes to accelerate OS boot cycles.
+
+
+================================================================================
+4. ENTITY RELATIONSHIP DIAGRAM (ERD) - SCHEMAS & PERSISTENCE
+================================================================================
+Although Eternal operates primarily as a low-level system utility interacting with 
+native OS interfaces rather than an active traditional SQL database, it manages persistent 
+states, settings objects, and structured system-level data.
+
+The diagram below maps the relationships between persistent configurations (Settings), 
+active diagnostics datasets, BCD configurations, process profiles, and drivers.
+
++-----------------------------------------------------------------------------+
+|                                  ERD SCHEMA                                 |
++-----------------------------------------------------------------------------+
+
+      +----------------------+                  +-----------------------+
+      |  AppConfigSettings   |                  |   TelemetryMetrics    |
+      +----------------------+                  +-----------------------+
+      | PK | SettingsId (INT)|1                1| PK | MetricId (INT)   |
+      |    | AccentColor     |------------------| FK | SettingsId (INT) |
+      |    | SidebarCollapsed|                  |    | CpuLoadPercent   |
+      |    | DisplayScale    |                  |    | RamUsedBytes     |
+      |    | SafeExecution   |                  |    | ThreadCount      |
+      |    | LoggingEnabled  |                  |    | CpuTempCelsius   |
+      +----------------------+                  |    | GpuTempCelsius   |
+                 |                              +-----------------------+
+                 | 1
+                 |
+                 | 1..*
+      +-----------------------------------------+
+      |            RegistryTuningKey            |
+      +-----------------------------------------+
+      | PK | KeyId (INT)                        |
+      | FK | SettingsId (INT)                   |
+      |    | RegistryHive (String: HKLM/HKCU)   |
+      |    | SubkeyPath (String)                |
+      |    | ValueName (String)                 |
+      |    | ValueData (String/DWORD)           |
+      |    | OptimizationCategory (String)      |
+      |    | IsActive (Boolean)                 |
+      +-----------------------------------------+
+
+      +-----------------------------------------+
+      |                BootLoader               |
+      +-----------------------------------------+
+      | PK | LoaderId (INT)                     |
+      |    | BootGuid (Guid/String)             |
+      |    | LoaderDescription (String)         |
+      |    | TimeoutSeconds (INT)               |
+      |    | SafeBootType (String)              |
+      |    | IsCurrentLoader (Boolean)          |
+      |    | IsBootMgr (Boolean)                |
+      |    | TargetPartition (String)           |
+      +-----------------------------------------+
+
+      +-----------------------------------------+
+      |              ActiveProcess              |
+      +-----------------------------------------+
+      | PK | ProcessPid (INT)                   |
+      |    | ProcessName (String)               |
+      |    | MemoryBytes (Double)               |
+      |    | DiskBytesPerSec (Double)           |
+      |    | NetworkBytesPerSec (Double)        |
+      |    | ExecutablePath (String)            |
+      |    | SignatureStatus (String)           |
+      |    | FileEntropy (Double)               |
+      |    | ObfuscatedAlert (Boolean)          |
+      +-----------------------------------------+
+                           | 1
+                           |
+                           | 1..*
+      +-----------------------------------------+
+      |             ProcessImport               |
+      +-----------------------------------------+
+      | PK | ImportId (INT)                     |
+      | FK | ProcessPid (INT)                   |
+      |    | ApiFunctionName (String)           |
+      |    | IsInjectionIndicator (Boolean)     |
+      +-----------------------------------------+
+
+      +-----------------------------------------+
+      |               DriverBackup              |
+      +-----------------------------------------+
+      | PK | DriverId (INT)                     |
+      |    | SysFileName (String)               |
+      |    | ServiceName (String)               |
+      |    | FileSize (INT)                     |
+      |    | IsActiveSys (Boolean)              |
+      |    | SignedStatus (String)              |
+      |    | ManifestHash (String)              |
+      |    | ZIPArchiveName (String)            |
+      +-----------------------------------------+
+
+
+================================================================================
+5. DETAILED OPERATION FLOWCHARTS
+================================================================================
+
+--------------------------------------------------------------------------------
+5.1. BOOT EDITOR ADJUSTMENT & CONSTRAINTS PIPELINE
+--------------------------------------------------------------------------------
+This flowchart shows how BCD boot loaders are manipulated while enforcing safety 
+constraints to protect critical Windows configuration files.
+
+           [ User Enters Boot Architecture Editor ]
+                              │
+                              ▼
+        [ App Queries BCD Store via WMI & bcdedit ]
+                              │
+                              ▼
+    [ Population of View Model Loaders Grid & Parameters ]
+                              │
+               ┌──────────────┴──────────────┐
+               ▼                             ▼
+     [ User Adjusts Timeout ]     [ User Triggers Delete ]
+               │                             │
+               ▼                             ▼
+    [ Slider Intercepts Value ]    { Is Loader Guid == }
+               │                   { {current} or {bootmgr}? }
+               │                        │             │
+               │                        │ Yes         │ No
+               │                        ▼             ▼
+               │                [ Action Blocked ]  [ Proceed with Delete ]
+               │                [ Alert Showned ]   [ Run bcdedit /delete ]
+               │                        │             │
+               ▼                        v             ▼
+    [ Run bcdedit /timeout X ] ───> [ Re-query BCD Store & Refresh UI ]
+                                                │
+                                                ▼
+                                    ( System Safely Configured )
+
+--------------------------------------------------------------------------------
+5.2. FORENSIC ENTROPY & IMPORT SIGNATURE SCAN PIPELINE
+--------------------------------------------------------------------------------
+This flowchart details how binary files are forensic-audited for encryption 
+indicators and dangerous Win32 API sequences.
+
+               [ Expert User Selects Binary to Scan ]
+                                 │
+                                 ▼
+                     { Is File Size > 10MB? }
+                        │               │
+                    Yes │               │ No
+                        ▼               ▼
+            [ Trim Stream to 10MB ]   [ Read Full Stream In Memory ]
+                        │               │
+                        └───────┬───────┘
+                                │
+                                ▼
+         [ Compute Shannon Entropy of Byte Stream ]
+          Formula: H(X) = -Sum( P(xi) * Log2(P(xi)) )
+                                │
+                                ▼
+            [ Parse PE Header Import Address Table ]
+                                │
+                                ▼
+         [ Filter Imports Against Injection Signature List ]
+         (VirtualAlloc, WriteProcessMemory, CreateRemoteThread)
+                                │
+                                ▼
+        { Is Shannon Entropy > 7.2 OR Signatures Found? }
+                        │               │
+                    Yes │               │ No
+                        ▼               ▼
+           [ Flag Obfuscated Alert ]  [ Set High Security Trust ]
+           [ List Imports in Warning ] [ Log Normal Signature ]
+                        │               │
+                        └───────┬───────┘
+                                │
+                                ▼
+                   [ Render Results to Forensic View ]
+
+--------------------------------------------------------------------------------
+5.3. PRECISION STRESS TESTING & EMERGENCY THERMAL FAILSAFE LOOP
+--------------------------------------------------------------------------------
+This flowchart tracks the operation of the stress benchmarking loops run in parallel 
+with the high-priority thermal sensor daemon.
+
+            [ User Triggers Stress Benchmark ]
+                            │
+              ┌─────────────┴─────────────┐
+              ▼                           ▼
+    [ Launch Stress Threads ]   [ Launch 500ms Sensor Poller ]
+              │                           │
+    { Wave or Constant? }                 │
+      │              │                    ▼
+      ▼ Wave         ▼ Constant   [ Query Core Sensor via Native API ]
+    [ Cosine Wave ] [ Max 100% ]          │
+    [ Duty Cycle  ] [ Load     ]          ▼
+      │              │          { Core Temperature >= 88°C? }
+      │              │            │                      │
+      └──────┬───────┘            │ Yes                  │ No
+             │                    ▼                      ▼
+             │            [ Signal Interrupt ]    [ Sleep 500ms ]
+             │            [ Terminate Workers ]          │
+             │                    │                      │
+             v                    v                      │
+             { Checked Interrupt Status? } <─────────────┘
+              │                         │
+              │ Interrupt               │ Normal (Continue)
+              ▼                         ▼
+      [ Stop All Workers ]      [ Loop Stress Computations ]
+      [ Set Thermal Halt status ] [ Update Benchmark Progress ]
+              │                         │
+              ▼                         ▼
+      ( Hardware Protected )    ( Cycle Continues )
+
+--------------------------------------------------------------------------------
+5.4. SENTINEL PRIVACY TELEMETRY CLEANER & FEEDBACK LOOP
+--------------------------------------------------------------------------------
+This flowchart displays the visual status synchronization while scrubbing system 
+logs under the Sentinel Privacy Hardener panel.
+
+            [ User Clicks 'Purge Telemetry Logs' ]
+                              │
+                              ▼
+           [ Query C:\ProgramData\Microsoft\Diagnosis ]
+                              │
+                              ▼
+         [ Retrieve Count of Diagnostic ETL Log Files ]
+                              │
+                              ▼
+           [ Loop Files and Attempt Forced Purge ]
+            (File.Delete inside safe try-catch hooks)
+                              │
+                              ▼
+     [ Calculate Monotonic Increment Progress Percentage ]
+                              │
+                              ▼
+    [ Push Value to Radial Wiping Gauge in PrivacyView.xaml ]
+                              │
+                              ▼
+      [ Update Interactive Circular Sweep Arc Renderers ]
+                              │
+                              ▼
+          [ Report 100% Success Wiping & Re-evaluate Index ]
+
+--------------------------------------------------------------------------------
+5.5. MULTI-DIMENSIONAL HIGH-DPI ADAPTATION PIPELINE
+--------------------------------------------------------------------------------
+This flowchart charts how Eternal automatically recalibrates its proportions, 
+avoiding layout clipping when resizing or working under high-DPI scaling.
+
+            [ Application Startup / Window Size Changed ]
+                                  │
+                                  ▼
+             [ Retrieve System Display DPI Scale Factor ]
+                                  │
+                                  ▼
+              [ Fetch Window Working Area Parameters ]
+               (SystemParameters.WorkArea values)
+                                  │
+                                  ▼
+               { Is Workspace Dimensions Restrained? }
+                        │                   │
+                    Yes │                   │ No
+                        ▼                   ▼
+            [ Scale Window Boundary ]  [ Initialize Default ]
+            [ Height * 0.88         ]  [ Dimensions (1400x800)]
+            [ Width  * 0.92         ]       │
+                        │                   │
+                        └─────────┬─────────┘
+                                  │
+                                  ▼
+          [ Calculate Scaling Ratio = Min(R_width, R_height) ]
+                                  │
+                                  ▼
+            [ Apply Scaling Ratio to Primary Grid Root ]
+                                  │
+                                  ▼
+        { Is Width Scale Below Collapse Width Threshold? }
+                        │                   │
+                    Yes │                   │ No
+                        ▼                   ▼
+           [ Collapse Nav Sidebar ]    [ Keep Full Expanded ]
+           [ Fade Out Text Labels ]    [ Sidebar View       ]
+           [ Keep Icons Visible   ]         │
+                        │                   │
+                        └─────────┬─────────┘
+                                  │
+                                  ▼
+               ( High-fidelity Responsive Layout Rendered )
+
+
+================================================================================
+6. HCI INTEGRATION STANDARDS (DON NORMAN FRAMEWORK)
+================================================================================
+Eternal is meticulously built around the principles defined in Don Norman's 
+seminal work, "The Design of Everyday Things." Every feature incorporates these five 
+human-computer interaction paradigms:
+
+6.1. THE CONCEPTUAL MODEL (Mental Models)
+- App Interface: Instantly matches the user's expectations. Green means healthy, 
+  blue means processing, red/orange means warnings that require attention.
+- Hacker gate vs Admin dashboard: Offers a clear conceptual boundary for different 
+  user groups (Developer Monospaced terminal vs Clean consumer gauges).
+
+6.2. VISIBILITY OF SYSTEM STATUS
+- Radial Sweeper Gauge: A visual vertical scanline sweep and dual Concentric 
+  rotating dashed rings convey that background processes are successfully auditing, 
+  removing "frozen window" concerns.
+- Monotonic Progress Indicator: Ensures progress never steps backward during scans 
+  or jumps ahead unexpectedly, accurately reflecting system status.
+
+6.3. MAPPING & AFFORDANCES
+- Dynamic Keypad Dot Gate: Affords input of a 6-digit security code. Clicking dots 
+  fills visual icons, confirming input mapping naturally.
+- Sidebar Collapse Chevron: Signifies expanding/collapsing. Hovering over sidebar 
+  options invokes "card lifts" to signify clickability.
+
+6.4. INTERACTIVE FEEDBACK
+- Lockout Attempt Shake: The 3-dot attempt track physically translates/shakes on 
+  password failure, providing sensory rejection feedback.
+- Toast Compaction Compactor: Compacting heap memory immediately triggers a sliding 
+  holographic notification box confirming saved megabytes.
+
+6.5. LOGICAL & PHYSICAL CONSTRAINTS
+- Boot Protected Records: System prevents deleting `{current}` and `{bootmgr}` loader 
+  records, mapping absolute safety boundaries.
+- Thermal Benchmark Halt: Stress benchmarking checks temperature limits continuously, 
+  disabling threads before a physical overheat occurs, enforcing hard constraints.
+
+================================================================================
+                       ( END OF ARCHITECTURE FILE )
+================================================================================

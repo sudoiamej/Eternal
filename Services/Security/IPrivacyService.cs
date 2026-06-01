@@ -9,5 +9,6 @@ namespace Eternal.Services.Security
         Task<bool> ApplyPolicyAsync(string policyId);
         Task<bool> UndoPolicyAsync(string policyId);
         Task<bool> ApplyAllHardeningAsync();
+        Task<(bool Success, string Message, int ClearedFilesCount)> ClearTelemetryCacheAsync();
     }
 }

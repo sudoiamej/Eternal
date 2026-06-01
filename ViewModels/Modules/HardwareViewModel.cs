@@ -30,6 +30,16 @@ namespace Eternal.ViewModels.Modules
 
         public CommunityToolkit.Mvvm.Input.IAsyncRelayCommand LoadDataCommand { get; }
 
+        public override void ReleaseMemory()
+        {
+            DetailedInfo = new();
+            Disks = new();
+            Cpu = null;
+            Gpu = null;
+            Ram = null;
+            Motherboard = null;
+        }
+
         private async Task LoadDataAsync()
         {
             IsBusy = true;

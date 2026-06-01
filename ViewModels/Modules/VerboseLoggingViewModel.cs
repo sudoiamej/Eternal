@@ -46,12 +46,18 @@ namespace Eternal.ViewModels.Modules
             base.Deactivate();
         }
 
+        public override void ReleaseMemory()
+        {
+            ActionLogEntries.Clear();
+            EventViewerEntries.Clear();
+        }
+
         private void OnNewLogAdded(object? sender, LogEntry entry)
         {
             var app = System.Windows.Application.Current;
             if (app == null) return;
 
-            app.Dispatcher.Invoke(() =>
+            _ = app.Dispatcher.InvokeAsync(() =>
             {
                 ActionLogEntries.Insert(0, entry);
                 if (ActionLogEntries.Count > 2000) ActionLogEntries.RemoveAt(ActionLogEntries.Count - 1);

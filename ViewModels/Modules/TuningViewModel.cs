@@ -27,6 +27,11 @@ namespace Eternal.ViewModels.Modules
 
         public IAsyncRelayCommand LoadTweaksCommand { get; }
 
+        public override void ReleaseMemory()
+        {
+            Tweaks.Clear();
+        }
+
         private async Task LoadTweaksAsync()
         {
             if (IsBusy) return;

@@ -12,6 +12,7 @@
     <Grid>
         <!-- Main Content (HCI Rule 4: Cognitive Load Control) -->
         <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="40" 
+                      VirtualizingPanel.ScrollUnit="Pixel"
                       Visibility="{Binding HasError, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
             <StackPanel>
                 <!-- 1. Unified Header (HCI Rule 9: Consistency) -->

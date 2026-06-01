@@ -22,6 +22,7 @@ namespace Eternal.Views.Helpers
             _lockoutTimer.Tick += LockoutTimer_Tick;
 
             CheckLockoutState();
+            UpdateAttemptPins();
             PinInput.Focus();
         }
 
@@ -41,6 +42,9 @@ namespace Eternal.Views.Helpers
         private void EnableLockoutUI()
         {
             LockoutPanel.Visibility = Visibility.Visible;
+            AttemptPinsPanel.Visibility = Visibility.Collapsed;
+            VisualPinContainer.Visibility = Visibility.Collapsed;
+            InputPromptText.Visibility = Visibility.Collapsed;
             UnlockButton.IsEnabled = false;
             PinInput.IsEnabled = false;
             ErrorText.Visibility = Visibility.Collapsed;
@@ -51,9 +55,14 @@ namespace Eternal.Views.Helpers
         private void DisableLockoutUI()
         {
             LockoutPanel.Visibility = Visibility.Collapsed;
+            AttemptPinsPanel.Visibility = Visibility.Visible;
+            VisualPinContainer.Visibility = Visibility.Visible;
+            InputPromptText.Visibility = Visibility.Visible;
             UnlockButton.IsEnabled = true;
             PinInput.IsEnabled = true;
+            PinInput.Focus();
             _lockoutTimer.Stop();
+            UpdateAttemptPins();
         }
 
         private void LockoutTimer_Tick(object sender, EventArgs e)
@@ -74,6 +83,83 @@ namespace Eternal.Views.Helpers
         {
             var remaining = _settingsService.Current.LockoutEnd.Value - DateTime.Now;
             LockoutTimerText.Text = $"Please wait {remaining.Minutes:D2}:{remaining.Seconds:D2}";
+        }
+
+        private void VisualPinContainer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            PinInput.Focus();
+        }
+
+        private void PinInput_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            UpdatePinVisuals();
+        }
+
+        private void UpdatePinVisuals()
+        {
+            int len = PinInput.Password.Length;
+            var dots = new[] { Dot1, Dot2, Dot3, Dot4, Dot5, Dot6 };
+            var accentBrush = (System.Windows.Media.Brush)FindResource("AccentBrush");
+            var borderBrush = (System.Windows.Media.Brush)FindResource("BorderBrush");
+
+            for (int i = 0; i < 6; i++)
+            {
+                if (i < len)
+                {
+                    dots[i].Background = accentBrush;
+                    dots[i].BorderBrush = System.Windows.Media.Brushes.Transparent;
+                    if (dots[i].Effect is System.Windows.Media.Effects.DropShadowEffect shadow)
+                    {
+                        shadow.Opacity = 0.8;
+                    }
+                }
+                else
+                {
+                    dots[i].Background = System.Windows.Media.Brushes.Transparent;
+                    dots[i].BorderBrush = borderBrush;
+                    if (dots[i].Effect is System.Windows.Media.Effects.DropShadowEffect shadow)
+                    {
+                        shadow.Opacity = 0;
+                    }
+                }
+            }
+        }
+
+        private void UpdateAttemptPins()
+        {
+            var settings = _settingsService.Current;
+            int failed = settings.FailedAttemptsCount;
+            var pins = new[] { Attempt1, Attempt2, Attempt3 };
+            var successBrush = (System.Windows.Media.Brush)FindResource("SuccessBrush");
+            var criticalBrush = (System.Windows.Media.Brush)FindResource("CriticalBrush");
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (i < failed)
+                {
+                    pins[i].Fill = criticalBrush;
+                }
+                else
+                {
+                    pins[i].Fill = successBrush;
+                }
+            }
+        }
+
+        private void TriggerShake(UIElement element)
+        {
+            var doubleAnim = new System.Windows.Media.Animation.DoubleAnimation
+            {
+                From = 1.0,
+                To = 1.3,
+                Duration = TimeSpan.FromMilliseconds(150),
+                AutoReverse = true
+            };
+            element.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
+            var scale = new System.Windows.Media.ScaleTransform(1, 1);
+            element.RenderTransform = scale;
+            scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, doubleAnim);
+            scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, doubleAnim);
         }
 
         private void Unlock_Click(object sender, RoutedEventArgs e)
@@ -124,6 +210,16 @@ namespace Eternal.Views.Helpers
             ErrorText.Text = $"Invalid access code ({settings.FailedAttemptsCount}/3)";
             ErrorText.Visibility = Visibility.Visible;
             PinInput.Password = string.Empty;
+            UpdatePinVisuals();
+            UpdateAttemptPins();
+
+            // Trigger shake effect on the newly failed pin
+            int failedIndex = settings.FailedAttemptsCount - 1;
+            if (failedIndex >= 0 && failedIndex < 3)
+            {
+                var pins = new[] { Attempt1, Attempt2, Attempt3 };
+                TriggerShake(pins[failedIndex]);
+            }
 
             if (settings.FailedAttemptsCount >= 3)
             {
@@ -145,6 +241,7 @@ namespace Eternal.Views.Helpers
             settings.CurrentLockoutMinutes = 0;
             settings.LockoutEnd = null;
             _settingsService.Save();
+            UpdateAttemptPins();
         }
 
         private void Exit_Click(object sender, RoutedEventArgs e)

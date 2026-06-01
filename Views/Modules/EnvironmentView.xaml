@@ -16,6 +16,7 @@
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
             <Setter Property="CanUserAddRows" Value="False"/>
             <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True"/>
+            <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
         </Style>
         <Style TargetType="DataGridColumnHeader">
             <Setter Property="Background" Value="{DynamicResource CardBrush}"/>

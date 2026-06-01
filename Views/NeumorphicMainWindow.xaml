@@ -1,0 +1,259 @@
+<Window x:Class="Eternal.Views.NeumorphicMainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:vm="clr-namespace:Eternal.ViewModels"
+        xmlns:vmm="clr-namespace:Eternal.ViewModels.Modules"
+        xmlns:vmv="clr-namespace:Eternal.Views.Modules"
+        xmlns:helpers="clr-namespace:Eternal.Views.Helpers"
+        mc:Ignorable="d"
+        Title="Eternal Intelligence" Height="800" Width="1300"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        MouseDown="Window_MouseDown">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vmm:HomeGridDashboardViewModel}"><vmv:HomeGridDashboard/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:CategoryGridViewModel}"><vmv:CategoryGridView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:DashboardViewModel}"><vmv:DashboardView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:HardwareViewModel}"><vmv:HardwareView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:PEModeViewModel}"><vmv:PEModeView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:BiosViewModel}"><vmv:BiosView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:SecurityViewModel}"><vmv:SecurityView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:PerformanceViewModel}"><vmv:PerformanceView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:DriversViewModel}"><vmv:DriversView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ServicesViewModel}"><vmv:ServicesView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:StorageViewModel}"><vmv:StorageView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:NetworkViewModel}"><vmv:NetworkView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ReportsViewModel}"><vmv:ReportsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ToolsViewModel}"><vmv:ToolsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:SettingsViewModel}"><vmv:SettingsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ProcessIntelligenceViewModel}"><vmv:ProcessIntelligenceView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ThermalViewModel}"><vmv:ThermalView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:EnvironmentViewModel}"><vmv:EnvironmentView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:VerboseLoggingViewModel}"><vmv:VerboseLoggingView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:RepairCenterViewModel}"><vmv:RepairCenterView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:RegistryViewModel}"><vmv:RegistryView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:TuningViewModel}"><vmv:TuningView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ConsoleViewModel}"><vmv:ConsoleView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:BootViewModel}"><vmv:BootView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:UserManagementViewModel}"><vmv:UserManagementView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ComponentsViewModel}"><vmv:ComponentsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:WindowsUpdateViewModel}"><vmv:WindowsUpdateView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:DisplayViewModel}"><vmv:DisplayView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:PcScannerViewModel}"><vmv:PcScannerView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:DismImagingViewModel}"><vmv:DismImagingView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:PcRatingViewModel}"><vmv:PcRatingView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:SnapshotsViewModel}"><vmv:SnapshotsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:HardwareStressViewModel}"><vmv:HardwareStressView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:CommandPaletteViewModel}"><helpers:CommandPaletteOverlay/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:PrivacyViewModel}"><vmv:PrivacyView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:BatteryViewModel}"><vmv:BatteryView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:FileForensicsViewModel}"><vmv:FileForensicsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:AdvisorViewModel}"><vmv:AdvisorPane/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:FeatureTogglesViewModel}"><vmv:FeatureTogglesView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:FlagsViewModel}"><vmv:FlagsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ConfigEditorViewModel}"><vmv:ConfigEditorView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:WmiExplorerViewModel}"><vmv:WmiExplorerView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:AppProfilerViewModel}"><vmv:AppProfilerView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:TestingViewModel}"><vmv:TestingView/></DataTemplate>
+    </Window.Resources>
+    <Border Background="#090A0E" CornerRadius="30" BorderThickness="1" BorderBrush="#1CFFFFFF" Margin="15">
+        <Grid>
+            <!-- 1. Car Startup Overlay -->
+            <Grid x:Name="StartupOverlay" Panel.ZIndex="1000" Background="#090A0E">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <!-- The Eternal Logo as the primary boot icon with Cinematic Glow -->
+                    <Image x:Name="BootLogo" Source="/Assets/logo.png" Width="180" Height="180" RenderOptions.BitmapScalingMode="HighQuality">
+                        <Image.RenderTransform>
+                            <ScaleTransform CenterX="90" CenterY="90" x:Name="BootLogoScale"/>
+                        </Image.RenderTransform>
+                    </Image>
+                    <TextBlock x:Name="StartupStatusText" Text="ETERNAL SYSTEM INTELLIGENCE" Margin="0,40,0,0" FontSize="18" FontWeight="Black" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center" Opacity="0.9"/>
+                    <TextBlock Text="PREPARING WORKSPACE STATE" FontSize="11" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Opacity="0.4" Margin="0,10,0,0"/>
+                    <Border Width="300" Height="4" Background="#1C1C1E" CornerRadius="2" Margin="0,30,0,0" HorizontalAlignment="Center">
+                        <Border x:Name="TachometerSweep" Width="0" Height="4" Background="#FFFFFF" CornerRadius="2" HorizontalAlignment="Left">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#FFFFFF" BlurRadius="12" ShadowDepth="0" Opacity="0.8"/>
+                            </Border.Effect>
+                        </Border>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- 2. Main Interface Content -->
+            <Grid x:Name="MainInterfaceGrid" Opacity="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/> <!-- CarPlay Dock -->
+                    <ColumnDefinition Width="*"/>  <!-- Main Content -->
+                </Grid.ColumnDefinitions>
+
+                <!-- CarPlay Style Dock (Layered, distinct spatial separation) -->
+                <Border Grid.Column="0" Background="#111218" CornerRadius="30,0,0,30" BorderThickness="0,0,1,0" BorderBrush="#15FFFFFF"
+                        AllowDrop="True" Drop="Dock_Drop" DragOver="Dock_DragOver">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Home Button -->
+                        <RowDefinition Height="*"/>    <!-- Recent Apps -->
+                        <RowDefinition Height="Auto"/> <!-- Status/Clock -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Home Button (Eternal Logo in circular CarPlay anchor) -->
+                    <Button Grid.Row="0" Margin="10,25,10,10" Command="{Binding NavigateCommand}" CommandParameter="Home">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource CarPlayDockButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsHomeActive}" Value="True">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <Image Source="/Assets/logo.png" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    </Button>
+
+                    <!-- Dynamic Recent Apps / Category Workspaces (Touch-friendly, borderless) -->
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding PinnedItems}" VerticalAlignment="Center">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Margin="0,8" 
+                                        Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                        CommandParameter="{Binding ViewName}"
+                                        Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Style="{StaticResource CarPlayDockButton}"
+                                        ToolTip="{Binding Name}"
+                                        PreviewMouseLeftButtonDown="DockItem_PreviewMouseLeftButtonDown"
+                                        PreviewMouseMove="DockItem_PreviewMouseMove">
+                                    <Button.ContextMenu>
+                                        <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                            <MenuItem Header="Unpin Shortcut" 
+                                                      Command="{Binding UnpinFeatureCommand}"
+                                                      CommandParameter="{Binding Path=PlacementTarget.DataContext.ViewName, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                <MenuItem.Icon>
+                                                    <fa:ImageAwesome Icon="Times" Foreground="{DynamicResource CriticalBrush}"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                    <fa:ImageAwesome Icon="{Binding Icon}" Width="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Bottom Status (Clean, tactile settings and system info) -->
+                    <StackPanel Grid.Row="2" Margin="0,0,0,30">
+                        <Button Margin="0,10" Command="{Binding NavigateCommand}" CommandParameter="Settings">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource CarPlayDockButton}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSettingsActive}" Value="True">
+                                            <Setter Property="Tag" Value="Active"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <fa:ImageAwesome Icon="Gear" Width="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </Button>
+                        
+                        <TextBlock Text="{Binding CurrentTime}" Foreground="{DynamicResource TextBrush}" FontSize="12" FontWeight="Black" HorizontalAlignment="Center" Margin="0,15,0,0" Opacity="0.9"/>
+                        <TextBlock Text="{Binding BatteryPercentage}" Foreground="{DynamicResource SuccessBrush}" FontSize="10" FontWeight="Black" HorizontalAlignment="Center" Opacity="0.8"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Main Content Area (Accepts drops of unpinned items from the sidebar) -->
+            <Grid Grid.Column="1" AllowDrop="True" Drop="MainContent_Drop" DragOver="MainContent_DragOver">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/> <!-- Custom Title Bar -->
+                    <RowDefinition Height="*"/>  <!-- View Content -->
+                </Grid.RowDefinitions>
+
+                <!-- Title Bar -->
+                <Grid Grid.Row="0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="25,0,0,0">
+                        <!-- Universal Back Button -->
+                        <Button Command="{Binding NavigateCommand}" 
+                                CommandParameter="Home" 
+                                Style="{StaticResource IconButton}" 
+                                ToolTip="Back to Springboard"
+                                Margin="0,0,15,0"
+                                Visibility="{Binding IsHomeActive, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
+                            <fa:ImageAwesome Icon="ChevronLeft" Width="10" Foreground="#A0A5B5"/>
+                        </Button>
+                        <TextBlock Text="{Binding Title}" Foreground="#A0A5B5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,15,0">
+                        <!-- UI Toggle Button -->
+                        <Button Command="{Binding ToggleUICommand}" Style="{StaticResource IconButton}" ToolTip="Switch to Legacy UI" 
+                                Visibility="{Binding IsUiToggleVisible, Converter={StaticResource VisibilityConverter}}" Margin="0,0,10,0">
+                            <fa:ImageAwesome Icon="Exchange" Width="14" Foreground="{DynamicResource AccentBrush}"/>
+                        </Button>
+
+                        <Button Click="MinimizeButton_Click" Style="{StaticResource IconButton}" Content="—" Foreground="{DynamicResource TextBrush}" FontSize="16" Width="40"/>
+                        <Button Click="CloseButton_Click" Style="{StaticResource IconButton}" Content="✕" Foreground="{DynamicResource CriticalBrush}" FontSize="16" Width="40"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Dynamic View Host: Layered, Floating App Viewport -->
+                <Border Grid.Row="1" Margin="12" CornerRadius="24" Background="#14161F" BorderThickness="1" BorderBrush="#12FFFFFF">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" BlurRadius="20" ShadowDepth="2" Opacity="0.4"/>
+                    </Border.Effect>
+                    <ContentControl Content="{Binding CurrentView}">
+                        <ContentControl.RenderTransform>
+                            <TranslateTransform/>
+                        </ContentControl.RenderTransform>
+                        <ContentControl.Style>
+                            <Style TargetType="ContentControl">
+                                <Style.Triggers>
+                                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                        <BeginStoryboard Storyboard="{StaticResource ViewTransitionAnim}"/>
+                                    </EventTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ContentControl.Style>
+                    </ContentControl>
+                </Border>
+            </Grid>
+            </Grid>
+
+            <!-- 3. CarPlay Security Lockout Overlay -->
+            <Grid x:Name="SecurityOverlay" Panel.ZIndex="2000" Background="#000000" Opacity="0" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="40">
+                    <!-- CarPlay Minimalist Lock Shield -->
+                    <Border Width="80" Height="80" CornerRadius="40" Background="#1C1C1E" Margin="0,0,0,30" HorizontalAlignment="Center">
+                        <fa:ImageAwesome Icon="Lock" Width="36" Foreground="#FF2A6D" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+                    
+                    <TextBlock Text="SECURITY VIOLATION DETECTED" FontSize="22" FontWeight="Black" Foreground="#FF2A6D" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                    
+                    <TextBlock Text="For the protection and safety of the application, debugging this application without permission is not allowed." 
+                               Foreground="#FFFFFF" FontSize="14" FontWeight="SemiBold" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="500" LineHeight="22" Margin="0,0,0,30"/>
+                    
+                    <!-- CarPlay styled warning badge -->
+                    <Border Background="#121214" BorderBrush="#1C1C1E" BorderThickness="1" Padding="20,15" CornerRadius="12" MaxWidth="450" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="ExclamationTriangle" Width="14" Foreground="#8E8E93" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Active debug tracing has been terminated dynamically." Foreground="#8E8E93" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+                
+                <!-- Action -->
+                <Button Grid.Row="1" Content="EXIT APPLICATION" Click="CloseButton_Click" 
+                        Style="{StaticResource NeuButton}" Width="220" Height="45" Margin="0,0,0,50" HorizontalAlignment="Center"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

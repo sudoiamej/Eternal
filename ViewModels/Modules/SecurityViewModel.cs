@@ -25,6 +25,14 @@ namespace Eternal.ViewModels.Modules
 
         public CommunityToolkit.Mvvm.Input.IAsyncRelayCommand LoadCommand { get; }
 
+        public override void ReleaseMemory()
+        {
+            Startups = new();
+            Services = new();
+            BitLockerVolumes = new();
+            ReAgent = null;
+        }
+
         public async Task LoadDataAsync()
         {
             if (IsLoading) return;

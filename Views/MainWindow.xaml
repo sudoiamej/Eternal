@@ -38,6 +38,24 @@
                     </DoubleAnimation>
                 </Storyboard>
             </BeginStoryboard>
+            <BeginStoryboard>
+                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                    <DoubleAnimation Storyboard.TargetName="Orb1Trans" Storyboard.TargetProperty="X" From="-50" To="100" Duration="0:0:25"/>
+                    <DoubleAnimation Storyboard.TargetName="Orb1Trans" Storyboard.TargetProperty="Y" From="-50" To="150" Duration="0:0:30"/>
+                </Storyboard>
+            </BeginStoryboard>
+            <BeginStoryboard>
+                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                    <DoubleAnimation Storyboard.TargetName="Orb2Trans" Storyboard.TargetProperty="X" From="50" To="-150" Duration="0:0:28"/>
+                    <DoubleAnimation Storyboard.TargetName="Orb2Trans" Storyboard.TargetProperty="Y" From="-100" To="100" Duration="0:0:35"/>
+                </Storyboard>
+            </BeginStoryboard>
+            <BeginStoryboard>
+                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                    <DoubleAnimation Storyboard.TargetName="Orb3Trans" Storyboard.TargetProperty="X" From="-100" To="150" Duration="0:0:32"/>
+                    <DoubleAnimation Storyboard.TargetName="Orb3Trans" Storyboard.TargetProperty="Y" From="50" To="-120" Duration="0:0:27"/>
+                </Storyboard>
+            </BeginStoryboard>
         </EventTrigger>
     </Window.Triggers>
 
@@ -131,6 +149,57 @@
             </Rectangle.Style>
         </Rectangle>
 
+        <!-- Spatial Cyber Orbs Canvas -->
+        <Canvas x:Name="OrbsCanvas" IsHitTestVisible="False" Opacity="0.5">
+            <!-- Orb 1: Emerald/Indigo -->
+            <Ellipse x:Name="Orb1" Width="400" Height="400" Canvas.Left="-50" Canvas.Top="-50">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#2000FF88" Offset="0"/>
+                        <GradientStop Color="#00000000" Offset="1"/>
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+                <Ellipse.Effect>
+                    <BlurEffect Radius="100"/>
+                </Ellipse.Effect>
+                <Ellipse.RenderTransform>
+                    <TranslateTransform x:Name="Orb1Trans" X="0" Y="0"/>
+                </Ellipse.RenderTransform>
+            </Ellipse>
+
+            <!-- Orb 2: Royal Blue/Violet -->
+            <Ellipse x:Name="Orb2" Width="500" Height="500" Canvas.Right="-100" Canvas.Top="200">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#150078D7" Offset="0"/>
+                        <GradientStop Color="#00000000" Offset="1"/>
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+                <Ellipse.Effect>
+                    <BlurEffect Radius="120"/>
+                </Ellipse.Effect>
+                <Ellipse.RenderTransform>
+                    <TranslateTransform x:Name="Orb2Trans" X="0" Y="0"/>
+                </Ellipse.RenderTransform>
+            </Ellipse>
+
+            <!-- Orb 3: Contextual Glow bound to Accent -->
+            <Ellipse x:Name="Orb3" Width="450" Height="450" Canvas.Left="400" Canvas.Bottom="-100">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="{DynamicResource AccentColor}" Offset="0"/>
+                        <GradientStop Color="#00000000" Offset="1"/>
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+                <Ellipse.Effect>
+                    <BlurEffect Radius="110"/>
+                </Ellipse.Effect>
+                <Ellipse.RenderTransform>
+                    <TranslateTransform x:Name="Orb3Trans" X="0" Y="0"/>
+                </Ellipse.RenderTransform>
+            </Ellipse>
+        </Canvas>
+
         <!-- Main Structure (Spatial Layout Engine) -->
         <Grid Margin="20">
             <Grid.RowDefinitions>
@@ -197,9 +266,16 @@
                 </StackPanel>
             </Border>
 
+            <!-- Telemetry HUD Toggle Button -->
+            <Button Grid.Row="0" Command="{Binding ToggleTelemetryHudCommand}" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                    Margin="0,0,70,25" Style="{StaticResource IconButton}" ToolTip="Toggle Performance HUD" Panel.ZIndex="100">
+                <fa:ImageAwesome Icon="Dashboard" Width="16" Foreground="{DynamicResource AccentBrush}"/>
+            </Button>
+
             <!-- UI Toggle Button (Upper Right Context) -->
             <Button Grid.Row="0" Command="{Binding ToggleUICommand}" HorizontalAlignment="Right" VerticalAlignment="Center" 
-                    Margin="0,0,30,25" Style="{StaticResource IconButton}" ToolTip="Switch to Legacy UI" Panel.ZIndex="100">
+                    Margin="0,0,30,25" Style="{StaticResource IconButton}" ToolTip="Switch to Legacy UI" Panel.ZIndex="100"
+                    Visibility="{Binding IsUiToggleVisible, Converter={StaticResource VisibilityConverter}}">
                 <fa:ImageAwesome Icon="Exchange" Width="16" Foreground="{DynamicResource AccentBrush}"/>
             </Button>
 
@@ -210,137 +286,200 @@
                     <ColumnDefinition Width="*"/>    <!-- Adaptive Content -->
                 </Grid.ColumnDefinitions>
 
-                <!-- Floating Navigation Rail -->
-                <Border Grid.Column="0" x:Name="MainSidebar" 
-                        Background="{DynamicResource SidebarBrush}" 
-                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                        CornerRadius="30"
-                        Width="65" HorizontalAlignment="Left" Margin="0,0,25,0" Padding="0,20">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="40" ShadowDepth="0" Opacity="0.4" Color="Black"/>
-                    </Border.Effect>
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CurrentView.IsFocusModeActive}" Value="True">
-                                    <Setter Property="Opacity" Value="0.2"/>
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding IsChecked, ElementName=MenuToggle}" Value="False"/>
-                                        <Condition Binding="{Binding IsMouseOver, ElementName=MenuToggle}" Value="False"/>
-                                        <Condition Binding="{Binding IsMouseOver, ElementName=MainSidebar}" Value="False"/>
-                                    </MultiDataTrigger.Conditions>
-                                    <MultiDataTrigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard><DoubleAnimation Storyboard.TargetProperty="Width" To="65" Duration="0:0:0.3"><DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseIn"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard>
-                                        </BeginStoryboard>
-                                    </MultiDataTrigger.EnterActions>
-                                    <MultiDataTrigger.ExitActions>
-                                        <BeginStoryboard>
-                                            <Storyboard><DoubleAnimation Storyboard.TargetProperty="Width" To="280" Duration="0:0:0.4"><DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard>
-                                        </BeginStoryboard>
-                                    </MultiDataTrigger.ExitActions>
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                    
-                    <Grid Width="280" HorizontalAlignment="Left">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                <!-- Floating Navigation Rail Panel (HCI: Collapsible with spring overshoot) -->
+                <Grid Grid.Column="0" HorizontalAlignment="Left" Margin="0,0,25,0">
+                    <Border x:Name="MainSidebar" 
+                            Background="{DynamicResource SidebarBrush}" 
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                            CornerRadius="30"
+                            HorizontalAlignment="Left" Padding="0,20">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="40" ShadowDepth="0" Opacity="0.4" Color="Black"/>
+                        </Border.Effect>
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Width" Value="280"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentView.IsFocusModeActive}" Value="True">
+                                        <Setter Property="Opacity" Value="0.2"/>
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsChecked, ElementName=SidebarToggle}" Value="False">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetProperty="Width" To="65" Duration="0:0:0.6">
+                                                        <DoubleAnimation.EasingFunction>
+                                                            <BackEase EasingMode="EaseInOut" Amplitude="0.6"/>
+                                                        </DoubleAnimation.EasingFunction>
+                                                    </DoubleAnimation>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetProperty="Width" To="280" Duration="0:0:0.6">
+                                                        <DoubleAnimation.EasingFunction>
+                                                            <BackEase EasingMode="EaseInOut" Amplitude="0.6"/>
+                                                        </DoubleAnimation.EasingFunction>
+                                                    </DoubleAnimation>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        
+                        <Grid Width="280" HorizontalAlignment="Left">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                        <!-- Rail Content -->
-                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                            <StackPanel Margin="10,0">
-                                <StackPanel.Resources>
-                                    <DataTemplate x:Key="NavItemTemplate">
-                                        <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding ViewName}"
-                                                HorizontalContentAlignment="Left"
-                                                Margin="0,2" Padding="0" Background="Transparent" BorderThickness="0" Height="45">
-                                            <Button.Style>
-                                                <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="Button">
-                                                                <Border Background="{TemplateBinding Background}" CornerRadius="15"><ContentPresenter/></Border>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                            <Setter Property="Background" Value="#20FFFFFF"/>
-                                                        </DataTrigger>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Background" Value="#15FFFFFF"/>
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Button.Style>
-                                            <Grid Width="260">
-                                                <Grid.ColumnDefinitions><ColumnDefinition Width="45"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                            <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="16" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                <fa:ImageAwesome.Style>
-                                                    <Style TargetType="fa:ImageAwesome">
-                                                        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                            <!-- Rail Content -->
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.ScrollUnit="Pixel">
+                                <StackPanel Margin="10,0">
+                                    <StackPanel.Resources>
+                                        <DataTemplate x:Key="NavItemTemplate">
+                                            <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding ViewName}"
+                                                    HorizontalContentAlignment="Left"
+                                                    Margin="0,2" Padding="0" Background="Transparent" BorderThickness="0" Height="45">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Border Background="{TemplateBinding Background}" CornerRadius="15"><ContentPresenter/></Border>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/></DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True"><Setter Property="Foreground" Value="White"/></DataTrigger>
-                                                            <DataTrigger Binding="{Binding HasAlert}" Value="True">
-                                                                <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
-                                                                <DataTrigger.EnterActions>
-                                                                    <BeginStoryboard x:Name="AlertPulse">
-                                                                        <Storyboard RepeatBehavior="Forever">
-                                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0.4" Duration="0:0:0.8" AutoReverse="True"/>
-                                                                        </Storyboard>
-                                                                    </BeginStoryboard>
-                                                                </DataTrigger.EnterActions>
-                                                                <DataTrigger.ExitActions>
-                                                                    <StopStoryboard BeginStoryboardName="AlertPulse"/>
-                                                                </DataTrigger.ExitActions>
+                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                <Setter Property="Background" Value="#20FFFFFF"/>
                                                             </DataTrigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="#15FFFFFF"/>
+                                                            </Trigger>
                                                         </Style.Triggers>
                                                     </Style>
-                                                </fa:ImageAwesome.Style>
-                                            </fa:ImageAwesome>
-                                                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" FontSize="13" Margin="10,0,0,0">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
+                                                </Button.Style>
+                                                <Grid Width="260">
+                                                    <Grid.ColumnDefinitions><ColumnDefinition Width="45"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                                <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="16" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                    <fa:ImageAwesome.Style>
+                                                        <Style TargetType="fa:ImageAwesome">
                                                             <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter Property="Foreground" Value="White"/><Setter Property="FontWeight" Value="Black"/></DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/></DataTrigger>
                                                                 <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True"><Setter Property="Foreground" Value="White"/></DataTrigger>
+                                                                <DataTrigger Binding="{Binding HasAlert}" Value="True">
+                                                                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                                                    <DataTrigger.EnterActions>
+                                                                        <BeginStoryboard x:Name="AlertPulse">
+                                                                            <Storyboard RepeatBehavior="Forever">
+                                                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0.4" Duration="0:0:0.8" AutoReverse="True"/>
+                                                                            </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                    </DataTrigger.EnterActions>
+                                                                    <DataTrigger.ExitActions>
+                                                                        <StopStoryboard BeginStoryboardName="AlertPulse"/>
+                                                                    </DataTrigger.ExitActions>
+                                                                </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
-                                            </Grid>
-                                        </Button>
-                                    </DataTemplate>
-                                </StackPanel.Resources>
+                                                    </fa:ImageAwesome.Style>
+                                                </fa:ImageAwesome>
+                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" FontSize="13" Margin="10,0,0,0">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter Property="Foreground" Value="White"/><Setter Property="FontWeight" Value="Black"/></DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True"><Setter Property="Foreground" Value="White"/></DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsChecked, ElementName=SidebarToggle}" Value="False">
+                                                                        <DataTrigger.EnterActions>
+                                                                            <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.15"/>
+                                                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" BeginTime="0:0:0.15">
+                                                                                        <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Collapsed}"/>
+                                                                                    </ObjectAnimationUsingKeyFrames>
+                                                                                </Storyboard>
+                                                                            </BeginStoryboard>
+                                                                        </DataTrigger.EnterActions>
+                                                                        <DataTrigger.ExitActions>
+                                                                            <BeginStoryboard>
+                                                                                <Storyboard>
+                                                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                                                                        <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}"/>
+                                                                                    </ObjectAnimationUsingKeyFrames>
+                                                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1.0" Duration="0:0:0.2"/>
+                                                                                </Storyboard>
+                                                                            </BeginStoryboard>
+                                                                        </DataTrigger.ExitActions>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Grid>
+                                            </Button>
+                                        </DataTemplate>
+                                    </StackPanel.Resources>
 
-                                <ItemsControl ItemsSource="{Binding SystemItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-                                <Border Background="{DynamicResource BorderBrush}" Height="1" Margin="15,15" Opacity="0.3"/>
-                                <ItemsControl ItemsSource="{Binding TelemetryItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-                                <Border Background="{DynamicResource BorderBrush}" Height="1" Margin="15,15" Opacity="0.3"/>
-                                <ItemsControl ItemsSource="{Binding MonitoringItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-                                <Border Background="{DynamicResource BorderBrush}" Height="1" Margin="15,15" Opacity="0.3"/>
-                                <ItemsControl ItemsSource="{Binding SupportItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-
-                                <!-- SPATIAL LAYER 4: Developer / Testing Suite (Secret Menu) -->
-                                <StackPanel Visibility="{Binding IsTestingModeActive, Converter={StaticResource VisibilityConverter}}">
+                                    <ItemsControl ItemsSource="{Binding SystemItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
                                     <Border Background="{DynamicResource BorderBrush}" Height="1" Margin="15,15" Opacity="0.3"/>
-                                    <TextBlock Text="DEV TESTING SUITE" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" Margin="20,0,0,10" Opacity="0.8"/>
-                                    <ItemsControl ItemsSource="{Binding DevToolkitItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
+                                    <ItemsControl ItemsSource="{Binding TelemetryItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
+                                    <Border Background="{DynamicResource BorderBrush}" Height="1" Margin="15,15" Opacity="0.3"/>
+                                    <ItemsControl ItemsSource="{Binding MonitoringItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
+                                    <Border Background="{DynamicResource BorderBrush}" Height="1" Margin="15,15" Opacity="0.3"/>
+                                    <ItemsControl ItemsSource="{Binding SupportItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
+
+                                    <!-- SPATIAL LAYER 4: Developer / Testing Suite (Secret Menu) -->
+                                    <StackPanel Visibility="{Binding IsTestingModeActive, Converter={StaticResource VisibilityConverter}}">
+                                        <Border Background="{DynamicResource BorderBrush}" Height="1" Margin="15,15" Opacity="0.3"/>
+                                        <TextBlock Text="DEV TESTING SUITE" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" Margin="20,0,0,10" Opacity="0.8"/>
+                                        <ItemsControl ItemsSource="{Binding DevToolkitItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
+                                    </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
-                        </ScrollViewer>
-                    </Grid>
-                </Border>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+
+                    <!-- Floating Chevron Toggle Button (HCI Signifier & Affordance) -->
+                    <ToggleButton x:Name="SidebarToggle" 
+                                  IsChecked="{Binding IsChecked, ElementName=MenuToggle, Mode=TwoWay}"
+                                  Width="24" Height="24"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  Margin="0,0,-12,0"
+                                  Cursor="Hand"
+                                  Panel.ZIndex="100">
+                        <ToggleButton.Template>
+                            <ControlTemplate TargetType="ToggleButton">
+                                <Border x:Name="BtnBorder" Background="{DynamicResource SidebarBrush}" 
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                        CornerRadius="12">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.3" Color="Black"/>
+                                    </Border.Effect>
+                                    <fa:ImageAwesome x:Name="BtnIcon" Icon="ChevronLeft" Width="10" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                        <Setter TargetName="BtnIcon" Property="Foreground" Value="White"/>
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="False">
+                                        <Setter TargetName="BtnIcon" Property="Icon" Value="ChevronRight"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </ToggleButton.Template>
+                    </ToggleButton>
+                </Grid>
 
                 <!-- Adaptive Content Area -->
                 <Border Grid.Column="1" Background="#05FFFFFF" CornerRadius="30" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" ClipToBounds="True">
@@ -425,6 +564,12 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <ContentControl Panel.ZIndex="100" Content="{Binding CommandPaletteVm}" Visibility="{Binding CommandPaletteVm.IsOpen, Converter={StaticResource VisibilityConverter}}"/>
+        <!-- Spatial Layer 5: Drag-and-Drop HUD Overlay Layer -->
+        <Canvas Panel.ZIndex="300" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}" IsHitTestVisible="True">
+            <helpers:TelemetryHUD Canvas.Left="50" Canvas.Top="150"
+                                  Visibility="{Binding IsTelemetryHudOpen, Converter={StaticResource VisibilityConverter}}"/>
+        </Canvas>
+
+        <ContentControl Panel.ZIndex="400" Content="{Binding CommandPaletteVm}" Visibility="{Binding CommandPaletteVm.IsOpen, Converter={StaticResource VisibilityConverter}}"/>
     </Grid>
 </Window>

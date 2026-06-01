@@ -36,4 +36,29 @@
     <!-- Derived from Accent (Fallback) -->
     <Color x:Key="AccentSecondaryColor">#333333</Color>
 
+    <!-- CarPlay style Plate brushes for Home Dashboard -->
+    <LinearGradientBrush x:Key="DiagnosticsPlateBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#00FFAA" Offset="0"/>
+        <GradientStop Color="#00B0FF" Offset="1"/>
+    </LinearGradientBrush>
+    <Color x:Key="DiagnosticsPlateColor">#00FFAA</Color>
+
+    <LinearGradientBrush x:Key="TuningPlateBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#FFB300" Offset="0"/>
+        <GradientStop Color="#FF3D00" Offset="1"/>
+    </LinearGradientBrush>
+    <Color x:Key="TuningPlateColor">#FF3D00</Color>
+
+    <LinearGradientBrush x:Key="MonitoringPlateBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#00E5FF" Offset="0"/>
+        <GradientStop Color="#7F00FF" Offset="1"/>
+    </LinearGradientBrush>
+    <Color x:Key="MonitoringPlateColor">#00E5FF</Color>
+
+    <LinearGradientBrush x:Key="SupportPlateBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#A000FF" Offset="0"/>
+        <GradientStop Color="#FF2A6D" Offset="1"/>
+    </LinearGradientBrush>
+    <Color x:Key="SupportPlateColor">#FF2A6D</Color>
+
 </ResourceDictionary>

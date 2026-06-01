@@ -86,7 +86,7 @@
                 </Border>
 
                 <!-- 3. Tweak Grid (UX: Visual Hierarchy & Mapping) -->
-                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" VirtualizingPanel.ScrollUnit="Pixel">
                     <ItemsControl ItemsSource="{Binding Tweaks}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>

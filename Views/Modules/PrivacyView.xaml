@@ -29,28 +29,61 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Score Summary -->
-            <Border Grid.Row="1" Style="{StaticResource StandardCard}" Margin="0,0,0,30">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <helpers:RadialGauge Value="{Binding PrivacyScore}" Width="120" Height="120" StrokeThickness="8" Stroke="{DynamicResource AccentBrush}" GlowColor="{DynamicResource AccentColor}">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="{Binding PrivacyScore}" FontSize="32" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
-                            <TextBlock Text="INDEX" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,-5,0,0"/>
+            <!-- Score & Telemetry Purger Summary -->
+            <Grid Grid.Row="1" Margin="0,0,0,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left Card: Privacy Score -->
+                <Border Grid.Column="0" Style="{StaticResource StandardCard}" Margin="0,0,10,0">
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <helpers:RadialGauge Value="{Binding PrivacyScore}" Width="110" Height="110" StrokeThickness="8" Stroke="{DynamicResource AccentBrush}" GlowColor="{DynamicResource AccentColor}">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding PrivacyScore}" FontSize="28" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+                                <TextBlock Text="INDEX" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,-5,0,0"/>
+                            </StackPanel>
+                        </helpers:RadialGauge>
+                        
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="15,0">
+                            <TextBlock Text="PRIVACY STATUS" Style="{StaticResource Caption}" Margin="0,0,0,3"/>
+                            <TextBlock Text="{Binding ScoreStatus}" FontSize="24" FontWeight="Black" Foreground="White"/>
+                            <TextBlock Text="Alignment of Windows telemetry and app permission policies with the Eternal Sentinel privacy baseline." 
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0" LineHeight="14"/>
                         </StackPanel>
-                    </helpers:RadialGauge>
-                    
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0">
-                        <TextBlock Text="PRIVACY STATUS" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
-                        <TextBlock Text="{Binding ScoreStatus}" FontSize="36" FontWeight="Black" Foreground="White"/>
-                        <TextBlock Text="This score represents the alignment of your Windows telemetry and permission settings with the Eternal Sentinel privacy baseline." 
-                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13" TextWrapping="Wrap" Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Right Card: Telemetry Cleanser -->
+                <Border Grid.Column="1" Style="{StaticResource StandardCard}" Margin="10,0,0,0">
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <helpers:RadialGauge Value="{Binding CleanserProgress}" Width="110" Height="110" StrokeThickness="8" Stroke="{DynamicResource InfoBrush}" GlowColor="{DynamicResource InfoColor}">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding CleanserProgress, StringFormat='{}{0:0}%'}" FontSize="24" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+                                <TextBlock Text="PROGRESS" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,-5,0,0"/>
+                            </StackPanel>
+                        </helpers:RadialGauge>
+                        
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="15,0">
+                            <TextBlock Text="TELEMETRY PURGER" Style="{StaticResource Caption}" Margin="0,0,0,3"/>
+                            <Button Command="{Binding ClearTelemetryCacheCommand}" Content="CLEANSE TELEMETRY" Style="{StaticResource PrimaryButton}" 
+                                    Background="{DynamicResource InfoBrush}" Foreground="White" Padding="12,6" Height="28" Margin="0,5,0,0"
+                                    IsEnabled="{Binding IsCleansing, Converter={StaticResource InvertBooleanConverter}}"/>
+                            <TextBlock Text="Wipes diagnostic trace logs (.etl) in ProgramData to minimize passive telemetry data collection." 
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0" LineHeight="14"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
 
             <!-- Policies List -->
             <Border Grid.Row="2" Style="{StaticResource StandardCard}" Padding="0">

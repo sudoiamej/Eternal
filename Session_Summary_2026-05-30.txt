@@ -1,0 +1,29 @@
+# Eternal System Intelligence - Development Milestone Summary
+**Date:** May 30, 2026
+**Version:** 2.5.0-M5 (Neumorphic Edition)
+
+## 1. UI/UX Evolution: Neumorphic CarPlay
+- **Paradigm Shift:** Successfully implemented a modernized **Neumorphic (Soft UI)** design language using dual-shadow depth effects and solid-color surfaces.
+- **Navigation Engine:** Replaced the legacy sidebar with an **Apple CarPlay-inspired** two-tier grid system.
+  - **Tier 1 (Home):** A high-fidelity grid of primary category "folders" (Diagnostics, Tuning, Monitoring, Support).
+  - **Tier 2 (Category Grid):** Dynamic sub-grids that display individual feature tiles with physics-based cascading entrance animations.
+- **Persistent Dock:** A new edge-dock features a branded Eternal logo Home button, pinned module shortcuts, and a **real-time system status area** (HH:mm clock and live battery percentage).
+
+## 2. Resource & Memory Optimization
+- **Aggressive Purging:** Implemented `IMemoryOptimizable` across all major ViewModels. The application now proactively releases large data collections and object references when modules are not in focus.
+- **Rendering Efficiency:** Integrated **Bitmap Caching** for all complex Neumorphic shadow-casting elements, significantly reducing GPU/CPU overhead.
+- **Polling Suspension:** Refined navigation logic to strictly deactivate background polling for non-visible modules, preserving energy and CPU cycles.
+
+## 3. Core System Enhancements
+- **Version-Aware Feature Gating:** Standardized OS detection using a centralized `OsHelper`. The application now supports **Windows 10 Version 1507 (Build 10240) onwards** and intelligently hides incompatible features (e.g., Windows 11 tweaks) from the UI.
+- **Unified Animation Framework:** Created a centralized `Animations.xaml` system providing synchronized, hardware-accelerated transitions (Fade + Slide) across the entire suite.
+- **Drag-and-Drop Pinning:** Implemented a customizable CarPlay dock. Users can now drag feature tiles from any grid and drop them onto the sidebar to create persistent, quick-access shortcuts. Includes persistence logic in `AppSettings` and a right-click unpinning system.
+- **Stability & Isolation:** Fixed several regression bugs related to UI swapping and navigation routing, ensuring the **Legacy UI** remains fully functional and isolated from the new redesign.
+
+## 4. Technical Debt Clearance
+- Standardized ViewModel title handling via `BaseViewModel`.
+- Resolved namespace ambiguities between WPF and WinForms components.
+- Fixed XAML compilation errors (MC4005) and binding mismatches.
+
+---
+*Status: Ready for Production Preview.*

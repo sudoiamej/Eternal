@@ -164,5 +164,15 @@ namespace Eternal.ViewModels.Modules
             RecommendedCount = RecommendedIssues.Count;
             OptionalCount = OptionalIssues.Count;
         }
+
+        public override void ReleaseMemory()
+        {
+            _allDiscoveredIssues.Clear();
+            RequiredIssues.Clear();
+            RecommendedIssues.Clear();
+            OptionalIssues.Clear();
+            SortedIssues.Clear();
+            UpdateCounts();
+        }
     }
 }

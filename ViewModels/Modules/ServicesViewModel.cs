@@ -69,5 +69,32 @@ namespace Eternal.ViewModels.Modules
             detailWin.Owner = System.Windows.Application.Current.MainWindow;
             detailWin.ShowDialog();
         }
+
+        [RelayCommand]
+        private async Task ToggleDelayedStart(ServiceInfo? service)
+        {
+            if (service == null) return;
+            
+            await ExecuteBusyActionAsync(async () =>
+            {
+                bool newState = !service.IsDelayed;
+                bool success = await _servicesService.ToggleDelayedStartAsync(service.Name, newState);
+                if (success)
+                {
+                    _toastService.ShowSuccess($"Delayed startup {(newState ? "Enabled" : "Disabled")} for {service.DisplayName}.");
+                    await LoadDataAsync();
+                }
+                else
+                {
+                    _toastService.ShowError("Failed to modify service Delayed Start. Elevation required.");
+                }
+            }, "Updating Service Startup...");
+        }
+
+        public override void ReleaseMemory()
+        {
+            Services = new();
+            SelectedService = null;
+        }
     }
 }

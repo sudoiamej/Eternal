@@ -112,6 +112,40 @@
                                     <TextBlock Text="STOP SERVICE" FontSize="11" FontWeight="Bold"/>
                                 </StackPanel>
                             </Button>
+
+                            <Button Command="{Binding ToggleDelayedStartCommand}" 
+                                    CommandParameter="{Binding SelectedService}"
+                                    IsEnabled="{Binding IsChecked, ElementName=SafetyLock}"
+                                    Style="{StaticResource StandardButton}" Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="ClockOutline" Width="12" Margin="0,0,12,0">
+                                        <fa:ImageAwesome.Style>
+                                            <Style TargetType="fa:ImageAwesome">
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SelectedService.IsDelayed}" Value="True">
+                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </fa:ImageAwesome.Style>
+                                    </fa:ImageAwesome>
+                                    <TextBlock FontSize="11" FontWeight="Bold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="DELAYED STARTUP (OFF)"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SelectedService.IsDelayed}" Value="True">
+                                                        <Setter Property="Text" Value="DELAYED STARTUP (ON)"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
                             
                             <Button Command="{Binding ShowDetailsCommand}" 
                                     CommandParameter="{Binding SelectedService}"

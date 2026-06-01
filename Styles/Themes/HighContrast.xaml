@@ -36,4 +36,17 @@
     <!-- Derived from Accent (Fallback) -->
     <Color x:Key="AccentSecondaryColor">#333333</Color>
 
+    <!-- CarPlay style Plate brushes for Home Dashboard -->
+    <SolidColorBrush x:Key="DiagnosticsPlateBrush" Color="#FFFFFF"/>
+    <Color x:Key="DiagnosticsPlateColor">#00000000</Color>
+
+    <SolidColorBrush x:Key="TuningPlateBrush" Color="#FFFFFF"/>
+    <Color x:Key="TuningPlateColor">#00000000</Color>
+
+    <SolidColorBrush x:Key="MonitoringPlateBrush" Color="#FFFFFF"/>
+    <Color x:Key="MonitoringPlateColor">#00000000</Color>
+
+    <SolidColorBrush x:Key="SupportPlateBrush" Color="#FFFFFF"/>
+    <Color x:Key="SupportPlateColor">#00000000</Color>
+
 </ResourceDictionary>

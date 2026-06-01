@@ -31,65 +31,148 @@
                 </Button>
             </Grid>
 
-            <!-- 2. Records List -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Records}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Style="{StaticResource StandardCard}" Margin="0,0,0,15">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+            <!-- 2. Records List & BCD Sidebar -->
+            <Grid Grid.Row="1" Margin="0,15,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="280"/>
+                </Grid.ColumnDefinitions>
 
-                                    <!-- Indicator Icon -->
-                                    <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20" Background="#10FFFFFF" Margin="0,0,20,0">
-                                        <Grid>
-                                            <fa:ImageAwesome Icon="ExternalLink" Width="16" Foreground="{DynamicResource InfoBrush}" Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                            <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{DynamicResource SuccessBrush}" Visibility="{Binding IsCurrent, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                            <fa:ImageAwesome Icon="HddOutline" Width="16" Foreground="{DynamicResource TextSecondaryBrush}" 
-                                                           Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                        </Grid>
-                                    </Border>
+                <!-- Left Panel: Records List -->
+                <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,20,0">
+                    <ItemsControl ItemsSource="{Binding Records}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource StandardCard}" Margin="0,0,0,15">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <!-- Content -->
-                                    <StackPanel Grid.Column="1">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding Description}" FontWeight="Bold" FontSize="16" Foreground="White"/>
-                                            <Border Background="#20FFFFFF" CornerRadius="2" Padding="4,1" Margin="10,0,0,0" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Identifier}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" FontFamily="Consolas"/>
-                                            </Border>
+                                        <!-- Indicator Icon -->
+                                        <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20" Background="#10FFFFFF" Margin="0,0,20,0" VerticalAlignment="Top">
+                                            <Grid>
+                                                <fa:ImageAwesome Icon="ExternalLink" Width="16" Foreground="{DynamicResource InfoBrush}" Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{DynamicResource SuccessBrush}" Visibility="{Binding IsCurrent, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                <fa:ImageAwesome Icon="HddOutline" Width="16" Foreground="{DynamicResource TextSecondaryBrush}" 
+                                                               Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Content -->
+                                        <StackPanel Grid.Column="1">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Description}" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                                <Border Background="#20FFFFFF" CornerRadius="2" Padding="4,1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Identifier}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" FontFamily="Consolas"/>
+                                                </Border>
+                                            </StackPanel>
+
+                                            <UniformGrid Columns="2" Margin="0,15,0,0">
+                                                <StackPanel Margin="0,0,10,10">
+                                                    <TextBlock Text="DEVICE / PATH" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{Binding Device}" FontSize="11" Foreground="White"/>
+                                                    <TextBlock Text="{Binding Path}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,10,10">
+                                                    <TextBlock Text="OS ARCHITECTURE" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{Binding OsDevice}" FontSize="11" Foreground="White"/>
+                                                    <TextBlock Text="{Binding SystemRoot}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,10,0">
+                                                    <TextBlock Text="RESUME OBJECT" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{Binding ResumeObject}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" FontFamily="Consolas"/>
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,10,0">
+                                                    <TextBlock Text="BOOT POLICY" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{Binding BootMenuPolicy}" FontSize="11" Foreground="White"/>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Nx, StringFormat='NX: {0}'}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                        <TextBlock Text=" | SafeBoot: Active" FontSize="10" Foreground="{DynamicResource SuccessBrush}" Visibility="{Binding IsSafeBoot, Converter={StaticResource VisibilityConverter}}" Margin="5,0,0,0"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </UniformGrid>
                                         </StackPanel>
 
-                                        <UniformGrid Columns="2" Margin="0,15,0,0">
-                                            <StackPanel Margin="0,0,10,10">
-                                                <TextBlock Text="DEVICE / PATH" Style="{StaticResource Caption}"/>
-                                                <TextBlock Text="{Binding Device}" FontSize="11" Foreground="White"/>
-                                                <TextBlock Text="{Binding Path}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                            <StackPanel Margin="0,0,10,10">
-                                                <TextBlock Text="OS ARCHITECTURE" Style="{StaticResource Caption}"/>
-                                                <TextBlock Text="{Binding OsDevice}" FontSize="11" Foreground="White"/>
-                                                <TextBlock Text="{Binding SystemRoot}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                            </StackPanel>
-                                            <StackPanel Margin="0,0,10,0">
-                                                <TextBlock Text="RESUME OBJECT" Style="{StaticResource Caption}"/>
-                                                <TextBlock Text="{Binding ResumeObject}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" FontFamily="Consolas"/>
-                                            </StackPanel>
-                                            <StackPanel Margin="0,0,10,0">
-                                                <TextBlock Text="BOOT POLICY" Style="{StaticResource Caption}"/>
-                                                <TextBlock Text="{Binding BootMenuPolicy}" FontSize="11" Foreground="White"/>
-                                                <TextBlock Text="{Binding Nx, StringFormat='NX: {0}'}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                            </StackPanel>
-                                        </UniformGrid>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                                        <!-- Card Actions -->
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="20,0,0,0" Width="100">
+                                            <Button Command="{Binding DataContext.ToggleSafeBootCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                    CommandParameter="{Binding}"
+                                                    Style="{StaticResource StandardButton}" 
+                                                    Padding="5,4" Margin="0,0,0,8" Height="26">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fa:ImageAwesome Icon="Shield" Width="10" Margin="0,0,5,0">
+                                                        <fa:ImageAwesome.Style>
+                                                            <Style TargetType="fa:ImageAwesome">
+                                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsSafeBoot}" Value="True">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </fa:ImageAwesome.Style>
+                                                    </fa:ImageAwesome>
+                                                    <TextBlock Text="Safe Boot" FontSize="10" VerticalAlignment="Center" Foreground="White"/>
+                                                </StackPanel>
+                                            </Button>
+
+                                            <Button Command="{Binding DataContext.DeleteEntryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                    CommandParameter="{Binding}"
+                                                    Foreground="{DynamicResource DangerBrush}"
+                                                    Padding="5,4" Height="26">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource StandardButton}">
+                                                        <Setter Property="IsEnabled" Value="True"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsBootManager}" Value="True">
+                                                                <Setter Property="IsEnabled" Value="False"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                                <Setter Property="IsEnabled" Value="False"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fa:ImageAwesome Icon="Trash" Width="10" Margin="0,0,5,0" Foreground="{DynamicResource DangerBrush}"/>
+                                                    <TextBlock Text="Delete" FontSize="10" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Right Panel: BCD Editor Settings Sidebar -->
+                <Border Grid.Column="1" Style="{StaticResource StandardCard}" VerticalAlignment="Top">
+                    <StackPanel Margin="15">
+                        <TextBlock Text="BCD PARAMETERS" FontWeight="Bold" FontSize="12" Foreground="White" Margin="0,0,0,15"/>
+
+                        <TextBlock Text="BOOT MENU TIMEOUT" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Value="{Binding BootTimeout, Mode=TwoWay}" Minimum="0" Maximum="120" TickFrequency="5" IsSnapToTickEnabled="True" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding BootTimeout, StringFormat='{}{0}s'}" Foreground="White" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,0,0" Width="30" TextAlignment="Right"/>
+                        </Grid>
+
+                        <Button Command="{Binding SaveTimeoutCommand}" Style="{StaticResource StandardButton}" Content="Save Timeout" Margin="0,0,0,20" Height="30"/>
+
+                        <Separator Background="#20FFFFFF" Margin="0,0,0,15"/>
+
+                        <TextBlock Text="SYSTEM HARDENING" FontWeight="Bold" FontSize="12" Foreground="White" Margin="0,0,0,10"/>
+                        <TextBlock Text="Select a record on the left to configure advanced boot structures. Safe Boot toggles allow diagnostic isolation. Delete command is constrained to guard critical loaders." TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" LineHeight="15"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Grid>
     </Border>
 </UserControl>

@@ -58,6 +58,7 @@ namespace Eternal.Services.System
                             Id = $"LOW_DISK_{p.DriveLetter}",
                             Title = $"Critical Disk Space: {p.DriveLetter}",
                             Description = $"Drive {p.DriveLetter} has less than 5% free space ({p.FreeSpace / 1024 / 1024 / 1024} GB). System performance may be severely impacted.",
+                            TechnicalDetails = $"Volume Label: {p.Label}\nFile System: {p.FileSystem}\nUsed Space: {(p.TotalSize - p.FreeSpace) / 1024 / 1024 / 1024} GB / {p.TotalSize / 1024 / 1024 / 1024} GB\nRaw Free Space Bytes: {p.FreeSpace}",
                             Severity = IssueSeverity.Required,
                             ActionType = ScannerActionType.ManualNavigation,
                             ActionTarget = "Storage",
@@ -77,6 +78,7 @@ namespace Eternal.Services.System
                     Id = "DEFENDER_DISABLED",
                     Title = "System Protection Disabled",
                     Description = "Windows Defender or Real-time protection is currently disabled. Your system is vulnerable to security threats.",
+                    TechnicalDetails = $"Antivirus Status: {(defender.AntivirusEnabled ? "Active" : "Disabled")}\nReal-Time Guard Status: {(defender.RealTimeProtection ? "Running" : "Stopped")}\nWMI Security Provider: Microsoft Defender Security Service",
                     Severity = IssueSeverity.Required,
                     ActionType = ScannerActionType.ManualNavigation,
                     ActionTarget = "Security",
@@ -92,6 +94,7 @@ namespace Eternal.Services.System
                     Id = "UNSIGNED_PROCESSES",
                     Title = "Unsigned Processes Detected",
                     Description = $"{unsigned.Count} processes are running without a valid digital signature. These could be malicious or unauthorized binaries.",
+                    TechnicalDetails = $"Unsigned Executables:\n" + string.Join("\n", unsigned.Take(5).Select(ps => $"  - PID: {ps.PID} | Name: {ps.Name} | Path: {ps.Path}")) + (unsigned.Count > 5 ? $"\n  - ... and {unsigned.Count - 5} more processes." : ""),
                     Severity = IssueSeverity.Required,
                     ActionType = ScannerActionType.ManualNavigation,
                     ActionTarget = "Dashboard", // Dashboard has the Threat Hunter view
@@ -114,6 +117,7 @@ namespace Eternal.Services.System
                             Id = "OUTDATED_BIOS",
                             Title = "Outdated BIOS/Firmware",
                             Description = $"Your BIOS was last updated on {biosInfo.ReleaseDate} ({age.TotalDays / 365:F1} years ago). Outdated firmware can lead to stability and security issues.",
+                            TechnicalDetails = $"BIOS Vendor: {biosInfo.Vendor}\nSMBIOS Version: {biosInfo.Version}\nRelease Date: {biosInfo.ReleaseDate}\nAge Threshold: 2.0 Years (Current: {age.TotalDays / 365:F2} Years)",
                             Severity = IssueSeverity.Recommended,
                             ActionType = ScannerActionType.ManualNavigation,
                             ActionTarget = "Bios",
@@ -134,6 +138,7 @@ namespace Eternal.Services.System
                     Id = "HIGH_RAM",
                     Title = "High Memory Pressure",
                     Description = $"Current RAM usage is at {perf.RamUsage:F1}%. High memory pressure can cause system instability and lag.",
+                    TechnicalDetails = $"Memory Load: {perf.RamUsage:F1}%\nAvailable Standby Cache: Standby Working Set pages can be purged to reclaim immediate capacity.",
                     Severity = IssueSeverity.Recommended,
                     ActionType = ScannerActionType.AutoFix,
                     ActionTarget = "PurgeRAM",
@@ -155,6 +160,7 @@ namespace Eternal.Services.System
                             Id = "HIGH_LATENCY",
                             Title = "High Network Latency",
                             Description = $"Network latency is high ({reply.RoundtripTime}ms). This may impact online diagnostic synchronization and overall system connectivity.",
+                            TechnicalDetails = $"Audit Target: 8.8.8.8 (Google DNS)\nPing Roundtrip: {reply.RoundtripTime} ms\nStatus Code: {reply.Status}\nThreshold Warning: 150 ms",
                             Severity = IssueSeverity.Recommended,
                             ActionType = ScannerActionType.ManualNavigation,
                             ActionTarget = "Network",
@@ -168,6 +174,7 @@ namespace Eternal.Services.System
                             Id = "MODERATE_LATENCY",
                             Title = "Moderate Network Latency",
                             Description = $"Network latency is slightly elevated ({reply.RoundtripTime}ms). Connection performance is suboptimal.",
+                            TechnicalDetails = $"Audit Target: 8.8.8.8 (Google DNS)\nPing Roundtrip: {reply.RoundtripTime} ms\nStatus Code: {reply.Status}\nThreshold Alert: 80 ms",
                             Severity = IssueSeverity.Optional,
                             ActionType = ScannerActionType.ManualNavigation,
                             ActionTarget = "Network",
@@ -179,19 +186,18 @@ namespace Eternal.Services.System
             catch { }
 
             // 5. System Cleanup (85%)
-            progress.Report(85);
+            progress.Report(80);
             issues.Add(new ScannerIssue
             {
                 Id = "TEMP_FILES",
                 Title = "Temporary File Accumulation",
                 Description = "System temporary files and caches have accumulated. Cleaning these can reclaim space and improve file system responsiveness.",
+                TechnicalDetails = $"Target Path 1: %TEMP% (User Cache)\nTarget Path 2: %SystemRoot%\\Temp (System Cache)\nClean Action: Immediate deletion of non-locked file handles",
                 Severity = IssueSeverity.Optional,
                 ActionType = ScannerActionType.AutoFix,
                 ActionTarget = "ClearTemp",
                 Category = "Cleanup"
             });
-
-            progress.Report(100);
 
             // 6. Driver Integrity Scan (95%)
             progress.Report(95);
@@ -212,6 +218,7 @@ namespace Eternal.Services.System
                     Id = "GENERIC_DRIVERS",
                     Title = "Generic Drivers Detected",
                     Description = $"{criticalDevices.Count} critical devices (GPU/Network) are using generic Microsoft drivers. Official manufacturer drivers are recommended for full performance and stability.",
+                    TechnicalDetails = $"Identified Devices:\n" + string.Join("\n", criticalDevices.Take(4).Select(d => $"  - {d.Name} (Provider: {d.Provider})")) + (criticalDevices.Count > 4 ? $"\n  - ... and {criticalDevices.Count - 4} more devices." : ""),
                     Severity = IssueSeverity.Recommended,
                     ActionType = ScannerActionType.ManualNavigation,
                     ActionTarget = "Drivers",
@@ -219,6 +226,7 @@ namespace Eternal.Services.System
                 });
             }
 
+            progress.Report(100);
             return issues;
         }
 

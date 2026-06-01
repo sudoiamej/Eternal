@@ -77,6 +77,13 @@ namespace Eternal.ViewModels.Modules
         public IAsyncRelayCommand ChangeLetterCommand { get; }
         public IAsyncRelayCommand DeletePartitionCommand { get; }
 
+        public override void ReleaseMemory()
+        {
+            PhysicalDisks.Clear();
+            SelectedDisk = null;
+            SelectedPartition = null;
+        }
+
         [RelayCommand]
         private void SelectPartition(PartitionInfo? p)
         {

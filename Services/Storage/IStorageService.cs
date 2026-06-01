@@ -189,9 +189,46 @@ namespace Eternal.Services.Storage
             {
                 try
                 {
-                    long mb = newSizeInBytes / (1024 * 1024);
-                    string script = $"select volume {driveLetter.Replace(":", "")}\nextend size={mb}";
-                    return RunDiskpartScript(script, $"Resize {driveLetter}");
+                    long currentSizeInBytes = 0;
+                    try
+                    {
+                        var driveInfo = new global::System.IO.DriveInfo(driveLetter);
+                        currentSizeInBytes = driveInfo.TotalSize;
+                    }
+                    catch { }
+
+                    if (currentSizeInBytes == 0)
+                    {
+                        // Fallback to WMI if DriveInfo fails
+                        using var volSearcher = CreateSearcher($"select Capacity from Win32_Volume where DriveLetter = '{driveLetter}'");
+                        foreach (ManagementObject vol in volSearcher.Get())
+                        {
+                            currentSizeInBytes = global::System.Convert.ToInt64(vol["Capacity"] ?? 0);
+                            break;
+                        }
+                    }
+
+                    if (currentSizeInBytes == 0)
+                    {
+                        // Default fallback to simple extend if current size is completely unknown
+                        long mb = newSizeInBytes / (1024 * 1024);
+                        string script = $"select volume {driveLetter.Replace(":", "")}\nextend size={mb}";
+                        return RunDiskpartScript(script, $"Resize {driveLetter}");
+                    }
+
+                    long diffBytes = newSizeInBytes - currentSizeInBytes;
+                    long diffMb = Math.Abs(diffBytes) / (1024 * 1024);
+
+                    if (diffMb == 0)
+                    {
+                        return (true, $"Volume {driveLetter} is already at the requested size.");
+                    }
+
+                    string action = diffBytes > 0 ? "extend" : "shrink";
+                    string sizeParam = diffBytes > 0 ? $"size={diffMb}" : $"desired={diffMb}";
+
+                    string scriptString = $"select volume {driveLetter.Replace(":", "")}\n{action} {sizeParam}";
+                    return RunDiskpartScript(scriptString, $"Resize ({action}) {driveLetter}");
                 }
                 catch (global::System.Exception ex) { return (false, ex.Message); }
             });

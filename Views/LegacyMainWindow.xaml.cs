@@ -22,6 +22,26 @@ namespace Eternal.Views
             InitializeComponent();
             this.Closing += MainWindow_Closing;
             InitializeTray();
+            
+            // Adjust window dimensions dynamically to fit under 100% and 125% DPI scale boundaries
+            AdjustWindowSizeToWorkingArea();
+        }
+
+        private void AdjustWindowSizeToWorkingArea()
+        {
+            try
+            {
+                double workingWidth = SystemParameters.WorkArea.Width;
+                double workingHeight = SystemParameters.WorkArea.Height;
+
+                // Base design dimensions are 1400 x 800. If the display working area is tight (e.g. 100% small screen or 125% scaled 1080p which gives 1536x832)
+                if (workingWidth < 1450 || workingHeight < 850)
+                {
+                    this.Width = Math.Max(1024, workingWidth * 0.92);
+                    this.Height = Math.Max(700, workingHeight * 0.88);
+                }
+            }
+            catch { }
         }
 
         private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -71,8 +91,10 @@ namespace Eternal.Views
             var vm = this.DataContext as MainViewModel;
             if (vm != null)
             {
-                // Base design width is 1400. Calculate proportional scale.
-                double targetScale = e.NewSize.Width / 1400.0;
+                // Calculate proportional scale based on both dimensions to prevent vertical or horizontal clipping
+                double scaleX = e.NewSize.Width / 1400.0;
+                double scaleY = e.NewSize.Height / 800.0;
+                double targetScale = Math.Min(scaleX, scaleY);
                 vm.DisplayScale = Math.Max(0.5, Math.Min(2.0, targetScale));
             }
         }

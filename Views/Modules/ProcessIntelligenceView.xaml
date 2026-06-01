@@ -68,40 +68,13 @@
             <!-- 2. Main Data Grid -->
             <DataGrid Grid.Row="1" ItemsSource="{Binding Source={StaticResource ProcessGroups}}" 
                       SelectedItem="{Binding SelectedProcess}"
-                      AutoGenerateColumns="False" IsReadOnly="True" 
-                      Background="Transparent" BorderThickness="0" Margin="10,0"
-                      RowBackground="Transparent" GridLinesVisibility="None"
-                      HeadersVisibility="Column" SelectionMode="Single"
+                      Style="{StaticResource NeuDataGrid}"
+                      Margin="10,0"
                       VirtualizingPanel.IsVirtualizing="True"
                       VirtualizingPanel.VirtualizationMode="Recycling"
                       VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                       CanUserSortColumns="True"
                       RenderOptions.ClearTypeHint="Enabled">
-                <DataGrid.Resources>
-                    <Style TargetType="DataGridRow">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#08FFFFFF"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#15FFFFFF"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                    <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                        <Setter Property="Padding" Value="10,0"/>
-                        <Setter Property="FontSize" Value="10"/>
-                        <Setter Property="FontWeight" Value="Black"/>
-                        <Setter Property="Height" Value="35"/>
-                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-                    </Style>
-                </DataGrid.Resources>
-
                 <DataGrid.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>
@@ -119,17 +92,16 @@
                 </DataGrid.GroupStyle>
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="PROCESS IDENTITY" Binding="{Binding Name}" Width="3*" MinWidth="200">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="White"/>
-                                <Setter Property="FontWeight" Value="SemiBold"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="Padding" Value="10,8"/>
-                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="PROCESS IDENTITY" Width="3*" MinWidth="200">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="10,0">
+                                    <fa:ImageAwesome Icon="Cube" Width="12" Foreground="{DynamicResource AccentBrush}" Margin="0,0,12,0" Opacity="0.6"/>
+                                    <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
                     <DataGridTextColumn Header="PID" Binding="{Binding PID}" Width="0.8*">
                         <DataGridTextColumn.ElementStyle>
@@ -177,7 +149,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Header="FOOTPRINT" Binding="{Binding MemoryUsage}" Width="1.5*">
+                    <DataGridTextColumn Header="FOOTPRINT" Binding="{Binding MemoryUsage}" Width="1.5*" SortMemberPath="MemoryBytes">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -189,7 +161,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="I/O BURST" Binding="{Binding DiskUsage}" Width="1.2*">
+                    <DataGridTextColumn Header="I/O BURST" Binding="{Binding DiskUsage}" Width="1.2*" SortMemberPath="DiskBytesPerSec">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -201,7 +173,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="NET TRAFFIC" Binding="{Binding NetworkUsage}" Width="1.2*">
+                    <DataGridTextColumn Header="NET TRAFFIC" Binding="{Binding NetworkUsage}" Width="1.2*" SortMemberPath="NetworkBytesPerSec">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -259,7 +231,7 @@
                     <TextBlock Text="{Binding SelectedProcess.PID, StringFormat='{}SYSTEM PROCESS PID: {0}'}" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" Opacity="0.8"/>
                 </StackPanel>
 
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" VirtualizingPanel.ScrollUnit="Pixel">
                     <StackPanel>
                         <!-- Live Telemetry Card -->
                         <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20" Padding="20">

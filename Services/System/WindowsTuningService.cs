@@ -12,8 +12,13 @@ namespace Eternal.Services.System
     {
         private List<SystemTweak> _tweaks;
 
-        public WindowsTuningService()
+        private readonly ISettingsService _settingsService;
+        private readonly ILoggingService _loggingService;
+
+        public WindowsTuningService(ISettingsService settingsService, ILoggingService loggingService)
         {
+            _settingsService = settingsService;
+            _loggingService = loggingService;
             InitializeTweaks();
         }
 
@@ -156,6 +161,7 @@ namespace Eternal.Services.System
                     RegistryValue = "",
                     AppliedValue = "",
                     DefaultValue = null,
+                    MinBuild = Eternal.Helpers.OsHelper.Build_Win11_21H2,
                     ValueKind = RegistryValueKind.String
                 },
                 new SystemTweak
@@ -168,6 +174,7 @@ namespace Eternal.Services.System
                     RegistryValue = "TaskbarAl",
                     AppliedValue = 0,
                     DefaultValue = 1,
+                    MinBuild = Eternal.Helpers.OsHelper.Build_Win11_21H2,
                     ValueKind = RegistryValueKind.DWord
                 },
                 new SystemTweak
@@ -193,7 +200,7 @@ namespace Eternal.Services.System
                 {
                     tweak.IsApplied = CheckIsApplied(tweak);
                 }
-                return _tweaks;
+                return _tweaks.Where(t => Eternal.Helpers.OsHelper.IsBuildSupported(t.MinBuild, t.MaxBuild)).ToList();
             });
         }
 
@@ -231,6 +238,13 @@ namespace Eternal.Services.System
             {
                 try
                 {
+                    if (_settingsService.Current.SafeExecutionMode)
+                    {
+                        _loggingService.Log($"[SafeMode Tweak Simulation] Skip Apply: {tweak.Name} -> RegistryPath: {tweak.RegistryPath}");
+                        tweak.IsApplied = true;
+                        return true;
+                    }
+
                     SetRegistryValue(tweak.RegistryPath, tweak.RegistryValue, tweak.AppliedValue, tweak.ValueKind);
                     tweak.IsApplied = true;
                     return true;
@@ -252,10 +266,17 @@ namespace Eternal.Services.System
             {
                 try
                 {
+                    if (_settingsService.Current.SafeExecutionMode)
+                    {
+                        _loggingService.Log($"[SafeMode Tweak Simulation] Skip Undo: {tweak.Name} -> RegistryPath: {tweak.RegistryPath}");
+                        tweak.IsApplied = false;
+                        return true;
+                    }
+
                     if (tweak.Id == "ui_win11_menus")
                     {
                         using var baseKey = OpenBaseKey(tweak.RegistryPath, true);
-                        baseKey.DeleteSubKeyTree(GetRelativePath(tweak.RegistryPath), false);
+                        baseKey.DeleteSubKeyTree(@"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}", false);
                     }
                     else if (tweak.DefaultValue == null)
                     {
@@ -340,7 +361,8 @@ namespace Eternal.Services.System
                         inParams["EventType"] = 100;        // BEGIN_SYSTEM_CHANGE
                         
                         ManagementBaseObject outParams = process.InvokeMethod("CreateRestorePoint", inParams, null);
-                        return true; 
+                        uint ret = (uint)(outParams["ReturnValue"] ?? 1);
+                        return ret == 0; 
                     }
                 }
                 catch (Exception ex)

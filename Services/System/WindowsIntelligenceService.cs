@@ -191,23 +191,35 @@ namespace Eternal.Services.System
 
                 try
                 {
-                    var processes = Process.GetProcesses()
-                        .OrderByDescending(p => p.WorkingSet64)
-                        .Take(3)
-                        .ToList();
+                    var processes = Process.GetProcesses();
+                    var list = new List<(string Name, long WorkingSet)>();
 
-                    foreach (var process in processes)
+                    foreach (var p in processes)
                     {
-                        if (process.WorkingSet64 > 500 * 1024 * 1024)
+                        try
                         {
-                            double mb = process.WorkingSet64 / (1024.0 * 1024.0);
+                            if (!p.HasExited)
+                            {
+                                list.Add((p.ProcessName, p.WorkingSet64));
+                            }
+                        }
+                        catch { /* Skip exiting or access-denied processes */ }
+                    }
+
+                    var topMemory = list.OrderByDescending(x => x.WorkingSet).Take(3).ToList();
+
+                    foreach (var item in topMemory)
+                    {
+                        if (item.WorkingSet > 500 * 1024 * 1024)
+                        {
+                            double mb = item.WorkingSet / (1024.0 * 1024.0);
                             causes.Add(new RootCause(
                                 "Memory",
-                                process.ProcessName,
+                                item.Name,
                                 $"Process is consuming {mb:F0} MB of RAM.",
                                 new HumanExplanation(
                                     $"{mb:F0} MB",
-                                    $"'{process.ProcessName}' is using a significant amount of memory. If you are not actively using it, closing it will free up system resources.",
+                                    $"'{item.Name}' is using a significant amount of memory. If you are not actively using it, closing it will free up system resources.",
                                     SeverityLevel.Medium)
                             ));
                         }

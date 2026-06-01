@@ -111,8 +111,14 @@ namespace Eternal.Services.System
             var batchContent = $@"
 @echo off
 taskkill /f /pid {Process.GetCurrentProcess().Id} >nul 2>&1
+set /a retry=0
+:loop
 timeout /t 1 /nobreak >nul
 move /y ""{_downloadPath}"" ""{currentExe}""
+if errorlevel 1 (
+    set /a retry+=1
+    if %retry% lss 10 goto loop
+)
 start """" ""{currentExe}""
 del ""%~f0""
 ";

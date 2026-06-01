@@ -170,12 +170,21 @@
                         </TextBlock.Style>
                     </TextBlock>
 
-                    <Button Command="{Binding RunDiagnosticsCommand}" Style="{DynamicResource PrimaryButton}" 
-                            Content="RUN SYSTEM DIAGNOSTIC" Height="45" Width="220" HorizontalAlignment="Right">
-                        <Button.IsEnabled>
-                            <Binding Path="IsTesting" Converter="{StaticResource InvertBooleanConverter}"/>
-                        </Button.IsEnabled>
-                    </Button>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Command="{Binding PurgeMemoryHeapCommand}" Style="{StaticResource SecondaryButton}" 
+                                Content="PURGE MEMORY HEAP" Height="45" Width="180" Margin="0,0,15,0"
+                                ToolTip="Force complete Garbage Collection and Large Object Heap (LOH) compaction.">
+                            <Button.IsEnabled>
+                                <Binding Path="IsTesting" Converter="{StaticResource InvertBooleanConverter}"/>
+                            </Button.IsEnabled>
+                        </Button>
+                        <Button Command="{Binding RunDiagnosticsCommand}" Style="{DynamicResource PrimaryButton}" 
+                                Content="RUN SYSTEM DIAGNOSTIC" Height="45" Width="220">
+                            <Button.IsEnabled>
+                                <Binding Path="IsTesting" Converter="{StaticResource InvertBooleanConverter}"/>
+                            </Button.IsEnabled>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
             

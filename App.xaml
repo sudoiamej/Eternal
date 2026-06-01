@@ -5,8 +5,10 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/Styles/Themes/Dark.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Styles/Themes/NeumorphicDark.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Styles/Colors.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Styles/Animations.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Styles/NeumorphicControls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
             <helpers:ValueToVisibilityConverter x:Key="VisibilityConverter"/>
@@ -27,5 +29,3 @@
         </ResourceDictionary>
     </Application.Resources>
 </Application>
-
-

@@ -70,6 +70,82 @@
                                 </Grid>
                             </Border>
 
+                            <!-- Entropy Gauge -->
+                            <TextBlock Text="SHANNON ENTROPY" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
+                            <Grid Margin="0,0,0,15">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <ProgressBar Value="{Binding AnalysisResult.Entropy}" Minimum="0" Maximum="8.0" Height="8" Background="#20FFFFFF" BorderThickness="0" Margin="0,0,0,5">
+                                    <ProgressBar.Style>
+                                        <Style TargetType="ProgressBar">
+                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding AnalysisResult.Entropy, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>7.2'}" Value="True">
+                                                    <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                </DataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding AnalysisResult.Entropy, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>6.0'}" Value="True"/>
+                                                        <Condition Binding="{Binding AnalysisResult.Entropy, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>7.2'}" Value="False"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ProgressBar.Style>
+                                </ProgressBar>
+                                <Grid Grid.Row="1">
+                                    <TextBlock Text="{Binding AnalysisResult.Entropy, StringFormat='{}{0:F2} / 8.0'}" FontSize="11" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock HorizontalAlignment="Right" FontSize="10" FontWeight="Bold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="Normal Structure"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding AnalysisResult.Entropy, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>7.2'}" Value="True">
+                                                        <Setter Property="Text" Value="Obfuscated / Packed (Ransomware Threat!)"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                    </DataTrigger>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding AnalysisResult.Entropy, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>6.0'}" Value="True"/>
+                                                            <Condition Binding="{Binding AnalysisResult.Entropy, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='>7.2'}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Text" Value="Moderately Packed / Compressed"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </Grid>
+
+                            <!-- Suspicious Injection APIs -->
+                            <TextBlock Text="SUSPICIOUS MEMORY INJECTIONS" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
+                            <Border CornerRadius="6" Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1" Padding="10" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <TextBlock Text="No injection vectors detected in file structures." 
+                                               Foreground="{DynamicResource SuccessBrush}" FontWeight="Bold" FontSize="10"
+                                               Visibility="{Binding AnalysisResult.SuspiciousApis.Count, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
+                                    
+                                    <ItemsControl ItemsSource="{Binding AnalysisResult.SuspiciousApis}"
+                                                  Visibility="{Binding AnalysisResult.SuspiciousApis.Count, Converter={StaticResource VisibilityConverter}}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                                                    <fa:ImageAwesome Icon="ExclamationTriangle" Width="10" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding}" Foreground="White" FontFamily="Consolas" FontSize="10" VerticalAlignment="Center"/>
+                                                    <TextBlock Text=" (API Injection vector)" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
                             <!-- Hashes -->
                             <TextBlock Text="CRYPTOGRAPHIC HASHES" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
                             <StackPanel Margin="0,0,0,15">

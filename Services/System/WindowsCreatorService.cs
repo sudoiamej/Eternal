@@ -232,10 +232,20 @@ namespace Eternal.Services.System
 
                             if (!isSuspicious)
                             {
-                                var psi = new ProcessStartInfo("powershell", $"-Command \"(Get-AuthenticodeSignature '{path}').Status\"") { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
-                                var signProc = Process.Start(psi);
-                                string status = await signProc.StandardOutput.ReadToEndAsync();
-                                if (!status.Contains("Valid"))
+                                bool isSigned = false;
+                                try
+                                {
+                                    using (var cert = global::System.Security.Cryptography.X509Certificates.X509Certificate.CreateFromSignedFile(path))
+                                    {
+                                        isSigned = cert != null;
+                                    }
+                                }
+                                catch
+                                {
+                                    isSigned = false;
+                                }
+
+                                if (!isSigned)
                                 {
                                     isSuspicious = true;
                                     reason = "Unsigned Binary";

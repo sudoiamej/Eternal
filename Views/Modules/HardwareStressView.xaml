@@ -91,42 +91,87 @@
                 <!-- Right: Config & Impact -->
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="CONFIGURATION" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                    <Border Style="{StaticResource StandardCard}" Padding="25" Margin="0,0,0,20">
+                    <Border Style="{StaticResource StandardCard}" Padding="20" Margin="0,0,0,20">
                         <StackPanel>
-                            <TextBlock Text="Target Threads" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,10"/>
-                            <ComboBox ItemsSource="{Binding ThreadOptions}" SelectedItem="{Binding ThreadCount}" 
-                                      IsEnabled="{Binding IsRunning, Converter={StaticResource InvertBooleanConverter}}"
-                                      Background="#151515" Foreground="White" BorderBrush="{DynamicResource BorderBrush}"
-                                      HorizontalAlignment="Stretch" Padding="10,5">
-                                <ComboBox.ItemContainerStyle>
-                                    <Style TargetType="ComboBoxItem">
-                                        <Setter Property="Background" Value="#222222"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                        <Setter Property="Padding" Value="10,5"/>
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ComboBox.ItemContainerStyle>
-                            </ComboBox>
-                            <TextBlock Text="Higher counts will maximize CPU load across more logical cores." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,0" TextWrapping="Wrap" Opacity="0.5"/>
+                            <!-- Thread Workers Slider -->
+                            <TextBlock Text="THREAD WORKERS" Style="{StaticResource Caption}" Margin="0,0,0,5"/>
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Slider Value="{Binding ThreadCount, Mode=TwoWay}" Minimum="1" Maximum="{Binding ThreadOptions.Count}" IsSnapToTickEnabled="True" TickFrequency="1"
+                                        IsEnabled="{Binding IsRunning, Converter={StaticResource InvertBooleanConverter}}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding ThreadCount}" Foreground="White" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,0,0" Width="20" TextAlignment="Right"/>
+                            </Grid>
+
+                            <!-- Cyclical Stress Mode -->
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="CYCLICAL LOAD WAVE" FontWeight="Bold" FontSize="11" Foreground="White"/>
+                                    <TextBlock Text="Fluctuates CPU load on a cosine cycle" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <ToggleButton Grid.Column="1" Style="{StaticResource ModernSwitch}" IsChecked="{Binding IsCyclicalMode}"
+                                              IsEnabled="{Binding IsRunning, Converter={StaticResource InvertBooleanConverter}}" VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <!-- Thermal Safety Switch -->
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="THERMAL SAFETY SHIELD" FontWeight="Bold" FontSize="11" Foreground="White"/>
+                                    <TextBlock Text="Halts stress test if core spikes &gt; 88°C" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <ToggleButton Grid.Column="1" Style="{StaticResource ModernSwitch}" IsChecked="{Binding IsThermalSafetyEnabled}"
+                                              IsEnabled="{Binding IsRunning, Converter={StaticResource InvertBooleanConverter}}" VerticalAlignment="Center"/>
+                            </Grid>
                         </StackPanel>
                     </Border>
 
                     <TextBlock Text="REAL-TIME IMPACT" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                    <Border Style="{StaticResource StandardCard}" Padding="25">
+                    <Border Style="{StaticResource StandardCard}" Padding="20">
                         <StackPanel>
-                            <!-- CPU Usage (Bound to Window DataContext which is MainViewModel) -->
-                            <Grid Margin="0,0,0,15">
-                                <TextBlock Text="CPU Load" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <!-- CPU Usage -->
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="System CPU Load" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                 <TextBlock Text="{Binding DataContext.CpuUsage, RelativeSource={RelativeSource AncestorType=Window}}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
                             </Grid>
-                            <ProgressBar Value="{Binding DataContext.CpuUsageValue, RelativeSource={RelativeSource AncestorType=Window}}" Height="4" Style="{StaticResource GlowingProgressBar}"/>
+                            <ProgressBar Value="{Binding DataContext.CpuUsageValue, RelativeSource={RelativeSource AncestorType=Window}}" Height="4" Style="{StaticResource GlowingProgressBar}" Margin="0,0,0,20"/>
 
-                            <TextBlock Text="Note: This test uses high-intensity prime calculations. Your system may become unresponsive during the test." 
-                                       FontSize="10" Foreground="{DynamicResource WarningBrush}" Margin="0,25,0,0" TextWrapping="Wrap" FontWeight="SemiBold"/>
+                            <!-- CPU Temperature -->
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="CPU Core Temperature" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding CurrentCpuTemp, StringFormat='{}{0:F1}°C'}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                            </Grid>
+                            <ProgressBar Value="{Binding CurrentCpuTemp}" Minimum="0" Maximum="100" Height="4" Margin="0,0,0,20">
+                                <ProgressBar.Style>
+                                    <Style TargetType="ProgressBar" BasedOn="{StaticResource GlowingProgressBar}">
+                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding CurrentCpuTemp, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='&gt;80'}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                            </DataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding CurrentCpuTemp, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='&gt;65'}" Value="True"/>
+                                                    <Condition Binding="{Binding CurrentCpuTemp, Converter={StaticResource NumericComparisonConverter}, ConverterParameter='&gt;80'}" Value="False"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ProgressBar.Style>
+                            </ProgressBar>
+
+                            <TextBlock Text="Safety Notice: This test utilizes high-intensity prime calculations. The thermal safety shield will auto-terminate operations to protect processor silicon." 
+                                       FontSize="10" Foreground="{DynamicResource WarningBrush}" Margin="0,5,0,0" TextWrapping="Wrap" FontWeight="SemiBold" LineHeight="14"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>

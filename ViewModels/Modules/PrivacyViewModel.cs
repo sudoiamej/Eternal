@@ -19,6 +19,8 @@ namespace Eternal.ViewModels.Modules
         
         [ObservableProperty] private int _privacyScore;
         [ObservableProperty] private string _scoreStatus = "Unknown";
+        [ObservableProperty] private double _cleanserProgress;
+        [ObservableProperty] private bool _isCleansing;
 
         public PrivacyViewModel(IPrivacyService privacyService, IToastService toastService)
         {
@@ -86,6 +88,75 @@ namespace Eternal.ViewModels.Modules
                 
                 await LoadAuditAsync();
             }, "Hardening System...");
+        }
+
+        [RelayCommand]
+        private async Task ClearTelemetryCache()
+        {
+            IsCleansing = true;
+            CleanserProgress = 0;
+            
+            await ExecuteBusyActionAsync(async () =>
+            {
+                var result = await Task.Run(async () =>
+                {
+                    int count = 0;
+                    string dirPath = @"C:\ProgramData\Microsoft\Diagnosis\ETMLogs";
+                    try
+                    {
+                        if (System.IO.Directory.Exists(dirPath))
+                        {
+                            var files = System.IO.Directory.GetFiles(dirPath, "*.etl", System.IO.SearchOption.AllDirectories);
+                            int total = files.Length;
+                            if (total == 0)
+                            {
+                                for (int i = 0; i <= 100; i += 10)
+                                {
+                                    CleanserProgress = i;
+                                    await Task.Delay(40);
+                                }
+                                return (true, "No active telemetry trace logs found under ETMLogs.", 0);
+                            }
+                            
+                            for (int i = 0; i < total; i++)
+                            {
+                                string file = files[i];
+                                try
+                                {
+                                    System.IO.File.Delete(file);
+                                    count++;
+                                }
+                                catch { }
+                                CleanserProgress = (double)(i + 1) / total * 100.0;
+                                await Task.Delay(30);
+                            }
+                            return (true, $"Telemetry logs cleared. Swept {count} diagnostic trace files.", count);
+                        }
+                        
+                        for (int i = 0; i <= 100; i += 10)
+                        {
+                            CleanserProgress = i;
+                            await Task.Delay(40);
+                        }
+                        return (true, "Telemetry cache folder is inactive.", 0);
+                    }
+                    catch (Exception ex)
+                    {
+                        return (false, $"Failed to clear telemetry logs: {ex.Message}", 0);
+                    }
+                });
+
+                if (result.Item1)
+                {
+                    _toastService.ShowSuccess(result.Item2);
+                }
+                else
+                {
+                    _toastService.ShowError(result.Item2);
+                }
+            }, "Purging Diagnostic Traces...");
+
+            IsCleansing = false;
         }
     }
 }

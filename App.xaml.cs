@@ -23,6 +23,18 @@ namespace Eternal
         {
             try
             {
+                // Perform Security/Anti-Debug Audit
+                if (Eternal.Helpers.AntiDebugHelper.IsDebuggerDetected())
+                {
+                    System.Windows.MessageBox.Show("For the protection and safety of the application, debugging this application without permission is not allowed.", 
+                        "Security Warning", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Stop);
+                    Environment.Exit(0);
+                    return;
+                }
+
+                // Optimize garbage collection for smooth, stutter-free UI animations
+                System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
+
                 var serviceCollection = new ServiceCollection();
                 ConfigureServices(serviceCollection);
 
@@ -47,9 +59,45 @@ namespace Eternal
                     ex.SetObserved(); // Mark as handled to prevent process teardown
                 };
 
-                // Entry point is now the Splash Screen which handles async initialization
-                var splashScreen = new Views.SplashScreenWindow();
-                splashScreen.Show();
+                // Resolve Settings to determine startup path
+                var settings = ServiceProvider.GetRequiredService<ISettingsService>();
+
+                if (settings.Current.UseLegacyUI)
+                {
+                    // Legacy Path: External Splash Screen
+                    var splashScreen = new Views.SplashScreenWindow();
+                    splashScreen.Show();
+                }
+                else
+                {
+                    // Modern Path: Direct launch into Neumorphic MainWindow (with internal Car Startup)
+                    
+                    // 1. Compatibility Check
+                    if (!IsSystemCompatible())
+                    {
+                        var incompatibilityWindow = new Views.IncompatibilityWindow();
+                        incompatibilityWindow.Show();
+                        return;
+                    }
+
+                    // 2. Entry Lock Check
+                    if (settings.Current.IsStartupLockEnabled)
+                    {
+                        var lockWindow = new Eternal.Views.Helpers.EntryLockWindow(settings);
+                        if (lockWindow.ShowDialog() != true)
+                        {
+                            Application.Current.Shutdown();
+                            return;
+                        }
+                    }
+
+                    var mainVm = ServiceProvider.GetRequiredService<MainViewModel>();
+                    var mainWindow = new Views.NeumorphicMainWindow();
+                    mainWindow.DataContext = mainVm;
+                    
+                    System.Windows.Application.Current.MainWindow = mainWindow;
+                    mainWindow.Show();
+                }
             }
             catch (Exception ex)
             {
@@ -62,6 +110,15 @@ namespace Eternal
             }
 
             base.OnStartup(e);
+        }
+
+        private bool IsSystemCompatible()
+        {
+            var os = Environment.OSVersion;
+            // Windows 10 Version 1507 (Build 10240) or later
+            return os.Platform == PlatformID.Win32NT && 
+                   os.Version.Major >= 10 && 
+                   (os.Version.Major > 10 || os.Version.Build >= Eternal.Helpers.OsHelper.Build_Win10_1507);
         }
 
         private void ConfigureServices(IServiceCollection services)
@@ -109,6 +166,8 @@ namespace Eternal
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<ToastViewModel>();
             services.AddSingleton<DashboardViewModel>();
+            services.AddSingleton<HomeGridDashboardViewModel>();
+            services.AddSingleton<CategoryGridViewModel>();
             services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<HardwareViewModel>();
             services.AddSingleton<ConsoleViewModel>();
@@ -142,7 +201,10 @@ namespace Eternal
             services.AddSingleton<HardwareStressViewModel>();
             services.AddSingleton<PrivacyViewModel>();
             services.AddSingleton<BatteryViewModel>();
-            services.AddSingleton<FileForensicsViewModel>();
+            services.AddSingleton<TestingViewModel>();
+            services.AddSingleton<WmiExplorerViewModel>();
+            services.AddSingleton<AppProfilerViewModel>();
+            services.AddSingleton<ConfigEditorViewModel>();
             services.AddSingleton<FeatureTogglesViewModel>();
             services.AddSingleton<FlagsViewModel>();
             services.AddSingleton<DisplayViewModel>();

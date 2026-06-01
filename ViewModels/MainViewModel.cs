@@ -33,14 +33,19 @@ namespace Eternal.ViewModels
         private readonly IHardwareService _hardwareService;
         private readonly ICreatorService _creatorService;
         private readonly IEnvironmentService _envService;
+        private readonly IBatteryService _batteryService;
         private DispatcherTimer? _statusTimer;
 
         public ToastViewModel ToastVm { get; }
 
-        [ObservableProperty] private string _title = "Eternal System Intelligence";
         [ObservableProperty] private BaseViewModel _currentView;
+        public bool IsHomeActive => CurrentView is HomeGridDashboardViewModel;
+        public bool IsSettingsActive => CurrentView is SettingsViewModel;
+        public bool IsSelected => false;
+        
         [ObservableProperty] private bool _isAdvancedMode = false;
         [ObservableProperty] private bool _isTestingModeActive = false;
+        [ObservableProperty] private bool _isTelemetryHudOpen = true;
         public TestingViewModel TestingVm => App.ServiceProvider.GetRequiredService<TestingViewModel>();
         
         public AppSettings Settings => _settingsService.Current;
@@ -58,19 +63,29 @@ namespace Eternal.ViewModels
         [ObservableProperty] private string _ramUsage = "0%";
         [ObservableProperty] private double _ramUsageValue = 0.0;
         [ObservableProperty] private string _uptime = "0d 0h 0m";
+        [ObservableProperty] private string _currentTime = DateTime.Now.ToString("HH:mm");
+        [ObservableProperty] private string _batteryPercentage = "100%";
         [ObservableProperty] private bool _isPeMode = false;
         [ObservableProperty] private double _displayScale = 1.0;
+        [ObservableProperty] private bool _isUiToggleVisible = true;
 
         [ObservableProperty] private ObservableCollection<NavigationItem> _systemItems;
         [ObservableProperty] private ObservableCollection<NavigationItem> _telemetryItems;
         [ObservableProperty] private ObservableCollection<NavigationItem> _monitoringItems;
         [ObservableProperty] private ObservableCollection<NavigationItem> _supportItems;
+        [ObservableProperty] private ObservableCollection<NavigationItem> _pinnedItems = new();
 
         [ObservableProperty] private NavigationSortOption _navSortOption = NavigationSortOption.Default;
         
         [ObservableProperty] private CommandPaletteViewModel _commandPaletteVm;
 
         partial void OnNavSortOptionChanged(NavigationSortOption value) => SortNavigation();
+        
+        partial void OnCurrentViewChanged(BaseViewModel value)
+        {
+            OnPropertyChanged(nameof(IsHomeActive));
+            OnPropertyChanged(nameof(IsSettingsActive));
+        }
 
         public MainViewModel(
             ILoggingService loggingService, 
@@ -80,6 +95,7 @@ namespace Eternal.ViewModels
             IHardwareService hardwareService,
             ICreatorService creatorService,
             IEnvironmentService envService,
+            IBatteryService batteryService,
             ToastViewModel toastVm)
         {
             _loggingService = loggingService;
@@ -89,8 +105,10 @@ namespace Eternal.ViewModels
             _hardwareService = hardwareService;
             _creatorService = creatorService;
             _envService = envService;
+            _batteryService = batteryService;
             ToastVm = toastVm;
 
+            Title = "Eternal System Intelligence";
             _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
             _loggingService.Log($"Dev Preview Suite Version 2.5.0-M4");
 
@@ -121,6 +139,86 @@ namespace Eternal.ViewModels
         public void InitializeNavigation()
         {
             var disabled = Settings.DisabledFeatures;
+            IsUiToggleVisible = !disabled.Contains("UiToggle");
+
+            // Upgrade old default pinned features to clean high-level CarPlay categories
+            if (Settings.PinnedFeatures.Count == 3 && 
+                Settings.PinnedFeatures.Contains("Hardware") && 
+                Settings.PinnedFeatures.Contains("Processes") && 
+                Settings.PinnedFeatures.Contains("Tuning"))
+            {
+                Settings.PinnedFeatures = new() { "Category_Diagnostics", "Category_Tuning", "Category_Monitoring" };
+                _settingsService.Save();
+            }
+
+            // Initialize Pinned Items for Neumorphic UI
+            PinnedItems.Clear();
+            var allItems = new List<NavigationItem>();
+            
+            // Temporary list of all available navigation items to find the pinned ones
+            var tempSystem = new List<NavigationItem>
+            {
+                new NavigationItem("Dashboard", "Dashboard", "Dashboard", 0, 0, 0),
+                new NavigationItem("PC Scanner", "Search", "PcScanner", 0, 0, 1),
+                new NavigationItem("Eternal Doctor", "Stethoscope", "Repair", 2, 2, 2),
+                new NavigationItem("Registry", "Book", "Registry", 2, 2, 3),
+                new NavigationItem("Reports", "FileText", "Reports", 0, 1, 4),
+                new NavigationItem("Tools", "Wrench", "Tools", 1, 1, 5),
+                new NavigationItem("Guardian Tuning", "Gears", "Tuning", 1, 2, 6)
+            };
+            var tempTelemetry = new List<NavigationItem>
+            {
+                new NavigationItem("Hardware", "Microchip", "Hardware", 0, 0, 0),
+                new NavigationItem("Displays", "Desktop", "Display", 0, 0, 1),
+                new NavigationItem("Battery Lab", "Bolt", "Battery", 0, 0, 2),
+                new NavigationItem("Stress Test", "Flash", "StressTest", 1, 1, 3),
+                new NavigationItem("PC Rating", "Trophy", "PcRating", 0, 0, 4),
+                new NavigationItem("Thermal", "ThermometerThreeQuarters", "Thermal", 0, 0, 5),
+                new NavigationItem("Components", "Laptop", "Components", 0, 0, 6),
+                new NavigationItem("BIOS / UEFI", "InfoCircle", "Bios", 0, 0, 7),
+                new NavigationItem("Boot Records", "List", "Boot", 1, 1, 8),
+                new NavigationItem("Storage", "HddOutline", "Storage", 0, 0, 9)
+            };
+            var tempMonitoring = new List<NavigationItem>
+            {
+                new NavigationItem("Processes", "Tasks", "Processes", 1, 1, 0),
+                new NavigationItem("Performance", "LineChart", "Performance", 0, 0, 1),
+                new NavigationItem("Sentinel Privacy", "EyeSlash", "Privacy", 1, 1, 2),
+                new NavigationItem("Services", "Server", "Services", 1, 1, 3),
+                new NavigationItem("User Accounts", "Users", "Users", 1, 1, 4),
+                new NavigationItem("Network", "Globe", "Network", 0, 0, 5),
+                new NavigationItem("Security", "Shield", "Security", 1, 1, 6),
+                new NavigationItem("Drivers", "ListAlt", "Drivers", 1, 2, 7),
+                new NavigationItem("Environment", "Code", "Environment", 1, 1, 8)
+            };
+            var tempSupport = new List<NavigationItem>
+            {
+                new NavigationItem("Eternal Console", "Terminal", "Console", 2, 2, 0),
+                new NavigationItem("Time Machine", "ClockOutline", "Snapshots", 1, 1, 2),
+                new NavigationItem("DISM Imaging", "Archive", "DismImaging", 1, 2, 3),
+                new NavigationItem("Windows Update", "Refresh", "WindowsUpdate", 0, 0, 4),
+                new NavigationItem("Settings", "Gear", "Settings", 0, 0, 5),
+                new NavigationItem("System Logs", "Bars", "Logs", 0, 0, 6),
+                new NavigationItem("Help", "QuestionCircle", "Help", 0, 0, 7),
+                new NavigationItem("PE Mode", "Medkit", "PeMode", 1, 1, 8)
+            };
+
+            allItems.AddRange(tempSystem);
+            allItems.AddRange(tempTelemetry);
+            allItems.AddRange(tempMonitoring);
+            allItems.AddRange(tempSupport);
+            
+            // Add Category Folders as pinnable items
+            allItems.Add(new NavigationItem("Diagnostics", "Search", "Category_Diagnostics"));
+            allItems.Add(new NavigationItem("Tuning & Repair", "Wrench", "Category_Tuning"));
+            allItems.Add(new NavigationItem("Monitoring", "LineChart", "Category_Monitoring"));
+            allItems.Add(new NavigationItem("Support & Tools", "LifeRing", "Category_Support"));
+
+            foreach (var viewName in Settings.PinnedFeatures)
+            {
+                var item = allItems.FirstOrDefault(i => i.ViewName == viewName);
+                if (item != null) PinnedItems.Add(item);
+            }
 
             if (IsPeMode)
             {
@@ -154,60 +252,16 @@ namespace Eternal.ViewModels
             }
             else
             {
-                SystemItems = FilterNav(new List<NavigationItem>
-                {
-                    new NavigationItem("Dashboard", "Dashboard", "Dashboard", 0, 0, 0),
-                    new NavigationItem("PC Scanner", "Search", "PcScanner", 0, 0, 1),
-                    new NavigationItem("Eternal Doctor", "Stethoscope", "Repair", 2, 2, 2),
-                    new NavigationItem("Registry", "Book", "Registry", 2, 2, 3),
-                    new NavigationItem("Reports", "FileText", "Reports", 0, 1, 4),
-                    new NavigationItem("Tools", "Wrench", "Tools", 1, 1, 5),
-                    new NavigationItem("Guardian Tuning", "Gears", "Tuning", 1, 2, 6)
-                }, disabled);
-
-                TelemetryItems = FilterNav(new List<NavigationItem>
-                {
-                    new NavigationItem("Hardware", "Microchip", "Hardware", 0, 0, 0),
-                    new NavigationItem("Displays", "Desktop", "Display", 0, 0, 1),
-                    new NavigationItem("Battery Lab", "Bolt", "Battery", 0, 0, 2),
-                    new NavigationItem("Stress Test", "Flash", "StressTest", 1, 1, 3),
-                    new NavigationItem("PC Rating", "Trophy", "PcRating", 0, 0, 4),
-                    new NavigationItem("Thermal", "ThermometerThreeQuarters", "Thermal", 0, 0, 5),
-                    new NavigationItem("Components", "Laptop", "Components", 0, 0, 6),
-                    new NavigationItem("BIOS / UEFI", "InfoCircle", "Bios", 0, 0, 7),
-                    new NavigationItem("Boot Records", "List", "Boot", 1, 1, 8),
-                    new NavigationItem("Storage", "HddOutline", "Storage", 0, 0, 9)
-                }, disabled);
-
-                MonitoringItems = FilterNav(new List<NavigationItem>
-                {
-                    new NavigationItem("Processes", "Tasks", "Processes", 1, 1, 0),
-                    new NavigationItem("Performance", "LineChart", "Performance", 0, 0, 1),
-                    new NavigationItem("Sentinel Privacy", "EyeSlash", "Privacy", 1, 1, 2),
-                    new NavigationItem("Services", "Server", "Services", 1, 1, 3),
-                    new NavigationItem("User Accounts", "Users", "Users", 1, 1, 4),
-                    new NavigationItem("Network", "Globe", "Network", 0, 0, 5),
-                    new NavigationItem("Security", "Shield", "Security", 1, 1, 6),
-                    new NavigationItem("Drivers", "ListAlt", "Drivers", 1, 2, 7),
-                    new NavigationItem("Environment", "Code", "Environment", 1, 1, 8)
-                }, disabled);
-
-                SupportItems = FilterNav(new List<NavigationItem>
-                {
-                    new NavigationItem("Eternal Console", "Terminal", "Console", 2, 2, 0),
-                    new NavigationItem("Time Machine", "ClockOutline", "Snapshots", 1, 1, 2),                    new NavigationItem("DISM Imaging", "Archive", "DismImaging", 1, 2, 3),
-                    new NavigationItem("Windows Update", "Refresh", "WindowsUpdate", 0, 0, 4),
-                    new NavigationItem("Settings", "Gear", "Settings", 0, 0, 5),
-                    new NavigationItem("System Logs", "Bars", "Logs", 0, 0, 6),
-                    new NavigationItem("Help", "QuestionCircle", "Help", 0, 0, 7),
-                    new NavigationItem("PE Mode", "Medkit", "PeMode", 1, 1, 8)
-                }, disabled);
+                SystemItems = FilterNav(tempSystem, disabled);
+                TelemetryItems = FilterNav(tempTelemetry, disabled);
+                MonitoringItems = FilterNav(tempMonitoring, disabled);
+                SupportItems = FilterNav(tempSupport, disabled);
             }
         }
 
         private ObservableCollection<NavigationItem> FilterNav(List<NavigationItem> items, List<string> disabled)
         {
-            var filtered = items.Where(i => !disabled.Contains(i.ViewName)).ToList();
+            var filtered = items.Where(i => !disabled.Contains(i.ViewName) && Eternal.Helpers.OsHelper.IsBuildSupported(i.MinBuild, i.MaxBuild)).ToList();
             return new ObservableCollection<NavigationItem>(filtered);
         }
 
@@ -239,6 +293,13 @@ namespace Eternal.ViewModels
             }
         }
 
+        public override void ReleaseMemory()
+        {
+            ActivePorts.Clear();
+            UnsignedProcesses.Clear();
+            PersistenceEntries.Clear();
+        }
+
         [RelayCommand]
         private void ToggleUI()
         {
@@ -248,7 +309,7 @@ namespace Eternal.ViewModels
             System.Windows.Window newWindow;
             if (currentWindow is LegacyMainWindow)
             {
-                newWindow = new MainWindow();
+                newWindow = new NeumorphicMainWindow();
             }
             else
             {
@@ -259,9 +320,8 @@ namespace Eternal.ViewModels
             System.Windows.Application.Current.MainWindow = newWindow;
             newWindow.Show();
 
-            if (currentWindow is MainWindow mw) 
+            if (currentWindow is NeumorphicMainWindow mw) 
             {
-                mw.IsSwappingUI = true;
                 Settings.UseLegacyUI = true;
             }
             else if (currentWindow is LegacyMainWindow lmw) 
@@ -271,6 +331,10 @@ namespace Eternal.ViewModels
             }
 
             _settingsService.Save();
+            
+            // Navigate to the appropriate starting view for the new UI mode
+            _ = Navigate(Settings.UseLegacyUI ? "Dashboard" : "Home");
+            
             currentWindow.Close();
         }
 
@@ -319,7 +383,9 @@ namespace Eternal.ViewModels
         {
             try
             {
-                var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(Settings.ThemeAccentColor);
+                bool isCarPlayActive = Settings.Theme == "CarPlay" && !Settings.UseLegacyUI;
+                var colorStr = isCarPlayActive ? "#FFFFFF" : Settings.ThemeAccentColor;
+                var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colorStr);
                 var resources = System.Windows.Application.Current.Resources;
                 
                 resources["AccentColor"] = color;
@@ -336,24 +402,33 @@ namespace Eternal.ViewModels
 
                 // Apply Background Gradiency for Modern UI
                 System.Windows.Media.Color stop1, stop2, stop3;
-                switch (Settings.NewUiGradiency)
+                if (isCarPlayActive)
                 {
-                    case "Nebula": 
-                        stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#10051A"); 
-                        stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1A0A2E"); 
-                        stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2B124C"); break;
-                    case "Aurora": 
-                        stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#051014"); 
-                        stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0A1A22"); 
-                        stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#122C34"); break;
-                    case "Crimson Flow": 
-                        stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1A0505"); 
-                        stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2E0A0A"); 
-                        stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#4C1212"); break;
-                    default: 
-                        stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#05050A"); 
-                        stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0D0D1A"); 
-                        stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1A1A30"); break;
+                    stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#000000");
+                    stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#000000");
+                    stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#000000");
+                }
+                else
+                {
+                    switch (Settings.NewUiGradiency)
+                    {
+                        case "Nebula": 
+                            stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#10051A"); 
+                            stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1A0A2E"); 
+                            stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2B124C"); break;
+                        case "Aurora": 
+                            stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#051014"); 
+                            stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0A1A22"); 
+                            stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#122C34"); break;
+                        case "Crimson Flow": 
+                            stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1A0505"); 
+                            stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2E0A0A"); 
+                            stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#4C1212"); break;
+                        default: 
+                            stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#05050A"); 
+                            stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0D0D1A"); 
+                            stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1A1A30"); break;
+                    }
                 }
                 resources["BgGradientStop1"] = stop1;
                 resources["BgGradientStop2"] = stop2;
@@ -367,6 +442,24 @@ namespace Eternal.ViewModels
         private string _activeTheme = "";
         private void ApplyTheme(string themeName)
         {
+            if (Settings.UseLegacyUI)
+            {
+                // CarPlay theme is exclusively for Modern Neumorphic UI and should not affect Legacy UI.
+                // If CarPlay is selected globally, fall back to "Dark" for the Legacy UI.
+                if (themeName == "CarPlay")
+                {
+                    themeName = "Dark";
+                }
+            }
+            else
+            {
+                // If in Neumorphic UI mode, we force the NeumorphicDark theme unless CarPlay is selected
+                if (themeName != "CarPlay")
+                {
+                    themeName = "NeumorphicDark";
+                }
+            }
+
             if (_activeTheme == themeName) return;
             try
             {
@@ -437,6 +530,9 @@ namespace Eternal.ViewModels
         [RelayCommand]
         private void ResetZoom() => DisplayScale = 1.0;
 
+        [RelayCommand]
+        private void ToggleTelemetryHud() => IsTelemetryHudOpen = !IsTelemetryHudOpen;
+
         public void StartTimers()
         {
             _performanceService.StartPolling();
@@ -444,8 +540,25 @@ namespace Eternal.ViewModels
 
             if (_statusTimer != null) return;
             _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-            _statusTimer.Tick += (s, e) => UpdateUptime();
+            _statusTimer.Tick += (s, e) => {
+                UpdateUptime();
+                CurrentTime = DateTime.Now.ToString("HH:mm");
+                _ = UpdateBatteryInfo();
+            };
             _statusTimer.Start();
+        }
+
+        private async Task UpdateBatteryInfo()
+        {
+            try
+            {
+                var info = await _batteryService.GetBatteryInfoAsync();
+                if (info != null)
+                {
+                    BatteryPercentage = $"{info.ChargeLevel}%";
+                }
+            }
+            catch { }
         }
 
         private void OnGlobalPerformanceUpdated(object? sender, PerformanceSnapshot snap)
@@ -453,7 +566,7 @@ namespace Eternal.ViewModels
             var app = System.Windows.Application.Current;
             if (app == null) return;
 
-            app.Dispatcher.Invoke(() =>
+            _ = app.Dispatcher.InvokeAsync(() =>
             {
                 CpuUsage = $"{snap.CpuUsage:F0}%";
                 CpuUsageValue = snap.CpuUsage;
@@ -522,15 +635,12 @@ namespace Eternal.ViewModels
         [RelayCommand]
         public async Task Navigate(string viewName)
         {
-            // Implementation of "Polling Suspension" (HCI Optimization)
-            // Instead of fully stopping all background tasks, we slow down those that aren't in focus
-            // to save CPU/Memory while keeping the dashboard/telemetry alive.
-            
-            if (CurrentView is ThermalViewModel oldThermal) oldThermal.Deactivate(); // Full stop for heat monitoring if not visible
-            else if (CurrentView is NetworkViewModel oldNetwork) oldNetwork.Deactivate(); 
-            else if (CurrentView is ProcessIntelligenceViewModel oldProc) oldProc.Deactivate();
-            else if (CurrentView is PerformanceViewModel oldPerf) oldPerf.Deactivate();
-            else if (CurrentView is BatteryViewModel oldBattery) oldBattery.Deactivate();
+            // Polymorphically deactivate the outgoing view to systematically release memory
+            // and suspend background polling loops across the entire application.
+            if (CurrentView != null)
+            {
+                CurrentView.Deactivate();
+            }
 
             UpdateNavigationSelection(viewName);
 
@@ -538,10 +648,33 @@ namespace Eternal.ViewModels
             var sp = App.ServiceProvider;
             switch (viewName)
             {
+                case "Home":
+                    CurrentView = sp.GetRequiredService<HomeGridDashboardViewModel>();
+                    break;
                 case "Dashboard": 
-                    var dashboardVm = sp.GetRequiredService<DashboardViewModel>();
-                    CurrentView = dashboardVm; 
-                    await dashboardVm.LoadDashboardAsync();
+                    var systemDashboardVm = sp.GetRequiredService<DashboardViewModel>();
+                    CurrentView = systemDashboardVm;
+                    await systemDashboardVm.LoadDashboardAsync();
+                    break;
+                case "Category_Tuning":
+                    var catVmSystem = sp.GetRequiredService<CategoryGridViewModel>();
+                    catVmSystem.Initialize("System & Tuning", SystemItems);
+                    CurrentView = catVmSystem;
+                    break;
+                case "Category_Diagnostics":
+                    var catVmDiag = sp.GetRequiredService<CategoryGridViewModel>();
+                    catVmDiag.Initialize("Diagnostics", TelemetryItems);
+                    CurrentView = catVmDiag;
+                    break;
+                case "Category_Monitoring":
+                    var catVmMon = sp.GetRequiredService<CategoryGridViewModel>();
+                    catVmMon.Initialize("Monitoring", MonitoringItems);
+                    CurrentView = catVmMon;
+                    break;
+                case "Category_Support":
+                    var catVmSup = sp.GetRequiredService<CategoryGridViewModel>();
+                    catVmSup.Initialize("Support", SupportItems);
+                    CurrentView = catVmSup;
                     break;
                 case "Repair": 
                     CurrentView = sp.GetRequiredService<RepairCenterViewModel>(); 
@@ -670,7 +803,7 @@ namespace Eternal.ViewModels
                 case "Logs": 
                     var logVm = sp.GetRequiredService<VerboseLoggingViewModel>();
                     CurrentView = logVm; 
-                    await logVm.LoadSystemLogsCommand.ExecuteAsync(null);
+                    logVm.Activate();
                     break;
                 case "Users": 
                     var userVm = sp.GetRequiredService<UserManagementViewModel>();
@@ -701,6 +834,17 @@ namespace Eternal.ViewModels
                 case "FeatureToggles":
                     CurrentView = sp.GetRequiredService<FeatureTogglesViewModel>();
                     break;
+                case "WmiExplorer":
+                    CurrentView = sp.GetRequiredService<WmiExplorerViewModel>();
+                    break;
+                case "AppProfiler":
+                    var profilerVm = sp.GetRequiredService<AppProfilerViewModel>();
+                    CurrentView = profilerVm;
+                    profilerVm.Activate();
+                    break;
+                case "ConfigEditor":
+                    CurrentView = sp.GetRequiredService<ConfigEditorViewModel>();
+                    break;
                 case "Flags":
                     CurrentView = sp.GetRequiredService<FlagsViewModel>();
                     break;
@@ -721,13 +865,56 @@ namespace Eternal.ViewModels
             DevToolkitItems.Clear();
             DevToolkitItems.Add(new NavigationItem("Feature Integrity", "CheckCircleOutline", "Testing", 0, 0, 0));
             DevToolkitItems.Add(new NavigationItem("Feature Toggles", "ToggleOn", "FeatureToggles", 0, 0, 1));
-            DevToolkitItems.Add(new NavigationItem("DevFlags", "Flag", "Flags", 0, 0, 2));
-            DevToolkitItems.Add(new NavigationItem("Exit Testing", "SignOut", "ExitTestMode", 0, 0, 3));
+            DevToolkitItems.Add(new NavigationItem("Live App Logs", "Terminal", "Logs", 0, 0, 2));
+            DevToolkitItems.Add(new NavigationItem("WMI Explorer", "Search", "WmiExplorer", 0, 0, 3));
+            DevToolkitItems.Add(new NavigationItem("App Profiler", "Heartbeat", "AppProfiler", 0, 0, 4));
+            DevToolkitItems.Add(new NavigationItem("Config Editor", "FileCodeOutline", "ConfigEditor", 0, 0, 5));
+            DevToolkitItems.Add(new NavigationItem("DevFlags", "Flag", "Flags", 0, 0, 6));
+            DevToolkitItems.Add(new NavigationItem("Exit Testing", "SignOut", "ExitTestMode", 0, 0, 7));
             
             _toastService.ShowSuccess("TESTING MODE ACTIVE: System integrity suite unlocked.");
             Navigate("Testing");
             _loggingService.Log("!!! DEV TESTING MODE ACTIVATED !!!");
             }
+
+        [RelayCommand]
+        public void PinFeature(string viewName)
+        {
+            if (PinnedItems.Any(i => i.ViewName == viewName)) return;
+            if (PinnedItems.Count >= 8)
+            {
+                _toastService.ShowWarning("Dock is full. Unpin an item first.");
+                return;
+            }
+
+            // Find the item in all collections
+            var all = new List<NavigationItem>();
+            if (SystemItems != null) all.AddRange(SystemItems);
+            if (TelemetryItems != null) all.AddRange(TelemetryItems);
+            if (MonitoringItems != null) all.AddRange(MonitoringItems);
+            if (SupportItems != null) all.AddRange(SupportItems);
+
+            var target = all.FirstOrDefault(i => i.ViewName == viewName);
+            if (target != null)
+            {
+                PinnedItems.Add(target);
+                Settings.PinnedFeatures.Add(viewName);
+                _settingsService.Save();
+                _toastService.ShowSuccess($"{target.Name} pinned to dock.");
+            }
+        }
+
+        [RelayCommand]
+        public void UnpinFeature(string viewName)
+        {
+            var target = PinnedItems.FirstOrDefault(i => i.ViewName == viewName);
+            if (target != null)
+            {
+                PinnedItems.Remove(target);
+                Settings.PinnedFeatures.Remove(viewName);
+                _settingsService.Save();
+            }
+        }
 
         private void ExitTestingMode()
         {
@@ -744,6 +931,7 @@ namespace Eternal.ViewModels
             if (MonitoringItems != null) allItems.AddRange(MonitoringItems);
             if (SupportItems != null) allItems.AddRange(SupportItems);
             if (DevToolkitItems != null) allItems.AddRange(DevToolkitItems);
+            if (PinnedItems != null) allItems.AddRange(PinnedItems);
 
             foreach (var item in allItems) item.IsSelected = item.ViewName == viewName;
         }
@@ -779,13 +967,16 @@ namespace Eternal.ViewModels
         public int DangerLevel { get; set; }
         public int DifficultyLevel { get; set; }
         public int OriginalOrder { get; set; }
+        public int? MinBuild { get; set; }
+        public int? MaxBuild { get; set; }
         [ObservableProperty] private bool _isSelected;
         [ObservableProperty] private bool _hasAlert;
 
-        public NavigationItem(string name, string icon, string viewName, int danger = 0, int difficulty = 0, int order = 0)
+        public NavigationItem(string name, string icon, string viewName, int danger = 0, int difficulty = 0, int order = 0, int? minBuild = null, int? maxBuild = null)
         {
             Name = name; Icon = icon; ViewName = viewName;
             DangerLevel = danger; DifficultyLevel = difficulty; OriginalOrder = order;
+            MinBuild = minBuild; MaxBuild = maxBuild;
         }
     }
 }

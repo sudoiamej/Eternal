@@ -38,7 +38,6 @@ namespace Eternal.ViewModels.Modules
         private MediaCapture? _mediaCapture;
         private Windows.Media.Capture.Frames.MediaFrameReader? _frameReader;
         private bool _isInitialized;
-        private byte[]? _frameBuffer;
 
         // Keyboard Properties
         [ObservableProperty] private ObservableCollection<ObservableCollection<KeyModel>> _keyboardRows = new();
@@ -200,7 +199,6 @@ namespace Eternal.ViewModels.Modules
             await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => {
                 CameraFeed = null;
                 FrameInfo = "Feed terminated.";
-                _frameBuffer = null;
             });
         }
 
@@ -211,23 +209,19 @@ namespace Eternal.ViewModels.Modules
                 var bitmap = frame?.VideoMediaFrame?.SoftwareBitmap;
                 if (bitmap == null) return;
 
+                int width = bitmap.PixelWidth;
+                int height = bitmap.PixelHeight;
+                int stride = width * 4;
+
+                var buffer = new byte[stride * height];
+                bitmap.CopyToBuffer(buffer.AsBuffer());
+
                 // SoftwareBitmap must be accessed on the UI thread or converted to a format suitable for WPF
-                System.Windows.Application.Current.Dispatcher.Invoke(() => 
+                _ = System.Windows.Application.Current.Dispatcher.InvokeAsync(() => 
                 {
                     try
                     {
                         if (!IsCameraActive) return;
-
-                        int width = bitmap.PixelWidth;
-                        int height = bitmap.PixelHeight;
-                        int stride = width * 4;
-
-                        if (_frameBuffer == null || _frameBuffer.Length != stride * height)
-                        {
-                            _frameBuffer = new byte[stride * height];
-                        }
-
-                        bitmap.CopyToBuffer(_frameBuffer.AsBuffer());
 
                         // Reuse WriteableBitmap if dimensions match
                         if (CameraFeed is not WriteableBitmap wbm || wbm.PixelWidth != width || wbm.PixelHeight != height)
@@ -236,7 +230,7 @@ namespace Eternal.ViewModels.Modules
                             CameraFeed = wbm;
                         }
 
-                        wbm.WritePixels(new Int32Rect(0, 0, width, height), _frameBuffer, stride, 0);
+                        wbm.WritePixels(new Int32Rect(0, 0, width, height), buffer, stride, 0);
                         FrameInfo = $"{width}x{height} @ Active";
                     }
                     catch { }

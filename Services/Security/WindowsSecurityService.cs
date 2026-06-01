@@ -11,6 +11,9 @@ namespace Eternal.Services.Security
     public class WindowsSecurityService : ISecurityService
     {
         private readonly EnumerationOptions _wmiOptions = new EnumerationOptions { Timeout = TimeSpan.FromSeconds(5) };
+        private List<DriverSignatureInfo>? _cachedDrivers;
+        private DateTime _lastDriverScan = DateTime.MinValue;
+        private readonly object _driverLock = new object();
 
         private ManagementObjectSearcher CreateSearcher(string query, string? scope = null) 
             => new ManagementObjectSearcher(scope, query, _wmiOptions);
@@ -133,6 +136,14 @@ namespace Eternal.Services.Security
         {
             return Task.Run(() =>
             {
+                lock (_driverLock)
+                {
+                    if (_cachedDrivers != null && (DateTime.Now - _lastDriverScan).TotalMinutes < 5)
+                    {
+                        return new List<DriverSignatureInfo>(_cachedDrivers);
+                    }
+                }
+
                 var drivers = new List<DriverSignatureInfo>();
                 try
                 {
@@ -144,6 +155,12 @@ namespace Eternal.Services.Security
                             global::System.Convert.ToBoolean(obj["IsSigned"] ?? false),
                             obj["Manufacturer"]?.ToString() ?? "Unknown"
                         ));
+                    }
+
+                    lock (_driverLock)
+                    {
+                        _cachedDrivers = drivers;
+                        _lastDriverScan = DateTime.Now;
                     }
                 }
                 catch { }

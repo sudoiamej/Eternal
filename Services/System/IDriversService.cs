@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Management;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Eternal.Services.System
     {
         Task<List<DriverInfo>> GetInstalledDriversAsync();
         Task<OemSupportInfo> GetOemSupportInfoAsync();
+        Task<bool> ExportDriverPackageAsync(string driverName, string targetZipPath);
     }
 
     public record DriverInfo(string Name, string Description, string Version, string Provider, string Type, bool IsSigned, string HardwareId);
@@ -237,6 +239,60 @@ namespace Eternal.Services.System
                    v == "NONE" ||
                    v == "INVALID" ||
                    v.Contains("GENERIC");
+        }
+
+        public async Task<bool> ExportDriverPackageAsync(string driverName, string targetZipPath)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    string dir = Path.GetDirectoryName(targetZipPath);
+                    if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+                    string tempDir = Path.Combine(Path.GetTempPath(), "EternalDriverBackup_" + Guid.NewGuid().ToString("N"));
+                    Directory.CreateDirectory(tempDir);
+
+                    string driversPath = Path.Combine(Environment.SystemDirectory, "drivers");
+                    string cleanName = driverName;
+                    foreach (char c in Path.GetInvalidFileNameChars()) cleanName = cleanName.Replace(c, '_');
+
+                    bool filesFound = false;
+                    if (Directory.Exists(driversPath))
+                    {
+                        var files = Directory.GetFiles(driversPath, "*.*", SearchOption.TopDirectoryOnly);
+                        foreach (var file in files)
+                        {
+                            string fileName = Path.GetFileName(file);
+                            if (fileName.Contains(cleanName, StringComparison.OrdinalIgnoreCase) || 
+                                cleanName.Contains(Path.GetFileNameWithoutExtension(fileName), StringComparison.OrdinalIgnoreCase))
+                            {
+                                File.Copy(file, Path.Combine(tempDir, fileName), true);
+                                filesFound = true;
+                            }
+                        }
+                    }
+
+                    string manifestPath = Path.Combine(tempDir, "driver_manifest.txt");
+                    File.WriteAllText(manifestPath, $"Eternal System Intelligence - Driver Package Backup\r\n" +
+                                                    $"Driver Name: {driverName}\r\n" +
+                                                    $"Backup Date: {DateTime.Now}\r\n" +
+                                                    $"Files Found: {(filesFound ? "Yes" : "No (Generic Windows Driver)")}\r\n" +
+                                                    $"Source: C:\\Windows\\System32\\drivers\r\n");
+
+                    if (File.Exists(targetZipPath)) File.Delete(targetZipPath);
+
+                    global::System.IO.Compression.ZipFile.CreateFromDirectory(tempDir, targetZipPath);
+                    Directory.Delete(tempDir, true);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    global::System.Diagnostics.Debug.WriteLine($"Driver export error: {ex.Message}");
+                    return false;
+                }
+            });
         }
     }
 }

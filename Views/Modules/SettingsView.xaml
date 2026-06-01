@@ -16,21 +16,35 @@
                     <StackPanel>
                         <TextBlock Text="APPEARANCE &amp; THEME" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
 
-                        <!-- Legacy Theme Selector -->
-                        <Grid Margin="0,0,0,20" Visibility="{Binding Settings.UseLegacyUI, Converter={StaticResource VisibilityConverter}}">
+                        <!-- Interface Theme Selector (Global) -->
+                        <Grid Margin="0,0,0,20">
                             <StackPanel>
                                 <TextBlock Text="Interface Theme" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBlock Text="Select a global visual style for the legacy interface." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Select a global visual style (choose 'CarPlay' for Apple CarPlay minimalist black)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                             <ComboBox SelectedValue="{Binding SelectedTheme}" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <system:String>Dark</system:String>
                                 <system:String>Gray</system:String>
                                 <system:String>HighContrast</system:String>
+                                <system:String>CarPlay</system:String>
                             </ComboBox>
                         </Grid>
 
                         <!-- Modern Gradiency Selector -->
-                        <Grid Margin="0,0,0,20" Visibility="{Binding Settings.UseLegacyUI, Converter={StaticResource VisibilityConverter}, ConverterParameter='Inverse'}">
+                        <Grid Margin="0,0,0,20">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Settings.UseLegacyUI}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SelectedTheme}" Value="CarPlay">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
                             <StackPanel>
                                 <TextBlock Text="Modern Background Gradiency" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                 <TextBlock Text="Select a neural background profile for the modern workspace." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -43,35 +57,49 @@
                             </ComboBox>
                         </Grid>
 
-                        <TextBlock Text="System Accent Color" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,10"/>
-                        <TextBlock Text="Choose a primary color for the application interface." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+                        <!-- System Accent Color (Hidden for CarPlay monochrome style) -->
+                        <StackPanel>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedTheme}" Value="CarPlay">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            
+                            <TextBlock Text="System Accent Color" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,10"/>
+                            <TextBlock Text="Choose a primary color for the application interface." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,15"/>
 
-                        <UniformGrid Columns="8" HorizontalAlignment="Left">
-                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#9B59B6">
-                                <Border Width="20" Height="20" Background="#9B59B6" CornerRadius="10"/>
-                            </Button>
-                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#3498DB">
-                                <Border Width="20" Height="20" Background="#3498DB" CornerRadius="10"/>
-                            </Button>
-                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#2ECC71">
-                                <Border Width="20" Height="20" Background="#2ECC71" CornerRadius="10"/>
-                            </Button>
-                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#E74C3C">
-                                <Border Width="20" Height="20" Background="#E74C3C" CornerRadius="10"/>
-                            </Button>
-                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#F1C40F">
-                                <Border Width="20" Height="20" Background="#F1C40F" CornerRadius="10"/>
-                            </Button>
-                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#E67E22">
-                                <Border Width="20" Height="20" Background="#E67E22" CornerRadius="10"/>
-                            </Button>
-                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#1ABC9C">
-                                <Border Width="20" Height="20" Background="#1ABC9C" CornerRadius="10"/>
-                            </Button>
-                            <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#607D8B">
-                                <Border Width="20" Height="20" Background="#607D8B" CornerRadius="10"/>
-                            </Button>
-                        </UniformGrid>
+                            <UniformGrid Columns="8" HorizontalAlignment="Left">
+                                <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#9B59B6">
+                                    <Border Width="20" Height="20" Background="#9B59B6" CornerRadius="10"/>
+                                </Button>
+                                <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#3498DB">
+                                    <Border Width="20" Height="20" Background="#3498DB" CornerRadius="10"/>
+                                </Button>
+                                <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#2ECC71">
+                                    <Border Width="20" Height="20" Background="#2ECC71" CornerRadius="10"/>
+                                </Button>
+                                <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#E74C3C">
+                                    <Border Width="20" Height="20" Background="#E74C3C" CornerRadius="10"/>
+                                </Button>
+                                <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#F1C40F">
+                                    <Border Width="20" Height="20" Background="#F1C40F" CornerRadius="10"/>
+                                </Button>
+                                <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#E67E22">
+                                    <Border Width="20" Height="20" Background="#E67E22" CornerRadius="10"/>
+                                </Button>
+                                <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#1ABC9C">
+                                    <Border Width="20" Height="20" Background="#1ABC9C" CornerRadius="10"/>
+                                </Button>
+                                <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#607D8B">
+                                    <Border Width="20" Height="20" Background="#607D8B" CornerRadius="10"/>
+                                </Button>
+                            </UniformGrid>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 

@@ -6,6 +6,7 @@ namespace Eternal.ViewModels
 {
     public partial class BaseViewModel : ObservableObject, IMemoryOptimizable
     {
+        [ObservableProperty] private string _title = string.Empty;
         [ObservableProperty] private bool _isBusy;
         [ObservableProperty] private bool _isLoading;
         [ObservableProperty] private string _statusMessage = "Ready";

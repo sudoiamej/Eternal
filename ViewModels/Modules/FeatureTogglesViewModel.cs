@@ -58,6 +58,7 @@ namespace Eternal.ViewModels.Modules
             AddFeature("Reports", "Reports", "System", disabled);
             AddFeature("Tools", "Tools", "System", disabled);
             AddFeature("Guardian Tuning", "Tuning", "System", disabled);
+            AddFeature("UI Toggle Button", "UiToggle", "System", disabled);
 
             // Telemetry
             AddFeature("Hardware", "Hardware", "Telemetry", disabled);

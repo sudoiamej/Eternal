@@ -1,0 +1,55 @@
+<UserControl x:Class="Eternal.Views.Modules.ConfigEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1000">
+    <Grid Margin="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="*"/>    <!-- Editor -->
+            <RowDefinition Height="Auto"/> <!-- Footer -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,30">
+            <TextBlock Text="ETERNAL SYSTEM WORKSPACE" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
+            <TextBlock Text="Raw Configuration Editor" Style="{StaticResource H1}" Margin="0"/>
+            <TextBlock Text="Modify application state directly by editing the raw JSON settings. Proceed with caution." Foreground="{DynamicResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <!-- Editor Area -->
+        <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="5">
+            <TextBox Text="{Binding RawJson, UpdateSourceTrigger=PropertyChanged}" 
+                     Style="{StaticResource ModernTextBox}"
+                     AcceptsReturn="True" AcceptsTab="True"
+                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                     FontFamily="Consolas" FontSize="13"
+                     BorderThickness="0" Background="Transparent"/>
+        </Border>
+
+        <!-- Footer / Actions -->
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Border Background="#20FFCC00" CornerRadius="4" Padding="10,5" Visibility="{Binding IsModified, Converter={StaticResource VisibilityConverter}}">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Warning" Width="12" Foreground="#FFCC00" Margin="0,0,10,0"/>
+                        <TextBlock Text="UNSAVED CHANGES" Foreground="#FFCC00" FontWeight="Black" FontSize="10"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Command="{Binding LoadConfigCommand}" Style="{StaticResource StandardButton}" Margin="0,0,15,0" Width="120" Content="RELOAD"/>
+                <Button Command="{Binding SaveConfigCommand}" Style="{StaticResource PrimaryButton}" Width="150">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Save" Width="12" Foreground="Black" Margin="0,0,10,0"/>
+                        <TextBlock Text="SAVE &amp; APPLY" FontSize="11" FontWeight="Black"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

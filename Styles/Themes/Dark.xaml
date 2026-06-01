@@ -2,20 +2,20 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Futuristic Glassmorphism Palette -->
-    <Color x:Key="BackgroundColor">#05050A</Color>
-    <Color x:Key="BackgroundGradientColor">#0D0D1A</Color>
-    <Color x:Key="SidebarColor">#0AFFFFFF</Color> <!-- Ultra-translucent glass -->
-    <Color x:Key="CardColor">#15FFFFFF</Color>    <!-- Layered glass -->
+    <Color x:Key="BackgroundColor">#020206</Color>
+    <Color x:Key="BackgroundGradientColor">#070714</Color>
+    <Color x:Key="SidebarColor">#08FFFFFF</Color> <!-- Ultra-translucent glass -->
+    <Color x:Key="CardColor">#0EFFFFFF</Color>    <!-- Layered glass -->
     <Color x:Key="TextColor">#FFFFFF</Color>
-    <Color x:Key="TextSecondaryColor">#B0B0C0</Color>
-    <Color x:Key="TextDisabledColor">#404050</Color>
-    <Color x:Key="BorderColor">#20FFFFFF</Color>  <!-- Thin glass border -->
+    <Color x:Key="TextSecondaryColor">#A0A0C0</Color>
+    <Color x:Key="TextDisabledColor">#303045</Color>
+    <Color x:Key="BorderColor">#15FFFFFF</Color>  <!-- Thin glass border -->
 
     <!-- Neon Semantic Colors (HCI: Feedback) -->
     <Color x:Key="SuccessColor">#00FFAA</Color>    <!-- Neon Cyan-Green -->
-    <Color x:Key="WarningColor">#FFCC00</Color>    <!-- Bright Amber -->
-    <Color x:Key="CriticalColor">#FF3366</Color>   <!-- Neon Magenta-Red -->
-    <Color x:Key="InfoColor">#00CCFF</Color>       <!-- Electric Blue -->
+    <Color x:Key="WarningColor">#FFB300</Color>    <!-- Bright Neon Amber -->
+    <Color x:Key="CriticalColor">#FF2A6D</Color>   <!-- Neon Magenta-Red -->
+    <Color x:Key="InfoColor">#00E5FF</Color>       <!-- Electric Blue -->
 
     <!-- Brushes -->
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
@@ -32,10 +32,35 @@
     
     <!-- Neon Accents -->
     <Color x:Key="AccentColor">#00E5FF</Color>
-    <Color x:Key="AccentSecondaryColor">#6200EA</Color>
+    <Color x:Key="AccentSecondaryColor">#7F00FF</Color>
     
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
     <SolidColorBrush x:Key="AccentSecondaryBrush" Color="{StaticResource AccentSecondaryColor}"/>
     <SolidColorBrush x:Key="AccentTextBrush" Color="White"/>
+
+    <!-- CarPlay style Plate brushes for Home Dashboard -->
+    <LinearGradientBrush x:Key="DiagnosticsPlateBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#00FFAA" Offset="0"/>
+        <GradientStop Color="#00B0FF" Offset="1"/>
+    </LinearGradientBrush>
+    <Color x:Key="DiagnosticsPlateColor">#00FFAA</Color>
+
+    <LinearGradientBrush x:Key="TuningPlateBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#FFB300" Offset="0"/>
+        <GradientStop Color="#FF3D00" Offset="1"/>
+    </LinearGradientBrush>
+    <Color x:Key="TuningPlateColor">#FF3D00</Color>
+
+    <LinearGradientBrush x:Key="MonitoringPlateBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#00E5FF" Offset="0"/>
+        <GradientStop Color="#7F00FF" Offset="1"/>
+    </LinearGradientBrush>
+    <Color x:Key="MonitoringPlateColor">#00E5FF</Color>
+
+    <LinearGradientBrush x:Key="SupportPlateBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#A000FF" Offset="0"/>
+        <GradientStop Color="#FF2A6D" Offset="1"/>
+    </LinearGradientBrush>
+    <Color x:Key="SupportPlateColor">#FF2A6D</Color>
 
 </ResourceDictionary>

@@ -48,6 +48,13 @@ namespace Eternal.ViewModels.Modules
             base.Deactivate();
         }
 
+        public override void ReleaseMemory()
+        {
+            Data = new ThermalSnapshot(-1, -1, 0, 0, 0, "Unknown", 0, "Unknown", false);
+            CpuTempText = "Passive";
+            GpuTempText = "Passive";
+        }
+
         public CommunityToolkit.Mvvm.Input.IAsyncRelayCommand LoadCommand { get; }
 
         private bool _isUpdatingData = false;

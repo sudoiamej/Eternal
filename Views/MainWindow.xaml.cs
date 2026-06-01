@@ -60,6 +60,26 @@ namespace Eternal.Views
             this.Closing += MainWindow_Closing;
             this.SourceInitialized += MainWindow_SourceInitialized;
             InitializeTray();
+            
+            // Adjust window dimensions dynamically to fit under 100% and 125% DPI scale boundaries
+            AdjustWindowSizeToWorkingArea();
+        }
+
+        private void AdjustWindowSizeToWorkingArea()
+        {
+            try
+            {
+                double workingWidth = SystemParameters.WorkArea.Width;
+                double workingHeight = SystemParameters.WorkArea.Height;
+
+                // Base design dimensions are 1400 x 800. If the display working area is tight (e.g. 100% small screen or 125% scaled 1080p which gives 1536x832)
+                if (workingWidth < 1450 || workingHeight < 850)
+                {
+                    this.Width = Math.Max(1024, workingWidth * 0.92);
+                    this.Height = Math.Max(700, workingHeight * 0.88);
+                }
+            }
+            catch { }
         }
 
         private void MainWindow_SourceInitialized(object? sender, EventArgs e)
@@ -75,15 +95,14 @@ namespace Eternal.Views
                 if (isPeMode) return; // Disable glass in WinRE for stability
 
                 IntPtr hwnd = new WindowInteropHelper(this).Handle;
-                var osVersion = Environment.OSVersion.Version;
 
-                if (osVersion.Major >= 10 && osVersion.Build >= 22000)
+                if (Eternal.Helpers.OsHelper.IsWindows11OrGreater())
                 {
                     // Windows 11: Mica Effect
                     int trueValue = 1;
                     DwmSetWindowAttribute(hwnd, 38, ref trueValue, Marshal.SizeOf(typeof(int))); // DWMWA_MICA_EFFECT
                 }
-                else if (osVersion.Major >= 10)
+                else if (Eternal.Helpers.OsHelper.IsWindows10OrGreater())
                 {
                     // Windows 10: Acrylic Blur
                     var accent = new AccentPolicy { AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND, GradientColor = 0x01000000 };
@@ -143,8 +162,21 @@ namespace Eternal.Views
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            // Sidebar auto-collapse logic
-            if (e.NewSize.Width < 1200)
+            var vm = this.DataContext as MainViewModel;
+            if (vm != null)
+            {
+                // Calculate proportional scale based on both dimensions to prevent vertical or horizontal clipping
+                double scaleX = e.NewSize.Width / 1400.0;
+                double scaleY = e.NewSize.Height / 800.0;
+                double targetScale = Math.Min(scaleX, scaleY);
+                vm.DisplayScale = Math.Max(0.5, Math.Min(2.0, targetScale));
+            }
+
+            // Sidebar auto-collapse logic (adjusted for current scale to remain visually proportional)
+            double threshold = 1200;
+            if (vm != null) threshold *= vm.DisplayScale;
+
+            if (e.NewSize.Width < threshold)
             {
                 if (MenuToggle.IsChecked == true) MenuToggle.IsChecked = false;
             }
@@ -152,8 +184,6 @@ namespace Eternal.Views
             {
                 if (MenuToggle.IsChecked == false) MenuToggle.IsChecked = true;
             }
-
-            // Note: Dynamic Auto-Scaling (proportional zoom) is disabled to maintain native 100% resolution.
         }
 
         private void ShowWindow()

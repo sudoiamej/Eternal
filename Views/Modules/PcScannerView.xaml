@@ -15,73 +15,110 @@
                 <StackPanel>
                     <StackPanel.Resources>
                         <DataTemplate x:Key="IssueItemTemplate">
-                            <Border Background="{DynamicResource CardBrush}" Padding="20" Margin="0,0,0,12" CornerRadius="6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    
-                                    <fa:ImageAwesome Grid.Column="0" Width="18" VerticalAlignment="Top" Margin="0,2,20,0">
-                                        <fa:ImageAwesome.Style>
-                                            <Style TargetType="fa:ImageAwesome">
-                                                <Setter Property="Icon" Value="ExclamationCircle"/>
-                                                <Style.Triggers>
-                                                    <!-- Category Icons -->
-                                                    <DataTrigger Binding="{Binding Category}" Value="Security">
-                                                        <Setter Property="Icon" Value="Shield"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Category}" Value="Storage">
-                                                        <Setter Property="Icon" Value="Database"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Category}" Value="Performance">
-                                                        <Setter Property="Icon" Value="Flash"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Category}" Value="Cleanup">
-                                                        <Setter Property="Icon" Value="TrashOutline"/>
-                                                    </DataTrigger>
-                                                    
-                                                    <!-- Severity Colors -->
-                                                    <DataTrigger Binding="{Binding Severity}" Value="Required">
-                                                        <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Severity}" Value="Recommended">
-                                                        <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Severity}" Value="Optional">
-                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </fa:ImageAwesome.Style>
-                                    </fa:ImageAwesome>
+                            <Border Background="{DynamicResource CardBrush}" Margin="0,0,0,12" CornerRadius="12" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" ClipToBounds="True">
+                                <StackPanel>
+                                    <!-- Header Row (Clickable) -->
+                                    <ToggleButton x:Name="ExpandToggle" Background="Transparent" BorderThickness="0" Padding="20" HorizontalContentAlignment="Stretch" Cursor="Hand">
+                                        <ToggleButton.Template>
+                                            <ControlTemplate TargetType="ToggleButton">
+                                                <Border Background="Transparent">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        
+                                                        <!-- Category Icon -->
+                                                        <fa:ImageAwesome Grid.Column="0" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,20,0">
+                                                            <fa:ImageAwesome.Style>
+                                                                <Style TargetType="fa:ImageAwesome">
+                                                                    <Setter Property="Icon" Value="ExclamationCircle"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Category}" Value="Security"><Setter Property="Icon" Value="Shield"/></DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Category}" Value="Storage"><Setter Property="Icon" Value="Database"/></DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Category}" Value="Performance"><Setter Property="Icon" Value="Flash"/></DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Category}" Value="Cleanup"><Setter Property="Icon" Value="TrashOutline"/></DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Severity}" Value="Required"><Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/></DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Severity}" Value="Recommended"><Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/></DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Severity}" Value="Optional"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/></DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </fa:ImageAwesome.Style>
+                                                        </fa:ImageAwesome>
 
-                                    <StackPanel Grid.Column="1">
-                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14" Foreground="White"/>
-                                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,5,30,0" TextWrapping="Wrap"/>
-                                    </StackPanel>
+                                                        <!-- Text Summary -->
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding Title}" FontWeight="Black" FontSize="14" Foreground="White"/>
+                                                            <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,4,30,0" TextWrapping="Wrap" Opacity="0.8"/>
+                                                        </StackPanel>
 
-                                    <Button Grid.Column="2" Command="{Binding DataContext.FixIssueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                            CommandParameter="{Binding}" VerticalAlignment="Center" Padding="15,7">
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ActionType}" Value="AutoFix">
-                                                        <Setter Property="Content" Value="FIX NOW"/>
-                                                        <Setter Property="Background" Value="#1A4CAF50"/>
-                                                        <Setter Property="ToolTip" Value="Attempt to resolve this issue automatically with one click."/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding ActionType}" Value="ManualNavigation">
-                                                        <Setter Property="Content" Value="REVIEW"/>
-                                                        <Setter Property="ToolTip" Value="Navigate to the specialized module to address this issue manually."/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
-                                </Grid>
+                                                        <!-- Action Button -->
+                                                        <Button Grid.Column="2" Command="{Binding DataContext.FixIssueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                                CommandParameter="{Binding}" VerticalAlignment="Center" Margin="0,0,15,0" Padding="15,7">
+                                                            <Button.Style>
+                                                                <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding ActionType}" Value="AutoFix">
+                                                                            <Setter Property="Content" Value="FIX NOW"/>
+                                                                            <Setter Property="Background" Value="#1A4CAF50"/>
+                                                                            <Setter Property="BorderBrush" Value="#404CAF50"/>
+                                                                            <Setter Property="ToolTip" Value="Attempt to resolve this issue automatically with one click."/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding ActionType}" Value="ManualNavigation">
+                                                                            <Setter Property="Content" Value="REVIEW"/>
+                                                                            <Setter Property="ToolTip" Value="Navigate to the specialized module to address this issue manually."/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Button.Style>
+                                                        </Button>
+
+                                                        <!-- Expand Arrow (Signifier) -->
+                                                        <fa:ImageAwesome Grid.Column="3" Icon="AngleDown" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                                            <fa:ImageAwesome.RenderTransform>
+                                                                <RotateTransform Angle="0"/>
+                                                            </fa:ImageAwesome.RenderTransform>
+                                                            <fa:ImageAwesome.Style>
+                                                                <Style TargetType="fa:ImageAwesome">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                                                                            <DataTrigger.EnterActions>
+                                                                                <BeginStoryboard>
+                                                                                    <Storyboard><DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)" To="180" Duration="0:0:0.25"/></Storyboard>
+                                                                                </BeginStoryboard>
+                                                                            </DataTrigger.EnterActions>
+                                                                            <DataTrigger.ExitActions>
+                                                                                <BeginStoryboard>
+                                                                                    <Storyboard><DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)" To="0" Duration="0:0:0.25"/></Storyboard>
+                                                                                </BeginStoryboard>
+                                                                            </DataTrigger.ExitActions>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </fa:ImageAwesome.Style>
+                                                        </fa:ImageAwesome>
+                                                    </Grid>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </ToggleButton.Template>
+                                    </ToggleButton>
+
+                                    <!-- Collapsible Expert Detail Section (Don Norman: Conceptual Models) -->
+                                    <Border x:Name="DetailsPane" Background="#05FFFFFF" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource BorderBrush}" Padding="25" Visibility="Collapsed">
+                                        <StackPanel>
+                                            <TextBlock Text="UNDER THE HOOD (DIAGNOSTIC METRICS)" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10"/>
+                                            <TextBlock Text="{Binding TechnicalDetails}" FontFamily="Consolas, Courier New" FontSize="11" Foreground="#CCFFFFFF" LineHeight="18" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
                             </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsChecked, ElementName=ExpandToggle}" Value="True">
+                                    <Setter TargetName="DetailsPane" Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </StackPanel.Resources>
 
@@ -210,8 +247,8 @@
                         <ItemsControl ItemsSource="{Binding SortedIssues}" ItemTemplate="{StaticResource IssueItemTemplate}"/>
                     </StackPanel>
 
-                    <!-- Empty State -->
-                    <Border Background="{DynamicResource CardBrush}" Padding="40" CornerRadius="8" Margin="0,20,0,0"
+                    <!-- Empty State (Shield of Safety) -->
+                    <Border Background="{DynamicResource CardBrush}" Padding="45" CornerRadius="20" Margin="0,20,0,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                             Visibility="{Binding RequiredCount, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
                         <Border.Style>
                             <Style TargetType="Border">
@@ -224,11 +261,33 @@
                             </Style>
                         </Border.Style>
                         <StackPanel HorizontalAlignment="Center">
-                            <fa:ImageAwesome Icon="CheckCircle" Width="48" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                            <TextBlock Text="Your system is currently within optimal parameters." 
-                                       Foreground="White" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Run a full scan periodically to ensure security and performance integrity." 
-                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                            <Grid Width="70" Height="70" Margin="0,0,0,25" RenderTransformOrigin="0.5,0.5">
+                                <Grid.RenderTransform>
+                                    <ScaleTransform x:Name="ShieldScale" ScaleX="1" ScaleY="1"/>
+                                </Grid.RenderTransform>
+                                <Grid.Triggers>
+                                    <EventTrigger RoutedEvent="Grid.Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                <DoubleAnimation Storyboard.TargetName="ShieldScale" Storyboard.TargetProperty="ScaleX" From="1.0" To="1.06" Duration="0:0:2.5">
+                                                    <DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut"/></DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                                <DoubleAnimation Storyboard.TargetName="ShieldScale" Storyboard.TargetProperty="ScaleY" From="1.0" To="1.06" Duration="0:0:2.5">
+                                                    <DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut"/></DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Grid.Triggers>
+                                <Ellipse Fill="#0800FFAA" Stroke="{DynamicResource SuccessBrush}" StrokeThickness="1.5" Width="70" Height="70">
+                                    <Ellipse.Effect><DropShadowEffect Color="{DynamicResource SuccessColor}" BlurRadius="30" ShadowDepth="0" Opacity="0.5"/></Ellipse.Effect>
+                                </Ellipse>
+                                <fa:ImageAwesome Icon="Shield" Width="30" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Grid>
+                            <TextBlock Text="System Shield: Fully Secure &amp; Optimized" 
+                                       Foreground="White" FontWeight="Black" FontSize="18" HorizontalAlignment="Center"/>
+                            <TextBlock Text="All analyzed hardware metrics, process signatures, and memory margins are within optimal thresholds." 
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" HorizontalAlignment="Center" Margin="0,10,0,0" Opacity="0.8"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>

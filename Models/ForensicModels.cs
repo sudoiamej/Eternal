@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Eternal.Models
 {
@@ -11,6 +12,8 @@ namespace Eternal.Models
         string SignerName,
         string Issuer,
         DateTime? Timestamp,
-        bool IsTrusted
+        bool IsTrusted,
+        double Entropy,
+        List<string> SuspiciousApis
     );
 }

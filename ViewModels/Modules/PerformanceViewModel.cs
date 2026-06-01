@@ -33,7 +33,7 @@ namespace Eternal.ViewModels.Modules
             SelectHistoryCommand = new RelayCommand<HistoryType>(type => SelectedHistory = type);
         }
 
-        public void Activate()
+        public override void Activate()
         {
             if (_isActive) return;
             _isActive = true;
@@ -41,11 +41,19 @@ namespace Eternal.ViewModels.Modules
             _ = UpdateAsync();
         }
 
-        public void Deactivate()
+        public override void Deactivate()
         {
             if (!_isActive) return;
             _isActive = false;
             _performanceService.Updated -= OnPerformanceUpdated;
+            base.Deactivate();
+        }
+
+        public override void ReleaseMemory()
+        {
+            CpuHistory.Clear();
+            RamHistory.Clear();
+            DiskHistory.Clear();
         }
 
         private void OnPerformanceUpdated(object? sender, PerformanceSnapshot snap)
@@ -55,7 +63,7 @@ namespace Eternal.ViewModels.Modules
             var app = System.Windows.Application.Current;
             if (app == null) return;
 
-            app.Dispatcher.Invoke(() =>
+            _ = app.Dispatcher.InvokeAsync(() =>
             {
                 CurrentCpu = snap.CpuUsage;
                 CurrentRam = snap.RamUsage;

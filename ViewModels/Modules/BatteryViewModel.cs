@@ -108,6 +108,12 @@ namespace Eternal.ViewModels.Modules
             base.Deactivate();
         }
 
+        public override void ReleaseMemory()
+        {
+            WattageHistory.Clear();
+            Battery = null;
+        }
+
         [RelayCommand]
         private void OptimizeCharging()
         {

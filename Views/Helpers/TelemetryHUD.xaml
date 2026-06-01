@@ -1,0 +1,152 @@
+<UserControl x:Class="Eternal.Views.Helpers.TelemetryHUD"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             mc:Ignorable="d" 
+             Width="240" Height="260"
+             MouseLeftButtonDown="UserControl_MouseLeftButtonDown"
+             MouseMove="UserControl_MouseMove"
+             MouseLeftButtonUp="UserControl_MouseLeftButtonUp"
+             Cursor="SizeAll">
+
+    <UserControl.Resources>
+        <!-- Mini Sparkline Item Style -->
+        <Style x:Key="SparklineBar" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Opacity" Value="0.7"/>
+            <Setter Property="Margin" Value="1,0"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="CornerRadius" Value="1"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,1"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value><ScaleTransform ScaleY="1.2"/></Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid x:Name="HudRoot" RenderTransformOrigin="0.5,0.5">
+        <Grid.LayoutTransform>
+            <ScaleTransform x:Name="HudScale" ScaleX="1" ScaleY="1"/>
+        </Grid.LayoutTransform>
+
+        <!-- Glassmorphic Outer Panel -->
+        <Border CornerRadius="20" Background="#150A0A14" BorderBrush="#35FFFFFF" BorderThickness="1.5">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="25" ShadowDepth="0" Opacity="0.5" Color="Black"/>
+            </Border.Effect>
+            
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Grab Handle & Scaling -->
+                    <RowDefinition Height="*"/>    <!-- Telemetry Stats -->
+                </Grid.RowDefinitions>
+
+                <!-- ROW 0: Grab Handle, Scale Adjusters & Close Button -->
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Grab Dots -->
+                        <fa:ImageAwesome Icon="EllipsisV" Width="8" Foreground="#80FFFFFF" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="TELEMETRY HUD" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Scale Buttons & Close -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Click="ScaleDown_Click" Style="{StaticResource IconButton}" Padding="2" ToolTip="Scale Down" Width="18" Height="18" VerticalAlignment="Center">
+                            <fa:ImageAwesome Icon="Minus" Width="8" Foreground="White"/>
+                        </Button>
+                        <Button Click="ScaleUp_Click" Style="{StaticResource IconButton}" Padding="2" ToolTip="Scale Up" Width="18" Height="18" Margin="4,0" VerticalAlignment="Center">
+                            <fa:ImageAwesome Icon="Plus" Width="8" Foreground="White"/>
+                        </Button>
+                        <Button Click="Close_Click" Style="{StaticResource IconButton}" Padding="2" ToolTip="Close HUD" Width="18" Height="18" VerticalAlignment="Center">
+                            <fa:ImageAwesome Icon="Times" Width="8" Foreground="#FFFF3366"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ROW 1: Telemetry Data -->
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/> <!-- CPU -->
+                        <RowDefinition Height="*"/> <!-- RAM -->
+                        <RowDefinition Height="Auto"/> <!-- Active Threads -->
+                    </Grid.RowDefinitions>
+
+                    <!-- CPU Telemetry Block -->
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <TextBlock Text="CPU LOAD" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock x:Name="TxtCpu" Text="0%" FontSize="12" FontWeight="Black" Foreground="White" HorizontalAlignment="Right"/>
+                        </Grid>
+                        
+                        <!-- Sparkline Graph -->
+                        <ItemsControl x:Name="CpuGraph" Grid.Row="1" Margin="0,4,0,0" Height="30" VerticalAlignment="Bottom">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="25" Rows="1" VerticalAlignment="Bottom"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Height="{Binding}" Style="{StaticResource SparklineBar}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+
+                    <!-- RAM Telemetry Block -->
+                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <TextBlock Text="RAM USAGE" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock x:Name="TxtRam" Text="0%" FontSize="12" FontWeight="Black" Foreground="White" HorizontalAlignment="Right"/>
+                        </Grid>
+                        
+                        <!-- Sparkline Graph -->
+                        <ItemsControl x:Name="RamGraph" Grid.Row="1" Margin="0,4,0,0" Height="30" VerticalAlignment="Bottom">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="25" Rows="1" VerticalAlignment="Bottom"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Height="{Binding}" Style="{StaticResource SparklineBar}" Background="{DynamicResource AccentSecondaryBrush}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+
+                    <!-- System Threads Count -->
+                    <Border Grid.Row="2" Background="#1000FFAA" CornerRadius="10" Padding="10,6">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse Width="6" Height="6" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0">
+                                    <Ellipse.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever">
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0.3" Duration="0:0:0.8" AutoReverse="True"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Ellipse.Triggers>
+                                </Ellipse>
+                                <TextBlock Text="ACTIVE THREADS" FontSize="9" FontWeight="Black" Foreground="{DynamicResource SuccessBrush}"/>
+                            </StackPanel>
+                            <TextBlock x:Name="TxtThreads" Text="--" FontSize="11" FontWeight="Black" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

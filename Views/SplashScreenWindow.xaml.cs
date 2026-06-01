@@ -65,9 +65,6 @@ namespace Eternal.Views
             // Fully await preloading before continuing to ensure Dashboard is ready immediately
             await mainVm.PreloadAllDataAsync();
             
-            // Trigger initial navigation after construction and preload are complete
-            await mainVm.Navigate("Dashboard");
-
             await Task.Delay(500);
 
             // Ensure we stay visible for at least the branding timer
@@ -79,19 +76,12 @@ namespace Eternal.Views
                 return;
             }
 
-            // Launch the correct window based on user preference
-            Window mainWindow;
-            if (mainVm.Settings.UseLegacyUI)
-            {
-                mainWindow = new LegacyMainWindow();
-            }
-            else
-            {
-                mainWindow = new MainWindow();
-            }
-
+            // Legacy Path: Launch the classic window
+            var mainWindow = new LegacyMainWindow();
             mainWindow.DataContext = mainVm;
-            mainVm.StartTimers(); // Start real-time status bar
+            mainVm.StartTimers();
+            
+            _ = mainVm.Navigate("Dashboard");
 
             System.Windows.Application.Current.MainWindow = mainWindow;
             mainWindow.Show();
@@ -101,10 +91,10 @@ namespace Eternal.Views
         private bool IsSystemCompatible()
         {
             var os = Environment.OSVersion;
-            // Windows 10 or later, Build 19041+
+            // Windows 10 Version 1507 (Build 10240) or later
             return os.Platform == PlatformID.Win32NT && 
                    os.Version.Major >= 10 && 
-                   (os.Version.Major > 10 || os.Version.Build >= 19041);
+                   (os.Version.Major > 10 || os.Version.Build >= Eternal.Helpers.OsHelper.Build_Win10_1507);
         }
 
         private void Window_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)

@@ -15,9 +15,11 @@ namespace Eternal.Models
         public string ResumeObject { get; set; }
         public string Nx { get; set; }
         public string BootMenuPolicy { get; set; }
+        public string SafeBoot { get; set; }
         
         // Helper to determine the type for UI icons
         public bool IsBootManager => Identifier?.Contains("{bootmgr}", StringComparison.OrdinalIgnoreCase) ?? false;
         public bool IsCurrent => Identifier?.Contains("{current}", StringComparison.OrdinalIgnoreCase) ?? false;
+        public bool IsSafeBoot => !string.IsNullOrEmpty(SafeBoot);
     }
 }

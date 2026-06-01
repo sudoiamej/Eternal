@@ -98,6 +98,9 @@
         <DataTemplate DataType="{x:Type vmm:AdvisorViewModel}"><vmv:AdvisorPane/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:FeatureTogglesViewModel}"><vmv:FeatureTogglesView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:FlagsViewModel}"><vmv:FlagsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ConfigEditorViewModel}"><vmv:ConfigEditorView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:WmiExplorerViewModel}"><vmv:WmiExplorerView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:AppProfilerViewModel}"><vmv:AppProfilerView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:TestingViewModel}"><vmv:TestingView/></DataTemplate>
     </Window.Resources>
 
@@ -298,7 +301,7 @@
                     </StackPanel>
 
                     <!-- Navigation -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" VirtualizingPanel.ScrollUnit="Pixel">
                         <StackPanel Margin="10,0">
                             <StackPanel.Resources>
                                 <DataTemplate x:Key="NavItemTemplate">
