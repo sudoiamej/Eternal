@@ -4,9 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:h="clr-namespace:Eternal.Helpers"
              mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1200">
 
     <UserControl.Resources>
+        <h:ProportionalPartitionWidthConverter x:Key="ProportionalPartitionWidthConverter"/>
         <!-- Spatial Entrance Animation -->
         <Storyboard x:Key="EntranceAnim">
             <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
@@ -137,7 +139,7 @@
                                             <ItemsControl ItemsSource="{Binding Partitions}">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
-                                                        <UniformGrid Rows="1"/>
+                                                        <StackPanel Orientation="Horizontal"/>
                                                     </ItemsPanelTemplate>
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplate>
@@ -145,6 +147,12 @@
                                                         <Button Command="{Binding DataContext.SelectPartitionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 CommandParameter="{Binding}"
                                                                 Background="Transparent" BorderThickness="0" Padding="0">
+                                                            <Button.Width>
+                                                                <MultiBinding Converter="{StaticResource ProportionalPartitionWidthConverter}">
+                                                                    <Binding Path="TotalSize"/>
+                                                                    <Binding Path="DataContext.Size" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
+                                                                </MultiBinding>
+                                                            </Button.Width>
                                                             <Button.Template>
                                                                 <ControlTemplate TargetType="Button">
                                                                     <Border x:Name="Bd" BorderThickness="0,0,1,0" BorderBrush="{DynamicResource BorderBrush}" Padding="15,12">
@@ -218,6 +226,41 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+
+                    <!-- Dynamic SMART Telemetry & Diagnostics Card -->
+                    <Border Style="{StaticResource StandardCard}" Margin="0,30,0,15" Padding="25">
+                        <StackPanel>
+                            <TextBlock Text="S.M.A.R.T. TELEMETRY &amp; TELEDIAGNOSTICS" Style="{StaticResource Caption}" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,0,15"/>
+                            <TextBlock Text="Select any physical disk from the list above to poll live SMART controller registers." 
+                                       FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+                            <Border Background="#0DFFFFFF" Padding="15" CornerRadius="8">
+                                <TextBlock Text="{Binding SmartText}" FontFamily="Consolas" FontSize="11" Foreground="#00FF00" TextWrapping="Wrap"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Advanced VHD / VHDX Recoveries Card -->
+                    <Border Style="{StaticResource StandardCard}" Margin="0,15,0,0" Padding="25">
+                        <StackPanel>
+                            <TextBlock Text="VIRTUAL STORAGE CONTROLLER (VHD/VHDX)" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,15"/>
+                            <Grid Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                    <TextBlock Text="VIRTUAL HARD DISK IMAGE PATH" Style="{StaticResource Caption}" Margin="0,0,0,8"/>
+                                    <TextBox Text="{Binding VhdPath}" Padding="10" Background="{DynamicResource BackgroundBrush}" Foreground="White" BorderBrush="{DynamicResource BorderBrush}" FontSize="12"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Command="{Binding BrowseVhdFileCommand}" Content="BROWSE" Style="{StaticResource SecondaryButton}" VerticalAlignment="Bottom" Padding="15,9"/>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal">
+                                <Button Command="{Binding MountVhdCommand}" Content="MOUNT VIRTUAL DISK" Style="{StaticResource PrimaryAction}" Padding="20,10" Margin="0,0,15,0"/>
+                                <Button Command="{Binding DetachVhdCommand}" Content="DETACH VIRTUAL DISK" Style="{StaticResource SecondaryButton}" Padding="20,10"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </ScrollViewer>
         </Border>

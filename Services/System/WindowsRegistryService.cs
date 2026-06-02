@@ -309,5 +309,112 @@ namespace Eternal.Services.System
             // Placeholder for value-specific intelligence
             return "No specific value intelligence found.";
         }
+
+        public async Task<bool> MountOfflineHiveAsync(string hivePath, string mountName)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    if (!File.Exists(hivePath)) return false;
+
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "reg.exe",
+                        Arguments = $"load HKLM\\{mountName} \"{hivePath}\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true
+                    };
+
+                    using var process = Process.Start(psi);
+                    if (process == null) return false;
+                    process.WaitForExit();
+                    return process.ExitCode == 0;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error mounting registry hive: {ex.Message}");
+                    return false;
+                }
+            });
+        }
+
+        public async Task<bool> UnmountOfflineHiveAsync(string mountName)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    // Reg unload requires admin privilege and that no handles are open.
+                    // We run GC to release any registry key handles in our app process.
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "reg.exe",
+                        Arguments = $"unload HKLM\\{mountName}",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true
+                    };
+
+                    using var process = Process.Start(psi);
+                    if (process == null) return false;
+                    process.WaitForExit();
+                    return process.ExitCode == 0;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error unmounting registry hive: {ex.Message}");
+                    return false;
+                }
+            });
+        }
+
+        public async Task<bool> RunDriverTriageMacroAsync(string mountName)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    using var baseKey = Registry.LocalMachine;
+                    using var mountedKey = baseKey.OpenSubKey(mountName, true);
+                    if (mountedKey == null) return false;
+
+                    string[] controlSets = { "ControlSet001", "ControlSet002" };
+                    string[] drivers = { "stornvme", "storahci", "iastorv", "intelide", "pciide" };
+
+                    bool modified = false;
+                    foreach (var cs in controlSets)
+                    {
+                        using var csKey = mountedKey.OpenSubKey(cs, true);
+                        if (csKey == null) continue;
+
+                        using var servicesKey = csKey.OpenSubKey("Services", true);
+                        if (servicesKey == null) continue;
+
+                        foreach (var driver in drivers)
+                        {
+                            using var driverKey = servicesKey.OpenSubKey(driver, true);
+                            if (driverKey != null)
+                            {
+                                driverKey.SetValue("Start", 0, RegistryValueKind.DWord);
+                                modified = true;
+                            }
+                        }
+                    }
+                    return modified;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error running driver triage macro: {ex.Message}");
+                    return false;
+                }
+            });
+        }
     }
 }

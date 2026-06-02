@@ -17,5 +17,10 @@ namespace Eternal.Services.System
         Task<RegistryValueKind> GetValueKindAsync(string hive, string path, string valueName);
         Task<RegistryProvenance> GetProvenanceAsync(string hive, string path);
         Task<List<RegistryWatchEntry>> CheckWatchlistDriftAsync(List<RegistryWatchEntry> watchlist);
+        
+        // Offline Technician & Triage Features
+        Task<bool> MountOfflineHiveAsync(string hivePath, string mountName);
+        Task<bool> UnmountOfflineHiveAsync(string mountName);
+        Task<bool> RunDriverTriageMacroAsync(string mountName);
     }
 }

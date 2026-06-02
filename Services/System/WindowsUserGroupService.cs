@@ -32,8 +32,9 @@ namespace Eternal.Services.System
                                 IsLockedOut = user.IsAccountLockedOut(),
                                 PasswordNeverExpires = user.PasswordNeverExpires,
                                 UserCannotChangePassword = user.UserCannotChangePassword,
-                                MustChangePasswordAtNextLogon = true, // If we got here in some contexts, but let's be more precise
+                                MustChangePasswordAtNextLogon = false,
                                 LastLogon = user.LastLogon,
+                                PasswordLastSet = user.LastPasswordSet,
                                 Sid = user.Sid.ToString(),
                                 Groups = user.GetGroups().Select(g => g.Name).ToList()
                             });

@@ -16,6 +16,11 @@ namespace Eternal.ViewModels.Modules
 
         [ObservableProperty] private string _selectedFilePath = string.Empty;
         [ObservableProperty] private WimFileDetails? _wimDetails;
+        [ObservableProperty] private string _driverDirectoryPath = string.Empty;
+        [ObservableProperty] private string _targetOfflinePath = string.Empty;
+        [ObservableProperty] private bool _forceUnsignedDrivers = true;
+        [ObservableProperty] private string _dismLogOutput = string.Empty;
+        [ObservableProperty] private WimImageInfo? _selectedImage;
 
         public DismImagingViewModel(IDismService dismService, ILoggingService loggingService)
         {
@@ -78,6 +83,127 @@ namespace Eternal.ViewModels.Modules
             {
                 System.Windows.Clipboard.SetText(SelectedFilePath);
             }
+        }
+
+        [RelayCommand]
+        private void BrowseDriverDirectory()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Select Driver File or Location",
+                Filter = "Driver Information (*.inf)|*.inf|All Files (*.*)|*.*",
+                CheckFileExists = false
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                DriverDirectoryPath = global::System.IO.Path.GetDirectoryName(dialog.FileName) ?? dialog.FileName;
+            }
+        }
+
+        [RelayCommand]
+        private void BrowseTargetOfflinePath()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Select Target Offline Windows Installation Path",
+                Filter = "Windows System Config (SYSTEM)|SYSTEM|All Files (*.*)|*.*",
+                CheckFileExists = false
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                string filePath = dialog.FileName;
+                string? root = global::System.IO.Path.GetPathRoot(filePath);
+                if (!string.IsNullOrEmpty(root))
+                {
+                    if (filePath.Contains("Windows", StringComparison.OrdinalIgnoreCase))
+                    {
+                        int idx = filePath.IndexOf("Windows", StringComparison.OrdinalIgnoreCase);
+                        TargetOfflinePath = filePath.Substring(0, idx);
+                    }
+                    else
+                    {
+                        TargetOfflinePath = root;
+                    }
+                }
+            }
+        }
+
+        [RelayCommand]
+        private async Task InjectDriversAsync()
+        {
+            if (string.IsNullOrEmpty(DriverDirectoryPath))
+            {
+                System.Windows.MessageBox.Show("Please select a driver directory path first.", "Validation Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                return;
+            }
+
+            string target = string.IsNullOrEmpty(TargetOfflinePath) ? "Online" : TargetOfflinePath;
+            DismLogOutput = "Starting Driver Injection...\n";
+
+            await ExecuteBusyActionAsync(async () =>
+            {
+                bool success = await _dismService.InjectDriversAsync(
+                    target,
+                    DriverDirectoryPath,
+                    ForceUnsignedDrivers,
+                    (progressLine) =>
+                    {
+                        DismLogOutput += progressLine + "\n";
+                    }
+                );
+
+                if (success)
+                {
+                    _loggingService.Log($"DISM: Drivers successfully injected into {target}.");
+                    System.Windows.MessageBox.Show("Drivers successfully injected!", "Success", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                }
+                else
+                {
+                    _loggingService.Log($"DISM: Driver injection failed for {target}.");
+                    System.Windows.MessageBox.Show("Driver injection failed. Check output logs.", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }, "Injecting Drivers...");
+        }
+
+        [RelayCommand]
+        private async Task RestoreHealthAsync()
+        {
+            if (string.IsNullOrEmpty(SelectedFilePath))
+            {
+                System.Windows.MessageBox.Show("Please load a Windows Image (.wim/.esd) first to use as a repair source.", "Validation Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                return;
+            }
+
+            int index = SelectedImage?.Index ?? 1;
+            bool isOnline = string.IsNullOrEmpty(TargetOfflinePath);
+            DismLogOutput = $"Starting DISM RestoreHealth repair (Source image index: {index})...\n";
+
+            await ExecuteBusyActionAsync(async () =>
+            {
+                bool success = await _dismService.RestoreHealthFromSourceAsync(
+                    TargetOfflinePath,
+                    SelectedFilePath,
+                    index,
+                    isOnline,
+                    (progressLine) =>
+                    {
+                        DismLogOutput += progressLine + "\n";
+                    }
+                );
+
+                if (success)
+                {
+                    _loggingService.Log("DISM: System restore health completed successfully.");
+                    System.Windows.MessageBox.Show("System restore health completed successfully!", "Success", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                }
+                else
+                {
+                    _loggingService.Log("DISM: System restore health failed.");
+                    System.Windows.MessageBox.Show("System restore health failed. Check output logs.", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }, "Running System Repair...");
         }
     }
 }

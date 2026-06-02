@@ -84,12 +84,59 @@
                             </Button>
                         </Grid>
                     </Border>
+
+                    <!-- BSOD Minidump & Crash Analyzer Section -->
+                    <TextBlock Text="BSOD MINIDUMP &amp; CRASH ANALYZER" Style="{StaticResource Caption}" Margin="0,30,0,15" Foreground="{DynamicResource CriticalBrush}"/>
+                    <Border Style="{StaticResource StandardCard}" Padding="25" Margin="0,0,0,15">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                    <TextBlock Text="MINIDUMP SCAN PATH" Style="{StaticResource Caption}" Margin="0,0,0,8"/>
+                                    <TextBox Text="{Binding MinidumpPath}" Padding="10" Background="{DynamicResource BackgroundBrush}" Foreground="White" BorderBrush="{DynamicResource BorderBrush}" FontSize="12"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Command="{Binding BrowseCustomMinidumpCommand}" Content="BROWSE DMP" Style="{StaticResource SecondaryButton}" VerticalAlignment="Bottom" Padding="15,9"/>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                <Button Command="{Binding ScanMinidumpsCommand}" Content="SCAN MINIDUMPS" Style="{StaticResource PrimaryAction}" Padding="20,10" Margin="0,0,10,0"/>
+                            </StackPanel>
+
+                            <!-- Results Listing -->
+                            <TextBlock Text="{Binding MinidumpResults.Count, StringFormat='{}FOUND {0} CRASH DUMP FILES'}" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
+                            <DataGrid ItemsSource="{Binding MinidumpResults}" SelectedItem="{Binding SelectedMinidump}" 
+                                      AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" Height="150"
+                                      BorderThickness="0" RowBackground="Transparent" GridLinesVisibility="None"
+                                      Foreground="{DynamicResource TextBrush}" Margin="0,0,0,20">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="FILE NAME" Binding="{Binding FileName}" Width="150"/>
+                                    <DataGridTextColumn Header="BUGCHECK" Binding="{Binding BugCheckCode}" Width="100"/>
+                                    <DataGridTextColumn Header="SUSPECT DRIVER" Binding="{Binding SuspectDriver}" Width="150" FontWeight="Bold"/>
+                                    <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Description}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <!-- Details Card -->
+                            <Border Visibility="{Binding SelectedMinidump, Converter={StaticResource VisibilityConverter}}" Background="#0DFFFFFF" Padding="15" CornerRadius="6">
+                                <StackPanel>
+                                    <TextBlock Text="CRASH DUMP ANALYTICS SUMMARY" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10"/>
+                                    <TextBlock Text="{Binding SelectedMinidump.FileName, StringFormat='File: {0}'}" FontSize="12" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
+                                    <TextBlock Text="{Binding SelectedMinidump.BugCheckCode, StringFormat='BugCheck: {0}'}" FontSize="11" Foreground="{DynamicResource CriticalBrush}" FontWeight="Bold" Margin="0,0,0,5"/>
+                                    <TextBlock Text="{Binding SelectedMinidump.SuspectDriver, StringFormat='Culprit: {0}'}" FontSize="11" Foreground="{DynamicResource WarningBrush}" FontWeight="Bold" Margin="0,0,0,10"/>
+                                    <TextBlock Text="{Binding SelectedMinidump.Description}" TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
                     
                     <Border Margin="0,20,0,0" Padding="15" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4">
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,12,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             <TextBlock Text="Note: Exporting does not modify system files. This is a read-only operation." 
-                                       FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                                        FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>

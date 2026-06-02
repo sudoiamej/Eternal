@@ -131,14 +131,76 @@
                     <!-- Selected User Management -->
                     <TextBlock Text="SELECTION CONTEXT" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
                     <Border Visibility="{Binding SelectedUser, Converter={StaticResource VisibilityConverter}}" 
-                            Background="{DynamicResource CardBrush}" Padding="20" CornerRadius="8" Margin="0,0,0,25">
-                        <StackPanel>
+                            Background="{DynamicResource CardBrush}" Padding="20" CornerRadius="8" Margin="0,0,0,25">                        <StackPanel>
                             <TextBlock Text="{Binding SelectedUser.Name}" FontSize="18" FontWeight="Bold" Foreground="White"/>
-                            <TextBlock Text="{Binding SelectedUser.FullName}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,20"/>
+                            <TextBlock Text="{Binding SelectedUser.FullName}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,15"/>
+
+                            <!-- Detailed Metadata Card -->
+                            <Border Background="#0DFFFFFF" Padding="12" CornerRadius="6" Margin="0,0,0,20">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Last Logon -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Last Logon:" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,8,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding LastLogonString}" FontSize="10" Foreground="White" Margin="0,2,0,2" FontWeight="SemiBold"/>
+
+                                    <!-- Password Age -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Password Age:" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,8,2"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding PasswordAgeString}" FontSize="10" Foreground="White" Margin="0,2,0,2" FontWeight="SemiBold"/>
+
+                                    <!-- Lock Status -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Lockout Status:" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,8,2" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,2,0,2">
+                                        <TextBlock FontSize="10" FontWeight="Bold" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsLockedOut}" Value="True">
+                                                            <Setter Property="Text" Value="LOCKED"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsLockedOut}" Value="False">
+                                                            <Setter Property="Text" Value="UNLOCKED"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <Button Command="{Binding UnlockAccountCommand}" Content="UNLOCK" Margin="10,0,0,0" Padding="6,2" FontSize="8" 
+                                                Visibility="{Binding IsLockedOut, Converter={StaticResource VisibilityConverter}}"
+                                                Style="{StaticResource PrimaryButton}"/>
+                                    </StackPanel>
+
+                                    <!-- Password Never Expires Toggle -->
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Never Expires:" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,8,2" VerticalAlignment="Center"/>
+                                    <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding PasswordNeverExpires}" Command="{Binding TogglePasswordNeverExpiresCommand}"
+                                              Style="{StaticResource StandardCheckBox}" Margin="0,6,0,2" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Interactive Local Groups Binder -->
+                            <TextBlock Text="LOCAL GROUP MEMBERSHIPS" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10"/>
+                            <Border Background="#05FFFFFF" Padding="12" CornerRadius="6" Margin="0,0,0,20">
+                                <StackPanel>
+                                    <CheckBox IsChecked="{Binding IsInAdministratorsGroup}" Content="Administrators" FontSize="11" Margin="0,4" Foreground="White"/>
+                                    <CheckBox IsChecked="{Binding IsInUsersGroup}" Content="Users" FontSize="11" Margin="0,4" Foreground="White"/>
+                                    <CheckBox IsChecked="{Binding IsInRemoteDesktopUsersGroup}" Content="Remote Desktop Users" FontSize="11" Margin="0,4" Foreground="White"/>
+                                </StackPanel>
+                            </Border>
 
                             <TextBlock Text="ACCOUNT CONSTRAINTS" Style="{StaticResource Caption}" Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,10"/>
                             <CheckBox x:Name="UserSafetyLock" Content="Unlock Administrative Actions" 
-                                      Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,0,0,20"/>
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,0,0,20"/>
 
                             <Button Command="{Binding ToggleUserStatusCommand}" CommandParameter="{Binding SelectedUser}"
                                     IsEnabled="{Binding IsChecked, ElementName=UserSafetyLock}"

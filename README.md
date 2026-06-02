@@ -1,10 +1,22 @@
-# Eternal System Intelligence (Dev Preview v2.5.0-M4)
+# Eternal System Intelligence (v3.0.0 Gold Release)
 
 ![Eternal Banner](Assets/logo.png)
 
-**Eternal System Intelligence** is a Windows diagnostic, recovery, and optimization suite. Built for power users, system administrators, and forensic experts, it provides deep hardware telemetry and proactive system maintenance tools.
+**Eternal System Intelligence** is a Windows diagnostic, recovery, and optimization suite. Built for power users, system administrators, and forensic experts, it provides deep hardware telemetry, proactive system maintenance tools, and offline PE recovery systems.
 
 ## 🚀 Key Features
+
+### 🛠️ Professional Technician's Belt (NEW in v3.0.0)
+Advanced diagnostics and system rescue tools:
+- **Offline Registry Hive Mount & Triage:** Mount registry hives (`SYSTEM`, `SAM`, `SOFTWARE`) from offline partitions to reset driver startup parameters or unlock accounts.
+- **DISM Driver Injector:** Recursively inject storage, network, or controller OEM drivers (`.inf`) into active or offline Windows installations.
+- **BSOD Minidump Crash Parser:** Read `.dmp` crash dumps to instantly isolate BugCheck codes and failing third-party `.sys` driver modules.
+- **Advanced User & Localgroup Triage:** Manage active status, lockout conditions, password policies, and assign local security group memberships with safety limits.
+
+### 📊 Storage & Partition Map Studio (NEW in v3.0.0)
+- **Proportional Partition Layout:** Visualizes partitions on each drive with proportional widths bound to their size percentage.
+- **SMART Telemetry Diagnostics:** Retrieve bare-metal statistics (Power-On Hours, Reallocated Sector Counts, and Predict Failure alerts) directly from WMI.
+- **VHD/VHDX Mount Utility:** Attach or detach virtual disks natively.
 
 ### 🛡️ Guardian Tuning (Debloater)
 Optimize Windows performance and privacy with a centralized registry tweak engine.
@@ -16,7 +28,7 @@ Optimize Windows performance and privacy with a centralized registry tweak engin
 A problem-oriented repair center mapping common issues to automated fixes.
 - Resolve network connectivity and DNS conflicts.
 - Repair corrupted OS files (SFC/DISM).
-- Clear stuck print queues and audio engine resets.
+- **DISM /RestoreHealth Source Repairs:** Repair system health using an active or offline WIM/ESD image edition as the local repair source context.
 
 ### 💻 Eternal Console
 Integrated PowerShell environment with built-in diagnostic macros for rapid system audits.
@@ -29,7 +41,7 @@ Automatically detects **Windows PE** environments to provide a streamlined recov
 
 ## 🛠️ Technical Specs
 - **Framework:** .NET 10.0-windows
-- **UI:** WPF (MVVM Pattern)
+- **UI:** WPF (MVVM Pattern with Custom Neumorphic CarPlay layout)
 - **Library:** CommunityToolkit.Mvvm, LibreHardwareMonitorLib
 - **Security:** Integrated Obfuscar pipeline
 

@@ -20,34 +20,62 @@ namespace Eternal.Services.System
             _settingsService = settingsService;
         }
 
+        private T RunInSTAThread<T>(Func<T> action)
+        {
+            T result = default!;
+            Exception? exception = null;
+            var thread = new global::System.Threading.Thread(() =>
+            {
+                try
+                {
+                    result = action();
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+            });
+            thread.SetApartmentState(global::System.Threading.ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+            if (exception != null)
+            {
+                throw exception;
+            }
+            return result;
+        }
+
         public async Task<List<WindowsUpdateItem>> GetAvailableUpdatesAsync()
         {
             return await Task.Run<List<WindowsUpdateItem>>(() =>
             {
-                var updates = new List<WindowsUpdateItem>();
                 try
                 {
-                    Type? sessionType = Type.GetTypeFromProgID("Microsoft.Update.Session");
-                    if (sessionType == null) return updates;
-
-                    dynamic session = Activator.CreateInstance(sessionType)!;
-                    dynamic searcher = session.CreateUpdateSearcher();
-                    
-                    // Search for updates that are not installed and not hidden
-                    dynamic searchResult = searcher.Search("IsInstalled=0 and IsHidden=0");
-                    dynamic updateCollection = searchResult.Updates;
-
-                    for (int i = 0; i < updateCollection.Count; i++)
+                    return RunInSTAThread(() =>
                     {
-                        dynamic update = updateCollection.Item(i);
-                        updates.Add(MapUpdate(update, false));
-                    }
+                        var updates = new List<WindowsUpdateItem>();
+                        Type? sessionType = Type.GetTypeFromProgID("Microsoft.Update.Session");
+                        if (sessionType == null) return updates;
+
+                        dynamic session = Activator.CreateInstance(sessionType)!;
+                        dynamic searcher = session.CreateUpdateSearcher();
+                        
+                        dynamic searchResult = searcher.Search("IsInstalled=0 and IsHidden=0");
+                        dynamic updateCollection = searchResult.Updates;
+
+                        for (int i = 0; i < updateCollection.Count; i++)
+                        {
+                            dynamic update = updateCollection.Item(i);
+                            updates.Add(MapUpdate(update, false));
+                        }
+                        return updates;
+                    });
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Error searching for updates: {ex.Message}");
+                    return new List<WindowsUpdateItem>();
                 }
-                return updates;
             });
         }
 
@@ -55,33 +83,101 @@ namespace Eternal.Services.System
         {
             return await Task.Run<List<WindowsUpdateItem>>(() =>
             {
-                var updates = new List<WindowsUpdateItem>();
                 try
                 {
-                    Type? sessionType = Type.GetTypeFromProgID("Microsoft.Update.Session");
-                    if (sessionType == null) return updates;
-
-                    dynamic session = Activator.CreateInstance(sessionType)!;
-                    dynamic searcher = session.CreateUpdateSearcher();
-                    
-                    // Search for installed updates
-                    dynamic searchResult = searcher.Search("IsInstalled=1");
-                    dynamic updateCollection = searchResult.Updates;
-
-                    // WUA API can be slow for full history, limit to last 50
-                    int count = Math.Min(updateCollection.Count, 50);
-                    for (int i = updateCollection.Count - 1; i >= updateCollection.Count - count; i--)
+                    return RunInSTAThread(() =>
                     {
-                        dynamic update = updateCollection.Item(i);
-                        updates.Add(MapUpdate(update, true));
-                    }
+                        var updates = new List<WindowsUpdateItem>();
+                        Type? sessionType = Type.GetTypeFromProgID("Microsoft.Update.Session");
+                        if (sessionType == null) throw new Exception("WUA Session not available");
+
+                        dynamic session = Activator.CreateInstance(sessionType)!;
+                        dynamic searcher = session.CreateUpdateSearcher();
+                        
+                        dynamic searchResult = searcher.Search("IsInstalled=1");
+                        dynamic updateCollection = searchResult.Updates;
+
+                        int count = Math.Min(updateCollection.Count, 50);
+                        for (int i = updateCollection.Count - 1; i >= updateCollection.Count - count; i--)
+                        {
+                            dynamic update = updateCollection.Item(i);
+                            updates.Add(MapUpdate(update, true));
+                        }
+                        return updates;
+                    });
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error searching for installed updates: {ex.Message}");
+                    Debug.WriteLine($"Error searching for installed updates: {ex.Message}. Using fallback...");
+                    return GetInstalledUpdatesFallback();
                 }
-                return updates;
             });
+        }
+
+        private List<WindowsUpdateItem> GetInstalledUpdatesFallback()
+        {
+            var fallbackList = new List<WindowsUpdateItem>();
+            try
+            {
+                using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_QuickFixEngineering");
+                using var results = searcher.Get();
+                foreach (var obj in results)
+                {
+                    string kb = obj["HotFixID"]?.ToString() ?? "N/A";
+                    string desc = obj["Description"]?.ToString() ?? "";
+                    fallbackList.Add(new WindowsUpdateItem
+                    {
+                        Title = $"Security Update ({kb})",
+                        KBArticle = kb,
+                        Description = desc,
+                        IsInstalled = true,
+                        Status = WindowsUpdateStatus.Installed,
+                        UpdateID = kb
+                    });
+                }
+            }
+            catch (Exception wmiEx)
+            {
+                Debug.WriteLine($"WMI Fallback failed: {wmiEx.Message}");
+            }
+
+            try
+            {
+                using var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\Packages");
+                if (key != null)
+                {
+                    var names = key.GetSubKeyNames();
+                    foreach (var name in names)
+                    {
+                        if (name.Contains("KB") && (name.Contains("Update") || name.Contains("Package")))
+                        {
+                            var match = Regex.Match(name, @"KB\d+");
+                            if (match.Success)
+                            {
+                                string kb = match.Value;
+                                if (!fallbackList.Any(u => u.KBArticle == kb))
+                                {
+                                    fallbackList.Add(new WindowsUpdateItem
+                                    {
+                                        Title = $"Windows Package ({kb})",
+                                        KBArticle = kb,
+                                        Description = "Installed system package",
+                                        IsInstalled = true,
+                                        Status = WindowsUpdateStatus.Installed,
+                                        UpdateID = kb
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception regEx)
+            {
+                Debug.WriteLine($"Registry Fallback failed: {regEx.Message}");
+            }
+
+            return fallbackList.OrderByDescending(x => x.KBArticle).Take(50).ToList();
         }
 
         public async Task<bool> PauseUpdatesAsync(int days)

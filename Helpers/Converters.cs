@@ -316,4 +316,39 @@ namespace Eternal.Helpers
         }
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
+
+    public class ProportionalPartitionWidthConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values == null || values.Length < 2) return 150.0;
+            
+            try
+            {
+                double partSize = System.Convert.ToDouble(values[0]);
+                double diskSize = System.Convert.ToDouble(values[1]);
+                
+                if (diskSize <= 0) return 150.0;
+                
+                double pct = partSize / diskSize;
+                
+                double totalMapWidth = 720.0;
+                if (parameter != null && double.TryParse(parameter.ToString(), out double customWidth))
+                {
+                    totalMapWidth = customWidth;
+                }
+                
+                return Math.Max(95.0, pct * totalMapWidth);
+            }
+            catch
+            {
+                return 150.0;
+            }
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

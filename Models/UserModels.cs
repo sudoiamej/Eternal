@@ -15,6 +15,7 @@ namespace Eternal.Models
         public bool PasswordRequired { get; set; }
         public bool MustChangePasswordAtNextLogon { get; set; }
         public DateTime? LastLogon { get; set; }
+        public DateTime? PasswordLastSet { get; set; }
         public string Sid { get; set; } = string.Empty;
         public List<string> Groups { get; set; } = new List<string>();
     }

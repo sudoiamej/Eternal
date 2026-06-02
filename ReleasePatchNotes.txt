@@ -1,43 +1,59 @@
 ETERNAL SYSTEM INTELLIGENCE - RELEASE NOTES
-Version: 2.5.0 (Milestone 4)
-Edition: DEV PREVIEW
-Build Date: April 23, 2026
+Version: 3.0.0 (Gold Release)
+Edition: PROFESSIONAL POWER-USER SUITE
+Build Date: June 2, 2026
 
 --------------------------------------------------------------------------------
 OVERVIEW
 --------------------------------------------------------------------------------
-Milestone 4 focuses on UI/UX modernization and log stream isolation. This update 
-introduces a major overhaul of the navigation system with a new hover-to-expand 
-"Drawer" architecture and isolated logging streams for better diagnostic 
-traceability.
+Version 3.0.0 represents the ultimate transformation of Eternal into a premium, 
+high-density technician's diagnostics and system recovery suite. This release 
+integrates offline partition mounting, recursive driver injection, advanced BSOD 
+dump analysis, a redesigned disk layout visualizer, and WUA thread fixes.
 
 --------------------------------------------------------------------------------
 NEW FEATURES & ARCHITECTURAL ENHANCEMENTS
 --------------------------------------------------------------------------------
 
-[NAVIGATION OVERHAUL] - UI MODERNIZATION
-- HOVER-TO-EXPAND DRAWER: The sidebar now functions as a fluid overlay, 
-  expanding on hover and collapsing to a compact icon view automatically.
-- ACCENT GLOW HIGHLIGHTS: Premium linear gradient highlights and glow effects 
-  using the application's active Accent Color.
-- OVERLAY ARCHITECTURE: Navigation no longer shifts main content, providing 
-  a more stable and premium "System Drawer" feel.
+[TECHNICIAN RESCUE BELT] - OFFLINE SYSTEM TRIAGE
+- OFFLINE REGISTRY MOUNTER: Load offline registry hives (`SYSTEM`, `SAM`, `SOFTWARE`) 
+  from boot-failed OS drives directly within WinPE/WinRE.
+- BOOT RECOVERY MACROS: One-click triage automation that resets startup driver states 
+  (NVMe/SATA/AHCI) to recover systems locked in BSOD boot loops.
+- DISM DRIVER INJECTOR: Recursively inject OEM controller or storage driver directories 
+  (`.inf` / `.sys`) into active or offline target Windows images.
+- BSOD MINIDUMP PARSER: Reads crash dump headers (`.dmp`) to extract BugCheck error codes 
+  and trace third-party culprit drivers, with automated Knowledge Base advice.
 
-[LOGGING ISOLATION] - DIAGNOSTIC TRACEABILITY
-- DUAL-STREAM LOGGING: Complete separation of internal "Application Actions" 
-  from Windows "Event Viewer" entries.
-- SIDE-BY-SIDE CONSOLE: New dual-grid layout in Verbose Logging for simultaneous 
-  monitoring of app behavior and system events.
-- SYNC FEEDBACK: Dedicated loading states and synchronization overlays for 
-  Windows Event log retrieval.
+[STORAGE & DISK MAP STUDIO] - TELEMETRY & LAYOUT
+- PROPORTIONAL PARTITION LAYOUT: Repartition mapping visualizer dynamically scales 
+  the width of partition cards proportional to their actual capacity on disk.
+- SMART DIAGNOSTICS: Low-level bare-metal telemetry (Power-On Hours, Reallocated 
+  Sector counts, and Predictive Failure flags) directly via WMI wrappers.
+- VHD/VHDX VIRTUAL DISKS: Mount or detach virtual disk volumes natively.
+
+[USER & SECURITY TRIAGE] - ACCOUNT RESCUE MANAGER
+- ACCOUNT HEALTH METADATA: Track account lock status, last logon time, password age, 
+  and Password Never Expires configuration state.
+- FLUID GROUP BINDINGS: Checkbox bindings to quickly assign or revoke user groups 
+  (Administrators, Users, Remote Desktop Users) with active lockout prevention locks.
+
+[WINDOWS UPDATE STABILIZATION] - STA THREAD ISOLATION
+- STA COM THREAD BINDING: Binds WUA (`Microsoft.Update.Session`) COM API calls to an 
+  STA (Single-Threaded Apartment) thread, eliminating all MTA thread crashes on .NET 10.
+- CONTEXTUAL FALLBACKS: Automatic backup queries utilizing WMI `Win32_QuickFixEngineering` 
+  and CBS logs so update history displays instantly even if the update service is offline.
 
 --------------------------------------------------------------------------------
 PREVIOUS VERSIONS
 --------------------------------------------------------------------------------
+Version: 2.5.0 (Milestone 4)
+Build Date: April 23, 2026
+OVERVIEW: Milestone 4 introduced Navigation Hover Drawer overlays and Dual-Stream isolated logging.
+
 Version: 2.5.0 (Milestone 3)
 Build Date: April 19, 2026
-OVERVIEW: Milestone 3 introduced PC Intelligence Scanner, WinSAT PC Rating, 
-and DISM Image Studio. Core usability was redefined with the Theme Engine.
+OVERVIEW: Milestone 3 introduced PC Intelligence Scanner, WinSAT PC Rating, and DISM Image Studio.
 
 Version: 2.5.0 (Milestone 2)
 Build Date: April 18, 2026

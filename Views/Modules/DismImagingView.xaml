@@ -116,6 +116,66 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
+
+                                <!-- Driver Triage & Offline Context Card -->
+                                <Border Style="{StaticResource StandardCard}" Margin="0,30,0,15" Padding="25">
+                                    <StackPanel>
+                                        <TextBlock Text="DRIVER INJECTION &amp; OFFLINE TARGET CONTEXT" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,15"/>
+                                        <Grid Margin="0,0,0,15">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                                <TextBlock Text="DRIVER DIRECTORY (INF FOLDER)" Style="{StaticResource Caption}" Margin="0,0,0,8"/>
+                                                <TextBox Text="{Binding DriverDirectoryPath}" Padding="10" Background="{DynamicResource BackgroundBrush}" Foreground="White" BorderBrush="{DynamicResource BorderBrush}" FontSize="12"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Command="{Binding BrowseDriverDirectoryCommand}" Content="BROWSE" Style="{StaticResource SecondaryButton}" VerticalAlignment="Bottom" Padding="15,9"/>
+                                        </Grid>
+
+                                        <Grid Margin="0,0,0,15">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                                <TextBlock Text="TARGET OFFLINE WINDOWS PATH (LEAVE EMPTY FOR /ONLINE)" Style="{StaticResource Caption}" Margin="0,0,0,8"/>
+                                                <TextBox Text="{Binding TargetOfflinePath}" Padding="10" Background="{DynamicResource BackgroundBrush}" Foreground="White" BorderBrush="{DynamicResource BorderBrush}" FontSize="12"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Command="{Binding BrowseTargetOfflinePathCommand}" Content="BROWSE" Style="{StaticResource SecondaryButton}" VerticalAlignment="Bottom" Padding="15,9"/>
+                                        </Grid>
+
+                                        <CheckBox IsChecked="{Binding ForceUnsignedDrivers}" Content="Force Unsigned Drivers (/ForceUnsigned)" Foreground="White" FontSize="11" Margin="0,0,0,20"/>
+
+                                        <Button Command="{Binding InjectDriversCommand}" Content="INJECT DRIVERS INTO TARGET" Style="{StaticResource PrimaryAction}" HorizontalAlignment="Left" Padding="25,12"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- DISM Repair Source RestoreHealth Card -->
+                                <Border Style="{StaticResource StandardCard}" Margin="0,15,0,15" Padding="25">
+                                    <StackPanel>
+                                        <TextBlock Text="DISM IMAGE SOURCE SYSTEM REPAIR" Style="{StaticResource Caption}" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,0,15"/>
+                                        
+                                        <TextBlock Text="SELECT SOURCE IMAGE EDITION FOR REPAIR CONTEXT:" Style="{StaticResource Caption}" Margin="0,0,0,8"/>
+                                        <ComboBox ItemsSource="{Binding WimDetails.Images}" SelectedItem="{Binding SelectedImage}" Margin="0,0,0,20" Padding="10" Background="{DynamicResource BackgroundBrush}" Foreground="White">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Name}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <Button Command="{Binding RestoreHealthCommand}" Content="RUN SYSTEM REBUILD &amp; REPAIR" Style="{StaticResource PrimaryAction}" HorizontalAlignment="Left" Padding="25,12"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Live Log stream -->
+                                <Border Style="{StaticResource StandardCard}" Margin="0,15,0,0" Padding="25" Background="#11000000">
+                                    <StackPanel>
+                                        <TextBlock Text="DISM PROCESSING CONSOLE OUTPUT" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
+                                        <TextBox Text="{Binding DismLogOutput, Mode=OneWay}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" Height="150" FontFamily="Consolas" FontSize="10" Background="Black" Foreground="#00FF00" BorderBrush="{DynamicResource BorderBrush}" VerticalScrollBarVisibility="Auto"/>
+                                    </StackPanel>
+                                </Border>
                             </StackPanel>
                         </Grid>
                     </StackPanel>

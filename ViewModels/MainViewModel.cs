@@ -110,7 +110,7 @@ namespace Eternal.ViewModels
 
             Title = "Eternal System Intelligence";
             _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
-            _loggingService.Log($"Dev Preview Suite Version 2.5.0-M4");
+            _loggingService.Log($"Dev Preview Suite Version 3.0.0");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
             _settingsService.SettingsChanged += OnSettingsChanged;

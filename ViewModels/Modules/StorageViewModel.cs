@@ -32,9 +32,24 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private bool _isPeMode;
         [ObservableProperty] private bool _isBypassActive;
 
+        [ObservableProperty] private string _vhdPath = string.Empty;
+        [ObservableProperty] private string _smartText = "Select a physical disk to view SMART telemetry.";
+
         partial void OnIsBypassActiveChanged(bool value)
         {
             IsFocusModeActive = value;
+        }
+
+        partial void OnSelectedDiskChanged(PhysicalDisk? oldValue, PhysicalDisk? newValue)
+        {
+            if (newValue != null)
+            {
+                _ = LoadSmartDiagnosticsAsync(newValue.DeviceID);
+            }
+            else
+            {
+                SmartText = "Select a physical disk to view SMART telemetry.";
+            }
         }
 
         public ObservableCollection<string> AvailableDriveLetters { get; } = new ObservableCollection<string>();
@@ -289,6 +304,85 @@ namespace Eternal.ViewModels.Modules
                     await LoadDataAsync();
                 }, "Deleting Partition...");
             }
+        }
+
+        [RelayCommand]
+        private async Task LoadSmartDiagnosticsAsync(string deviceId)
+        {
+            try
+            {
+                var smart = await _storageService.GetSmartDiagnosticsAsync(deviceId);
+                SmartText = smart.RawTelemetry;
+            }
+            catch (Exception ex)
+            {
+                SmartText = $"Failed to load SMART telemetry: {ex.Message}";
+            }
+        }
+
+        [RelayCommand]
+        private void BrowseVhdFile()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Select VHD/VHDX Disk File",
+                Filter = "Virtual Hard Disk (*.vhd;*.vhdx)|*.vhd;*.vhdx|All Files (*.*)|*.*"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                VhdPath = dialog.FileName;
+            }
+        }
+
+        [RelayCommand]
+        private async Task MountVhdAsync()
+        {
+            if (string.IsNullOrEmpty(VhdPath))
+            {
+                System.Windows.MessageBox.Show("Please select a VHD/VHDX file first.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            await ExecuteBusyActionAsync(async () =>
+            {
+                var (success, msg) = await _storageService.MountVhdAsync(VhdPath);
+                if (success)
+                {
+                    _toastService.ShowSuccess("VHD mounted successfully.");
+                    _loggingService.Log($"VHD Mount: {VhdPath} attached successfully.");
+                    await LoadDataAsync();
+                }
+                else
+                {
+                    _toastService.ShowError($"Failed to mount VHD: {msg}");
+                }
+            }, "Mounting VHD...");
+        }
+
+        [RelayCommand]
+        private async Task DetachVhdAsync()
+        {
+            if (string.IsNullOrEmpty(VhdPath))
+            {
+                System.Windows.MessageBox.Show("Please select a VHD/VHDX file first.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            await ExecuteBusyActionAsync(async () =>
+            {
+                var (success, msg) = await _storageService.DetachVhdAsync(VhdPath);
+                if (success)
+                {
+                    _toastService.ShowSuccess("VHD detached successfully.");
+                    _loggingService.Log($"VHD Detach: {VhdPath} detached successfully.");
+                    await LoadDataAsync();
+                }
+                else
+                {
+                    _toastService.ShowError($"Failed to detach VHD: {msg}");
+                }
+            }, "Detaching VHD...");
         }
     }
 }

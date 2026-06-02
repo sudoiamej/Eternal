@@ -87,5 +87,89 @@ namespace Eternal.Services.System
             if (int.TryParse(val, out int result)) return result;
             return 0;
         }
+
+        public async Task<bool> InjectDriversAsync(string imagePath, string driverPath, bool forceUnsigned, Action<string> progressCallback)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    string targetArg = string.Equals(imagePath, "Online", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(imagePath)
+                        ? "/Online"
+                        : $"/Image:\"{imagePath}\"";
+
+                    string unsignedArg = forceUnsigned ? " /ForceUnsigned" : "";
+                    string arguments = $"{targetArg} /Add-Driver /Driver:\"{driverPath}\" /Recurse{unsignedArg}";
+
+                    progressCallback?.Invoke($"Executing: dism.exe {arguments}");
+
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "dism.exe",
+                        Arguments = arguments,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    };
+
+                    using var process = new Process { StartInfo = psi };
+                    process.OutputDataReceived += (s, e) => { if (e.Data != null) progressCallback?.Invoke(e.Data); };
+                    process.ErrorDataReceived += (s, e) => { if (e.Data != null) progressCallback?.Invoke($"ERROR: {e.Data}"); };
+
+                    process.Start();
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+                    process.WaitForExit();
+
+                    return process.ExitCode == 0;
+                }
+                catch (Exception ex)
+                {
+                    progressCallback?.Invoke($"Exception during driver injection: {ex.Message}");
+                    return false;
+                }
+            });
+        }
+
+        public async Task<bool> RestoreHealthFromSourceAsync(string targetPath, string sourceWimPath, int imageIndex, bool isOnline, Action<string> progressCallback)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    string targetArg = isOnline ? "/Online" : $"/Image:\"{targetPath}\"";
+                    string arguments = $"{targetArg} /Cleanup-Image /RestoreHealth /Source:wim:\"{sourceWimPath}\":{imageIndex} /LimitAccess";
+
+                    progressCallback?.Invoke($"Executing: dism.exe {arguments}");
+
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "dism.exe",
+                        Arguments = arguments,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    };
+
+                    using var process = new Process { StartInfo = psi };
+                    process.OutputDataReceived += (s, e) => { if (e.Data != null) progressCallback?.Invoke(e.Data); };
+                    process.ErrorDataReceived += (s, e) => { if (e.Data != null) progressCallback?.Invoke($"ERROR: {e.Data}"); };
+
+                    process.Start();
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+                    process.WaitForExit();
+
+                    return process.ExitCode == 0;
+                }
+                catch (Exception ex)
+                {
+                    progressCallback?.Invoke($"Exception during image restore health: {ex.Message}");
+                    return false;
+                }
+            });
+        }
     }
 }
