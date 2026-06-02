@@ -71,9 +71,39 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Styled password box -->
-                    <PasswordBox x:Name="PinInput" Grid.Column="0" MaxLength="20" Height="46" Style="{StaticResource NeumorphicPasswordBox}"
-                                 PasswordChanged="PinInput_PasswordChanged" KeyDown="PinInput_KeyDown" VerticalAlignment="Center"/>
+                    <Grid Grid.Column="0" HorizontalAlignment="Center" Cursor="Hand" MouseLeftButtonDown="VisualPinContainer_MouseLeftButtonDown" VerticalAlignment="Center">
+                        <!-- Invisible PasswordBox overlaying the 6 boxes for focus/input -->
+                        <PasswordBox x:Name="PinInput" MaxLength="6" Width="280" Height="46" Opacity="0.01" Background="Transparent" BorderThickness="0"
+                                     PasswordChanged="PinInput_PasswordChanged" KeyDown="PinInput_KeyDown" CaretBrush="Transparent"/>
+                        
+                        <!-- 6-Box Visual Layout -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" IsHitTestVisible="False" VerticalAlignment="Center">
+                            <!-- Box 1 -->
+                            <Border x:Name="Box1" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                <TextBlock x:Name="Text1" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <!-- Box 2 -->
+                            <Border x:Name="Box2" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                <TextBlock x:Name="Text2" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <!-- Box 3 -->
+                            <Border x:Name="Box3" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                <TextBlock x:Name="Text3" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <!-- Box 4 -->
+                            <Border x:Name="Box4" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                <TextBlock x:Name="Text4" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <!-- Box 5 -->
+                            <Border x:Name="Box5" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                <TextBlock x:Name="Text5" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <!-- Box 6 -->
+                            <Border x:Name="Box6" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                <TextBlock x:Name="Text6" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
 
                     <!-- Side right-arrow action button -->
                     <Button x:Name="UnlockButton" Grid.Column="1" CommandParameter="{Binding}" Height="46" Width="50" Margin="10,0,0,0"

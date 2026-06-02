@@ -97,11 +97,38 @@ namespace Eternal.Views.Helpers
 
         private void UpdatePinVisuals()
         {
-            // Visuals are handled directly by the PasswordBox style now
+            if (PinInput == null || Box1 == null || Text1 == null) return;
+
+            int len = PinInput.Password.Length;
+            var boxes = new[] { Box1, Box2, Box3, Box4, Box5, Box6 };
+            var texts = new[] { Text1, Text2, Text3, Text4, Text5, Text6 };
+            
+            var accentBrush = (System.Windows.Media.Brush)FindResource("AccentBrush");
+            var borderBrush = (System.Windows.Media.Brush)FindResource("BorderBrush");
+            var backgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(10, 255, 255, 255)); // #0AFFFFFF
+            var activeBackground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(20, 255, 255, 255)); // #14FFFFFF
+
+            for (int i = 0; i < 6; i++)
+            {
+                if (i < len)
+                {
+                    texts[i].Text = "●"; // Masked character
+                    boxes[i].BorderBrush = accentBrush;
+                    boxes[i].Background = activeBackground;
+                }
+                else
+                {
+                    texts[i].Text = string.Empty;
+                    boxes[i].BorderBrush = (i == len) ? accentBrush : borderBrush; // Glow active target box!
+                    boxes[i].Background = (i == len) ? activeBackground : backgroundBrush;
+                }
+            }
         }
 
         private void UpdateAttemptPins()
         {
+            if (Attempt1 == null || Attempt2 == null || Attempt3 == null || _settingsService?.Current == null) return;
+
             var settings = _settingsService.Current;
             int failed = settings.FailedAttemptsCount;
             var pins = new[] { Attempt1, Attempt2, Attempt3 };
