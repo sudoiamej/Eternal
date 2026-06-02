@@ -470,7 +470,7 @@
     <!-- Premium Glass Button (HCI Rule 1: Clear Affordance) -->
     <Style TargetType="Button" x:Key="PrimaryAction">
         <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         <Setter Property="Padding" Value="20,10"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
