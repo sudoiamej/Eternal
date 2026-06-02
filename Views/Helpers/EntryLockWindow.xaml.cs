@@ -97,32 +97,7 @@ namespace Eternal.Views.Helpers
 
         private void UpdatePinVisuals()
         {
-            int len = PinInput.Password.Length;
-            var dots = new[] { Dot1, Dot2, Dot3, Dot4, Dot5, Dot6 };
-            var accentBrush = (System.Windows.Media.Brush)FindResource("AccentBrush");
-            var borderBrush = (System.Windows.Media.Brush)FindResource("BorderBrush");
-
-            for (int i = 0; i < 6; i++)
-            {
-                if (i < len)
-                {
-                    dots[i].Background = accentBrush;
-                    dots[i].BorderBrush = System.Windows.Media.Brushes.Transparent;
-                    if (dots[i].Effect is System.Windows.Media.Effects.DropShadowEffect shadow)
-                    {
-                        shadow.Opacity = 0.8;
-                    }
-                }
-                else
-                {
-                    dots[i].Background = System.Windows.Media.Brushes.Transparent;
-                    dots[i].BorderBrush = borderBrush;
-                    if (dots[i].Effect is System.Windows.Media.Effects.DropShadowEffect shadow)
-                    {
-                        shadow.Opacity = 0;
-                    }
-                }
-            }
+            // Visuals are handled directly by the PasswordBox style now
         }
 
         private void UpdateAttemptPins()
