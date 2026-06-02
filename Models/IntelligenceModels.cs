@@ -170,7 +170,7 @@ namespace Eternal.Models
 
         // Security & Environment
         public bool IsStartupLockEnabled { get; set; } = false;
-        public string StartupLockPin { get; set; } = "1234";
+        public string StartupLockPin { get; set; } = "072906";
         public int FailedAttemptsCount { get; set; } = 0;
         public int CurrentLockoutMinutes { get; set; } = 0;
         public DateTime? LockoutEnd { get; set; }

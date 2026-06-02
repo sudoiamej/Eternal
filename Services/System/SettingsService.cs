@@ -49,6 +49,13 @@ namespace Eternal.Services.System
                 {
                     string json = File.ReadAllText(_filePath);
                     Current = JsonConvert.DeserializeObject<AppSettings>(json) ?? new AppSettings();
+                    
+                    // Seamless transition: Upgrade old default pin '1234' to the new user pin '072906'
+                    if (Current.StartupLockPin == "1234")
+                    {
+                        Current.StartupLockPin = "072906";
+                        Save();
+                    }
                 }
             }
             catch 
