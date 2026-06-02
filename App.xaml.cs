@@ -80,17 +80,6 @@ namespace Eternal
                         return;
                     }
 
-                    // 2. Entry Lock Check
-                    if (settings.Current.IsStartupLockEnabled)
-                    {
-                        var lockWindow = new Eternal.Views.Helpers.EntryLockWindow(settings);
-                        if (lockWindow.ShowDialog() != true)
-                        {
-                            Application.Current.Shutdown();
-                            return;
-                        }
-                    }
-
                     var mainVm = ServiceProvider.GetRequiredService<MainViewModel>();
                     var mainWindow = new Views.NeumorphicMainWindow();
                     mainWindow.DataContext = mainVm;

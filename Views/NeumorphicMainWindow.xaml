@@ -73,15 +73,93 @@
                             <ScaleTransform CenterX="90" CenterY="90" x:Name="BootLogoScale"/>
                         </Image.RenderTransform>
                     </Image>
-                    <TextBlock x:Name="StartupStatusText" Text="ETERNAL SYSTEM INTELLIGENCE" Margin="0,40,0,0" FontSize="18" FontWeight="Black" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center" Opacity="0.9"/>
-                    <TextBlock Text="PREPARING WORKSPACE STATE" FontSize="11" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Opacity="0.4" Margin="0,10,0,0"/>
-                    <Border Width="300" Height="4" Background="#1C1C1E" CornerRadius="2" Margin="0,30,0,0" HorizontalAlignment="Center">
-                        <Border x:Name="TachometerSweep" Width="0" Height="4" Background="#FFFFFF" CornerRadius="2" HorizontalAlignment="Left">
-                            <Border.Effect>
-                                <DropShadowEffect Color="#FFFFFF" BlurRadius="12" ShadowDepth="0" Opacity="0.8"/>
-                            </Border.Effect>
+
+                    <!-- LOCK CONTAINER (UNLOCK PHASE) -->
+                    <StackPanel x:Name="LockContainer" Visibility="Collapsed" Width="340" HorizontalAlignment="Center" Margin="0,30,0,0">
+                        <TextBlock x:Name="InputPromptText" Text="ENTER ACCESS PIN" Foreground="{DynamicResource TextSecondaryBrush}" 
+                                   FontSize="10" FontWeight="Bold" Margin="0,0,0,12" HorizontalAlignment="Center"/>
+                        
+                        <Grid x:Name="VisualPinContainer" HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0" HorizontalAlignment="Center" Cursor="Hand" MouseLeftButtonDown="VisualPinContainer_MouseLeftButtonDown" VerticalAlignment="Center">
+                                <!-- Invisible PasswordBox overlaying the 6 boxes for focus/input -->
+                                <PasswordBox x:Name="PinInput" MaxLength="6" Width="280" Height="46" Opacity="0.01" Background="Transparent" BorderThickness="0"
+                                             PasswordChanged="PinInput_PasswordChanged" KeyDown="PinInput_KeyDown" CaretBrush="Transparent"/>
+                                
+                                <!-- 6-Box Visual Layout -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" IsHitTestVisible="False" VerticalAlignment="Center">
+                                    <Border x:Name="Box1" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                        <TextBlock x:Name="Text1" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <Border x:Name="Box2" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                        <TextBlock x:Name="Text2" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <Border x:Name="Box3" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                        <TextBlock x:Name="Text3" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <Border x:Name="Box4" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                        <TextBlock x:Name="Text4" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <Border x:Name="Box5" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                        <TextBlock x:Name="Text5" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <Border x:Name="Box6" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                        <TextBlock x:Name="Text6" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Side right-arrow action button -->
+                            <Button x:Name="UnlockButton" Grid.Column="1" Height="46" Width="50" Margin="10,0,0,0"
+                                    Style="{StaticResource PrimaryButton}" Click="Unlock_Click" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="ArrowRight" Width="14" Foreground="Black">
+                                    <fa:ImageAwesome.Effect>
+                                        <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="0" Opacity="0.3"/>
+                                    </fa:ImageAwesome.Effect>
+                                </fa:ImageAwesome>
+                            </Button>
+                        </Grid>
+
+                        <TextBlock x:Name="ErrorText" Text="Invalid access code" Foreground="{DynamicResource CriticalBrush}" 
+                                   FontSize="10" Margin="0,8,0,0" Visibility="Collapsed" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+
+                        <!-- Attempt Status & Lockouts -->
+                        <StackPanel HorizontalAlignment="Center" Margin="0,15,0,0">
+                            <!-- Visual Attempt Pins -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="AttemptPinsPanel" Margin="0,5">
+                                <Ellipse x:Name="Attempt1" Width="8" Height="8" Margin="5,0" Fill="{DynamicResource SuccessBrush}"/>
+                                <Ellipse x:Name="Attempt2" Width="8" Height="8" Margin="5,0" Fill="{DynamicResource SuccessBrush}"/>
+                                <Ellipse x:Name="Attempt3" Width="8" Height="8" Margin="5,0" Fill="{DynamicResource SuccessBrush}"/>
+                            </StackPanel>
+                            
+                            <StackPanel x:Name="LockoutPanel" Visibility="Collapsed" Margin="0,5">
+                                <TextBlock Text="SECURITY LOCKOUT ACTIVE" Foreground="{DynamicResource CriticalBrush}" 
+                                           FontWeight="Bold" FontSize="11" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="LockoutTimerText" Text="Please wait 00:60" Foreground="{DynamicResource TextSecondaryBrush}" 
+                                           FontSize="10" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Bottom Actions -->
+                        <Button Content="EXIT APPLICATION" Style="{StaticResource SecondaryButton}" Height="36" Width="180" Margin="0,20,0,0" Click="Exit_Click" HorizontalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- LOADING CONTAINER (STARTUP PHASE) -->
+                    <StackPanel x:Name="LoadingContainer" Visibility="Collapsed">
+                        <TextBlock x:Name="StartupStatusText" Text="ETERNAL SYSTEM INTELLIGENCE" Margin="0,40,0,0" FontSize="18" FontWeight="Black" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center" Opacity="0.9"/>
+                        <TextBlock Text="PREPARING WORKSPACE STATE" FontSize="11" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Opacity="0.4" Margin="0,10,0,0"/>
+                        <Border Width="300" Height="4" Background="#1C1C1E" CornerRadius="2" Margin="0,30,0,0" HorizontalAlignment="Center">
+                            <Border x:Name="TachometerSweep" Width="0" Height="4" Background="#FFFFFF" CornerRadius="2" HorizontalAlignment="Left">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#FFFFFF" BlurRadius="12" ShadowDepth="0" Opacity="0.8"/>
+                                </Border.Effect>
+                            </Border>
                         </Border>
-                    </Border>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
 
@@ -113,37 +191,43 @@
                                 </Style.Triggers>
                             </Style>
                         </Button.Style>
-                        <Image Source="/Assets/logo.png" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality"/>
+                        <Rectangle Fill="White" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality">
+                            <Rectangle.OpacityMask>
+                                <ImageBrush ImageSource="/Assets/logo.png" Stretch="Uniform"/>
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
                     </Button>
 
-                    <!-- Dynamic Recent Apps / Category Workspaces (Touch-friendly, borderless) -->
-                    <ItemsControl Grid.Row="1" ItemsSource="{Binding PinnedItems}" VerticalAlignment="Center">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Margin="0,8" 
-                                        Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                        CommandParameter="{Binding ViewName}"
-                                        Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        Style="{StaticResource CarPlayDockButton}"
-                                        ToolTip="{Binding Name}"
-                                        PreviewMouseLeftButtonDown="DockItem_PreviewMouseLeftButtonDown"
-                                        PreviewMouseMove="DockItem_PreviewMouseMove">
-                                    <Button.ContextMenu>
-                                        <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
-                                            <MenuItem Header="Unpin Shortcut" 
-                                                      Command="{Binding UnpinFeatureCommand}"
-                                                      CommandParameter="{Binding Path=PlacementTarget.DataContext.ViewName, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                <MenuItem.Icon>
-                                                    <fa:ImageAwesome Icon="Times" Foreground="{DynamicResource CriticalBrush}"/>
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                        </ContextMenu>
-                                    </Button.ContextMenu>
-                                    <fa:ImageAwesome Icon="{Binding Icon}" Width="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <!-- Dynamic Recent Apps / Category Workspaces (Touch-friendly, borderless, scrollable with hidden scrollbar) -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                        <ItemsControl ItemsSource="{Binding PinnedItems}" VerticalAlignment="Center">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Margin="0,8" 
+                                            Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                            CommandParameter="{Binding ViewName}"
+                                            Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            Style="{StaticResource CarPlayDockButton}"
+                                            ToolTip="{Binding Name}"
+                                            PreviewMouseLeftButtonDown="DockItem_PreviewMouseLeftButtonDown"
+                                            PreviewMouseMove="DockItem_PreviewMouseMove">
+                                        <Button.ContextMenu>
+                                            <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                                <MenuItem Header="Unpin Shortcut" 
+                                                          Command="{Binding UnpinFeatureCommand}"
+                                                          CommandParameter="{Binding Path=PlacementTarget.DataContext.ViewName, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                    <MenuItem.Icon>
+                                                        <fa:ImageAwesome Icon="Times" Foreground="{DynamicResource CriticalBrush}"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                        <fa:ImageAwesome Icon="{Binding Icon}" Width="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
 
                     <!-- Bottom Status (Clean, tactile settings and system info) -->
                     <StackPanel Grid.Row="2" Margin="0,0,0,30">

@@ -2,10 +2,46 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
-        Title="Change Access Code" Height="320" Width="400"
+        Title="Change Access Code" Height="350" Width="400"
         WindowStyle="None" AllowsTransparency="True"
-        WindowStartupLocation="CenterOwner" Background="Transparent">
-    <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="15" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+        WindowStartupLocation="CenterOwner" Background="Transparent"
+        MouseDown="Window_MouseDown">
+    
+    <Window.Resources>
+        <Style x:Key="NeumorphicPasswordBox" TargetType="PasswordBox">
+            <Setter Property="Background" Value="#0AFFFFFF"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                <Setter TargetName="border" Property="Background" Value="#12FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                <Setter TargetName="border" Property="Background" Value="#15FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1.5">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="25" ShadowDepth="2" Opacity="0.5"/>
+        </Border.Effect>
         <Grid Margin="30">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -14,31 +50,29 @@
             </Grid.RowDefinitions>
 
             <!-- Header -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                <fa:ImageAwesome Icon="Key" Width="24" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+            <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                <fa:ImageAwesome Icon="Key" Width="22" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Left" Margin="0,0,0,10"/>
                 <TextBlock Text="CHANGE ACCESS CODE" Style="{StaticResource H1}" FontSize="18"/>
                 <TextBlock Text="Set a new 6-digit security code for application entry." 
-                           Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,4,0,0"/>
+                            Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,4,0,0"/>
             </StackPanel>
 
             <!-- Input Fields -->
             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                 <TextBlock Text="NEW 6-DIGIT PIN" Style="{StaticResource Caption}" Margin="0,0,0,8"/>
-                <PasswordBox x:Name="NewPinInput" Padding="12" Background="{DynamicResource CardBrush}" 
-                             Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"
-                             FontSize="16" HorizontalContentAlignment="Center" MaxLength="6"/>
+                <PasswordBox x:Name="NewPinInput" Style="{StaticResource NeumorphicPasswordBox}" 
+                             HorizontalContentAlignment="Center" MaxLength="6"/>
 
-                <TextBlock Text="CONFIRM PIN" Style="{StaticResource Caption}" Margin="0,15,0,8"/>
-                <PasswordBox x:Name="ConfirmPinInput" Padding="12" Background="{DynamicResource CardBrush}" 
-                             Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"
-                             FontSize="16" HorizontalContentAlignment="Center" MaxLength="6"/>
+                <TextBlock Text="CONFIRM PIN" Style="{StaticResource Caption}" Margin="0,12,0,8"/>
+                <PasswordBox x:Name="ConfirmPinInput" Style="{StaticResource NeumorphicPasswordBox}" 
+                             HorizontalContentAlignment="Center" MaxLength="6"/>
                 
                 <TextBlock x:Name="ErrorText" Text="PINs do not match or invalid length" Foreground="{DynamicResource CriticalBrush}" 
-                           FontSize="10" Margin="0,10,0,0" Visibility="Collapsed" HorizontalAlignment="Center"/>
+                            FontSize="10" Margin="0,10,0,0" Visibility="Collapsed" HorizontalAlignment="Center"/>
             </StackPanel>
 
             <!-- Actions -->
-            <Grid Grid.Row="2" Margin="0,20,0,0">
+            <Grid Grid.Row="2" Margin="0,15,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -49,5 +83,3 @@
         </Grid>
     </Border>
 </Window>
-
-
