@@ -8,6 +8,7 @@
 
 ### 🛠️ Professional Technician's Belt (NEW in v3.0.0)
 Advanced diagnostics and system rescue tools:
+- **DISM Custom OS Flasher (NEW):** Flash custom Windows images (`.wim`, `.esd`, `.swm`) directly onto any target hard drive partition and configure bootloaders (`bcdboot`) automatically.
 - **Offline Registry Hive Mount & Triage:** Mount registry hives (`SYSTEM`, `SAM`, `SOFTWARE`) from offline partitions to reset driver startup parameters or unlock accounts.
 - **DISM Driver Injector:** Recursively inject storage, network, or controller OEM drivers (`.inf`) into active or offline Windows installations.
 - **BSOD Minidump Crash Parser:** Read `.dmp` crash dumps to instantly isolate BugCheck codes and failing third-party `.sys` driver modules.
@@ -41,7 +42,7 @@ Automatically detects **Windows PE** environments to provide a streamlined recov
 
 ## 🛠️ Technical Specs
 - **Framework:** .NET 10.0-windows
-- **UI:** WPF (MVVM Pattern with Custom Neumorphic CarPlay layout)
+- **UI:** WPF (MVVM Pattern with dual layout: Neumorphic CarPlay or classic Legacy UI, selectable directly from the Startup Lock Screen)
 - **Library:** CommunityToolkit.Mvvm, LibreHardwareMonitorLib
 - **Security:** Integrated Obfuscar pipeline
 
