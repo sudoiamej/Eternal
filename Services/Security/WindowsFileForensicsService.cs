@@ -30,7 +30,7 @@ namespace Eternal.Services.Security
                     try
                     {
                         // Modern approach to extract certificates from signed binaries
-                        var cert2 = new X509Certificate2(filePath);
+                        var cert2 = X509CertificateLoader.LoadCertificateFromFile(filePath);
                         signer = cert2.Subject;
                         issuer = cert2.Issuer;
                         sigStatus = "Signed";

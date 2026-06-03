@@ -38,15 +38,19 @@
                         <StackPanel>
                             <Grid Margin="0,0,0,14">
                                 <TextBlock Text="Version" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                                <TextBlock Text="2.5.0-M4" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                <TextBlock Text="3.0.0" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Grid>
                             <Grid Margin="0,0,0,14">
                                 <TextBlock Text="Milestone" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                                <TextBlock Text="Milestone 4" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                <TextBlock Text="Gold Release" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <TextBlock Text="Branch" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                <TextBlock Text="Main" Foreground="{DynamicResource SuccessBrush}" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Grid>
                             <Grid>
-                                <TextBlock Text="Branch" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                                <TextBlock Text="Dev Preview" Foreground="{DynamicResource WarningBrush}" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                <TextBlock Text="Build Date" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                <TextBlock x:Name="BuildDateText" Text="2026-06-03" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Grid>
                         </StackPanel>
                     </Border>

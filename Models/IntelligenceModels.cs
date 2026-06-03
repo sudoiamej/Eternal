@@ -157,7 +157,7 @@ namespace Eternal.Models
         public bool MinimizeToTray { get; set; } = true;
         public bool IsAdvancedMode { get; set; } = false;
         public List<string> DisabledFeatures { get; set; } = new();
-        public List<string> PinnedFeatures { get; set; } = new() { "Hardware", "Processes", "Tuning" };
+        public List<string> PinnedFeatures { get; set; } = new() { "Processes", "Storage", "Dashboard" };
 
         // System Flags (Developer / Testing)
         public bool EnableWmiPolling { get; set; } = true;

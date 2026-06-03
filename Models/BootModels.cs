@@ -4,18 +4,18 @@ namespace Eternal.Models
 {
     public class BootRecord
     {
-        public string Identifier { get; set; }
-        public string Device { get; set; }
-        public string Path { get; set; }
-        public string Description { get; set; }
-        public string Locale { get; set; }
-        public string Inherit { get; set; }
-        public string OsDevice { get; set; }
-        public string SystemRoot { get; set; }
-        public string ResumeObject { get; set; }
-        public string Nx { get; set; }
-        public string BootMenuPolicy { get; set; }
-        public string SafeBoot { get; set; }
+        public string Identifier { get; set; } = string.Empty;
+        public string Device { get; set; } = string.Empty;
+        public string Path { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Locale { get; set; } = string.Empty;
+        public string Inherit { get; set; } = string.Empty;
+        public string OsDevice { get; set; } = string.Empty;
+        public string SystemRoot { get; set; } = string.Empty;
+        public string ResumeObject { get; set; } = string.Empty;
+        public string Nx { get; set; } = string.Empty;
+        public string BootMenuPolicy { get; set; } = string.Empty;
+        public string SafeBoot { get; set; } = string.Empty;
         
         // Helper to determine the type for UI icons
         public bool IsBootManager => Identifier?.Contains("{bootmgr}", StringComparison.OrdinalIgnoreCase) ?? false;

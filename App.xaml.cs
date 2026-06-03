@@ -192,6 +192,7 @@ namespace Eternal
             services.AddSingleton<BatteryViewModel>();
             services.AddSingleton<TestingViewModel>();
             services.AddSingleton<WmiExplorerViewModel>();
+            services.AddSingleton<FileForensicsViewModel>();
             services.AddSingleton<AppProfilerViewModel>();
             services.AddSingleton<ConfigEditorViewModel>();
             services.AddSingleton<FeatureTogglesViewModel>();

@@ -143,11 +143,10 @@ namespace Eternal.ViewModels
 
             // Upgrade old default pinned features to clean high-level CarPlay categories
             if (Settings.PinnedFeatures.Count == 3 && 
-                Settings.PinnedFeatures.Contains("Hardware") && 
-                Settings.PinnedFeatures.Contains("Processes") && 
-                Settings.PinnedFeatures.Contains("Tuning"))
+                ((Settings.PinnedFeatures.Contains("Hardware") && Settings.PinnedFeatures.Contains("Processes") && Settings.PinnedFeatures.Contains("Tuning")) ||
+                 (Settings.PinnedFeatures.Contains("Category_Diagnostics") && Settings.PinnedFeatures.Contains("Category_Tuning") && Settings.PinnedFeatures.Contains("Category_Monitoring"))))
             {
-                Settings.PinnedFeatures = new() { "Category_Diagnostics", "Category_Tuning", "Category_Monitoring" };
+                Settings.PinnedFeatures = new() { "Processes", "Storage", "Dashboard" };
                 _settingsService.Save();
             }
 
@@ -189,7 +188,8 @@ namespace Eternal.ViewModels
                 new NavigationItem("Network", "Globe", "Network", 0, 0, 5),
                 new NavigationItem("Security", "Shield", "Security", 1, 1, 6),
                 new NavigationItem("Drivers", "ListAlt", "Drivers", 1, 2, 7),
-                new NavigationItem("Environment", "Code", "Environment", 1, 1, 8)
+                new NavigationItem("Environment", "Code", "Environment", 1, 1, 8),
+                new NavigationItem("File Forensics", "Eye", "Forensics", 1, 1, 9)
             };
             var tempSupport = new List<NavigationItem>
             {
@@ -873,7 +873,7 @@ namespace Eternal.ViewModels
             DevToolkitItems.Add(new NavigationItem("Exit Testing", "SignOut", "ExitTestMode", 0, 0, 7));
             
             _toastService.ShowSuccess("TESTING MODE ACTIVE: System integrity suite unlocked.");
-            Navigate("Testing");
+            _ = Navigate("Testing");
             _loggingService.Log("!!! DEV TESTING MODE ACTIVATED !!!");
             }
 

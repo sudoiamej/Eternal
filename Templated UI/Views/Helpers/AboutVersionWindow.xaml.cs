@@ -7,6 +7,7 @@ namespace Eternal.Views.Helpers
         public AboutVersionWindow()
         {
             InitializeComponent();
+            BuildDateText.Text = System.DateTime.Today.ToString("yyyy-MM-dd");
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)

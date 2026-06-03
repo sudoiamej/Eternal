@@ -8,15 +8,15 @@ namespace Eternal.Models
 
     public class SystemTweak
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public TweakCategory Category { get; set; }
         public bool IsApplied { get; set; }
-        public string RegistryPath { get; set; }
-        public string RegistryValue { get; set; }
-        public object AppliedValue { get; set; }
-        public object DefaultValue { get; set; }
+        public string RegistryPath { get; set; } = string.Empty;
+        public string RegistryValue { get; set; } = string.Empty;
+        public object AppliedValue { get; set; } = default!;
+        public object DefaultValue { get; set; } = default!;
         public int? MinBuild { get; set; }
         public int? MaxBuild { get; set; }
         public Microsoft.Win32.RegistryValueKind ValueKind { get; set; } = Microsoft.Win32.RegistryValueKind.DWord;

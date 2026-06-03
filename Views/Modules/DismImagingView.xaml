@@ -150,8 +150,7 @@
                                         <Button Command="{Binding InjectDriversCommand}" Content="INJECT DRIVERS INTO TARGET" Style="{StaticResource PrimaryAction}" HorizontalAlignment="Left" Padding="25,12"/>
                                     </StackPanel>
                                 </Border>
-
-                                <!-- DISM Repair Source RestoreHealth Card -->
+                                 <!-- DISM Repair Source RestoreHealth Card -->
                                 <Border Style="{StaticResource StandardCard}" Margin="0,15,0,15" Padding="25">
                                     <StackPanel>
                                         <TextBlock Text="DISM IMAGE SOURCE SYSTEM REPAIR" Style="{StaticResource Caption}" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,0,15"/>
@@ -166,6 +165,36 @@
                                         </ComboBox>
 
                                         <Button Command="{Binding RestoreHealthCommand}" Content="RUN SYSTEM REBUILD &amp; REPAIR" Style="{StaticResource PrimaryAction}" HorizontalAlignment="Left" Padding="25,12"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Custom OS Image Flashing (Rufus / 3uTools style target flashing) -->
+                                <Border Style="{StaticResource StandardCard}" Margin="0,15,0,15" Padding="25">
+                                    <StackPanel>
+                                        <TextBlock Text="FLASH CUSTOM WINDOWS TO DRIVE" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,15"/>
+                                        
+                                        <TextBlock Text="1. SELECT TARGET OS EDITION TO DEPLOY:" Style="{StaticResource Caption}" Margin="0,0,0,8"/>
+                                        <ComboBox ItemsSource="{Binding WimDetails.Images}" SelectedItem="{Binding SelectedFlashImage}" Margin="0,0,0,20" Padding="10" Background="{DynamicResource BackgroundBrush}" Foreground="White">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Name}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <Grid Margin="0,0,0,20">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                                <TextBlock Text="2. TARGET DRIVE LETTER / ROOT (E.G., E:\)" Style="{StaticResource Caption}" Margin="0,0,0,8"/>
+                                                <TextBox Text="{Binding TargetFlashDrive}" Padding="10" Background="{DynamicResource BackgroundBrush}" Foreground="White" BorderBrush="{DynamicResource BorderBrush}" FontSize="12"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Command="{Binding BrowseFlashDriveCommand}" Content="BROWSE" Style="{StaticResource SecondaryButton}" VerticalAlignment="Bottom" Padding="15,9"/>
+                                        </Grid>
+
+                                        <Button Command="{Binding FlashOSCommand}" Content="FLASH / DEPLOY CUSTOM OS INSTALLATION" Style="{StaticResource PrimaryAction}" Foreground="White" HorizontalAlignment="Left" Padding="25,12"/>
                                     </StackPanel>
                                 </Border>
 

@@ -27,15 +27,21 @@ namespace Eternal.Services.System
             if (IsSimulated) return (true, $"[SIMULATION] Dev Mode {(enable ? "Enabled" : "Disabled")}");
             try
             {
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true))
+                using (RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true))
                 {
-                    key.SetValue("Hidden", enable ? 1 : 2, RegistryValueKind.DWord);
-                    key.SetValue("HideFileExt", enable ? 0 : 1, RegistryValueKind.DWord);
+                    if (key != null)
+                    {
+                        key.SetValue("Hidden", enable ? 1 : 2, RegistryValueKind.DWord);
+                        key.SetValue("HideFileExt", enable ? 0 : 1, RegistryValueKind.DWord);
+                    }
                 }
                 
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\FileSystem", true))
+                using (RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\FileSystem", true))
                 {
-                    key.SetValue("LongPathsEnabled", enable ? 1 : 0, RegistryValueKind.DWord);
+                    if (key != null)
+                    {
+                        key.SetValue("LongPathsEnabled", enable ? 1 : 0, RegistryValueKind.DWord);
+                    }
                 }
 
                 return (true, $"Dev Mode {(enable ? "Enabled" : "Disabled")}. Explorer settings updated.");
@@ -73,7 +79,9 @@ namespace Eternal.Services.System
                 var psi = new ProcessStartInfo("netstat", "-ano") { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
                 using (var proc = Process.Start(psi))
                 {
-                    string output = await proc.StandardOutput.ReadToEndAsync();
+                    if (proc != null)
+                    {
+                        string output = await proc.StandardOutput.ReadToEndAsync();
                     var lines = output.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                     foreach (var line in lines.Skip(4)) // Skip headers
                     {
@@ -99,6 +107,7 @@ namespace Eternal.Services.System
                     }
                 }
             }
+            }
             catch { }
             return ports;
         }
@@ -113,7 +122,7 @@ namespace Eternal.Services.System
                 {
                     try
                     {
-                        if (p.MainModule.FileName.Equals(filePath, StringComparison.OrdinalIgnoreCase))
+                        if (p.MainModule?.FileName != null && p.MainModule.FileName.Equals(filePath, StringComparison.OrdinalIgnoreCase))
                         {
                             p.Kill();
                             return (true, $"Killed process {p.ProcessName} holding handle to file.");
@@ -235,7 +244,7 @@ namespace Eternal.Services.System
                                 bool isSigned = false;
                                 try
                                 {
-                                    using (var cert = global::System.Security.Cryptography.X509Certificates.X509Certificate.CreateFromSignedFile(path))
+                                    using (var cert = global::System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadCertificateFromFile(path))
                                     {
                                         isSigned = cert != null;
                                     }
@@ -243,6 +252,23 @@ namespace Eternal.Services.System
                                 catch
                                 {
                                     isSigned = false;
+                                }
+
+                                if (!isSigned)
+                                {
+                                    try
+                                    {
+                                        var versionInfo = global::System.Diagnostics.FileVersionInfo.GetVersionInfo(path);
+                                        if (versionInfo.CompanyName != null && versionInfo.CompanyName.Contains("Microsoft Corporation", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            string sysRoot = Environment.GetFolderPath(Environment.SpecialFolder.Windows).ToLower();
+                                            if (lowerPath.StartsWith(sysRoot))
+                                            {
+                                                isSigned = true;
+                                            }
+                                        }
+                                    }
+                                    catch { }
                                 }
 
                                 if (!isSigned)
@@ -350,9 +376,13 @@ namespace Eternal.Services.System
                 if (block)
                 {
                     var p = Process.GetProcessById(pid);
-                    string path = p.MainModule.FileName;
-                    Process.Start(new ProcessStartInfo("netsh", $"advfirewall firewall add rule name=\"{ruleName}\" dir=out action=block program=\"{path}\" enable=yes") { WindowStyle = ProcessWindowStyle.Hidden });
-                    return (true, $"Process {pid} Isolated from Network.");
+                    string? path = p.MainModule?.FileName;
+                    if (path != null)
+                    {
+                        Process.Start(new ProcessStartInfo("netsh", $"advfirewall firewall add rule name=\"{ruleName}\" dir=out action=block program=\"{path}\" enable=yes") { WindowStyle = ProcessWindowStyle.Hidden });
+                        return (true, $"Process {pid} Isolated from Network.");
+                    }
+                    return (false, "Could not locate process executable path.");
                 }
                 else
                 {

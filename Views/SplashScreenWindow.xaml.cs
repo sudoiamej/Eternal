@@ -76,12 +76,23 @@ namespace Eternal.Views
                 return;
             }
 
-            // Legacy Path: Launch the classic window
-            var mainWindow = new LegacyMainWindow();
-            mainWindow.DataContext = mainVm;
-            mainVm.StartTimers();
-            
-            _ = mainVm.Navigate("Dashboard");
+            Window mainWindow;
+            if (mainVm.Settings.UseLegacyUI)
+            {
+                var legacyWin = new LegacyMainWindow();
+                legacyWin.DataContext = mainVm;
+                mainVm.StartTimers();
+                _ = mainVm.Navigate("Dashboard");
+                mainWindow = legacyWin;
+            }
+            else
+            {
+                var modernWin = new NeumorphicMainWindow();
+                modernWin.DataContext = mainVm;
+                mainVm.StartTimers();
+                _ = mainVm.Navigate("Home");
+                mainWindow = modernWin;
+            }
 
             System.Windows.Application.Current.MainWindow = mainWindow;
             mainWindow.Show();

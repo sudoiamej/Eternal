@@ -93,7 +93,7 @@ namespace Eternal.ViewModels.Modules
 
             // Permanently Disabled by Developer
             AddDisabledFeature("Neural Advisor", "Advisor", "Intelligence", "Disabled by Developer");
-            AddDisabledFeature("File Forensics", "Forensics", "Security", "Disabled by Developer");
+            AddFeature("File Forensics", "Forensics", "Security", disabled);
         }
 
         private void AddFeature(string name, string viewName, string category, List<string> disabled)

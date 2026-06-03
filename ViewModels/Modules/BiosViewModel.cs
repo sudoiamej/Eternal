@@ -10,8 +10,8 @@ namespace Eternal.ViewModels.Modules
     {
         private readonly IBiosService _biosService;
 
-        [ObservableProperty] private BiosInfo _bios;
-        [ObservableProperty] private UefiStatus _uefi;
+        [ObservableProperty] private BiosInfo _bios = default!;
+        [ObservableProperty] private UefiStatus _uefi = default!;
 
         public BiosViewModel(IBiosService biosService)
         {

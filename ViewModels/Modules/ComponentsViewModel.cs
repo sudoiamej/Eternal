@@ -37,7 +37,6 @@ namespace Eternal.ViewModels.Modules
 
         private MediaCapture? _mediaCapture;
         private Windows.Media.Capture.Frames.MediaFrameReader? _frameReader;
-        private bool _isInitialized;
 
         // Keyboard Properties
         [ObservableProperty] private ObservableCollection<ObservableCollection<KeyModel>> _keyboardRows = new();
@@ -120,7 +119,7 @@ namespace Eternal.ViewModels.Modules
                     CameraStatus = "Standby";
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 CameraGroups.Add(new CameraGroup { DisplayName = "Detection Error", DeviceId = "Error" });
                 CameraStatus = "Error";
@@ -165,7 +164,6 @@ namespace Eternal.ViewModels.Modules
 
                 IsCameraActive = true;
                 CameraStatus = "Live Feed Active";
-                _isInitialized = true;
             }
             catch (Exception ex)
             {
@@ -193,7 +191,6 @@ namespace Eternal.ViewModels.Modules
                 _mediaCapture = null;
             }
 
-            _isInitialized = false;
             CameraStatus = "Standby";
             
             await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => {

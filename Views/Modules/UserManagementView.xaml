@@ -184,7 +184,7 @@
                                     <!-- Password Never Expires Toggle -->
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Never Expires:" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,8,2" VerticalAlignment="Center"/>
                                     <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding PasswordNeverExpires}" Command="{Binding TogglePasswordNeverExpiresCommand}"
-                                              Style="{StaticResource StandardCheckBox}" Margin="0,6,0,2" VerticalAlignment="Center"/>
+                                              Margin="0,6,0,2" VerticalAlignment="Center"/>
                                 </Grid>
                             </Border>
 

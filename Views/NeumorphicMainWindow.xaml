@@ -217,7 +217,7 @@
                                                           Command="{Binding UnpinFeatureCommand}"
                                                           CommandParameter="{Binding Path=PlacementTarget.DataContext.ViewName, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                                     <MenuItem.Icon>
-                                                        <fa:ImageAwesome Icon="Times" Foreground="{DynamicResource CriticalBrush}"/>
+                                                        <fa:ImageAwesome Icon="Times" Width="10" Height="10" Foreground="{DynamicResource CriticalBrush}"/>
                                                     </MenuItem.Icon>
                                                 </MenuItem>
                                             </ContextMenu>

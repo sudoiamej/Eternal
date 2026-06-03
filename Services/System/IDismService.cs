@@ -9,5 +9,6 @@ namespace Eternal.Services.System
         Task<WimFileDetails?> GetImageInfoAsync(string filePath);
         Task<bool> InjectDriversAsync(string imagePath, string driverPath, bool forceUnsigned, Action<string> progressCallback);
         Task<bool> RestoreHealthFromSourceAsync(string targetPath, string sourceWimPath, int imageIndex, bool isOnline, Action<string> progressCallback);
+        Task<bool> ApplyImageAsync(string sourceWimPath, int imageIndex, string targetDrive, Action<string> progressCallback);
     }
 }

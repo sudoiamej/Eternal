@@ -171,5 +171,85 @@ namespace Eternal.Services.System
                 }
             });
         }
+
+        public async Task<bool> ApplyImageAsync(string sourceWimPath, int imageIndex, string targetDrive, Action<string> progressCallback)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    // 1. Apply image
+                    string arguments = $"/Apply-Image /ImageFile:\"{sourceWimPath}\" /Index:{imageIndex} /ApplyDir:\"{targetDrive}\"";
+                    progressCallback?.Invoke($"Flashing OS Files: dism.exe {arguments}");
+
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "dism.exe",
+                        Arguments = arguments,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    };
+
+                    using (var process = new Process { StartInfo = psi })
+                    {
+                        process.OutputDataReceived += (s, e) => { if (e.Data != null) progressCallback?.Invoke(e.Data); };
+                        process.ErrorDataReceived += (s, e) => { if (e.Data != null) progressCallback?.Invoke($"ERROR: {e.Data}"); };
+
+                        process.Start();
+                        process.BeginOutputReadLine();
+                        process.BeginErrorReadLine();
+                        process.WaitForExit();
+
+                        if (process.ExitCode != 0)
+                        {
+                            progressCallback?.Invoke($"Flashing failed with exit code {process.ExitCode}");
+                            return false;
+                        }
+                    }
+
+                    // 2. Configure boot files using bcdboot.exe
+                    progressCallback?.Invoke($"Configuring bootloader on target partition {targetDrive}...");
+                    string targetRoot = targetDrive.TrimEnd('\\');
+                    string bcdArguments = $"\"{targetRoot}\\Windows\" /s {targetRoot} /f ALL";
+                    progressCallback?.Invoke($"Running: bcdboot.exe {bcdArguments}");
+
+                    var bcdPsi = new ProcessStartInfo
+                    {
+                        FileName = "bcdboot.exe",
+                        Arguments = bcdArguments,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    };
+
+                    using (var bcdProcess = new Process { StartInfo = bcdPsi })
+                    {
+                        bcdProcess.OutputDataReceived += (s, e) => { if (e.Data != null) progressCallback?.Invoke(e.Data); };
+                        bcdProcess.ErrorDataReceived += (s, e) => { if (e.Data != null) progressCallback?.Invoke($"ERROR: {e.Data}"); };
+
+                        bcdProcess.Start();
+                        bcdProcess.BeginOutputReadLine();
+                        bcdProcess.BeginErrorReadLine();
+                        bcdProcess.WaitForExit();
+
+                        if (bcdProcess.ExitCode != 0)
+                        {
+                            progressCallback?.Invoke($"Boot configuration (bcdboot) returned non-zero code {bcdProcess.ExitCode}. Boot configuration may be incomplete depending on drive configuration.");
+                        }
+                    }
+
+                    progressCallback?.Invoke("Flashing completed successfully!");
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    progressCallback?.Invoke($"Exception during image flashing: {ex.Message}");
+                    return false;
+                }
+            });
+        }
     }
 }

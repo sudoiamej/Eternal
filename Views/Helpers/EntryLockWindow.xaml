@@ -138,9 +138,14 @@
             </StackPanel>
 
             <!-- Bottom Actions -->
-            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="EXIT APPLICATION" Style="{StaticResource SecondaryButton}" Height="36" Width="180" Click="Exit_Click"/>
-            </StackPanel>
+            <Grid Grid.Row="3" Width="360" HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="SWITCH UI MODE" Style="{StaticResource SecondaryButton}" Height="36" Margin="0,0,5,0" Click="SwitchUI_Click"/>
+                <Button Grid.Column="1" Content="EXIT APPLICATION" Style="{StaticResource SecondaryButton}" Height="36" Margin="5,0,0,0" Click="Exit_Click"/>
+            </Grid>
         </Grid>
     </Border>
 </Window>

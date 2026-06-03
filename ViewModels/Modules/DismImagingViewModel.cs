@@ -21,6 +21,8 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private bool _forceUnsignedDrivers = true;
         [ObservableProperty] private string _dismLogOutput = string.Empty;
         [ObservableProperty] private WimImageInfo? _selectedImage;
+        [ObservableProperty] private WimImageInfo? _selectedFlashImage;
+        [ObservableProperty] private string _targetFlashDrive = string.Empty;
 
         public DismImagingViewModel(IDismService dismService, ILoggingService loggingService)
         {
@@ -204,6 +206,84 @@ namespace Eternal.ViewModels.Modules
                     System.Windows.MessageBox.Show("System restore health failed. Check output logs.", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                 }
             }, "Running System Repair...");
+        }
+
+        [RelayCommand]
+        private void BrowseFlashDrive()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Select Target Partition Root (choose any file on the drive to select it)",
+                Filter = "All Files (*.*)|*.*",
+                CheckFileExists = false
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                string filePath = dialog.FileName;
+                string? root = global::System.IO.Path.GetPathRoot(filePath);
+                if (!string.IsNullOrEmpty(root))
+                {
+                    TargetFlashDrive = root;
+                }
+            }
+        }
+
+        [RelayCommand]
+        private async Task FlashOSAsync()
+        {
+            if (string.IsNullOrEmpty(SelectedFilePath))
+            {
+                System.Windows.MessageBox.Show("Please load a Windows Image (.wim/.esd) first.", "Validation Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                return;
+            }
+
+            if (SelectedFlashImage == null)
+            {
+                System.Windows.MessageBox.Show("Please select an image edition to flash.", "Validation Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(TargetFlashDrive))
+            {
+                System.Windows.MessageBox.Show("Please specify a target drive letter (e.g. E:\\).", "Validation Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                return;
+            }
+
+            var result = System.Windows.MessageBox.Show(
+                $"WARNING: This will flash {SelectedFlashImage.Name} to target drive {TargetFlashDrive}.\n\nAll existing files on {TargetFlashDrive} will be overwritten. Are you sure you want to continue?",
+                "Confirm OS Flashing",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Warning);
+
+            if (result != System.Windows.MessageBoxResult.Yes) return;
+
+            int index = SelectedFlashImage.Index;
+            DismLogOutput = $"Starting Flash / Deployment of {SelectedFlashImage.Name} into target drive {TargetFlashDrive}...\n";
+
+            await ExecuteBusyActionAsync(async () =>
+            {
+                bool success = await _dismService.ApplyImageAsync(
+                    SelectedFilePath,
+                    index,
+                    TargetFlashDrive,
+                    (progressLine) =>
+                    {
+                        DismLogOutput += progressLine + "\n";
+                    }
+                );
+
+                if (success)
+                {
+                    _loggingService.Log($"DISM: Custom OS Image flashed successfully to {TargetFlashDrive}.");
+                    System.Windows.MessageBox.Show("Custom OS Image successfully flashed to the drive!", "Success", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                }
+                else
+                {
+                    _loggingService.Log($"DISM: Custom OS Image flashing failed for {TargetFlashDrive}.");
+                    System.Windows.MessageBox.Show("Custom OS Image flashing failed. Check log output.", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }, "Flashing Target Drive...");
         }
     }
 }

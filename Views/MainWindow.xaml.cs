@@ -199,7 +199,7 @@ namespace Eternal.Views
             this.Close();
         }
 
-        private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             if (_canClose || IsSwappingUI)
             {

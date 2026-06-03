@@ -151,5 +151,15 @@ namespace Eternal.Views.Helpers
         {
             System.Windows.Application.Current.Shutdown();
         }
+
+        private void SwitchUI_Click(object sender, RoutedEventArgs e)
+        {
+            var settings = _settingsService.Current;
+            settings.UseLegacyUI = !settings.UseLegacyUI;
+            _settingsService.Save();
+
+            string mode = settings.UseLegacyUI ? "LEGACY MODE" : "MODERN NEUMORPHIC MODE";
+            System.Windows.MessageBox.Show($"UI Mode switched to {mode}.\n\nThe changes will take effect after you unlock system or restart application.", "UI Mode Switched", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        }
     }
 }
