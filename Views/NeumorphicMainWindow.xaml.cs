@@ -18,7 +18,25 @@ namespace Eternal.Views
         public NeumorphicMainWindow()
         {
             InitializeComponent();
+            AdjustWindowSizeToWorkingArea();
             this.Loaded += NeumorphicMainWindow_Loaded;
+        }
+
+        private void AdjustWindowSizeToWorkingArea()
+        {
+            try
+            {
+                double workingWidth = SystemParameters.WorkArea.Width;
+                double workingHeight = SystemParameters.WorkArea.Height;
+
+                // Base design dimensions are 1300 x 800. If display working area is smaller due to resolution or DPI scaling:
+                if (workingWidth < 1350 || workingHeight < 850)
+                {
+                    this.Width = Math.Max(1024, workingWidth * 0.92);
+                    this.Height = Math.Max(700, workingHeight * 0.88);
+                }
+            }
+            catch { }
         }
 
         private async void NeumorphicMainWindow_Loaded(object sender, RoutedEventArgs e)
