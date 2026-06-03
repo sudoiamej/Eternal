@@ -35,6 +35,12 @@ namespace Eternal
                 // Optimize garbage collection for smooth, stutter-free UI animations
                 System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
 
+                // Disable hardware acceleration in WinPE environments to ensure stability with basic display drivers
+                if (Eternal.Helpers.OsHelper.IsWinPE())
+                {
+                    System.Windows.Media.RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
+                }
+
                 var serviceCollection = new ServiceCollection();
                 ConfigureServices(serviceCollection);
 

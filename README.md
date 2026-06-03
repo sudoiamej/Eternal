@@ -39,6 +39,9 @@ Forensic enumeration of BCD (Boot Configuration Data) records, revealing hardwar
 
 ### 🛠️ PE Mode Specialization
 Automatically detects **Windows PE** environments to provide a streamlined recovery UI, including **Offline Registry Mounting** and dynamic drive detection for systems where Windows is not on the C: drive.
+- **Safe Rendering Fallback:** Automatically forces software-only rendering (`RenderMode.SoftwareOnly`) to prevent UI startup crashes on barebones display drivers inside WinPE.
+- **Self-Contained Single-File Build:** Pre-configured to build as a standalone executable containing the .NET runtime so it can run immediately in any custom WinPE image.
+- **How to Publish for WinPE:** Run `dotnet publish -c Release -r win-x64 --self-contained true` to produce the ready-to-run binary.
 
 ## 🛠️ Technical Specs
 - **Framework:** .NET 10.0-windows

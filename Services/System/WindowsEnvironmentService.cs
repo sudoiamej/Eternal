@@ -23,8 +23,7 @@ namespace Eternal.Services.System
 
         public WindowsEnvironmentService()
         {
-            IsPeMode = global::System.IO.Directory.Exists(@"X:\Windows\System32") || 
-                       global::System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName.StartsWith("X:", StringComparison.OrdinalIgnoreCase) == true;
+            IsPeMode = Eternal.Helpers.OsHelper.IsWinPE();
             
             SystemDrive = IsPeMode ? "X:" : "C:";
         }

@@ -18,8 +18,8 @@
     <Description>System Intelligence and Diagnostics Suite</Description>
     
     <!-- Publish Configuration -->
-    <PublishSingleFile>false</PublishSingleFile>
-    <SelfContained>false</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
     <PublishTrimmed>false</PublishTrimmed>
     <DebugType>embedded</DebugType>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>

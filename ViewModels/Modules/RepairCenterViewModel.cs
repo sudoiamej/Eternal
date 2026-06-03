@@ -193,7 +193,7 @@ namespace Eternal.ViewModels.Modules
 
         private bool CheckIsPeMode()
         {
-            return System.IO.Directory.Exists(@"X:\Windows\System32");
+            return Eternal.Helpers.OsHelper.IsWinPE();
         }
     }
 }

@@ -91,7 +91,7 @@ namespace Eternal.Views
         {
             try
             {
-                bool isPeMode = System.IO.Directory.Exists(@"X:\Windows\System32");
+                bool isPeMode = Eternal.Helpers.OsHelper.IsWinPE();
                 if (isPeMode) return; // Disable glass in WinRE for stability
 
                 IntPtr hwnd = new WindowInteropHelper(this).Handle;

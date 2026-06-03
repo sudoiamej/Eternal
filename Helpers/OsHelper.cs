@@ -44,5 +44,35 @@ namespace Eternal.Helpers
         {
             return Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.Major >= 10;
         }
+
+        /// <summary>
+        /// Detects if the current system is running in a Windows PE / Recovery Environment.
+        /// </summary>
+        public static bool IsWinPE()
+        {
+            try
+            {
+                if (global::System.IO.Directory.Exists(@"X:\Windows\System32"))
+                {
+                    return true;
+                }
+
+                using (var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\MiniNT"))
+                {
+                    if (key != null) return true;
+                }
+
+                var currentProcess = global::System.Diagnostics.Process.GetCurrentProcess();
+                if (currentProcess.MainModule?.FileName.StartsWith("X:", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                // Fallback if registry or process access is restricted
+            }
+            return false;
+        }
     }
 }
