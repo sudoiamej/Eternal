@@ -181,7 +181,7 @@
                                                         <Trigger Property="IsMouseOver" Value="True">
                                                             <Setter Property="Opacity" Value="1.0"/>
                                                             <Setter Property="Effect">
-                                                                <Setter.Value><DropShadowEffect Color="White" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/></Setter.Value>
+                                                                <Setter.Value><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></Setter.Value>
                                                             </Setter>
                                                         </Trigger>
                                                         <DataTrigger Binding="{Binding DataContext.SelectedHistory, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static vm:HistoryType.Ram}">

@@ -61,6 +61,14 @@ namespace Eternal.Services.System
                     Description = "Emergency recovery tools.",
                     Content = "PE Mode tools are functional only when a native WinRE or PE environment is detected. It provides access to BCD Rebuild, SFC Offline, and Disk Check (Chkdsk) for repairing non-bootable systems.",
                     Icon = "Medkit"
+                },
+                new HelpArticle {
+                    Id = "Processes",
+                    Category = "Diagnostics",
+                    Title = "Process Intelligence",
+                    Description = "Real-time process telemetry.",
+                    Content = "The Process Intelligence module monitors active kernel threads, memory loads, and disk operations in real-time. Modeled after the Windows Task Manager, it exposes active PIDs, status responses, and exact hardware consumption per process. Select any row to inspect paths, evaluate live load graphs, or run high-privilege process termination tasks.",
+                    Icon = "Cube"
                 }
             };
         }

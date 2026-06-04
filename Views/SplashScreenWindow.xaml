@@ -63,7 +63,7 @@
                     <Border Width="160" Height="160" Background="#05050A" CornerRadius="80" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                         <Image Source="/Assets/logo.png" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <Image.Effect>
-                                <DropShadowEffect x:Name="LogoGlow" Color="{DynamicResource AccentColor}" BlurRadius="35" ShadowDepth="0" Opacity="0.8"/>
+                                <DropShadowEffect x:Name="LogoGlow" Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                             </Image.Effect>
                         </Image>
                     </Border>

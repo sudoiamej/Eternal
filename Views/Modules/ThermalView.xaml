@@ -11,7 +11,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- Header -->
                     <RowDefinition Height="Auto"/> <!-- Telemetry Grid -->
-                    <RowDefinition Height="Auto"/> <!-- Details -->
+                    <RowDefinition Height="Auto"/> <!-- Details (Environmental Analysis) -->
+                    <RowDefinition Height="Auto"/> <!-- Auxiliary/Other Sensors -->
                 </Grid.RowDefinitions>
 
                 <!-- 1. Header -->
@@ -29,8 +30,8 @@
                         <TextBlock Text="Thermal Intelligence" Style="{StaticResource H1}" Margin="0"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,5">
-                        <Button Command="{Binding LoadCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Rescan Sensors">
-                            <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <Button Command="{Binding LoadCommand}" IsEnabled="{Binding IsLoading, Converter={StaticResource InvertBooleanConverter}}" Style="{StaticResource IconButton}" ToolTip="Rescan Sensors">
+                            <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -42,7 +43,7 @@
                         <StackPanel>
                             <Grid Margin="0,0,0,15">
                                 <TextBlock Text="PROCESSOR TELEMETRY" Style="{StaticResource Caption}"/>
-                                <fa:ImageAwesome Icon="Microchip" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Right"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="Microchip" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Right"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             </Grid>
                             <Grid HorizontalAlignment="Center" Margin="0,10">
                                 <Ellipse Width="100" Height="100" Stroke="{DynamicResource BorderBrush}" StrokeThickness="6"/>
@@ -69,7 +70,7 @@
                         <StackPanel>
                             <Grid Margin="0,0,0,15">
                                 <TextBlock Text="GRAPHICS TELEMETRY" Style="{StaticResource Caption}"/>
-                                <fa:ImageAwesome Icon="Desktop" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Right"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="Desktop" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Right"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             </Grid>
                             <Grid HorizontalAlignment="Center" Margin="0,10">
                                 <Ellipse Width="100" Height="100" Stroke="{DynamicResource BorderBrush}" StrokeThickness="6"/>
@@ -98,14 +99,14 @@
                             <TextBlock Text="POWER ARCHITECTURE" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
                             
                             <StackPanel Visibility="{Binding Data.HasBattery, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
-                                <fa:ImageAwesome Icon="Plug" Width="32" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="Plug" Width="32" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                 <TextBlock Text="DIRECT AC POWER" FontSize="18" FontWeight="Bold"/>
                                 <TextBlock Text="Desktop configuration detected" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
 
                             <StackPanel Visibility="{Binding Data.HasBattery, Converter={StaticResource VisibilityConverter}}">
                                 <Grid Margin="0,0,0,10">
-                                    <fa:ImageAwesome Icon="BatteryFull" Width="32" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Left"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="BatteryFull" Width="32" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Left"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="{Binding Data.BatteryPercent, StringFormat='{}{0}%'}" FontSize="11" FontWeight="Bold" Margin="40,0,0,0" VerticalAlignment="Center"/>
                                 </Grid>
                                 <TextBlock Text="{Binding Data.PowerSource}" FontSize="18" FontWeight="Bold"/>
@@ -160,7 +161,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <fa:ImageAwesome Icon="LightbulbOutline" Width="24" Foreground="{DynamicResource InfoBrush}" VerticalAlignment="Top" Margin="0,2,20,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <fa:ImageAwesome Icon="LightbulbOutline" Width="24" Foreground="{DynamicResource InfoBrush}" VerticalAlignment="Top" Margin="0,2,20,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="ENVIRONMENTAL ANALYSIS" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
                             <TextBlock Text="{Binding ConclusionText}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="20"/>
@@ -168,10 +169,39 @@
                     </Grid>
                 </Border>
 
+                <!-- 4. Auxiliary/Future Devices & Other Sensors -->
+                <Border Grid.Row="3" Style="{StaticResource StandardCard}" Padding="25" Margin="0,20,0,0">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,15">
+                            <TextBlock Text="AUXILIARY DEVICE SENSORS" Style="{StaticResource Caption}"/>
+                            <fa:ImageAwesome Icon="Sliders" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Right"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        </Grid>
+                        
+                        <!-- Fallback / Empty message when no extra sensors are detected -->
+                        <TextBlock Text="No auxiliary thermal or hardware sensors detected." 
+                                   FontStyle="Italic"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontSize="13"
+                                   Visibility="{Binding HasOtherSensors, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" />
+
+                        <!-- List of auxiliary sensors -->
+                        <ItemsControl ItemsSource="{Binding Data.OtherSensors}"
+                                      Visibility="{Binding HasOtherSensors, Converter={StaticResource VisibilityConverter}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,10">
+                                        <TextBlock Text="{Binding}" Foreground="{DynamicResource TextBrush}" FontSize="13"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
                 <!-- Loading Overlay -->
-                <Border Grid.RowSpan="3" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}" Margin="-40">
+                <Border Grid.RowSpan="4" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}" Margin="-40">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
                         <TextBlock Text="Polling Thermal Sensors..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
                     </StackPanel>
                 </Border>
@@ -179,7 +209,5 @@
         </ScrollViewer>
     </Border>
 </UserControl>
-
-
 
 

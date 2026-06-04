@@ -23,7 +23,7 @@
 
                             <Button Grid.Column="1" Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
                                     CommandParameter="Help" Style="{StaticResource IconButton}" ToolTip="Open Knowledge Base" VerticalAlignment="Center">
-                                <fa:ImageAwesome Icon="QuestionCircleOutline" Width="12" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="QuestionCircleOutline" Width="12" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             </Button>
                         </Grid>
                     </StackPanel>
@@ -53,7 +53,7 @@
                                     Style="{StaticResource PrimaryAction}" Padding="25,12"
                                     ToolTip="Formal assessments may cause temporary screen flickering and heavy system load. Ensure all work is saved.">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Trophy" Width="14" Foreground="White" Margin="0,0,10,0" Spin="{Binding IsBusy}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Trophy" Width="14" Foreground="White" Margin="0,0,10,0" Spin="{Binding IsBusy}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="RUN NEW ASSESSMENT" FontWeight="Bold"/>
                                 </StackPanel>
                             </Button>

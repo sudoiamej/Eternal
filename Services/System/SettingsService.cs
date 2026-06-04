@@ -48,7 +48,34 @@ namespace Eternal.Services.System
                 if (File.Exists(_filePath))
                 {
                     string json = File.ReadAllText(_filePath);
-                    Current = JsonConvert.DeserializeObject<AppSettings>(json) ?? new AppSettings();
+                    var tempSettings = JsonConvert.DeserializeObject<AppSettings>(json, new JsonSerializerSettings
+                    {
+                        ObjectCreationHandling = ObjectCreationHandling.Replace
+                    });
+                    
+                    if (tempSettings == null || string.IsNullOrEmpty(tempSettings.AppVersion) || tempSettings.AppVersion != "3.0.0")
+                    {
+                        // Clean app data directory contents to avoid schema conflict
+                        string folder = Path.GetDirectoryName(_filePath);
+                        if (Directory.Exists(folder))
+                        {
+                            foreach (var file in Directory.GetFiles(folder))
+                            {
+                                try { File.Delete(file); } catch { }
+                            }
+                            foreach (var dir in Directory.GetDirectories(folder))
+                            {
+                                try { Directory.Delete(dir, true); } catch { }
+                            }
+                        }
+                        
+                        Current = new AppSettings();
+                        Current.AppVersion = "3.0.0";
+                        Save();
+                        return;
+                    }
+                    
+                    Current = tempSettings;
                     
                     // Seamless transition: Upgrade old default pin '1234' to the new user pin '072906'
                     if (Current.StartupLockPin == "1234")
@@ -57,10 +84,17 @@ namespace Eternal.Services.System
                         Save();
                     }
                 }
+                else
+                {
+                    Current = new AppSettings();
+                    Current.AppVersion = "3.0.0";
+                    Save();
+                }
             }
             catch 
             {
                 Current = new AppSettings();
+                Current.AppVersion = "3.0.0";
             }
         }
     }

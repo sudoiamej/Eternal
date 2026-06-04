@@ -49,7 +49,7 @@
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,40">
                 <Image Source="/Assets/logo.png" Width="90" Margin="0,0,0,25">
                     <Image.Effect>
-                        <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="30" ShadowDepth="0" Opacity="0.6"/>
+                        <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                     </Image.Effect>
                 </Image>
 

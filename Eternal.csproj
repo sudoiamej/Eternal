@@ -50,6 +50,13 @@
     <None Remove="Templated UI\**" />
     <Page Remove="Templated UI\**" />
     <ApplicationDefinition Remove="Templated UI\**" />
+
+    <Compile Remove="Views\LegacyMainWindow.xaml.cs" />
+    <Page Remove="Views\LegacyMainWindow.xaml" />
+    <Compile Remove="Views\MainWindow.xaml.cs" />
+    <Page Remove="Views\MainWindow.xaml" />
+    <Compile Remove="Views\SplashScreenWindow.xaml.cs" />
+    <Page Remove="Views\SplashScreenWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>

@@ -42,7 +42,7 @@
 
     <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1.5">
         <Border.Effect>
-            <DropShadowEffect Color="{DynamicResource NeuDarkShadowColor}" BlurRadius="30" ShadowDepth="5" Opacity="0.6"/>
+            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
         </Border.Effect>
         <Grid Margin="30">
             <Grid.RowDefinitions>
@@ -110,7 +110,7 @@
                             Style="{StaticResource PrimaryButton}" Click="Unlock_Click" VerticalAlignment="Center">
                         <fa:ImageAwesome Icon="ArrowRight" Width="14" Foreground="Black">
                             <fa:ImageAwesome.Effect>
-                                <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="0" Opacity="0.3"/>
+                                <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                             </fa:ImageAwesome.Effect>
                         </fa:ImageAwesome>
                     </Button>
@@ -139,12 +139,7 @@
 
             <!-- Bottom Actions -->
             <Grid Grid.Row="3" Width="360" HorizontalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="SWITCH UI MODE" Style="{StaticResource SecondaryButton}" Height="36" Margin="0,0,5,0" Click="SwitchUI_Click"/>
-                <Button Grid.Column="1" Content="EXIT APPLICATION" Style="{StaticResource SecondaryButton}" Height="36" Margin="5,0,0,0" Click="Exit_Click"/>
+                <Button Content="EXIT APPLICATION" Style="{StaticResource SecondaryButton}" Height="36" Width="180" Click="Exit_Click"/>
             </Grid>
         </Grid>
     </Border>

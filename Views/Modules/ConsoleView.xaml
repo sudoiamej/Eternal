@@ -36,10 +36,10 @@
                     
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
                         <Button Command="{Binding ClearConsoleCommand}" Style="{StaticResource IconButton}" ToolTip="Clear Active Buffer" Margin="0,0,10,0">
-                            <fa:ImageAwesome Icon="Trash" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <fa:ImageAwesome Icon="Trash" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </Button>
                         <Button Style="{StaticResource IconButton}" ToolTip="Terminal Settings">
-                            <fa:ImageAwesome Icon="Gear" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <fa:ImageAwesome Icon="Gear" Width="14" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -55,7 +55,7 @@
                                             CommandParameter="{Binding}"
                                             Style="{StaticResource IconButton}" Margin="0,0,0,10" HorizontalAlignment="Stretch" Padding="12" Background="#08FFFFFF">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                            <fa:ImageAwesome Icon="Terminal" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,12,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                            <fa:ImageAwesome Icon="Terminal" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,12,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                             <TextBlock Text="{Binding Name}" FontSize="12" Foreground="White" FontWeight="SemiBold"/>
                                         </StackPanel>
                                     </Button>
@@ -99,11 +99,11 @@
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
-                                                        <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                        <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                         <TextBlock Grid.Column="1" Text="{Binding Title}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                                         <Button Grid.Column="2" Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                                 CommandParameter="{Binding}" Style="{StaticResource IconButton}" Margin="10,0,0,0" Opacity="0.5">
-                                                            <fa:ImageAwesome Icon="Close" Width="8" Foreground="White"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                            <fa:ImageAwesome Icon="Close" Width="8" Foreground="White"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                         </Button>
                                                     </Grid>
                                                 </Border>
@@ -127,22 +127,22 @@
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5,0,0,0">
                             <Button Command="{Binding NewTabCommand}" CommandParameter="{Binding AvailableProfiles[0]}"
                                     Style="{StaticResource IconButton}" Padding="8,10" VerticalAlignment="Stretch" ToolTip="New Tab (PowerShell)">
-                                <fa:ImageAwesome Icon="Plus" Width="10" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="Plus" Width="10" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             </Button>
                             <Button x:Name="AddTabMenuButton" Click="AddTabMenuButton_Click"
                                     Style="{StaticResource IconButton}" Padding="4,10" VerticalAlignment="Stretch" ToolTip="Choose Profile">
                                 <fa:ImageAwesome Icon="ChevronDown" Width="8" Foreground="{DynamicResource TextDisabledBrush}"/>
                                 <Button.ContextMenu>
-                                    <ContextMenu x:Name="ProfileMenu" Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource BorderBrush}">
+                                    <ContextMenu x:Name="ProfileMenu" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}">
                                         <MenuItem Header="New PowerShell Session" Command="{Binding NewTabCommand}" CommandParameter="{Binding AvailableProfiles[0]}">
-                                            <MenuItem.Icon><fa:ImageAwesome Icon="Terminal" Width="12" Foreground="{StaticResource AccentBrush}"/></MenuItem.Icon>
+                                            <MenuItem.Icon><fa:ImageAwesome Icon="Terminal" Width="12" Foreground="{DynamicResource AccentBrush}"/></MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="New Command Prompt" Command="{Binding NewTabCommand}" CommandParameter="{Binding AvailableProfiles[1]}">
-                                            <MenuItem.Icon><fa:ImageAwesome Icon="Code" Width="12" Foreground="{StaticResource AccentBrush}"/></MenuItem.Icon>
+                                            <MenuItem.Icon><fa:ImageAwesome Icon="Code" Width="12" Foreground="{DynamicResource AccentBrush}"/></MenuItem.Icon>
                                         </MenuItem>
-                                        <Separator Background="{StaticResource BorderBrush}"/>
+                                        <Separator Background="{DynamicResource BorderBrush}"/>
                                         <MenuItem Header="Command Reference" Click="CommandReference_Click">
-                                            <MenuItem.Icon><fa:ImageAwesome Icon="Book" Width="12" Foreground="{StaticResource InfoBrush}"/></MenuItem.Icon>
+                                            <MenuItem.Icon><fa:ImageAwesome Icon="Book" Width="12" Foreground="{DynamicResource InfoBrush}"/></MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>
                                 </Button.ContextMenu>
@@ -200,7 +200,7 @@
                                             <!-- Loading Spinner for Session Start -->
                                             <Border Background="#CC000000" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
                                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                    <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="32" Margin="0,0,0,15"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                    <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="32" Margin="0,0,0,15"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                     <TextBlock Text="Initializing Secure Shell..." Foreground="White" FontSize="12" FontWeight="Bold"/>
                                                 </StackPanel>
                                             </Border>
@@ -212,7 +212,7 @@
                             <!-- Empty State -->
                             <Border Visibility="{Binding SelectedSession, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Background="#0F0F0F">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.5">
-                                    <fa:ImageAwesome Icon="Terminal" Width="48" Foreground="{DynamicResource TextDisabledBrush}" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Terminal" Width="48" Foreground="{DynamicResource TextDisabledBrush}" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="No Active Terminal Sessions" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
                                     <TextBlock Text="Click the '+' button to open a new PowerShell or CMD tab." Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,0"/>
                                 </StackPanel>

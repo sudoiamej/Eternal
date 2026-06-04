@@ -120,9 +120,6 @@ namespace Eternal.ViewModels.Modules
                 }
 
                 TotalProcessCount = result.RawCount;
-
-                // Force CollectionView to refresh to maintain active sorting/grouping in the UI
-                System.Windows.Data.CollectionViewSource.GetDefaultView(FlatProcesses)?.Refresh();
             });
         }
         private async Task KillProcess(ProcessDetail? process)

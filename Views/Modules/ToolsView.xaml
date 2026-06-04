@@ -25,7 +25,7 @@
                         <Button Command="{Binding FlushDnsCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Globe" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Globe" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
                                         <TextBlock Text="Flush DNS Cache" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                         <TextBlock Text="Clears system DNS resolver records." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -37,7 +37,7 @@
                         <Button Command="{Binding ClearTempCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="TrashOutline" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="TrashOutline" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
                                         <TextBlock Text="Clear Temp Files" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                         <TextBlock Text="Deletes files in the system temp directory." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -49,7 +49,7 @@
                         <Button Command="{Binding RebuildIconsCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Refresh" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Refresh" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource AccentBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
                                         <TextBlock Text="Rebuild Icon Cache" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                         <TextBlock Text="Forces Windows to reload explorer icons." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -61,7 +61,7 @@
                         <Button Command="{Binding ClearEventLogsCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="List" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource WarningBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="List" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource WarningBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
                                         <TextBlock Text="Clear Event Logs" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                         <TextBlock Text="Purge all Windows event logs." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -76,7 +76,7 @@
                         <Button Command="{Binding RepairSystemFilesCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0" BorderBrush="{DynamicResource InfoBrush}">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Shield" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource InfoBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Shield" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource InfoBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
                                         <TextBlock Text="SFC Scan &amp; Repair" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                         <TextBlock Text="Repairs corrupted system files (Admin)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -88,7 +88,7 @@
                         <Button Command="{Binding RunDismCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0" BorderBrush="{DynamicResource InfoBrush}">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Magic" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource InfoBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Magic" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource InfoBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
                                         <TextBlock Text="DISM Health Restore" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                         <TextBlock Text="Repairs Windows Component Store (Admin)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -100,7 +100,7 @@
                         <Button Command="{Binding ResetWindowsUpdateCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0" BorderBrush="{DynamicResource InfoBrush}">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Download" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource InfoBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Download" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource InfoBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
                                         <TextBlock Text="Reset Windows Update" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                         <TextBlock Text="Fixes stuck or broken update services." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -112,7 +112,7 @@
                         <Button Command="{Binding ResetNetworkCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0" BorderBrush="{DynamicResource CriticalBrush}">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Wifi" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource CriticalBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Wifi" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource CriticalBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
                                         <TextBlock Text="Reset Network Stack" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                         <TextBlock Text="Reinitializes Winsock and IP stack." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -127,7 +127,7 @@
                         <Button Command="{Binding OptimizeBootCommand}" Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5">
                             <Border Style="{StaticResource StandardCard}" Margin="0" BorderBrush="{DynamicResource SuccessBrush}">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Bolt" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource SuccessBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Bolt" Width="20" Margin="0,0,15,0" Foreground="{DynamicResource SuccessBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel>
                                         <TextBlock Text="Optimize Boot Performance" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                         <TextBlock Text="Realigns boot files for faster startup." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>

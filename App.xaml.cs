@@ -66,33 +66,22 @@ namespace Eternal
                 };
 
                 // Resolve Settings to determine startup path
-                var settings = ServiceProvider.GetRequiredService<ISettingsService>();
-
-                if (settings.Current.UseLegacyUI)
+                // Modern Path: Direct launch into Neumorphic MainWindow (with internal Car Startup)
+                
+                // 1. Compatibility Check
+                if (!IsSystemCompatible())
                 {
-                    // Legacy Path: External Splash Screen
-                    var splashScreen = new Views.SplashScreenWindow();
-                    splashScreen.Show();
+                    var incompatibilityWindow = new Views.IncompatibilityWindow();
+                    incompatibilityWindow.Show();
+                    return;
                 }
-                else
-                {
-                    // Modern Path: Direct launch into Neumorphic MainWindow (with internal Car Startup)
-                    
-                    // 1. Compatibility Check
-                    if (!IsSystemCompatible())
-                    {
-                        var incompatibilityWindow = new Views.IncompatibilityWindow();
-                        incompatibilityWindow.Show();
-                        return;
-                    }
 
-                    var mainVm = ServiceProvider.GetRequiredService<MainViewModel>();
-                    var mainWindow = new Views.NeumorphicMainWindow();
-                    mainWindow.DataContext = mainVm;
-                    
-                    System.Windows.Application.Current.MainWindow = mainWindow;
-                    mainWindow.Show();
-                }
+                var mainVm = ServiceProvider.GetRequiredService<MainViewModel>();
+                var mainWindow = new Views.NeumorphicMainWindow();
+                mainWindow.DataContext = mainVm;
+                
+                System.Windows.Application.Current.MainWindow = mainWindow;
+                mainWindow.Show();
             }
             catch (Exception ex)
             {

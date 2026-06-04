@@ -49,7 +49,7 @@
                     </StackPanel>
                     <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,5">
                         <Button Command="{Binding LoadCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Query Firmware Info">
-                            <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -61,7 +61,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <fa:ImageAwesome Icon="InfoCircle" Width="32" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top" Margin="0,5,30,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <fa:ImageAwesome Icon="InfoCircle" Width="32" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top" Margin="0,5,30,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="FIRMWARE IDENTITY" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
                             <Grid>
@@ -98,10 +98,10 @@
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="FIRMWARE MODE" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,10,0" Visibility="{Binding Uefi.IsUefi, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,10,0" Visibility="{Binding Uefi.IsUefi, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="UEFI (Modern)" FontSize="20" FontWeight="Bold" Visibility="{Binding Uefi.IsUefi, Converter={StaticResource VisibilityConverter}}"/>
                                     
-                                    <fa:ImageAwesome Icon="ExclamationTriangle" Width="16" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center" Margin="0,0,10,0" Visibility="{Binding Uefi.IsUefi, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="ExclamationTriangle" Width="16" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center" Margin="0,0,10,0" Visibility="{Binding Uefi.IsUefi, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="Legacy (BIOS)" FontSize="20" FontWeight="Bold" Visibility="{Binding Uefi.IsUefi, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
                                 </StackPanel>
                                 <TextBlock Text="Ensures modern hardware interface features." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,5,0,0"/>
@@ -112,10 +112,10 @@
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="SECURE BOOT" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Shield" Width="16" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,10,0" Visibility="{Binding Uefi.SecureBootEnabled, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Shield" Width="16" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,10,0" Visibility="{Binding Uefi.SecureBootEnabled, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="ENABLED" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" Visibility="{Binding Uefi.SecureBootEnabled, Converter={StaticResource VisibilityConverter}}"/>
                                     
-                                    <fa:ImageAwesome Icon="Shield" Width="16" Foreground="{DynamicResource CriticalBrush}" VerticalAlignment="Center" Margin="0,0,10,0" Visibility="{Binding Uefi.SecureBootEnabled, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Shield" Width="16" Foreground="{DynamicResource CriticalBrush}" VerticalAlignment="Center" Margin="0,0,10,0" Visibility="{Binding Uefi.SecureBootEnabled, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="DISABLED" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource CriticalBrush}" Visibility="{Binding Uefi.SecureBootEnabled, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
                                 </StackPanel>
                                 <TextBlock Text="Protects boot process from unauthorized code." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,5,0,0"/>
@@ -129,7 +129,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <fa:ImageAwesome Icon="Lock" Width="32" Foreground="{DynamicResource InfoBrush}" VerticalAlignment="Top" Margin="0,5,30,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <fa:ImageAwesome Icon="Lock" Width="32" Foreground="{DynamicResource InfoBrush}" VerticalAlignment="Top" Margin="0,5,30,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             <StackPanel Grid.Column="1">
                                 <TextBlock Text="TPM (TRUSTED PLATFORM MODULE) DETAILS" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
                                 
@@ -167,7 +167,7 @@
                 <!-- Loading Overlay (HCI Rule 7: Status) -->
                 <Border Grid.RowSpan="3" Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}" Margin="-40">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <TextBlock Text="Auditing Firmware Foundation..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
                     </StackPanel>
                 </Border>

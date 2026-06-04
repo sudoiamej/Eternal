@@ -148,7 +148,8 @@ namespace Eternal.Models
 
     public class AppSettings
     {
-        public bool UseLegacyUI { get; set; } = false;
+        public string AppVersion { get; set; } = "3.0.0";
+        public bool UseLegacyUI { get => false; set { } }
         public bool UseNeumorphicUI { get; set; } = true;
         public string NewUiGradiency { get; set; } = "Deep Space";
         public string Theme { get; set; } = "Dark";

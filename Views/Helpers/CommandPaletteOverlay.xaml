@@ -10,7 +10,7 @@
                 Background="#151515" CornerRadius="12"
                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
             <Border.Effect>
-                <DropShadowEffect BlurRadius="40" Direction="0" ShadowDepth="0" Opacity="0.6" Color="Black"/>
+                <DropShadowEffect BlurRadius="0" Direction="0" ShadowDepth="0" Opacity="0" Color="Transparent"/>
             </Border.Effect>
             <Grid Margin="15">
                 <Grid.RowDefinitions>

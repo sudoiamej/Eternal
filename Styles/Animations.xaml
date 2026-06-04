@@ -37,7 +37,7 @@
 
     <!-- 4. Premium Branding Breath -->
     <Storyboard x:Key="LogoBreathingAnim" RepeatBehavior="Forever" AutoReverse="True">
-        <DoubleAnimation Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.Opacity)" From="0.2" To="0.8" Duration="0:0:2">
+        <DoubleAnimation Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.Opacity)" From="0" To="0" Duration="0:0:2">
             <DoubleAnimation.EasingFunction>
                 <QuadraticEase EasingMode="EaseInOut"/>
             </DoubleAnimation.EasingFunction>

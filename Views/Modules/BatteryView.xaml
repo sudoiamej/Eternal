@@ -58,7 +58,7 @@
                                        StrokeThickness="20" Width="280" Height="280">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock Text="{Binding Battery.ChargeLevel, StringFormat='{}{0}%'}" FontSize="72" FontWeight="Black" Foreground="White">
-                                <TextBlock.Effect><DropShadowEffect BlurRadius="20" Opacity="0.5"/></TextBlock.Effect>
+                                <TextBlock.Effect><DropShadowEffect BlurRadius="0" Opacity="0"/></TextBlock.Effect>
                             </TextBlock>
                             <TextBlock Text="{Binding Battery.ChargingState}" FontSize="10" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" Margin="0,-5,0,0" Opacity="0.8"/>
                         </StackPanel>

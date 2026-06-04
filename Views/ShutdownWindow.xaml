@@ -52,7 +52,7 @@
                 <Grid Margin="0,0,0,30">
                     <Image Source="/Assets/logo.png" Width="90" Height="90">
                         <Image.Effect>
-                            <DropShadowEffect Color="{DynamicResource CriticalColor}" BlurRadius="50" ShadowDepth="0" Opacity="0.5"/>
+                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                         </Image.Effect>
                     </Image>
                     <!-- Pulse Glow behind logo -->
@@ -75,7 +75,7 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="ETERNAL" FontSize="42" FontWeight="Black" Foreground="White">
                         <TextBlock.Effect>
-                            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Color="Black" Opacity="0.5"/>
+                            <DropShadowEffect BlurRadius="0" ShadowDepth="0" Color="Transparent" Opacity="0"/>
                         </TextBlock.Effect>
                     </TextBlock>
                     <Border Background="{DynamicResource CriticalBrush}" CornerRadius="6" VerticalAlignment="Top" Margin="15,8,0,0" Padding="10,3" BorderBrush="#40FFFFFF" BorderThickness="1">

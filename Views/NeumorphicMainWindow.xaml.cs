@@ -18,22 +18,46 @@ namespace Eternal.Views
         public NeumorphicMainWindow()
         {
             InitializeComponent();
-            AdjustWindowSizeToWorkingArea();
             this.Loaded += NeumorphicMainWindow_Loaded;
+            this.DpiChanged += (s, e) => ApplyDpiScaling();
         }
 
-        private void AdjustWindowSizeToWorkingArea()
+        private void ApplyDpiScaling()
         {
             try
             {
+                double dpiScale = 1.0;
+                var source = PresentationSource.FromVisual(this);
+                if (source != null && source.CompositionTarget != null)
+                {
+                    dpiScale = source.CompositionTarget.TransformToDevice.M11;
+                }
+                else
+                {
+                    var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(this);
+                    dpiScale = dpi.DpiScaleX;
+                }
+
+                // Base design dimensions are 1300 x 800 physical pixels
+                double targetWidth = 1300 / dpiScale;
+                double targetHeight = 800 / dpiScale;
+
+                // Make sure we fit within the screen work area
                 double workingWidth = SystemParameters.WorkArea.Width;
                 double workingHeight = SystemParameters.WorkArea.Height;
 
-                // Base design dimensions are 1300 x 800. If display working area is smaller due to resolution or DPI scaling:
-                if (workingWidth < 1350 || workingHeight < 850)
+                if (targetWidth > workingWidth || targetHeight > workingHeight)
                 {
-                    this.Width = Math.Max(1024, workingWidth * 0.92);
-                    this.Height = Math.Max(700, workingHeight * 0.88);
+                    double ratioX = workingWidth / targetWidth;
+                    double ratioY = workingHeight / targetHeight;
+                    double scale = Math.Min(ratioX, ratioY) * 0.95;
+                    this.Width = targetWidth * scale;
+                    this.Height = targetHeight * scale;
+                }
+                else
+                {
+                    this.Width = targetWidth;
+                    this.Height = targetHeight;
                 }
             }
             catch { }
@@ -41,6 +65,7 @@ namespace Eternal.Views
 
         private async void NeumorphicMainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            ApplyDpiScaling();
             // Perform Security/Anti-Debug Audit
             if (Eternal.Helpers.AntiDebugHelper.IsDebuggerDetected())
             {
@@ -143,6 +168,22 @@ namespace Eternal.Views
             ignitionAnim?.Begin(this);
 
             // 2. Run Preloading in the background to prevent WMI/hardware queries from stuttering the UI thread
+            StartupStatusText.Text = "PURGING OLD DATA & CACHES...";
+            try
+            {
+                // Delete old log files from analytics folders to free up disk space and avoid memory lag
+                string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string logFolder = System.IO.Path.Combine(appData, "EternalAnalytics", "Logs");
+                if (System.IO.Directory.Exists(logFolder))
+                {
+                    foreach (var file in System.IO.Directory.GetFiles(logFolder))
+                    {
+                        try { System.IO.File.Delete(file); } catch { }
+                    }
+                }
+            }
+            catch { }
+
             StartupStatusText.Text = "LOADING CORE TELEMETRY...";
             _ = Task.Run(async () => await mainVm.PreloadAllDataAsync());
             
@@ -507,6 +548,19 @@ namespace Eternal.Views
                 }
             }
             e.Handled = true;
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var vm = this.DataContext as MainViewModel;
+            if (vm != null)
+            {
+                // Base design dimensions are 1300 x 800
+                double scaleX = e.NewSize.Width / 1300.0;
+                double scaleY = e.NewSize.Height / 800.0;
+                double targetScale = Math.Min(scaleX, scaleY);
+                vm.DisplayScale = Math.Max(0.5, Math.Min(2.0, targetScale));
+            }
         }
     }
 }

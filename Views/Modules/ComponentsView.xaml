@@ -60,7 +60,7 @@
                 <Border Grid.Row="0" Style="{StaticResource StandardCard}" Margin="0,0,0,20">
                     <Grid>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             <TextBlock Text="Tracking Accuracy Test: Move or touch the canvas to plot input data. Use the clear button to reset." VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
                         </StackPanel>
                         <Button Content="Clear Canvas" HorizontalAlignment="Right" Style="{StaticResource SecondaryButton}" Click="ClearCanvas_Click"/>
@@ -136,7 +136,7 @@
         <DataTemplate x:Key="SpeakersTemplate">
             <Border Style="{StaticResource StandardCard}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400">
                 <StackPanel HorizontalAlignment="Center">
-                    <fa:ImageAwesome Icon="VolumeUp" Width="64" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,30"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                    <fa:ImageAwesome Icon="VolumeUp" Width="64" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,30"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     <TextBlock Text="AUDIO CHANNEL TEST" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
                     <TextBlock Text="Verify speakers or headphones output clean audio signal." Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,30"/>
                     <Button Command="{Binding PlayTestSoundCommand}" Style="{StaticResource PrimaryButton}" Content="Play Test Tone" Width="200"/>
@@ -148,7 +148,7 @@
         <DataTemplate x:Key="MonitorTemplate">
             <Border Style="{StaticResource StandardCard}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="450">
                 <StackPanel HorizontalAlignment="Center">
-                    <fa:ImageAwesome Icon="Television" Width="64" Foreground="{DynamicResource InfoBrush}" Margin="0,0,0,30"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                    <fa:ImageAwesome Icon="Television" Width="64" Foreground="{DynamicResource InfoBrush}" Margin="0,0,0,30"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     <TextBlock Text="COLOR INTEGRITY TEST" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
                     <TextBlock Text="Detect dead pixels or backlight bleed by cycling through solid colors (RGBW+K)." 
                                Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,30" TextWrapping="Wrap"/>
@@ -168,7 +168,7 @@
 
                 <Border Grid.Row="0" Style="{StaticResource StandardCard}" Margin="0,0,0,20">
                     <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="Usb" Width="16" Foreground="{DynamicResource WarningBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <fa:ImageAwesome Icon="Usb" Width="16" Foreground="{DynamicResource WarningBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <TextBlock Text="USB EVENT TRACKER: Monitoring bus changes in real-time. Connect/Disconnect devices to verify ports." 
                                    VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     </StackPanel>

@@ -67,7 +67,7 @@ namespace Eternal.ViewModels
         [ObservableProperty] private string _batteryPercentage = "100%";
         [ObservableProperty] private bool _isPeMode = false;
         [ObservableProperty] private double _displayScale = 1.0;
-        [ObservableProperty] private bool _isUiToggleVisible = true;
+        [ObservableProperty] private bool _isUiToggleVisible = false;
 
         [ObservableProperty] private ObservableCollection<NavigationItem> _systemItems;
         [ObservableProperty] private ObservableCollection<NavigationItem> _telemetryItems;
@@ -139,7 +139,7 @@ namespace Eternal.ViewModels
         public void InitializeNavigation()
         {
             var disabled = Settings.DisabledFeatures;
-            IsUiToggleVisible = !disabled.Contains("UiToggle");
+            IsUiToggleVisible = false;
 
             // Upgrade old default pinned features to clean high-level CarPlay categories
             if (Settings.PinnedFeatures.Count == 3 && 
@@ -303,39 +303,7 @@ namespace Eternal.ViewModels
         [RelayCommand]
         private void ToggleUI()
         {
-            var currentWindow = System.Windows.Application.Current.MainWindow;
-            if (currentWindow == null) return;
-
-            System.Windows.Window newWindow;
-            if (currentWindow is LegacyMainWindow)
-            {
-                newWindow = new NeumorphicMainWindow();
-            }
-            else
-            {
-                newWindow = new LegacyMainWindow();
-            }
-
-            newWindow.DataContext = this;
-            System.Windows.Application.Current.MainWindow = newWindow;
-            newWindow.Show();
-
-            if (currentWindow is NeumorphicMainWindow mw) 
-            {
-                Settings.UseLegacyUI = true;
-            }
-            else if (currentWindow is LegacyMainWindow lmw) 
-            {
-                lmw.IsSwappingUI = true;
-                Settings.UseLegacyUI = false;
-            }
-
-            _settingsService.Save();
-            
-            // Navigate to the appropriate starting view for the new UI mode
-            _ = Navigate(Settings.UseLegacyUI ? "Dashboard" : "Home");
-            
-            currentWindow.Close();
+            System.Windows.MessageBox.Show("Legacy UI is permanently disabled.", "Interface Disabled", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
         }
 
         [RelayCommand]
@@ -640,6 +608,9 @@ namespace Eternal.ViewModels
             if (CurrentView != null)
             {
                 CurrentView.Deactivate();
+                CurrentView.ReleaseMemory();
+                // Perform lightweight collection to immediately free resources of closed views
+                GC.Collect(1, GCCollectionMode.Optimized, false);
             }
 
             UpdateNavigationSelection(viewName);

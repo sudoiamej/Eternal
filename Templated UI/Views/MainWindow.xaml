@@ -128,14 +128,14 @@
                                                     <Trigger Property="IsMouseOver" Value="True">
                                                         <Setter Property="Effect">
                                                             <Setter.Value>
-                                                                <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="20" ShadowDepth="0" Opacity="0.8"/>
+                                                                <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                                             </Setter.Value>
                                                         </Setter>
                                                     </Trigger>
                                                     <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
                                                         <Setter Property="Effect">
                                                             <Setter.Value>
-                                                                <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="25" ShadowDepth="0" Opacity="1.0"/>
+                                                                <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                                             </Setter.Value>
                                                         </Setter>
                                                     </DataTrigger>
@@ -195,7 +195,7 @@
                     Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0"
                     Width="0" HorizontalAlignment="Left">
                 <Border.Effect>
-                    <DropShadowEffect BlurRadius="30" Direction="0" ShadowDepth="0" Opacity="0.5" Color="Black"/>
+                    <DropShadowEffect BlurRadius="0" Direction="0" ShadowDepth="0" Opacity="0" Color="Transparent"/>
                 </Border.Effect>
                 <Border.Style>
                     <Style TargetType="Border">
@@ -346,7 +346,7 @@
 
                                             <Border x:Name="ActiveMark" Style="{StaticResource ActiveMarker}" Margin="0,0,0,0">
                                                 <Border.Effect>
-                                                    <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
+                                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                                 </Border.Effect>
                                             </Border>
 

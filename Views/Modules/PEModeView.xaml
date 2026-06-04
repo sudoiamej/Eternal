@@ -26,7 +26,7 @@
                         </Grid.ColumnDefinitions>
                         
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Medkit" Width="24" Foreground="{DynamicResource CriticalBrush}" VerticalAlignment="Center" Margin="0,0,15,8"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <fa:ImageAwesome Icon="Medkit" Width="24" Foreground="{DynamicResource CriticalBrush}" VerticalAlignment="Center" Margin="0,0,15,8"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             <TextBlock Text="PE Mode Diagnostics" Style="{StaticResource H1}" Margin="0"/>
                         </StackPanel>
 
@@ -69,7 +69,7 @@
                                 </TextBlock>
                                 <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
                                         CommandParameter="Help" Style="{StaticResource IconButton}" ToolTip="Open Knowledge Base" Margin="15,0,0,0" VerticalAlignment="Center">
-                                    <fa:ImageAwesome Icon="QuestionCircleOutline" Width="10" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="QuestionCircleOutline" Width="10" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                 </Button>
                             </StackPanel>
                         </Border>
@@ -89,7 +89,7 @@
                             <StackPanel>
                                 <Grid Margin="0,0,0,20">
                                     <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="HddOutline" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <fa:ImageAwesome Icon="HddOutline" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <TextBlock Text="System Drive Health" FontSize="15" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding SystemDriveStatus}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Right"/>
@@ -97,7 +97,7 @@
 
                                 <Grid Margin="0,0,0,20">
                                     <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="List" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <fa:ImageAwesome Icon="List" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <TextBlock Text="Boot Records (BCD)" FontSize="15" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding BootRecordStatus}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Right"/>
@@ -105,7 +105,7 @@
 
                                 <Grid>
                                     <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Microchip" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <fa:ImageAwesome Icon="Microchip" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <TextBlock Text="Memory Allocation" FontSize="15" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding MemoryStatus}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Right"/>
@@ -135,7 +135,7 @@
                                         Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalContentAlignment="Left" Padding="15" Margin="0,0,0,12" Background="#0AFFFFFF">
                                     <Grid>
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                        <fa:ImageAwesome Grid.Column="0" Icon="Wrench" Width="16" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,15,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <fa:ImageAwesome Grid.Column="0" Icon="Wrench" Width="16" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,15,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <StackPanel Grid.Column="1">
                                             <TextBlock Text="Rebuild Boot Config (BCD)" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                             <TextBlock Text="Fix missing or corrupt boot files." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -147,7 +147,7 @@
                                         Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalContentAlignment="Left" Padding="15" Margin="0,0,0,12" Background="#0AFFFFFF">
                                     <Grid>
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                        <fa:ImageAwesome Grid.Column="0" Icon="Search" Width="16" Foreground="{DynamicResource WarningBrush}" Margin="0,0,15,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <fa:ImageAwesome Grid.Column="0" Icon="Search" Width="16" Foreground="{DynamicResource WarningBrush}" Margin="0,0,15,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <StackPanel Grid.Column="1">
                                             <TextBlock Text="System File Checker" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                             <TextBlock Text="Repair corrupt Windows system files." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -159,7 +159,7 @@
                                         Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalContentAlignment="Left" Padding="15" Background="#0AFFFFFF">
                                     <Grid>
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                        <fa:ImageAwesome Grid.Column="0" Icon="HddOutline" Width="16" Foreground="{DynamicResource InfoBrush}" Margin="0,0,15,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <fa:ImageAwesome Grid.Column="0" Icon="HddOutline" Width="16" Foreground="{DynamicResource InfoBrush}" Margin="0,0,15,0" VerticalAlignment="Center"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <StackPanel Grid.Column="1">
                                             <TextBlock Text="Check Disk (Chkdsk)" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                             <TextBlock Text="Scan and repair filesystem errors." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>

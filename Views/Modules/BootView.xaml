@@ -27,7 +27,7 @@
                     <TextBlock Text="Boot Records" Style="{StaticResource H1}" Margin="0"/>
                 </StackPanel>
                 <Button Grid.Column="1" Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                    <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                    <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                 </Button>
             </Grid>
 
@@ -54,10 +54,10 @@
                                         <!-- Indicator Icon -->
                                         <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20" Background="#10FFFFFF" Margin="0,0,20,0" VerticalAlignment="Top">
                                             <Grid>
-                                                <fa:ImageAwesome Icon="ExternalLink" Width="16" Foreground="{DynamicResource InfoBrush}" Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                                <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{DynamicResource SuccessBrush}" Visibility="{Binding IsCurrent, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                <fa:ImageAwesome Icon="ExternalLink" Width="16" Foreground="{DynamicResource InfoBrush}" Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                <fa:ImageAwesome Icon="CheckCircle" Width="16" Foreground="{DynamicResource SuccessBrush}" Visibility="{Binding IsCurrent, Converter={StaticResource VisibilityConverter}}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                 <fa:ImageAwesome Icon="HddOutline" Width="16" Foreground="{DynamicResource TextSecondaryBrush}" 
-                                                               Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                               Visibility="{Binding IsBootManager, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                             </Grid>
                                         </Border>
 

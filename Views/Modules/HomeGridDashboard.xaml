@@ -36,7 +36,7 @@
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource DiagnosticsPlateBrush}">
                         <Border.Effect>
-                            <DropShadowEffect Color="{DynamicResource DiagnosticsPlateColor}" BlurRadius="12" ShadowDepth="0" Opacity="0.4"/>
+                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                         </Border.Effect>
                         <fa:ImageAwesome Icon="Search" Width="24" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Border>
@@ -62,7 +62,7 @@
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource TuningPlateBrush}">
                         <Border.Effect>
-                            <DropShadowEffect Color="{DynamicResource TuningPlateColor}" BlurRadius="12" ShadowDepth="0" Opacity="0.4"/>
+                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                         </Border.Effect>
                         <fa:ImageAwesome Icon="Wrench" Width="24" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Border>
@@ -88,7 +88,7 @@
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource MonitoringPlateBrush}">
                         <Border.Effect>
-                            <DropShadowEffect Color="{DynamicResource MonitoringPlateColor}" BlurRadius="12" ShadowDepth="0" Opacity="0.4"/>
+                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                         </Border.Effect>
                         <fa:ImageAwesome Icon="LineChart" Width="24" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Border>
@@ -114,7 +114,7 @@
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource SupportPlateBrush}">
                         <Border.Effect>
-                            <DropShadowEffect Color="{DynamicResource SupportPlateColor}" BlurRadius="12" ShadowDepth="0" Opacity="0.4"/>
+                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                         </Border.Effect>
                         <fa:ImageAwesome Icon="LifeRing" Width="24" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Border>

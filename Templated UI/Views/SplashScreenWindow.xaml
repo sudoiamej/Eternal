@@ -49,14 +49,14 @@
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,40">
                 <Image Source="/Assets/logo.png" Width="90" Margin="0,0,0,25">
                     <Image.Effect>
-                        <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="30" ShadowDepth="0" Opacity="0.6"/>
+                        <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                     </Image.Effect>
                 </Image>
                 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="ETERNAL" FontSize="42" FontWeight="Black" Foreground="White">
                         <TextBlock.Effect>
-                            <DropShadowEffect BlurRadius="10" ShadowDepth="0" Color="Black" Opacity="0.5"/>
+                            <DropShadowEffect BlurRadius="0" ShadowDepth="0" Color="Transparent" Opacity="0"/>
                         </TextBlock.Effect>
                     </TextBlock>
                     <Border Background="#9B59B6" CornerRadius="4" VerticalAlignment="Top" Margin="12,8,0,0" Padding="8,2" BorderBrush="#33FFFFFF" BorderThickness="1">

@@ -21,6 +21,36 @@ namespace Eternal.Helpers
             int processInformationLength,
             out int returnLength);
 
+        [StructLayout(LayoutKind.Sequential)]
+        private struct PROCESS_BASIC_INFORMATION
+        {
+            public IntPtr Reserved1;
+            public IntPtr PebBaseAddress;
+            public IntPtr Reserved2_0;
+            public IntPtr Reserved2_1;
+            public IntPtr UniqueProcessId;
+            public IntPtr InheritedFromUniqueProcessId;
+        }
+
+        [DllImport("ntdll.dll", EntryPoint = "NtQueryInformationProcess", SetLastError = true)]
+        private static extern int NtQueryInformationProcessBasic(
+            IntPtr processHandle,
+            int processInformationClass,
+            ref PROCESS_BASIC_INFORMATION processInformation,
+            int processInformationLength,
+            out int returnLength);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr OpenProcess(uint processAccess, bool bInheritHandle, int processId);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, System.Text.StringBuilder lpExeName, ref uint lpdwSize);
+
+        private const uint PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
+
         /// <summary>
         /// Detects if the application is running inside a Visual Studio debugging/host context.
         /// </summary>
@@ -35,19 +65,42 @@ namespace Eternal.Helpers
             bool parentIsVs = false;
             try
             {
-                int myPid = Process.GetCurrentProcess().Id;
-                using var searcher = new ManagementObjectSearcher($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myPid}");
-                using var collection = searcher.Get();
-                foreach (ManagementObject obj in collection)
-                {
-                    int parentPid = Convert.ToInt32(obj["ParentProcessId"]);
-                    using var parentProc = Process.GetProcessById(parentPid);
-                    string parentName = parentProc.ProcessName.ToLower();
+                var pbi = new PROCESS_BASIC_INFORMATION();
+                int size = Marshal.SizeOf(typeof(PROCESS_BASIC_INFORMATION));
+                int status = NtQueryInformationProcessBasic(
+                    Process.GetCurrentProcess().Handle,
+                    0, // ProcessBasicInformation
+                    ref pbi,
+                    size,
+                    out _);
 
-                    if (parentName.Contains("devenv") || parentName.Contains("msbuild") || parentName.Contains("dotnet"))
+                if (status == 0)
+                {
+                    int parentPid = pbi.InheritedFromUniqueProcessId.ToInt32();
+                    if (parentPid > 0)
                     {
-                        parentIsVs = true;
-                        break;
+                        IntPtr hParent = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, parentPid);
+                        if (hParent != IntPtr.Zero)
+                        {
+                            try
+                            {
+                                uint pathSize = 1024;
+                                var sb = new System.Text.StringBuilder((int)pathSize);
+                                if (QueryFullProcessImageName(hParent, 0, sb, ref pathSize))
+                                {
+                                    string parentPath = sb.ToString().ToLower();
+                                    string parentName = System.IO.Path.GetFileName(parentPath);
+                                    if (parentName.Contains("devenv") || parentName.Contains("msbuild") || parentName.Contains("dotnet"))
+                                    {
+                                        parentIsVs = true;
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                CloseHandle(hParent);
+                            }
+                        }
                     }
                 }
             }

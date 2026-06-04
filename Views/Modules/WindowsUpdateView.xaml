@@ -24,7 +24,7 @@
                             
                             <Button Grid.Column="1" Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
                                     CommandParameter="Help" Style="{StaticResource IconButton}" ToolTip="Open Knowledge Base" VerticalAlignment="Center">
-                                <fa:ImageAwesome Icon="QuestionCircleOutline" Width="12" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="QuestionCircleOutline" Width="12" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             </Button>
                         </Grid>
                     </StackPanel>
@@ -40,7 +40,7 @@
 
                             <Border Grid.Column="0" Width="64" Height="64" Background="{DynamicResource CardBrush}" CornerRadius="32" Margin="0,0,25,0">
                                 <fa:ImageAwesome Icon="Refresh" Width="32" Foreground="{DynamicResource AccentBrush}" 
-                                                 Spin="{Binding IsChecking}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                 Spin="{Binding IsChecking}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             </Border>
 
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -59,7 +59,7 @@
                                            Margin="0,5,0,0" Visibility="{Binding IsInstalling, Converter={StaticResource VisibilityConverter}}"/>
 
                                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Visibility="{Binding IsPaused, Converter={StaticResource VisibilityConverter}}">
-                                    <fa:ImageAwesome Icon="PauseCircleOutline" Width="12" Foreground="{DynamicResource WarningBrush}" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="PauseCircleOutline" Width="12" Foreground="{DynamicResource WarningBrush}" Margin="0,0,8,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="{Binding PauseUntil, StringFormat='Updates are paused until {0:D}'}" 
                                                Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
                                 </StackPanel>
@@ -70,7 +70,7 @@
                                         Background="{DynamicResource WarningBrush}"
                                         Visibility="{Binding IsRebootRequired, Converter={StaticResource VisibilityConverter}}">
                                     <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="White" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="White" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <TextBlock Text="REBOOT NOW" FontWeight="Bold"/>
                                     </StackPanel>
                                 </Button>
@@ -78,7 +78,7 @@
                                 <Button Command="{Binding ResumeUpdatesCommand}" Style="{StaticResource PrimaryAction}" Padding="15,10" Margin="0,0,15,0"
                                         Visibility="{Binding IsPaused, Converter={StaticResource VisibilityConverter}}">
                                     <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Play" Width="10" Foreground="White" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <fa:ImageAwesome Icon="Play" Width="10" Foreground="White" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <TextBlock Text="RESUME UPDATES" FontWeight="Bold"/>
                                     </StackPanel>
                                 </Button>
@@ -92,7 +92,7 @@
                                         </MultiBinding>
                                     </Button.Visibility>
                                     <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Download" Width="12" Foreground="White" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <fa:ImageAwesome Icon="Download" Width="12" Foreground="White" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <TextBlock Text="INSTALL ALL" FontWeight="Bold"/>
                                     </StackPanel>
                                 </Button>
@@ -100,7 +100,7 @@
                                 <Button Command="{Binding CheckForUpdatesCommand}" Style="{StaticResource PrimaryAction}" Padding="15,10"
                                         Visibility="{Binding IsPaused, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
                                     <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Search" Width="12" Foreground="White" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        <fa:ImageAwesome Icon="Search" Width="12" Foreground="White" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <TextBlock Text="CHECK FOR UPDATES" FontWeight="Bold"/>
                                     </StackPanel>
                                 </Button>
@@ -113,7 +113,7 @@
                     <Border Style="{StaticResource StandardCard}" Margin="0,0,0,30" Padding="20">
                         <Grid>
                             <StackPanel Orientation="Horizontal">
-                                <fa:ImageAwesome Icon="ClockOutline" Width="18" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="ClockOutline" Width="18" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="Pause Updates" FontWeight="Bold" Foreground="White"/>
                                     <TextBlock Text="Temporarily stop updates from being downloaded and installed." 
@@ -150,7 +150,7 @@
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <fa:ImageAwesome Icon="Download" Width="14" Foreground="{DynamicResource AccentBrush}" 
-                                                                 VerticalAlignment="Top" Margin="0,3,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                                 VerticalAlignment="Top" Margin="0,3,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                 <StackPanel Grid.Column="1">
                                                     <Grid>
                                                         <Grid.ColumnDefinitions>
@@ -191,7 +191,7 @@
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <fa:ImageAwesome Icon="Check" Width="14" Foreground="{DynamicResource SuccessBrush}" 
-                                                                 VerticalAlignment="Top" Margin="0,3,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                                                 VerticalAlignment="Top" Margin="0,3,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                                 <StackPanel Grid.Column="1">
                                                     <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" FontSize="12" TextWrapping="Wrap"/>
                                                     <TextBlock Text="{Binding KBArticle}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>

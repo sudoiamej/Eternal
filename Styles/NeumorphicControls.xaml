@@ -154,32 +154,24 @@
                             <ScaleTransform ScaleX="1" ScaleY="1"/>
                         </Grid.RenderTransform>
                         
-                        <!-- Translucent circular glass background plate -->
                         <Border x:Name="Plate" 
-                                CacheMode="BitmapCache"
                                 CornerRadius="28" 
                                 Background="#16FFFFFF" 
                                 BorderBrush="#0AFFFFFF" 
                                 BorderThickness="1">
                             <Border.Effect>
-                                <DropShadowEffect Color="Black" BlurRadius="6" ShadowDepth="1" Opacity="0.15"/>
+                                <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                             </Border.Effect>
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <!-- Hover State: Plate brightens, expands slightly -->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Plate" Property="Background" Value="#2AFFFFFF"/>
                             <Setter TargetName="Plate" Property="BorderBrush" Value="#20FFFFFF"/>
-                            <Setter TargetName="RootGrid" Property="RenderTransform">
-                                <Setter.Value>
-                                    <ScaleTransform ScaleX="1.08" ScaleY="1.08"/>
-                                </Setter.Value>
-                            </Setter>
                             <Setter TargetName="Plate" Property="Effect">
                                 <Setter.Value>
-                                    <DropShadowEffect Color="Black" BlurRadius="10" ShadowDepth="1" Opacity="0.3"/>
+                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                 </Setter.Value>
                             </Setter>
                             <Setter Property="Foreground" Value="White"/>
@@ -199,7 +191,7 @@
                             <Setter TargetName="Plate" Property="BorderBrush" Value="Transparent"/>
                             <Setter TargetName="Plate" Property="Effect">
                                 <Setter.Value>
-                                    <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="14" ShadowDepth="0" Opacity="0.5"/>
+                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                 </Setter.Value>
                             </Setter>
                             <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
@@ -210,23 +202,17 @@
                             <Setter TargetName="Plate" Property="BorderBrush" Value="Transparent"/>
                             <Setter TargetName="Plate" Property="Effect">
                                 <Setter.Value>
-                                    <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="14" ShadowDepth="0" Opacity="0.5"/>
+                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                 </Setter.Value>
                             </Setter>
                             <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
                         </Trigger>
-                        <!-- Keyboard Focus State: Scales up and glows like Hover -->
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter TargetName="Plate" Property="Background" Value="#2AFFFFFF"/>
                             <Setter TargetName="Plate" Property="BorderBrush" Value="#20FFFFFF"/>
-                            <Setter TargetName="RootGrid" Property="RenderTransform">
-                                <Setter.Value>
-                                    <ScaleTransform ScaleX="1.08" ScaleY="1.08"/>
-                                </Setter.Value>
-                            </Setter>
                             <Setter TargetName="Plate" Property="Effect">
                                 <Setter.Value>
-                                    <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="12" ShadowDepth="0" Opacity="0.4"/>
+                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                 </Setter.Value>
                             </Setter>
                             <Setter Property="Foreground" Value="White"/>
@@ -250,33 +236,26 @@
                             <ScaleTransform ScaleX="1" ScaleY="1"/>
                         </Grid.RenderTransform>
                         
-                        <!-- Main Card Body: Clean, borderless glass card with deep shadow -->
                         <Border x:Name="TileCard" 
-                                CacheMode="BitmapCache"
                                 CornerRadius="28" 
                                 Background="{TemplateBinding Background}" 
                                 BorderBrush="#1CFFFFFF" 
                                 BorderThickness="1">
                             <Border.Effect>
-                                <DropShadowEffect Color="Black" BlurRadius="18" ShadowDepth="3" Opacity="0.3"/>
+                                <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                             </Border.Effect>
                             
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <!-- Hover State: Scales up, glows softly, brightens background -->
+                        <!-- Hover State: Brightens background -->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="TileCard" Property="Background" Value="#1C1D26"/>
                             <Setter TargetName="TileCard" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
-                            <Setter TargetName="TileGrid" Property="RenderTransform">
-                                <Setter.Value>
-                                    <ScaleTransform ScaleX="1.03" ScaleY="1.03"/>
-                                </Setter.Value>
-                            </Setter>
                             <Setter TargetName="TileCard" Property="Effect">
                                 <Setter.Value>
-                                    <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="28" ShadowDepth="0" Opacity="0.4"/>
+                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                 </Setter.Value>
                             </Setter>
                         </Trigger>
@@ -300,7 +279,7 @@
                             </Setter>
                             <Setter TargetName="TileCard" Property="Effect">
                                 <Setter.Value>
-                                    <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="28" ShadowDepth="0" Opacity="0.4"/>
+                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                 </Setter.Value>
                             </Setter>
                         </Trigger>

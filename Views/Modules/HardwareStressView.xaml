@@ -34,7 +34,7 @@
                                     <Grid>
                                         <Ellipse x:Name="Outer" Stroke="{DynamicResource BorderBrush}" StrokeThickness="2">
                                             <Ellipse.Effect>
-                                                <DropShadowEffect x:Name="Glow" Color="{DynamicResource CriticalColor}" BlurRadius="30" ShadowDepth="0" Opacity="0"/>
+                                                <DropShadowEffect x:Name="Glow" Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                             </Ellipse.Effect>
                                         </Ellipse>
                                         <Ellipse x:Name="Inner" Margin="10" Fill="#10FFFFFF"/>

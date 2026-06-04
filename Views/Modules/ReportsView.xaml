@@ -33,7 +33,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <fa:ImageAwesome Icon="FileCodeOutline" Width="32" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top" Margin="0,5,30,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <fa:ImageAwesome Icon="FileCodeOutline" Width="32" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top" Margin="0,5,30,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="REPORT DATA MANIFEST" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
                             <TextBlock Text="The following telemetry modules will be included in the generated snapshot:" 
@@ -41,19 +41,19 @@
                             
                             <UniformGrid Columns="2">
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                    <fa:ImageAwesome Icon="CheckSquare" Width="12" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="CheckSquare" Width="12" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="CPU &amp; Architecture Details" Foreground="{DynamicResource TextBrush}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                    <fa:ImageAwesome Icon="CheckSquare" Width="12" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="CheckSquare" Width="12" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="Motherboard &amp; Chipset Info" Foreground="{DynamicResource TextBrush}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                    <fa:ImageAwesome Icon="CheckSquare" Width="12" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="CheckSquare" Width="12" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="Physical Memory Configuration" Foreground="{DynamicResource TextBrush}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                    <fa:ImageAwesome Icon="CheckSquare" Width="12" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="CheckSquare" Width="12" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="System Timestamp &amp; Environment" Foreground="{DynamicResource TextBrush}"/>
                                 </StackPanel>
                             </UniformGrid>
@@ -78,7 +78,7 @@
                             <Button Grid.Column="1" Command="{Binding GenerateJsonReportCommand}" 
                                     Style="{StaticResource PrimaryAction}" Padding="25,12">
                                 <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="Download" Width="14" Foreground="White" Margin="0,0,12,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Download" Width="14" Foreground="White" Margin="0,0,12,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBlock Text="Generate Intelligence Report"/>
                                 </StackPanel>
                             </Button>
@@ -134,7 +134,7 @@
                     
                     <Border Margin="0,20,0,0" Padding="15" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4">
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,12,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,12,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                             <TextBlock Text="Note: Exporting does not modify system files. This is a read-only operation." 
                                         FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                         </StackPanel>

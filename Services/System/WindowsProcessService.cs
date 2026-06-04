@@ -23,8 +23,39 @@ namespace Eternal.Services.System
             public ulong OtherTransferCount;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        private struct FILETIME
+        {
+            public uint dwLowDateTime;
+            public uint dwHighDateTime;
+            
+            public ulong ToTicks()
+            {
+                return ((ulong)dwHighDateTime << 32) | dwLowDateTime;
+            }
+        }
+
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool GetProcessIoCounters(IntPtr hProcess, out IO_COUNTERS lpIoCounters);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr OpenProcess(uint processAccess, bool bInheritHandle, int processId);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool GetProcessTimes(
+            IntPtr hProcess,
+            out FILETIME lpCreationTime,
+            out FILETIME lpExitTime,
+            out FILETIME lpKernelTime,
+            out FILETIME lpUserTime);
+
+        private const uint PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
 
         private class ProcessCacheItem
         {
@@ -55,7 +86,9 @@ namespace Eternal.Services.System
                     {
                         int pid = proc.Id;
                         currentPids.Add(pid);
-                        if (proc.HasExited) continue;
+                        bool hasExited = false;
+                        try { hasExited = proc.HasExited; } catch { }
+                        if (hasExited) continue;
 
                         ProcessCacheItem? history;
                         lock (_historyLock)
@@ -77,18 +110,46 @@ namespace Eternal.Services.System
                             try { history.SessionId = proc.SessionId; } catch { history.SessionId = 0; }
                             
                             string path = "Access Denied";
+                            bool hasAccess = false;
                             if (pid > 4)
                             {
-                                try { path = proc.MainModule?.FileName ?? "N/A"; } catch { }
+                                IntPtr hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
+                                if (hProcess != IntPtr.Zero)
+                                {
+                                    hasAccess = true;
+                                    try
+                                    {
+                                        uint size = 1024;
+                                        var sb = new StringBuilder((int)size);
+                                        if (QueryFullProcessImageName(hProcess, 0, sb, ref size))
+                                        {
+                                            path = sb.ToString();
+                                        }
+                                    }
+                                    finally
+                                    {
+                                        CloseHandle(hProcess);
+                                    }
+                                }
                             }
                             else if (pid == 4) path = "System";
                             else if (pid == 0) path = "Idle";
                             history.Path = path;
 
                             // Initial Categorization
+                            bool hasWindow = false;
+                            if (hasAccess)
+                            {
+                                try
+                                {
+                                    hasWindow = proc.MainWindowHandle != IntPtr.Zero && !string.IsNullOrEmpty(proc.MainWindowTitle);
+                                }
+                                catch { }
+                            }
+
                             if (history.SessionId == 0 || history.Path.Contains(@"\Windows\System32", StringComparison.OrdinalIgnoreCase))
                                 history.Category = ProcessCategory.Windows;
-                            else if (proc.MainWindowHandle != IntPtr.Zero && !string.IsNullOrEmpty(proc.MainWindowTitle))
+                            else if (hasWindow)
                                 history.Category = ProcessCategory.Apps;
                         }
 
@@ -97,13 +158,20 @@ namespace Eternal.Services.System
                         long diskBytes = 0;
                         string statusString = "Running";
 
-                        try
+                        IntPtr hProc = (pid > 0 && pid != 4) ? OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid) : IntPtr.Zero;
+                        if (hProc != IntPtr.Zero)
                         {
-                            if (pid > 0 && pid != 4 && !proc.HasExited)
+                            try
                             {
-                                var currentTime = proc.TotalProcessorTime;
+                                FILETIME creationTime, exitTime, kernelTime, userTime;
+                                TimeSpan currentTime = TimeSpan.Zero;
+                                if (GetProcessTimes(hProc, out creationTime, out exitTime, out kernelTime, out userTime))
+                                {
+                                    currentTime = TimeSpan.FromTicks((long)(kernelTime.ToTicks() + userTime.ToTicks()));
+                                }
+
                                 ulong currentIo = 0;
-                                if (GetProcessIoCounters(proc.Handle, out var io))
+                                if (GetProcessIoCounters(hProc, out var io))
                                 {
                                     currentIo = io.ReadTransferCount + io.WriteTransferCount + io.OtherTransferCount;
                                 }
@@ -125,18 +193,27 @@ namespace Eternal.Services.System
                                 history.IoTotal = currentIo;
                                 history.Timestamp = now;
 
-                                if (proc.Responding == false) statusString = "Not Responding";
+                                try
+                                {
+                                    if (proc.Responding == false) statusString = "Not Responding";
+                                }
+                                catch { }
+                            }
+                            finally
+                            {
+                                CloseHandle(hProc);
                             }
                         }
-                        catch { }
 
                         long net = cpuUsage > 15 ? 51200 : 0; 
+                        long memBytes = 0;
+                        try { memBytes = proc.WorkingSet64; } catch { }
 
                         details.Add(new ProcessDetail(
                             PID: pid,
                             Name: proc.ProcessName,
                             CpuUsage: Math.Clamp(cpuUsage, 0, 100),
-                            MemoryBytes: proc.WorkingSet64,
+                            MemoryBytes: memBytes,
                             Path: history.Path,
                             IsSigned: true,
                             Impact: cpuUsage > 20 ? "High" : (cpuUsage > 5 ? "Medium" : "Low"),

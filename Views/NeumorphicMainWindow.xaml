@@ -13,8 +13,12 @@
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
-        Background="Transparent"
-        MouseDown="Window_MouseDown">
+        MouseDown="Window_MouseDown"
+        SizeChanged="Window_SizeChanged">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="0" CornerRadius="0" CaptionHeight="0" ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
 
     <Window.Resources>
         <DataTemplate DataType="{x:Type vmm:HomeGridDashboardViewModel}"><vmv:HomeGridDashboard/></DataTemplate>
@@ -62,8 +66,11 @@
         <DataTemplate DataType="{x:Type vmm:AppProfilerViewModel}"><vmv:AppProfilerView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:TestingViewModel}"><vmv:TestingView/></DataTemplate>
     </Window.Resources>
-    <Border Background="#090A0E" CornerRadius="30" BorderThickness="1" BorderBrush="#1CFFFFFF" Margin="15">
+    <Border Background="#090A0E" CornerRadius="0" BorderThickness="0" BorderBrush="Transparent" Margin="0">
         <Grid>
+            <Grid.LayoutTransform>
+                <ScaleTransform ScaleX="{Binding DisplayScale}" ScaleY="{Binding DisplayScale}"/>
+            </Grid.LayoutTransform>
             <!-- 1. Car Startup Overlay -->
             <Grid x:Name="StartupOverlay" Panel.ZIndex="1000" Background="#090A0E">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -118,7 +125,7 @@
                                     Style="{StaticResource PrimaryButton}" Click="Unlock_Click" VerticalAlignment="Center">
                                 <fa:ImageAwesome Icon="ArrowRight" Width="14" Foreground="Black">
                                     <fa:ImageAwesome.Effect>
-                                        <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="0" Opacity="0.3"/>
+                                        <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                     </fa:ImageAwesome.Effect>
                                 </fa:ImageAwesome>
                             </Button>
@@ -155,7 +162,7 @@
                         <Border Width="300" Height="4" Background="#1C1C1E" CornerRadius="2" Margin="0,30,0,0" HorizontalAlignment="Center">
                             <Border x:Name="TachometerSweep" Width="0" Height="4" Background="#FFFFFF" CornerRadius="2" HorizontalAlignment="Left">
                                 <Border.Effect>
-                                    <DropShadowEffect Color="#FFFFFF" BlurRadius="12" ShadowDepth="0" Opacity="0.8"/>
+                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                 </Border.Effect>
                             </Border>
                         </Border>
@@ -170,8 +177,7 @@
                     <ColumnDefinition Width="*"/>  <!-- Main Content -->
                 </Grid.ColumnDefinitions>
 
-                <!-- CarPlay Style Dock (Layered, distinct spatial separation) -->
-                <Border Grid.Column="0" Background="#111218" CornerRadius="30,0,0,30" BorderThickness="0,0,1,0" BorderBrush="#15FFFFFF"
+                <Border Grid.Column="0" Background="#111218" CornerRadius="0" BorderThickness="0,0,1,0" BorderBrush="#15FFFFFF"
                         AllowDrop="True" Drop="Dock_Drop" DragOver="Dock_DragOver">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -181,17 +187,9 @@
                     </Grid.RowDefinitions>
 
                     <!-- Home Button (Eternal Logo in circular CarPlay anchor) -->
-                    <Button Grid.Row="0" Margin="10,25,10,10" Command="{Binding NavigateCommand}" CommandParameter="Home">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource CarPlayDockButton}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsHomeActive}" Value="True">
-                                        <Setter Property="Tag" Value="Active"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                        <Rectangle Fill="White" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality">
+                    <!-- Home Button (Eternal Logo clickable only) -->
+                    <Button Grid.Row="0" Margin="10,25,10,10" Command="{Binding NavigateCommand}" CommandParameter="Home" Style="{StaticResource NeuLogoButton}">
+                        <Rectangle Fill="White" Width="28" Height="28" RenderOptions.BitmapScalingMode="HighQuality">
                             <Rectangle.OpacityMask>
                                 <ImageBrush ImageSource="/Assets/logo.png" Stretch="Uniform"/>
                             </Rectangle.OpacityMask>
@@ -287,7 +285,7 @@
                 <!-- Dynamic View Host: Layered, Floating App Viewport -->
                 <Border Grid.Row="1" Margin="12" CornerRadius="24" Background="#14161F" BorderThickness="1" BorderBrush="#12FFFFFF">
                     <Border.Effect>
-                        <DropShadowEffect Color="Black" BlurRadius="20" ShadowDepth="2" Opacity="0.4"/>
+                        <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                     </Border.Effect>
                     <ContentControl Content="{Binding CurrentView}">
                         <ContentControl.RenderTransform>

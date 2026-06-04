@@ -26,7 +26,7 @@
                 <StackPanel VerticalAlignment="Center">
                     <Image Source="/Assets/logo.png" Width="110" Margin="0,0,0,35" HorizontalAlignment="Center">
                         <Image.Effect>
-                            <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="40" ShadowDepth="0" Opacity="0.5"/>
+                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                         </Image.Effect>
                     </Image>
                     
@@ -98,7 +98,7 @@
                     <StackPanel>
                         <fa:ImageAwesome Icon="Heart" Width="18" Foreground="{DynamicResource CriticalBrush}" HorizontalAlignment="Left" Margin="0,0,0,15">
                             <fa:ImageAwesome.Effect>
-                                <DropShadowEffect Color="{DynamicResource CriticalColor}" BlurRadius="15" Opacity="0.4"/>
+                                <DropShadowEffect Color="Transparent" BlurRadius="0" Opacity="0"/>
                             </fa:ImageAwesome.Effect>
                         </fa:ImageAwesome>
                         <TextBlock Text="To my one and only, the love of my life who helped me succeed this application. Thank you, Bernadette De Luna &lt;3" 

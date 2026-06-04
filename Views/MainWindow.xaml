@@ -213,7 +213,7 @@
                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" 
                     Background="{DynamicResource SidebarBrush}" Panel.ZIndex="50">
                 <Border.Effect>
-                    <DropShadowEffect BlurRadius="30" ShadowDepth="0" Opacity="0.4" Color="Black"/>
+                    <DropShadowEffect BlurRadius="0" ShadowDepth="0" Opacity="0" Color="Transparent"/>
                 </Border.Effect>
                 <Border.Style>
                     <Style TargetType="Border">
@@ -236,12 +236,12 @@
                                             <Style.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
                                                     <Setter Property="Effect">
-                                                        <Setter.Value><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="20" ShadowDepth="0" Opacity="0.8"/></Setter.Value>
+                                                        <Setter.Value><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></Setter.Value>
                                                     </Setter>
                                                 </Trigger>
                                                 <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
                                                     <Setter Property="Effect">
-                                                        <Setter.Value><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="30" ShadowDepth="0" Opacity="1.0"/></Setter.Value>
+                                                        <Setter.Value><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></Setter.Value>
                                                     </Setter>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -294,7 +294,7 @@
                             CornerRadius="30"
                             HorizontalAlignment="Left" Padding="0,20">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="40" ShadowDepth="0" Opacity="0.4" Color="Black"/>
+                            <DropShadowEffect BlurRadius="0" ShadowDepth="0" Opacity="0" Color="Transparent"/>
                         </Border.Effect>
                         <Border.Style>
                             <Style TargetType="Border">
@@ -463,7 +463,7 @@
                                         BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                                         CornerRadius="12">
                                     <Border.Effect>
-                                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.3" Color="Black"/>
+                                        <DropShadowEffect BlurRadius="0" ShadowDepth="0" Opacity="0" Color="Transparent"/>
                                     </Border.Effect>
                                     <fa:ImageAwesome x:Name="BtnIcon" Icon="ChevronLeft" Width="10" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Border>
@@ -492,7 +492,7 @@
                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" 
                     Background="{DynamicResource SidebarBrush}" Panel.ZIndex="50">
                 <Border.Effect>
-                    <DropShadowEffect BlurRadius="25" ShadowDepth="0" Opacity="0.3" Color="Black"/>
+                    <DropShadowEffect BlurRadius="0" ShadowDepth="0" Opacity="0" Color="Transparent"/>
                 </Border.Effect>
                 <Border.Style>
                     <Style TargetType="Border">
@@ -551,7 +551,7 @@
                 <DataTemplate>
                     <Border Background="{DynamicResource SidebarBrush}" CornerRadius="15" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,0,10" Padding="20,15">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.3" Color="Black"/>
+                            <DropShadowEffect BlurRadius="0" ShadowDepth="0" Opacity="0" Color="Transparent"/>
                         </Border.Effect>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="{Binding Severity, Converter={StaticResource CategoryToIconConverter}, ConverterParameter='Toast'}" 

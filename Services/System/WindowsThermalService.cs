@@ -21,7 +21,8 @@ namespace Eternal.Services.System
         string PowerSource, 
         int BatteryPercent, 
         string BatteryStatus, 
-        bool HasBattery);
+        bool HasBattery,
+        List<string> OtherSensors);
 
     public class WindowsThermalService : IThermalService, IDisposable
     {
@@ -45,7 +46,11 @@ namespace Eternal.Services.System
                 double cpuPower = 0;
                 double cpuVoltage = 0;
                 double fanSpeed = 0;
+                var otherSensors = new List<string>();
                 
+                // 1. Try WDDM Performance Counters first for GPU Temperature (same as Task Manager)
+                gpuTemp = GetGpuTempFromPerfCounters();
+
                 try
                 {
                     _libreService.Update();
@@ -60,7 +65,8 @@ namespace Eternal.Services.System
                                 {
                                     if (sensor.Name.Contains("Core Max") || sensor.Name.Contains("Package"))
                                         cpuTemp = sensor.Value ?? cpuTemp;
-                                    else if (cpuTemp == -1) cpuTemp = sensor.Value ?? cpuTemp;
+                                    else if (cpuTemp == -1) 
+                                        cpuTemp = sensor.Value ?? cpuTemp;
                                 }
                                 else if (sensor.SensorType == SensorType.Power && (sensor.Name.Contains("Package") || sensor.Name.Contains("Total")))
                                 {
@@ -72,32 +78,68 @@ namespace Eternal.Services.System
                                 }
                             }
                         }
-                        // GPU Telemetry
+                        // GPU Telemetry (NVIDIA / AMD / Intel)
                         else if (hardware.HardwareType == HardwareType.GpuNvidia || hardware.HardwareType == HardwareType.GpuAmd || hardware.HardwareType == HardwareType.GpuIntel)
                         {
                             foreach (ISensor sensor in hardware.Sensors)
                             {
-                                if (sensor.SensorType == SensorType.Temperature && sensor.Name.Contains("Core"))
-                                    gpuTemp = sensor.Value ?? gpuTemp;
+                                if (sensor.SensorType == SensorType.Temperature)
+                                {
+                                    // Update GPU Temp if not already retrieved via WDDM
+                                    if (gpuTemp == -1)
+                                    {
+                                        if (sensor.Name.Contains("Core") || sensor.Name.Contains("Temp") || gpuTemp == -1)
+                                            gpuTemp = sensor.Value ?? gpuTemp;
+                                    }
+                                    else
+                                    {
+                                        // Still capture secondary sensors (e.g. Memory, Hot Spot) in the auxiliary list
+                                        otherSensors.Add($"{hardware.Name} {sensor.Name}: {sensor.Value:F1}°C");
+                                    }
+                                }
                                 else if (sensor.SensorType == SensorType.Fan)
+                                {
                                     fanSpeed = sensor.Value ?? fanSpeed;
+                                }
                             }
                         }
-                        // Motherboard/LPC Fans
+                        // Motherboard / ACPI / SuperIO Chipset Sensors
                         else if (hardware.HardwareType == HardwareType.Motherboard)
                         {
                             foreach (var subHardware in hardware.SubHardware)
                             {
+                                subHardware.Update();
                                 foreach (var sensor in subHardware.Sensors)
                                 {
-                                    if (sensor.SensorType == SensorType.Fan && fanSpeed == 0)
+                                    if (sensor.SensorType == SensorType.Temperature && sensor.Value.HasValue)
+                                    {
+                                        otherSensors.Add($"{subHardware.Name} {sensor.Name}: {sensor.Value.Value:F1}°C");
+                                    }
+                                    else if (sensor.SensorType == SensorType.Fan && fanSpeed == 0)
+                                    {
                                         fanSpeed = sensor.Value ?? fanSpeed;
+                                    }
                                 }
                             }
                         }
                     }
                 }
                 catch { }
+
+                // 2. Fallbacks for CPU Temp (via WMI ACPI Thermal Zone)
+                if (cpuTemp == -1)
+                {
+                    cpuTemp = GetWmiThermalZoneTemp();
+                }
+
+                // 3. Fallbacks for GPU Temp (if both WDDM and Libre failed)
+                if (gpuTemp == -1)
+                {
+                    gpuTemp = GetFallbackGpuTemp();
+                }
+
+                // 4. Query ACPI Thermal Zones for auxiliary sensors
+                QueryWmiThermalZones(otherSensors);
 
                 string power = "Detecting...";
                 int bat = 0;
@@ -125,13 +167,91 @@ namespace Eternal.Services.System
                     status = "No Battery Detected";
                 }
 
-                return new ThermalSnapshot(cpuTemp, gpuTemp, cpuPower, cpuVoltage, fanSpeed, power, bat, status, hasBattery);
+                return new ThermalSnapshot(cpuTemp, gpuTemp, cpuPower, cpuVoltage, fanSpeed, power, bat, status, hasBattery, otherSensors);
             });
+        }
+
+        private double GetGpuTempFromPerfCounters()
+        {
+            try
+            {
+                using var searcher = new ManagementObjectSearcher(@"root\cimv2", "select Temperature from Win32_PerfFormattedData_GPUPerformanceCounters_GPUDevice");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    double temp = Convert.ToDouble(obj["Temperature"]);
+                    if (temp > 0 && temp < 120)
+                    {
+                        return temp;
+                    }
+                }
+            }
+            catch { }
+            return -1;
+        }
+
+        private double GetWmiThermalZoneTemp()
+        {
+            try
+            {
+                using var searcher = new ManagementObjectSearcher(@"root\wmi", "select CurrentTemperature from MSAcpi_ThermalZoneTemperature");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    double kelvin = Convert.ToDouble(obj["CurrentTemperature"]);
+                    double celsius = (kelvin / 10.0) - 273.15;
+                    if (celsius > 0 && celsius < 120)
+                    {
+                        return celsius;
+                    }
+                }
+            }
+            catch { }
+            return -1;
+        }
+
+        private double GetFallbackGpuTemp()
+        {
+            // Fallback: Check Win32_VideoController temperature sensors (if any vendor exposes it there)
+            try
+            {
+                using var searcher = new ManagementObjectSearcher("select CurrentTemperature from Win32_VideoController");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    double temp = Convert.ToDouble(obj["CurrentTemperature"]);
+                    if (temp > 0 && temp < 120) return temp;
+                }
+            }
+            catch { }
+            return -1;
+        }
+
+        private void QueryWmiThermalZones(List<string> list)
+        {
+            try
+            {
+                using var searcher = new ManagementObjectSearcher(@"root\wmi", "select CurrentTemperature, InstanceName from MSAcpi_ThermalZoneTemperature");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    double kelvin = Convert.ToDouble(obj["CurrentTemperature"]);
+                    double celsius = (kelvin / 10.0) - 273.15;
+                    string name = obj["InstanceName"]?.ToString() ?? "ACPI Zone";
+                    
+                    // Format instance name nicely
+                    if (name.Contains("_TZ_"))
+                    {
+                        name = name.Substring(name.IndexOf("_TZ_"));
+                    }
+                    
+                    if (celsius > -20 && celsius < 150)
+                    {
+                        list.Add($"{name}: {celsius:F1}°C");
+                    }
+                }
+            }
+            catch { }
         }
 
         public void Dispose()
         {
-            // Shared service handles disposal
         }
     }
 }

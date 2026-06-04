@@ -35,7 +35,7 @@
                             <CheckBox IsChecked="{Binding DataContext.IsAdvancedMode, RelativeSource={RelativeSource AncestorType=Window}}" Width="32" Height="18" Style="{StaticResource {x:Static ToolBar.CheckBoxStyleKey}}"/>
                         </StackPanel>
                         <Button Command="{Binding LoadDataCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource IconButton}" ToolTip="Rescan Hardware">
-                            <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                            <fa:ImageAwesome Icon="Refresh" Width="16" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -48,7 +48,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <fa:ImageAwesome Icon="Desktop" Width="32" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top" Margin="0,5,30,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                        <fa:ImageAwesome Icon="Desktop" Width="32" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top" Margin="0,5,30,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="{Binding Motherboard.Manufacturer}" FontSize="18" FontWeight="Bold"/>
                             <TextBlock Text="{Binding Motherboard.Model}" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,20"/>
@@ -56,7 +56,7 @@
                             <Separator Background="{DynamicResource BorderBrush}" Margin="0,0,0,20"/>
                             
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                <fa:ImageAwesome Icon="Microchip" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="Microchip" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                 <TextBlock Text="{Binding Cpu.Name}" FontSize="14" FontWeight="SemiBold"/>
                             </StackPanel>
                             
@@ -97,7 +97,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <fa:ImageAwesome Icon="Bars" Width="24" Foreground="{DynamicResource InfoBrush}" VerticalAlignment="Center" Margin="0,0,20,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="Bars" Width="24" Foreground="{DynamicResource InfoBrush}" VerticalAlignment="Center" Margin="0,0,20,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Text="System RAM" Style="{StaticResource Caption}"/>
                                     <TextBlock Text="{Binding Ram.TotalCapacity}" FontSize="24" FontWeight="Bold"/>
@@ -116,7 +116,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <fa:ImageAwesome Icon="Television" Width="24" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Top" Margin="0,5,20,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                <fa:ImageAwesome Icon="Television" Width="24" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Top" Margin="0,5,20,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                 <StackPanel Grid.Column="1">
                                     <TextBlock Text="Graphics Adapter" Style="{StaticResource Caption}"/>
                                     <TextBlock Text="{Binding Gpu.Name}" FontSize="16" FontWeight="Bold" TextTrimming="CharacterEllipsis" Margin="0,0,0,10"/>
@@ -167,7 +167,7 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <fa:ImageAwesome Icon="HddOutline" Width="16" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="HddOutline" Width="16" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Model}" FontWeight="SemiBold"/>
                                         <TextBlock Text="{Binding Size}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
@@ -193,7 +193,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <fa:ImageAwesome Icon="Search" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                    <fa:ImageAwesome Icon="Search" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                     <TextBox Grid.Column="1" Background="Transparent" BorderThickness="0" Foreground="White" 
                                              VerticalContentAlignment="Center" 
                                              FontSize="12" x:Name="PropertyFilter"
@@ -240,7 +240,7 @@
         <!-- Loading Overlay (HCI Rule 5: Feedback System) -->
         <Border Background="#CC0A0A0A" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                 <TextBlock Text="Scanning Hardware..." FontSize="18" Foreground="{DynamicResource TextBrush}"/>
             </StackPanel>
         </Border>

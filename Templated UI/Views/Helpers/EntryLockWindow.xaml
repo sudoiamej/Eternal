@@ -43,16 +43,13 @@
                 </StackPanel>
             </StackPanel>
 
-            <!-- Actions -->
             <Grid Grid.Row="2" Width="300" HorizontalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="SWITCH UI" Style="{StaticResource SecondaryButton}" Height="40" Margin="0,0,5,0" Click="SwitchUI_Click"/>
-                <Button Grid.Column="1" Content="EXIT APP" Style="{StaticResource SecondaryButton}" Height="40" Margin="5,0,5,0" Click="Exit_Click"/>
-                <Button Grid.Column="2" x:Name="UnlockButton" Content="UNLOCK" Style="{StaticResource PrimaryButton}" Height="40" Margin="5,0,0,0" Click="Unlock_Click"/>
+                <Button Grid.Column="0" Content="EXIT APP" Style="{StaticResource SecondaryButton}" Height="40" Margin="0,0,5,0" Click="Exit_Click"/>
+                <Button Grid.Column="1" x:Name="UnlockButton" Content="UNLOCK" Style="{StaticResource PrimaryButton}" Height="40" Margin="5,0,0,0" Click="Unlock_Click"/>
             </Grid>
         </Grid>
     </Border>

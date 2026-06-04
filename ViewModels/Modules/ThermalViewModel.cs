@@ -23,11 +23,12 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private string _fanSpeedText = "0 RPM";
         [ObservableProperty] private string _conclusionText = "Determining System Type...";
         [ObservableProperty] private string _thermalStatus = "STABLE";
+        [ObservableProperty] private bool _hasOtherSensors;
 
         public ThermalViewModel(IThermalService thermalService)
         {
             _thermalService = thermalService;
-            _data = new ThermalSnapshot(-1, -1, 0, 0, 0, "Detecting...", 0, "Unknown", false);
+            _data = new ThermalSnapshot(-1, -1, 0, 0, 0, "Detecting...", 0, "Unknown", false, new List<string>());
             LoadCommand = new CommunityToolkit.Mvvm.Input.AsyncRelayCommand(LoadDataAsync);
             
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -50,9 +51,10 @@ namespace Eternal.ViewModels.Modules
 
         public override void ReleaseMemory()
         {
-            Data = new ThermalSnapshot(-1, -1, 0, 0, 0, "Unknown", 0, "Unknown", false);
+            Data = new ThermalSnapshot(-1, -1, 0, 0, 0, "Unknown", 0, "Unknown", false, new List<string>());
             CpuTempText = "Passive";
             GpuTempText = "Passive";
+            HasOtherSensors = false;
         }
 
         public CommunityToolkit.Mvvm.Input.IAsyncRelayCommand LoadCommand { get; }
@@ -78,6 +80,7 @@ namespace Eternal.ViewModels.Modules
                 if (!_isActive) return;
 
                 Data = snapshot;
+                HasOtherSensors = snapshot.OtherSensors != null && snapshot.OtherSensors.Count > 0;
 
                 // Formatting
                 CpuTempText = snapshot.CpuTemp < 0 ? "N/A" : $"{snapshot.CpuTemp:F1}°C";

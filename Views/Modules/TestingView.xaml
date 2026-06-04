@@ -79,7 +79,7 @@
                                                         <Setter Property="Background" Value="#4CAF50"/>
                                                         <Setter Property="Effect">
                                                             <Setter.Value>
-                                                                <DropShadowEffect Color="#4CAF50" BlurRadius="15" ShadowDepth="0" Opacity="0.6"/>
+                                                                <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                                             </Setter.Value>
                                                         </Setter>
                                                     </DataTrigger>
@@ -87,7 +87,7 @@
                                                         <Setter Property="Background" Value="{DynamicResource CriticalColor}"/>
                                                         <Setter Property="Effect">
                                                             <Setter.Value>
-                                                                <DropShadowEffect Color="{DynamicResource CriticalColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.6"/>
+                                                                <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                                             </Setter.Value>
                                                         </Setter>
                                                     </DataTrigger>

@@ -44,7 +44,7 @@
                             <Button Grid.Column="1" Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Remap Topology" VerticalAlignment="Center" Margin="0,0,10,0">
                                 <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsLoading}">
                                     <fa:ImageAwesome.Effect>
-                                        <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                                        <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                     </fa:ImageAwesome.Effect>
                                 </fa:ImageAwesome>
                             </Button>
@@ -69,7 +69,7 @@
                                                 <StackPanel Orientation="Horizontal">
                                                     <fa:ImageAwesome Icon="HddOutline" Width="18" Foreground="{DynamicResource AccentBrush}" Margin="0,0,15,0" VerticalAlignment="Center">
                                                         <fa:ImageAwesome.Effect>
-                                                            <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="15" ShadowDepth="0" Opacity="0.4"/>
+                                                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                                         </fa:ImageAwesome.Effect>
                                                     </fa:ImageAwesome>
                                                     <StackPanel VerticalAlignment="Center">
@@ -201,7 +201,7 @@
                                                                 </ControlTemplate>
                                                             </Button.Template>
                                                             <Button.ToolTip>
-                                                                <ToolTip Background="{StaticResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="15">
+                                                                <ToolTip Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="15">
                                                                     <StackPanel>
                                                                         <TextBlock Text="{Binding Label}" FontWeight="Black" Foreground="White" FontSize="14" Margin="0,0,0,5"/>
                                                                         <TextBlock Text="{Binding Type}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,0,0,10"/>

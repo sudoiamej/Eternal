@@ -153,6 +153,22 @@ namespace Eternal.Services.Hardware
                     global::System.Diagnostics.Debug.WriteLine($"WMI GPU Scan Error: {ex.Message}");
                 }
 
+                // Try querying Task Manager / WDDM GPU counters first for temperature
+                try
+                {
+                    using var perfSearcher = new ManagementObjectSearcher(@"root\cimv2", "select Temperature from Win32_PerfFormattedData_GPUPerformanceCounters_GPUDevice");
+                    foreach (ManagementObject obj in perfSearcher.Get())
+                    {
+                        double pTemp = Convert.ToDouble(obj["Temperature"]);
+                        if (pTemp > 0 && pTemp < 120)
+                        {
+                            temp = $"{pTemp:F0}°C";
+                            break;
+                        }
+                    }
+                }
+                catch { }
+
                 try
                 {
                     _libreService.Update();
@@ -166,8 +182,11 @@ namespace Eternal.Services.Hardware
                             {
                                 if (sensor.SensorType == SensorType.Load && sensor.Name.Contains("GPU Core"))
                                     util = $"{sensor.Value:F0}%";
-                                else if (sensor.SensorType == SensorType.Temperature && sensor.Name.Contains("GPU Core"))
-                                    temp = $"{sensor.Value:F0}°C";
+                                else if (sensor.SensorType == SensorType.Temperature)
+                                {
+                                    if (sensor.Name.Contains("GPU Core") || sensor.Name.Contains("Core") || sensor.Name.Contains("Temp") || temp == "N/A")
+                                        temp = $"{sensor.Value:F0}°C";
+                                }
                                 else if (sensor.SensorType == SensorType.Clock && sensor.Name.Contains("GPU Core"))
                                     coreClock = $"{sensor.Value:F0} MHz";
                                 else if (sensor.SensorType == SensorType.Clock && sensor.Name.Contains("GPU Memory"))

@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar (Knowledge Index) -->
-        <Border Grid.Column="0" Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+        <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
             <Grid Margin="20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -22,12 +22,12 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5,10,0,20">
-                    <fa:ImageAwesome Icon="Book" Width="18" Foreground="{StaticResource AccentBrush}" Margin="0,0,12,0"/>
+                    <fa:ImageAwesome Icon="Book" Width="18" Foreground="{DynamicResource AccentBrush}" Margin="0,0,12,0"/>
                     <TextBlock Text="KNOWLEDGE BASE" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Search Bar (HCI: Efficiency) -->
-                <Border Grid.Row="1" Background="{StaticResource CardBrush}" CornerRadius="20" Padding="15,8" Margin="0,0,0,20" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <Border Grid.Row="1" Background="{StaticResource CardBrush}" CornerRadius="20" Padding="15,8" Margin="0,0,0,20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -123,7 +123,7 @@
                 <StackPanel>
                     <StackPanel Style="{StaticResource ModuleHeaderStyle}" Margin="0,0,0,40">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                            <TextBlock Text="DOCUMENTATION" Style="{StaticResource Caption}" Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock Text="DOCUMENTATION" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
                             <TextBlock Text=" › " Style="{StaticResource Caption}"/>
                             <TextBlock Text="{Binding SelectedArticle.Category, FallbackValue='GENERAL'}" Style="{StaticResource Caption}" Opacity="0.6"/>
                         </StackPanel>
@@ -133,17 +133,17 @@
 
                     <Border Style="{StaticResource StandardCard}" Padding="40" Background="#08FFFFFF">
                         <StackPanel>
-                            <fa:ImageAwesome Icon="QuoteLeft" Width="24" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Left" Opacity="0.15" Margin="0,0,0,25"/>
+                            <fa:ImageAwesome Icon="QuoteLeft" Width="24" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Left" Opacity="0.15" Margin="0,0,0,25"/>
                             <TextBlock Text="{Binding SelectedArticle.Content}" TextWrapping="Wrap" FontSize="17" Foreground="{DynamicResource TextBrush}" LineHeight="32"/>
-                            <fa:ImageAwesome Icon="QuoteRight" Width="24" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Right" Opacity="0.15" Margin="0,25,0,0"/>
+                            <fa:ImageAwesome Icon="QuoteRight" Width="24" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right" Opacity="0.15" Margin="0,25,0,0"/>
                         </StackPanel>
                     </Border>
                     
                     <Border Margin="0,40,0,0" Padding="25,20" Background="#0AFFFFFF" CornerRadius="8" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="LightbulbOutline" Width="18" Foreground="{StaticResource WarningBrush}" Margin="0,0,20,0" VerticalAlignment="Center"/>
+                            <fa:ImageAwesome Icon="LightbulbOutline" Width="18" Foreground="{DynamicResource WarningBrush}" Margin="0,0,20,0" VerticalAlignment="Center"/>
                             <StackPanel>
-                                <TextBlock Text="PRO TIP" FontWeight="Black" FontSize="10" Foreground="{StaticResource WarningBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Text="PRO TIP" FontWeight="Black" FontSize="10" Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,4"/>
                                 <TextBlock Text="You can find specific technical details by using the global 'Eternal Console' for direct CLI queries." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                         </StackPanel>
@@ -151,7 +151,7 @@
                 </StackPanel>
             </ScrollViewer>
 
-            <Border Grid.Row="1" Padding="30,20" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Background="{StaticResource SidebarBrush}">
+            <Border Grid.Row="1" Padding="30,20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Background="{DynamicResource SidebarBrush}">
                 <Button Content="Return to Workspace" HorizontalAlignment="Right"
                         Style="{StaticResource PrimaryAction}" Click="CloseButton_Click" Padding="30,12" FontSize="13" FontWeight="Bold"/>
             </Border>
@@ -160,7 +160,7 @@
         <!-- Loading Overlay -->
         <Border Grid.ColumnSpan="2" Background="#CC0A0A0A" Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{StaticResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
+                <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="48" Margin="0,0,0,20"/>
                 <TextBlock Text="INDEXING KNOWLEDGE BASE..." FontSize="18" FontWeight="Black" Foreground="White"/>
             </StackPanel>
         </Border>

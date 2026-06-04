@@ -34,7 +34,7 @@
         <!-- Glassmorphic Outer Panel -->
         <Border CornerRadius="20" Background="#150A0A14" BorderBrush="#35FFFFFF" BorderThickness="1.5">
             <Border.Effect>
-                <DropShadowEffect BlurRadius="25" ShadowDepth="0" Opacity="0.5" Color="Black"/>
+                <DropShadowEffect BlurRadius="0" ShadowDepth="0" Opacity="0" Color="Transparent"/>
             </Border.Effect>
             
             <Grid Margin="12">

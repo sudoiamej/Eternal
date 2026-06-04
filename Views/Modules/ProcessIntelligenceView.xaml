@@ -19,13 +19,6 @@
                 <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
-
-        <!-- Grouping logic for the DataGrid -->
-        <CollectionViewSource x:Key="ProcessGroups" Source="{Binding FlatProcesses}">
-            <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="Category"/>
-            </CollectionViewSource.GroupDescriptions>
-        </CollectionViewSource>
     </UserControl.Resources>
 
     <Grid RenderTransformOrigin="0.5,0.5">
@@ -57,7 +50,7 @@
                         <Button Command="{Binding LoadCommand}" Style="{StaticResource IconButton}" ToolTip="Sync Kernel Data">
                             <fa:ImageAwesome Icon="Refresh" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Spin="{Binding IsBusy}">
                                 <fa:ImageAwesome.Effect>
-                                    <DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
                                 </fa:ImageAwesome.Effect>
                             </fa:ImageAwesome>
                         </Button>
@@ -66,33 +59,16 @@
             </StackPanel>
 
             <!-- 2. Main Data Grid -->
-            <DataGrid Grid.Row="1" ItemsSource="{Binding Source={StaticResource ProcessGroups}}" 
+            <DataGrid Grid.Row="1" ItemsSource="{Binding FlatProcesses}" 
                       SelectedItem="{Binding SelectedProcess}"
                       Style="{StaticResource NeuDataGrid}"
                       Margin="10,0"
                       VirtualizingPanel.IsVirtualizing="True"
                       VirtualizingPanel.VirtualizationMode="Recycling"
-                      VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                       CanUserSortColumns="True"
                       RenderOptions.ClearTypeHint="Enabled">
-                <DataGrid.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
-                            <DataTemplate>
-                                <Border Background="#10FFFFFF" Margin="0,15,0,8" Padding="25,12" CornerRadius="18" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="{Binding Name, Converter={StaticResource CategoryToIconConverter}}" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,15,0"/>
-                                        <TextBlock Text="{Binding Name}" FontWeight="Black" Foreground="White" FontSize="15" VerticalAlignment="Center"/>
-                                        <TextBlock Text="{Binding ItemCount, StringFormat='{} ({0})'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.5"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
-                    </GroupStyle>
-                </DataGrid.GroupStyle>
-
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="PROCESS IDENTITY" Width="3*" MinWidth="200">
+                    <DataGridTemplateColumn Header="Name" Width="3*" MinWidth="200">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="10,0">
@@ -115,7 +91,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="STATE" Binding="{Binding Status}" Width="1.2*">
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="1.2*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -127,7 +103,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTemplateColumn Header="LOAD" Width="1*" SortMemberPath="CpuUsage">
+                    <DataGridTemplateColumn Header="CPU" Width="1*" SortMemberPath="CpuUsage">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Border Margin="4" CornerRadius="4">
@@ -149,7 +125,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Header="FOOTPRINT" Binding="{Binding MemoryUsage}" Width="1.5*" SortMemberPath="MemoryBytes">
+                    <DataGridTextColumn Header="Memory" Binding="{Binding MemoryUsage}" Width="1.5*" SortMemberPath="MemoryBytes">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -161,7 +137,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="I/O BURST" Binding="{Binding DiskUsage}" Width="1.2*" SortMemberPath="DiskBytesPerSec">
+                    <DataGridTextColumn Header="Disk" Binding="{Binding DiskUsage}" Width="1.2*" SortMemberPath="DiskBytesPerSec">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -173,7 +149,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="NET TRAFFIC" Binding="{Binding NetworkUsage}" Width="1.2*" SortMemberPath="NetworkBytesPerSec">
+                    <DataGridTextColumn Header="Network" Binding="{Binding NetworkUsage}" Width="1.2*" SortMemberPath="NetworkBytesPerSec">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
