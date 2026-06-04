@@ -44,6 +44,18 @@ NEW FEATURES & ARCHITECTURAL ENHANCEMENTS
 - CONTEXTUAL FALLBACKS: Automatic backup queries utilizing WMI `Win32_QuickFixEngineering` 
   and CBS logs so update history displays instantly even if the update service is offline.
 
+[PROCESS INTELLIGENCE OVERHAUL] - ALIGNED TELEMETRY MAP
+- FLAT PROCESS MAP: Rearchitected Process Intelligence UI to a flat list format modeled directly after Windows Task Manager's Process tab (Name, PID, Status, CPU, Memory, Disk, and Network). Removed layout groupings for maximum rendering performance.
+- PROCESS FORENSICS RAIL: High-performance contextual drawer displaying live thread load telemetry, CPU/Memory gauges, executable paths, and elevated process termination controls (`taskkill`).
+
+[THERMALS & HARDWARE DIAGNOSTICS] - MULTI-GPU SEPARATION
+- INDEPENDENT GPU COCOUNTERS: Integrated native WDDM performance counters (`Win32_PerfFormattedData_GPUPerformanceCounters_GPUDevice`) to pull independent GPU temperatures, preventing duplicated CPU temperature logs on multi-GPU setups.
+- DYNAMIC MOTHERBOARD SENSORS: Full ACPI thermal zone and motherboard auxiliary sensor polling, exposed in a custom-styled card adhering to black-and-white theme aesthetics.
+
+[PERFORMANCE & MEMORY OPTIMIZATION] - LAG-FREE RUNTIME
+- TRANSITION MEMORY PURGES: Intercepts active navigation routes to systematically call `ReleaseMemory()` and invoke lightweight garbage collection sweeps (`GC.Collect(1)`), releasing RAM instantly when closing high-telemetry modules.
+- STARTUP CACHE PURGING: Automatic deletion of stale logs and telemetry files inside the local AppData directory during tachometer sweeping, eliminating cold-boot startup lags.
+
 --------------------------------------------------------------------------------
 PREVIOUS VERSIONS
 --------------------------------------------------------------------------------
