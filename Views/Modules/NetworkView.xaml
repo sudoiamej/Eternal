@@ -13,11 +13,7 @@
         </Storyboard>
     </UserControl.Resources>
 
-    <Grid RenderTransformOrigin="0.5,0.5">
-        <Grid.RenderTransform>
-            <TranslateTransform Y="0"/>
-        </Grid.RenderTransform>
-
+    <Grid>
         <Border Padding="35">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
