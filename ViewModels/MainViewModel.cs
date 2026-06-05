@@ -609,20 +609,6 @@ namespace Eternal.ViewModels
             {
                 CurrentView.Deactivate();
                 CurrentView.ReleaseMemory();
-                
-                // Clear bindings, event subscriptions, and force aggressive garbage collection sweeps
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
-                GC.WaitForPendingFinalizers();
-                
-                // Working set API trim to yield unused physical RAM back to the operating system immediately
-                try
-                {
-                    using (var process = System.Diagnostics.Process.GetCurrentProcess())
-                    {
-                        process.MinWorkingSet = SystemParameters.HighContrast ? (IntPtr)1 : (IntPtr)(-1);
-                    }
-                }
-                catch { }
             }
 
             UpdateNavigationSelection(viewName);
