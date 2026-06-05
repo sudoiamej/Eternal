@@ -122,14 +122,10 @@ namespace Eternal.ViewModels.Modules
         [RelayCommand]
         private void ClearAllData()
         {
-            var confirm = System.Windows.MessageBox.Show(
-                "CRITICAL: This will reset all settings and PERMANENTLY DELETE all local application data, logs, and cached telemetry.\n\n" +
-                "The application will close after this operation.\n\nProceed?",
-                "Factory Reset & Data Purge",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
+            var confirmWin = new Eternal.Views.Helpers.ResetDataConfirmWindow();
+            confirmWin.Owner = System.Windows.Application.Current.MainWindow;
 
-            if (confirm == MessageBoxResult.Yes)
+            if (confirmWin.ShowDialog() == true)
             {
                 try
                 {

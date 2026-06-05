@@ -1,0 +1,50 @@
+<Window x:Class="Eternal.Views.Helpers.ResetDataConfirmWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        Title="Reset Application Data" Height="300" Width="400"
+        WindowStyle="None" AllowsTransparency="True"
+        WindowStartupLocation="CenterOwner" Background="Transparent"
+        MouseDown="Window_MouseDown">
+
+    <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="20" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1.5">
+        <Grid Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                <fa:ImageAwesome Icon="ExclamationTriangle" Width="22" Foreground="{DynamicResource CriticalBrush}" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                <TextBlock Text="FACTORY RESET &amp; PURGE" Style="{StaticResource H1}" FontSize="18" Foreground="{DynamicResource CriticalBrush}"/>
+                <TextBlock Text="This action will delete all local configuration profiles, security logs, and cached telemetry." 
+                           Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <!-- Warning Details -->
+            <Border Grid.Row="1" Background="#0AFFFFFF" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="• Reset settings to factory defaults" FontSize="11" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,5"/>
+                    <TextBlock Text="• Unregister auto-startup registry keys" FontSize="11" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,5"/>
+                    <TextBlock Text="• Purge telemetry database &amp; session logs" FontSize="11" Foreground="{DynamicResource TextBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Action buttons -->
+            <Grid Grid.Row="2" Margin="0,15,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="CANCEL" Style="{StaticResource SecondaryButton}" Margin="0,0,5,0" Click="Cancel_Click"/>
+                <Button Content="PURGE ALL DATA" Style="{StaticResource PrimaryButton}" Margin="5,0,0,0" BorderBrush="{DynamicResource CriticalBrush}" Background="#1AFF3B30" Click="Confirm_Click">
+                    <Button.Resources>
+                        <SolidColorBrush x:Key="AccentTextBrush" Color="White"/>
+                    </Button.Resources>
+                </Button>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
