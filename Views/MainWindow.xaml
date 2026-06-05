@@ -105,7 +105,6 @@
         <DataTemplate DataType="{x:Type vmm:PrivacyViewModel}"><vmv:PrivacyView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:BatteryViewModel}"><vmv:BatteryView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:FileForensicsViewModel}"><vmv:FileForensicsView/></DataTemplate>
-        <DataTemplate DataType="{x:Type vmm:AdvisorViewModel}"><vmv:AdvisorPane/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:FeatureTogglesViewModel}"><vmv:FeatureTogglesView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:FlagsViewModel}"><vmv:FlagsView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:TestingViewModel}"><vmv:TestingView/></DataTemplate>

@@ -26,6 +26,12 @@
             <helpers:CategoryToIconConverter x:Key="CategoryToIconConverter"/>
             <helpers:ProportionalHeightConverter x:Key="ProportionalHeightConverter"/>
             <helpers:EqualityConverter x:Key="EqualityConverter"/>
+            <helpers:SpeedTestProgressWidthConverter x:Key="SpeedTestProgressWidthConverter"/>
+
+            <Style TargetType="ScrollViewer">
+                <Setter Property="helpers:TrackpadScrollHelper.EnableTrackpadScrolling" Value="True"/>
+                <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

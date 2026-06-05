@@ -18,7 +18,7 @@ namespace Eternal.ViewModels.Modules
         private readonly IUpdateService _updateService;
 
         [ObservableProperty] private AppSettings _settings;
-        [ObservableProperty] private string _appVersion = "3.0.0";
+        [ObservableProperty] private string _appVersion = "3.1.0";
         [ObservableProperty] private string _lastScanTime = "N/A";
         [ObservableProperty] private string _machineId = "Unknown";
 

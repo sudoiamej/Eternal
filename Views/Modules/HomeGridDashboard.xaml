@@ -25,14 +25,6 @@
                     CommandParameter="Category_Diagnostics"
                     PreviewMouseLeftButtonDown="Tile_PreviewMouseLeftButtonDown"
                     PreviewMouseMove="Tile_PreviewMouseMove">
-                <Button.RenderTransform>
-                    <ScaleTransform CenterX="180" CenterY="100"/>
-                </Button.RenderTransform>
-                <Button.Triggers>
-                    <EventTrigger RoutedEvent="Button.Loaded">
-                        <BeginStoryboard Storyboard="{StaticResource TileEntranceAnim}"/>
-                    </EventTrigger>
-                </Button.Triggers>
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource DiagnosticsPlateBrush}">
                         <Border.Effect>
@@ -51,14 +43,6 @@
                     CommandParameter="Category_Tuning"
                     PreviewMouseLeftButtonDown="Tile_PreviewMouseLeftButtonDown"
                     PreviewMouseMove="Tile_PreviewMouseMove">
-                <Button.RenderTransform>
-                    <ScaleTransform CenterX="180" CenterY="100"/>
-                </Button.RenderTransform>
-                <Button.Triggers>
-                    <EventTrigger RoutedEvent="Button.Loaded">
-                        <BeginStoryboard Storyboard="{StaticResource TileEntranceAnim}"/>
-                    </EventTrigger>
-                </Button.Triggers>
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource TuningPlateBrush}">
                         <Border.Effect>
@@ -77,14 +61,6 @@
                     CommandParameter="Category_Monitoring"
                     PreviewMouseLeftButtonDown="Tile_PreviewMouseLeftButtonDown"
                     PreviewMouseMove="Tile_PreviewMouseMove">
-                <Button.RenderTransform>
-                    <ScaleTransform CenterX="180" CenterY="100"/>
-                </Button.RenderTransform>
-                <Button.Triggers>
-                    <EventTrigger RoutedEvent="Button.Loaded">
-                        <BeginStoryboard Storyboard="{StaticResource TileEntranceAnim}"/>
-                    </EventTrigger>
-                </Button.Triggers>
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource MonitoringPlateBrush}">
                         <Border.Effect>
@@ -103,14 +79,6 @@
                     CommandParameter="Category_Support"
                     PreviewMouseLeftButtonDown="Tile_PreviewMouseLeftButtonDown"
                     PreviewMouseMove="Tile_PreviewMouseMove">
-                <Button.RenderTransform>
-                    <ScaleTransform CenterX="180" CenterY="100"/>
-                </Button.RenderTransform>
-                <Button.Triggers>
-                    <EventTrigger RoutedEvent="Button.Loaded">
-                        <BeginStoryboard Storyboard="{StaticResource TileEntranceAnim}"/>
-                    </EventTrigger>
-                </Button.Triggers>
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource SupportPlateBrush}">
                         <Border.Effect>

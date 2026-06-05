@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -26,6 +27,18 @@ namespace Eternal.Views.Helpers
             base.OnContentChanged(oldContent, newContent);
 
             if (_mainPresenter == null || newContent == null) return;
+
+            bool disableAnimations = 
+                Environment.GetCommandLineArgs().Any(arg => arg.Equals("--no-animation", StringComparison.OrdinalIgnoreCase) || arg.Equals("--disable-animations", StringComparison.OrdinalIgnoreCase)) ||
+                Environment.GetEnvironmentVariable("DISABLE_ANIMATIONS") == "true" ||
+                Environment.GetEnvironmentVariable("ANTIGRAVITY") == "true";
+
+            if (disableAnimations)
+            {
+                _mainPresenter.Opacity = 1;
+                _mainPresenter.RenderTransform = new TranslateTransform(0, 0);
+                return;
+            }
 
             // Simple, stable, and high-performance animation
             // This prevents "ghosting" by only animating the incoming view

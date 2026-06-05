@@ -110,7 +110,7 @@ namespace Eternal.ViewModels
 
             Title = "Eternal System Intelligence";
             _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
-            _loggingService.Log($"Dev Preview Suite Version 3.0.0");
+            _loggingService.Log($"Dev Preview Suite Version 3.1.0");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
             _settingsService.SettingsChanged += OnSettingsChanged;
@@ -609,8 +609,20 @@ namespace Eternal.ViewModels
             {
                 CurrentView.Deactivate();
                 CurrentView.ReleaseMemory();
-                // Perform lightweight collection to immediately free resources of closed views
-                GC.Collect(1, GCCollectionMode.Optimized, false);
+                
+                // Clear bindings, event subscriptions, and force aggressive garbage collection sweeps
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
+                GC.WaitForPendingFinalizers();
+                
+                // Working set API trim to yield unused physical RAM back to the operating system immediately
+                try
+                {
+                    using (var process = System.Diagnostics.Process.GetCurrentProcess())
+                    {
+                        process.MinWorkingSet = SystemParameters.HighContrast ? (IntPtr)1 : (IntPtr)(-1);
+                    }
+                }
+                catch { }
             }
 
             UpdateNavigationSelection(viewName);

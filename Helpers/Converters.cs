@@ -317,6 +317,27 @@ namespace Eternal.Helpers
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
+    public class SpeedTestProgressWidthConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double pct = 0;
+            if (value is int i) pct = i;
+            else if (value is double d) pct = d;
+            
+            double maxWidth = 250.0;
+            if (parameter != null && double.TryParse(parameter.ToString(), out double customWidth))
+            {
+                maxWidth = customWidth;
+            }
+            
+            double width = (pct / 100.0) * maxWidth;
+            return Math.Max(0.0, Math.Min(maxWidth, width));
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
     public class ProportionalPartitionWidthConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

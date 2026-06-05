@@ -139,7 +139,6 @@ namespace Eternal
             services.AddSingleton<IOsUpdateService, WindowsOsUpdateService>();
             services.AddSingleton<IFileForensicsService, WindowsFileForensicsService>();
             services.AddSingleton<IPrivacyService, WindowsPrivacyService>();
-            services.AddSingleton<INeuralAdvisorService, WindowsIntelligenceEngine>();
             services.AddSingleton<IToolkitService, WindowsToolkitService>();
             services.AddSingleton<ISecurityService, WindowsSecurityService>();
             services.AddSingleton<IDriversService, WindowsDriversService>();
@@ -193,7 +192,6 @@ namespace Eternal
             services.AddSingleton<FeatureTogglesViewModel>();
             services.AddSingleton<FlagsViewModel>();
             services.AddSingleton<DisplayViewModel>();
-            services.AddSingleton<AdvisorViewModel>();
             services.AddSingleton<TestingViewModel>();
             
             bool isPe = System.IO.Directory.Exists(@"X:\Windows\System32");

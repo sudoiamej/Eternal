@@ -141,6 +141,23 @@ namespace Eternal.Views
 
         private async Task StartLoadingAndTransition(MainViewModel mainVm)
         {
+            bool disableAnimations = 
+                Array.Exists(Environment.GetCommandLineArgs(), arg => arg.Equals("--no-animation", StringComparison.OrdinalIgnoreCase) || arg.Equals("--disable-animations", StringComparison.OrdinalIgnoreCase)) ||
+                Environment.GetEnvironmentVariable("DISABLE_ANIMATIONS") == "true" ||
+                Environment.GetEnvironmentVariable("ANTIGRAVITY") == "true";
+
+            if (disableAnimations)
+            {
+                LockContainer.Visibility = Visibility.Collapsed;
+                LoadingContainer.Visibility = Visibility.Collapsed;
+                StartupOverlay.Visibility = Visibility.Collapsed;
+                MainInterfaceGrid.Opacity = 1;
+                mainVm.StartTimers();
+                _ = Task.Run(async () => await mainVm.PreloadAllDataAsync());
+                _ = mainVm.Navigate("Home");
+                return;
+            }
+
             // Smoothly fade out LockContainer if it was visible
             if (LockContainer.Visibility == Visibility.Visible)
             {
@@ -158,6 +175,22 @@ namespace Eternal.Views
             LoadingContainer.Visibility = Visibility.Visible;
             var fadeInLoading = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.4));
             LoadingContainer.BeginAnimation(OpacityProperty, fadeInLoading);
+
+            // Set random loading tip
+            string[] tips = new[]
+            {
+                "Tip: Hold Ctrl+Shift+Alt+T to enter developer Unsafe Mode! 🤫",
+                "Tip: Debloating Edge telemetry can speed up network request speeds! 🌐",
+                "Tip: Unpin items by right-clicking dock shortcuts on the sidebar! 📌",
+                "Tip: Trackpad precision scrolling works on all lists and details! 📜",
+                "Tip: Unsigned processes running from temporary directories are flagged! 🔍",
+                "Tip: Surface scans can inspect raw SMART attributes of disk sectors! 💾",
+                "Tip: Toggle between Legacy and Modern views inside the settings panel! ⚙️",
+                "Tip: Phi-3 AI engine runs locally without sending data to servers! 🧠",
+                "Tip: Safe mode runs logic by disabling aggressive hardware sweeps! 🔋",
+                "Tip: Reset DNS and Socket stacks inside the Repair Center section! 🛠️"
+            };
+            StartupTipText.Text = tips[new Random().Next(tips.Length)];
 
             // 1. Initial State & CarPlay Animation
             StartupOverlay.Opacity = 1;

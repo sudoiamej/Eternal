@@ -278,11 +278,21 @@ namespace Eternal.Services.System
 
                     try
                     {
-                        foreach (ProcessModule module in proc.Modules)
+                        // Check if process has exited or is invalid before reading modules
+                        if (!proc.HasExited && proc.Handle != IntPtr.Zero)
                         {
-                            loadedModules.Add($"{module.ModuleName} ({module.FileName})");
+                            foreach (ProcessModule module in proc.Modules)
+                            {
+                                loadedModules.Add($"{module.ModuleName} ({module.FileName})");
+                            }
+                        }
+                        else
+                        {
+                            loadedModules.Add("Process is not active or accessible.");
                         }
                     }
+                    catch (global::System.ComponentModel.Win32Exception) { loadedModules.Add("Access Denied (Insufficient Permissions)"); }
+                    catch (InvalidOperationException) { loadedModules.Add("Process has exited."); }
                     catch (Exception ex) { loadedModules.Add($"Error fetching modules: {ex.Message}"); }        
 
                     if (File.Exists(process.Path))

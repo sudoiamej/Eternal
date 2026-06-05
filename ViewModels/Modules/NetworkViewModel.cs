@@ -105,5 +105,47 @@ namespace Eternal.ViewModels.Modules
             history.Add(value);
             if (history.Count > 60) history.RemoveAt(0);
         }
+
+        [ObservableProperty] private bool _isSpeedTesting;
+        [ObservableProperty] private string _speedTestPhase = "Idle";
+        [ObservableProperty] private int _speedTestProgressPercentage;
+        [ObservableProperty] private double _speedTestValue;
+
+        [ObservableProperty] private double _resultDownload;
+        [ObservableProperty] private double _resultUpload;
+        [ObservableProperty] private int _resultPing;
+        [ObservableProperty] private bool _hasSpeedTestResult;
+
+        [RelayCommand]
+        public async Task StartSpeedTestAsync()
+        {
+            if (IsSpeedTesting) return;
+            IsSpeedTesting = true;
+            HasSpeedTestResult = false;
+            SpeedTestPhase = "Ping";
+            SpeedTestProgressPercentage = 0;
+            SpeedTestValue = 0;
+
+            try
+            {
+                var result = await _networkService.RunSpeedTestAsync(p =>
+                {
+                    SpeedTestPhase = p.Phase;
+                    SpeedTestProgressPercentage = p.Percentage;
+                    SpeedTestValue = p.CurrentSpeed;
+                });
+
+                ResultDownload = result.DownloadSpeedMbps;
+                ResultUpload = result.UploadSpeedMbps;
+                ResultPing = result.PingMs;
+                HasSpeedTestResult = true;
+            }
+            catch { }
+            finally
+            {
+                IsSpeedTesting = false;
+                SpeedTestPhase = "Completed";
+            }
+        }
     }
 }

@@ -1,0 +1,110 @@
+# ETERNAL SYSTEM INTELLIGENCE - COMPREHENSIVE TECHNICAL REFERENCE
+================================================================================
+Generated: Thursday, June 4, 2026
+Version: 3.0.0 "Gold Release"
+Namespace: Eternal (WPF / .NET 10.0-windows)
+================================================================================
+
+1. EXECUTIVE ARCHITECTURE SUMMARY
+--------------------------------------------------------------------------------
+Eternal is an industrial-grade Windows diagnostic, forensic, and recovery suite. 
+It employs a decoupled MVVM architecture, emphasizing direct system-level 
+interaction (Registry, SCM, WMI, P/Invoke) over high-level wrappers to ensure 
+bare-metal accuracy.
+
+1.1. COMPOSITION ROOT & DI
+The application initializes in `App.xaml.cs`, where it builds a service provider 
+using `Microsoft.Extensions.DependencyInjection`. All business logic is 
+encapsulated in interface-driven services (e.g., `IHardwareService`), allowing 
+for simulated "Safe Modes" and modular extensibility.
+
+1.2. UI/UX PHILOSOPHY (NORMAN FRAMEWORK)
+The interface is built on Don Norman's paradigms:
+- MAPPING: Visual "card lifts" and radial gauges provide natural affordances.
+- FEEDBACK: Shaking UI elements for invalid inputs and real-time telemetry arcs.
+- CONSTRAINTS: Logical locks on `{current}` boot records and thermal-linked 
+  stress thread termination.
+
+2. SYSTEM SUBSYSTEMS DEEP DIVE
+--------------------------------------------------------------------------------
+2.1. PROJECT NEURALIS (AI ADVISOR)
+- Engine: ONNX Runtime GenAI.
+- Model: Phi-3 Mini (2.3GB).
+- Implementation: `WindowsIntelligenceEngine.cs`.
+- Mechanics: Uses lazy-loading to preserve RAM. Requires 4GB minimum. Performs 
+  real-time token streaming using IAsyncEnumerable for fluid advisor feedback.
+
+2.2. STORAGE & PARTITION STUDIO
+- Topology Mapping: `StorageViewModel.cs` using `WindowsStorageService`.
+- Capabilities:
+  - Proportional partition visualization.
+  - VHD/VHDX native mounting/detaching.
+  - SMART Telemetry: Raw attribute parsing via WMI.
+  - Destructive Operations: Formatting, resizing, and GPT/MBR conversion with 
+    multi-level protection for recovery (X:) and boot volumes.
+
+2.3. ETERNAL DOCTOR (REPAIR CENTER)
+- Logic: Problem-oriented mapping in `RepairCenterViewModel.cs`.
+- Core Repairs:
+  - Network: FlushDNS, WinSock reset, stack re-initialization.
+  - Integrity: SFC /scannow and DISM /RestoreHealth (supports local WIM sources).
+  - Print Spooler & Audio: Automated SCM service restarts.
+- WinPE Mode: Specializes in offline registry hive mounting and `bcdboot` 
+  automated repairs on detected OS partitions.
+
+2.4. FORENSIC INTELLIGENCE ENGINE
+- Shannon Entropy: Computes byte distribution to detect packed/encrypted malware.
+- PE Parsing: Scans IAT (Import Address Table) for injection signatures: 
+  `VirtualAlloc`, `WriteProcessMemory`, `CreateRemoteThread`.
+- Threat Hunter: `MainViewModel.cs` coordinates persistence audits (Registry Run 
+  keys) and unsigned process detection (temp directory execution, masquerading 
+  extensions).
+
+2.5. GUARDIAN TUNING (DEBLOATER)
+- Tweak Engine: `WindowsTuningService.cs`.
+- Categories: 
+  - Privacy: Disables Telemetry (OS/Edge), Cortana, Activity History.
+  - Performance: Hibernation removal, Search Indexing limits, Game DVR disable.
+  - UI: Classic Context Menus, Taskbar Alignment, Startup Delay removal.
+- Safety: Integrated System Restore Point trigger via WMI.
+
+3. HARDWARE TELEMETRY & STRESS
+--------------------------------------------------------------------------------
+3.1. MULTI-SOURCE ACQUISITION
+- Registry: Low-latency SMBIOS and CPU string retrieval (Windows 11+).
+- WMI: Robust fallback for RAM slots, Disk status, and Network speeds.
+- LibreHardware: Core thermal and voltage polling for CPU/GPU.
+- P/Invoke: Kernel32 `GlobalMemoryStatusEx` for precise RAM metrics.
+
+3.2. THERMAL FAILSAFE
+- Logic: `WindowsThermalService.cs` polls sensors every 500ms. 
+- Trigger: If CPU package hits 88°C, an emergency interrupt signal is sent to 
+  the `HardwareStressViewModel` to terminate Prime-computation worker threads.
+
+4. WINPE & RECOVERY ENVIRONMENT
+--------------------------------------------------------------------------------
+Eternal is specialized for Windows PE operation:
+- Environment Detection: Checks for `X:\Windows\System32` presence.
+- UI Stability: Forces `RenderMode.SoftwareOnly` to bypass missing GPU drivers.
+- Recovery Tools: Unlocks specialized recovery ViewModels (PEModeViewModel) and 
+  enables offline drive detection using fallback partition mapping.
+
+5. SECURITY & PROTECTION
+--------------------------------------------------------------------------------
+- Anti-Debug: `AntiDebugHelper.cs` detects active debuggers and halts execution.
+- Obfuscation: Integrated `Obfuscar.xml` pipeline for binary protection.
+- Unsafe Mode: Access to high-risk tools is gated by the `TestingAuthWindow`.
+
+6. TECHNICAL SPECIFICATIONS & LIBS
+--------------------------------------------------------------------------------
+- Target Framework: .NET 10.0-windows10.0.26100.0
+- MVVM Toolkit: CommunityToolkit.Mvvm (8.4.2)
+- Hardware: LibreHardwareMonitorLib (0.9.3)
+- AI Engine: Microsoft.ML.OnnxRuntimeGenAI.DirectML (0.6.0)
+- UI/Fonts: FontAwesome.WPF (4.7.0.9)
+- Serialization: Newtonsoft.Json (13.0.4)
+- Platform: x64 Self-Contained Single-File Build.
+
+================================================================================
+© 2026 ETERNAL ANALYTICS. ALL RIGHTS RESERVED.
+================================================================================

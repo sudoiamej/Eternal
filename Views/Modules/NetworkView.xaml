@@ -9,10 +9,7 @@
     <UserControl.Resources>
         <!-- Spatial Entrance Animation -->
         <Storyboard x:Key="EntranceAnim">
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
-            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="20" To="0" Duration="0:0:0.8">
-                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.4"/>
         </Storyboard>
     </UserControl.Resources>
 
@@ -96,6 +93,79 @@
                         </Border>
                     </Grid>
                     
+                    <!-- CarPlay/Ookla Style Speed Test Panel -->
+                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,30" Padding="30">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="3*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                    <fa:ImageAwesome Icon="Dashboard" Width="16" Foreground="{DynamicResource AccentBrush}" Margin="0,0,12,0"/>
+                                    <TextBlock Text="INTELLIGENT SPEEDTEST" Style="{StaticResource Caption}" Opacity="0.7"/>
+                                </StackPanel>
+                                <TextBlock Text="Validate connection throughput against Cloudflare &amp; HTTPBin endpoints." 
+                                           Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,25" TextWrapping="Wrap" LineHeight="18"/>
+                                
+                                <Button Content="RUN SPEEDTEST" Command="{Binding StartSpeedTestCommand}" 
+                                        IsEnabled="{Binding IsSpeedTesting, Converter={StaticResource InvertBooleanConverter}}"
+                                        Style="{StaticResource PrimaryButton}" Height="45" Width="180" HorizontalAlignment="Left"/>
+                            </StackPanel>
+
+                            <Grid Grid.Column="1" Margin="30,0,0,0">
+                                <!-- Speed Testing Active View -->
+                                <Grid Visibility="{Binding IsSpeedTesting, Converter={StaticResource VisibilityConverter}}">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <fa:ImageAwesome Icon="Spinner" Spin="True" Foreground="{DynamicResource AccentBrush}" Width="36" Height="36" Margin="0,0,0,15"/>
+                                        <TextBlock Text="{Binding SpeedTestPhase, StringFormat='{}Phase: {0}'}" FontSize="14" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="{Binding SpeedTestValue, StringFormat='{}{0:F2} Mbps'}" FontSize="24" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" Margin="0,5,0,10" HorizontalAlignment="Center"/>
+                                        
+                                        <!-- ProgressBar -->
+                                        <Grid Width="250" Height="6">
+                                            <Border CornerRadius="3" Background="#16FFFFFF"/>
+                                            <Border CornerRadius="3" Background="{DynamicResource AccentBrush}" HorizontalAlignment="Left" Width="{Binding SpeedTestProgressPercentage, Converter={StaticResource SpeedTestProgressWidthConverter}, ConverterParameter='250'}"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Speed Test Idle / Finished Result View -->
+                                <Grid Visibility="{Binding IsSpeedTesting, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
+                                    <Grid Visibility="{Binding HasSpeedTestResult, Converter={StaticResource VisibilityConverter}}">
+                                        <UniformGrid Columns="3" VerticalAlignment="Center">
+                                            <!-- Download Result -->
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="DOWNLOAD" FontSize="10" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                <TextBlock Text="{Binding ResultDownload, StringFormat='{}{0:F1}'}" FontSize="36" FontWeight="Black" Foreground="White"/>
+                                                <TextBlock Text="Mbps" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            
+                                            <!-- Upload Result -->
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="UPLOAD" FontSize="10" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                <TextBlock Text="{Binding ResultUpload, StringFormat='{}{0:F1}'}" FontSize="36" FontWeight="Black" Foreground="White"/>
+                                                <TextBlock Text="Mbps" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            
+                                            <!-- Ping Result -->
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="LATENCY" FontSize="10" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                <TextBlock Text="{Binding ResultPing, StringFormat='{}{0} ms'}" FontSize="36" FontWeight="Black" Foreground="{DynamicResource AccentBrush}"/>
+                                                <TextBlock Text="RTT" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                        </UniformGrid>
+                                    </Grid>
+                                    
+                                    <Grid Visibility="{Binding HasSpeedTestResult, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}">
+                                        <TextBlock Text="Ready to run diagnostics..." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" 
+                                                   FontStyle="Italic" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                    
                     <!-- 3. Active Interface Cards -->
                     <TextBlock Text="HARDWARE INTERFACES" Style="{StaticResource Caption}" Margin="10,0,0,20" Opacity="0.6"/>
                     <ItemsControl ItemsSource="{Binding Adapters}" Margin="0,0,0,30">
@@ -122,53 +192,58 @@
                     <!-- 4. Connection Sentry (TCP/UDP MAP) -->
                     <TextBlock Text="CONNECTION SENTRY" Style="{StaticResource Caption}" Margin="10,0,0,20" Opacity="0.6"/>
                     <Border Style="{StaticResource StandardCard}" Padding="5">
-                        <DataGrid ItemsSource="{Binding Connections}" AutoGenerateColumns="False" 
-                                  IsReadOnly="True" Background="Transparent" BorderThickness="0" 
-                                  RowBackground="Transparent" GridLinesVisibility="None"
-                                  Foreground="White" CanUserAddRows="False"
-                                  VirtualizingStackPanel.IsVirtualizing="True"
-                                  VirtualizingStackPanel.VirtualizationMode="Recycling"
-                                  MinHeight="400">
-                            <DataGrid.Resources>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background" Value="#0DFFFFFF"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                                    <Setter Property="Padding" Value="15,10"/>
-                                    <Setter Property="FontWeight" Value="Black"/>
-                                    <Setter Property="FontSize" Value="10"/>
-                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-                                </Style>
-                                <Style TargetType="DataGridRow">
-                                    <Setter Property="Margin" Value="0,1"/>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#08FFFFFF"/></Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGrid.Resources>
+                        <DataGrid ItemsSource="{Binding Connections}" Style="{StaticResource NeuDataGrid}" MinHeight="400" HeadersVisibility="Column">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="PROTO" Binding="{Binding Protocol}" Width="80">
-                                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="FontWeight" Value="Black"/><Setter Property="FontSize" Value="11"/><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="Margin" Value="15,0"/></Style></DataGridTextColumn.ElementStyle>
-                                </DataGridTextColumn>
+                                <!-- Protocol with pill style accent tag -->
+                                <DataGridTemplateColumn Header="PROTO" Width="90">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#16FFFFFF" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="8,4" HorizontalAlignment="Center" Margin="5,0">
+                                                <TextBlock Text="{Binding Protocol}" FontSize="10" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 
+                                <!-- Local Address -->
                                 <DataGridTextColumn Header="LOCAL ADDRESS" Binding="{Binding LocalAddress}" Width="1.5*">
-                                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="12"/><Setter Property="VerticalAlignment" Value="Center"/></Style></DataGridTextColumn.ElementStyle>
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontFamily" Value="Consolas"/>
+                                            <Setter Property="FontSize" Value="12"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="10,0"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
 
+                                <!-- Remote Address -->
                                 <DataGridTextColumn Header="REMOTE ADDRESS" Binding="{Binding RemoteAddress}" Width="1.5*">
-                                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="12"/><Setter Property="Foreground" Value="{DynamicResource AccentSecondaryBrush}"/><Setter Property="VerticalAlignment" Value="Center"/></Style></DataGridTextColumn.ElementStyle>
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontFamily" Value="Consolas"/>
+                                            <Setter Property="FontSize" Value="12"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentSecondaryBrush}"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="10,0"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
 
+                                <!-- State with customized state pills -->
                                 <DataGridTemplateColumn Header="STATE" Width="140">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Border Padding="10,4" CornerRadius="8" HorizontalAlignment="Left" Margin="5">
+                                            <Border Padding="10,5" CornerRadius="8" HorizontalAlignment="Left" Margin="5">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
-                                                        <Setter Property="Background" Value="#1AFFFFFF"/>
+                                                        <Setter Property="Background" Value="#10FFFFFF"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding State}" Value="ESTABLISHED"><Setter Property="Background" Value="#1A00FFAA"/></DataTrigger>
                                                             <DataTrigger Binding="{Binding State}" Value="LISTENING"><Setter Property="Background" Value="#1A00CCFF"/></DataTrigger>
+                                                            <DataTrigger Binding="{Binding State}" Value="CLOSE_WAIT"><Setter Property="Background" Value="#1AFFBB00"/></DataTrigger>
+                                                            <DataTrigger Binding="{Binding State}" Value="TIME_WAIT"><Setter Property="Background" Value="#1AFF3B30"/></DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
@@ -179,6 +254,8 @@
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding State}" Value="ESTABLISHED"><Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/></DataTrigger>
                                                                 <DataTrigger Binding="{Binding State}" Value="LISTENING"><Setter Property="Foreground" Value="{DynamicResource InfoBrush}"/></DataTrigger>
+                                                                <DataTrigger Binding="{Binding State}" Value="CLOSE_WAIT"><Setter Property="Foreground" Value="#FFBB00"/></DataTrigger>
+                                                                <DataTrigger Binding="{Binding State}" Value="TIME_WAIT"><Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/></DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </TextBlock.Style>
@@ -188,9 +265,18 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTextColumn Header="PROCESS" Binding="{Binding ProcessName}" Width="*">
-                                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="FontWeight" Value="Black"/><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="FontSize" Value="12"/></Style></DataGridTextColumn.ElementStyle>
-                                </DataGridTextColumn>
+                                <!-- Process Name -->
+                                <DataGridTemplateColumn Header="PROCESS" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0" VerticalAlignment="Center">
+                                                <fa:ImageAwesome Icon="Terminal" Width="10" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" Opacity="0.7"/>
+                                                <TextBlock Text="{Binding ProcessName}" FontWeight="Black" FontSize="12" Foreground="White" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding PID, StringFormat=' ({0})'}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.6" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Border>
