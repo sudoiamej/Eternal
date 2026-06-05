@@ -13,6 +13,7 @@
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
+        Background="Transparent"
         MouseDown="Window_MouseDown"
         SizeChanged="Window_SizeChanged">
 
