@@ -82,7 +82,7 @@ namespace Eternal.ViewModels.Modules
         {
             UpdateStartupRegistration();
             _settingsService.Save();
-            System.Windows.MessageBox.Show("Configuration saved successfully to local app data.", "Settings", MessageBoxButton.OK, MessageBoxImage.Information);
+            Eternal.Views.Helpers.CustomNotificationWindow.Show("Configuration saved successfully to local app data.", "Settings", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Success);
         }
 
         [RelayCommand]
@@ -116,7 +116,7 @@ namespace Eternal.ViewModels.Modules
             Main.ApplyThemeColor();
             UpdateStartupRegistration();
             _settingsService.Save();
-            System.Windows.MessageBox.Show("Settings restored to factory defaults.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+            Eternal.Views.Helpers.CustomNotificationWindow.Show("Settings restored to factory defaults.", "Settings", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Warning);
         }
 
         [RelayCommand]
@@ -155,12 +155,12 @@ namespace Eternal.ViewModels.Modules
                         }
                     }
 
-                    System.Windows.MessageBox.Show("Data purge complete. The application will now exit.", "Reset Successful", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Eternal.Views.Helpers.CustomNotificationWindow.Show("Data purge complete. The application will now exit.", "Reset Successful", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Success);
                     System.Windows.Application.Current.Shutdown();
                 }
                 catch (Exception ex)
                 {
-                    System.Windows.MessageBox.Show($"Purge failed: {ex.Message}", "Reset Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Eternal.Views.Helpers.CustomNotificationWindow.Show($"Purge failed: {ex.Message}", "Reset Error", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Error);
                 }
             }
         }
@@ -175,7 +175,7 @@ namespace Eternal.ViewModels.Modules
             {
                 Settings.StartupLockPin = editWin.NewPin;
                 _settingsService.Save();
-                System.Windows.MessageBox.Show("Startup Access Code updated successfully.", "Security", MessageBoxButton.OK, MessageBoxImage.Information);
+                Eternal.Views.Helpers.CustomNotificationWindow.Show("Startup Access Code updated successfully.", "Security", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Success);
             }
         }
 

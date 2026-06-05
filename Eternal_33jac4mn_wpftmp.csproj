@@ -299,6 +299,7 @@
     <Compile Include="C:\Users\ethan\Desktop\projects\Eternal\obj\Debug\net10.0-windows10.0.26100.0\win-x64\Views\Helpers\AboutVersionWindow.g.cs" />
     <Compile Include="C:\Users\ethan\Desktop\projects\Eternal\obj\Debug\net10.0-windows10.0.26100.0\win-x64\Views\Helpers\CommandPaletteOverlay.g.cs" />
     <Compile Include="C:\Users\ethan\Desktop\projects\Eternal\obj\Debug\net10.0-windows10.0.26100.0\win-x64\Views\Helpers\CreateUserWindow.g.cs" />
+    <Compile Include="C:\Users\ethan\Desktop\projects\Eternal\obj\Debug\net10.0-windows10.0.26100.0\win-x64\Views\Helpers\CustomNotificationWindow.g.cs" />
     <Compile Include="C:\Users\ethan\Desktop\projects\Eternal\obj\Debug\net10.0-windows10.0.26100.0\win-x64\Views\Helpers\DetailWindow.g.cs" />
     <Compile Include="C:\Users\ethan\Desktop\projects\Eternal\obj\Debug\net10.0-windows10.0.26100.0\win-x64\Views\Helpers\EntryLockWindow.g.cs" />
     <Compile Include="C:\Users\ethan\Desktop\projects\Eternal\obj\Debug\net10.0-windows10.0.26100.0\win-x64\Views\Helpers\EnvVarEditWindow.g.cs" />
