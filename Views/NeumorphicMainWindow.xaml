@@ -65,7 +65,7 @@
         <DataTemplate DataType="{x:Type vmm:AppProfilerViewModel}"><vmv:AppProfilerView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:TestingViewModel}"><vmv:TestingView/></DataTemplate>
     </Window.Resources>
-    <Border Background="#090A0E" CornerRadius="0" BorderThickness="0" BorderBrush="Transparent" Margin="0">
+    <Border Background="#090A0E" CornerRadius="24" BorderThickness="1.5" BorderBrush="#1CFFFFFF" ClipToBounds="True" Margin="0">
         <Grid>
             <Grid.LayoutTransform>
                 <ScaleTransform ScaleX="{Binding DisplayScale}" ScaleY="{Binding DisplayScale}"/>
@@ -177,7 +177,7 @@
                     <ColumnDefinition Width="*"/>  <!-- Main Content -->
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Background="#111218" CornerRadius="0" BorderThickness="0,0,1,0" BorderBrush="#15FFFFFF"
+                <Border Grid.Column="0" Background="#111218" CornerRadius="22,0,0,22" BorderThickness="0,0,1,0" BorderBrush="#15FFFFFF"
                         AllowDrop="True" Drop="Dock_Drop" DragOver="Dock_DragOver">
                 <Grid>
                     <Grid.RowDefinitions>
