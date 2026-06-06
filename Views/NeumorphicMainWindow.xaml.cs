@@ -6,20 +6,302 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Eternal.ViewModels;
 using Eternal.Services.System;
+using Eternal.Models;
 
 namespace Eternal.Views
 {
     public partial class NeumorphicMainWindow : Window
     {
-        private ISettingsService _settingsService;
-        private System.Windows.Threading.DispatcherTimer _lockoutTimer;
+        private ISettingsService _settingsService = null!;
+        private System.Windows.Threading.DispatcherTimer _lockoutTimer = null!;
         private const string OverridePin = "000000";
+        private bool _isStartupCompleted = false;
+        private bool _isResetting = false;
+
+        private void NeumorphicMainWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (!_isStartupCompleted && !_isResetting)
+            {
+                if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.R)
+                {
+                    e.Handled = true;
+                    ShowFactoryResetPrompt();
+                }
+            }
+        }
+
+        private bool _resetPromptedFromSettings = false;
+
+        public void ShowFactoryResetPromptFromSettings()
+        {
+            _resetPromptedFromSettings = true;
+            
+            // Show password prompt directly overlaid on top of current screen
+            MainInterfaceGrid.Opacity = 0.3; // Dim main screen slightly
+            StartupOverlay.Visibility = Visibility.Visible;
+            StartupOverlay.Opacity = 1;
+            LockContainer.Visibility = Visibility.Collapsed;
+            LoadingContainer.Visibility = Visibility.Collapsed;
+            ResetPasscodeBox.Password = "";
+            ResetErrorText.Visibility = Visibility.Collapsed;
+            
+            if (_settingsService != null && !_settingsService.Current.IsStartupLockEnabled)
+            {
+                // Directly trigger the pending restart flow
+                InitiatePendingResetAndRestart();
+                return;
+            }
+
+            FactoryResetContainer.Visibility = Visibility.Visible;
+            ResetPasscodeBox.Focus();
+        }
+
+        private void ShowFactoryResetPrompt()
+        {
+            _resetPromptedFromSettings = false;
+
+            if (_settingsService != null && !_settingsService.Current.IsStartupLockEnabled)
+            {
+                // Directly trigger the pending restart flow
+                InitiatePendingResetAndRestart();
+                return;
+            }
+
+            LockContainer.Visibility = Visibility.Collapsed;
+            LoadingContainer.Visibility = Visibility.Collapsed;
+            ResetPasscodeBox.Password = "";
+            ResetErrorText.Visibility = Visibility.Collapsed;
+            FactoryResetContainer.Visibility = Visibility.Visible;
+            ResetPasscodeBox.Focus();
+        }
+
+        private void InitiatePendingResetAndRestart()
+        {
+            if (_settingsService != null)
+            {
+                _settingsService.Current.IsFactoryResetPending = true;
+                _settingsService.Save();
+            }
+
+            // Notify the user using CustomNotificationWindow that the app will reset on next launch
+            Eternal.Views.Helpers.CustomNotificationWindow.Show(
+                "Application data will be fully cleared and reset the next time you start the app.", 
+                "Factory Reset", 
+                Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Warning
+            );
+
+            // Close the overlay, clean up status, and return back to normal active view
+            FactoryResetContainer.Visibility = Visibility.Collapsed;
+            
+            if (_resetPromptedFromSettings)
+            {
+                StartupOverlay.Visibility = Visibility.Collapsed;
+                MainInterfaceGrid.Opacity = 1;
+                _isStartupCompleted = true;
+            }
+            else
+            {
+                // If it was Ctrl+R on startup, resume where it was (or lock screen)
+                var mainVm = DataContext as MainViewModel;
+                if (mainVm != null)
+                {
+                    if (_settingsService != null && _settingsService.Current.IsStartupLockEnabled)
+                    {
+                        LockContainer.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        _ = StartLoadingAndTransition(mainVm);
+                    }
+                }
+            }
+        }
+
+        public async Task TriggerFactoryReset()
+        {
+            _isResetting = true;
+            _isStartupCompleted = false;
+            
+            // 1. Initial Black Screen / Please Wait state
+            MainInterfaceGrid.Opacity = 0;
+            StartupOverlay.Visibility = Visibility.Visible;
+            StartupOverlay.Opacity = 1;
+            LockContainer.Visibility = Visibility.Collapsed;
+            FactoryResetContainer.Visibility = Visibility.Collapsed;
+            LoadingContainer.Visibility = Visibility.Visible;
+            LoadingContainer.Opacity = 1;
+            TachometerSweep.Width = 0;
+            StartupStatusText.Text = "PLEASE WAIT...";
+            StartupTipText.Text = "Please wait...";
+
+            // Yield control back to WPF message loop to render the UI updates immediately
+            await Task.Delay(100);
+
+            // 2. Perform the actual reset logic:
+            if (_settingsService != null)
+            {
+                try
+                {
+                    // Reset settings to default
+                    var defaults = new AppSettings();
+                    _settingsService.Current.RefreshFrequency = defaults.RefreshFrequency;
+                    _settingsService.Current.PreloadOnStartup = defaults.PreloadOnStartup;
+                    _settingsService.Current.IsAdvancedMode = defaults.IsAdvancedMode;
+                    _settingsService.Current.PollingProfile = defaults.PollingProfile;
+                    _settingsService.Current.RunAtStartup = defaults.RunAtStartup;
+                    _settingsService.Current.MinimizeToTray = defaults.MinimizeToTray;
+                    _settingsService.Current.ExportFolderPath = defaults.ExportFolderPath;
+                    _settingsService.Current.WmiTimeoutSeconds = defaults.WmiTimeoutSeconds;
+                    _settingsService.Current.IsVerboseLoggingEnabled = defaults.IsVerboseLoggingEnabled;
+                    _settingsService.Current.ThemeAccentColor = defaults.ThemeAccentColor;
+                    _settingsService.Current.FontAdjustmentScale = defaults.FontAdjustmentScale;
+                    _settingsService.Current.WindowScale = defaults.WindowScale;
+                    
+                    _settingsService.Current.IsStartupLockEnabled = defaults.IsStartupLockEnabled;
+                    _settingsService.Current.StartupLockPin = defaults.StartupLockPin;
+                    _settingsService.Current.LockoutEnd = null;
+                    _settingsService.Current.FailedAttemptsCount = 0;
+                    _settingsService.Current.CurrentLockoutMinutes = 0;
+
+                    // Also clear and restore default sidebar pinned items
+                    _settingsService.Current.PinnedFeatures = new() { "Processes", "Storage", "Dashboard" };
+                    
+                    // Clear the pending reset flag
+                    _settingsService.Current.IsFactoryResetPending = false;
+
+                    // Unregister startup if needed
+                    try
+                    {
+                        string path = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            using Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+                            key?.DeleteValue("EternalSystemIntelligence", false);
+                        }
+                    }
+                    catch { }
+
+                    // Delete local folders (telemetry, security database, and configuration cache)
+                    string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                    string folder = System.IO.Path.Combine(appData, "EternalAnalytics");
+                    if (System.IO.Directory.Exists(folder))
+                    {
+                        foreach (var file in System.IO.Directory.GetFiles(folder))
+                        {
+                            try { System.IO.File.Delete(file); } catch { }
+                        }
+                        foreach (var dir in System.IO.Directory.GetDirectories(folder))
+                        {
+                            try { System.IO.Directory.Delete(dir, true); } catch { }
+                        }
+                    }
+
+                    _settingsService.Save();
+
+                    // Apply visual theme, scale defaults, and update sidebar icons
+                    var mainVm = DataContext as MainViewModel;
+                    if (mainVm != null)
+                    {
+                        mainVm.ApplyThemeColor();
+                        mainVm.UpdateFontScale();
+                        mainWinScaleReset();
+                        mainVm.InitializeNavigation();
+                    }
+                }
+                catch { }
+            }
+
+            // Yield control again before launching sweep
+            await Task.Delay(100);
+
+            // 3. Simulated progress bar reset animation
+            for (int i = 0; i <= 100; i += 10)
+            {
+                StartupStatusText.Text = $"CLEARING SYSTEM STORAGE... {i}%";
+                TachometerSweep.Width = (i / 100.0) * 300;
+                await Task.Delay(100);
+            }
+
+            // 4. Black screen again when done saying please wait
+            TachometerSweep.Width = 0;
+            StartupStatusText.Text = "PLEASE WAIT...";
+            StartupTipText.Text = "Please wait...";
+            await Task.Delay(800);
+
+            _isResetting = false;
+            
+            // 5. Finally show the normal startup splash loader
+            var currentMainVm = DataContext as MainViewModel;
+            if (currentMainVm != null)
+            {
+                await StartLoadingAndTransition(currentMainVm);
+            }
+        }
+
+        private void ConfirmReset_Click(object sender, RoutedEventArgs e)
+        {
+            // Verify against existing passcode (or OverridePin "000000")
+            string enteredPin = ResetPasscodeBox.Password;
+            string correctPin = _settingsService?.Current?.StartupLockPin ?? OverridePin;
+
+            if (enteredPin != correctPin && enteredPin != OverridePin)
+            {
+                ResetErrorText.Visibility = Visibility.Visible;
+                ResetPasscodeBox.Password = "";
+                ResetPasscodeBox.Focus();
+                return;
+            }
+
+            ResetErrorText.Visibility = Visibility.Collapsed;
+            InitiatePendingResetAndRestart();
+        }
+
+        private void mainWinScaleReset()
+        {
+            // Reset window scale immediately to 1.0x (physically 1300x800)
+            this.Width = 1300;
+            this.Height = 800;
+            var mainVm = DataContext as MainViewModel;
+            if (mainVm != null)
+            {
+                mainVm.DisplayScale = 1.0;
+            }
+        }
+
+        private async void CancelReset_Click(object sender, RoutedEventArgs e)
+        {
+            FactoryResetContainer.Visibility = Visibility.Collapsed;
+            var mainVm = DataContext as MainViewModel;
+            if (mainVm != null)
+            {
+                if (_resetPromptedFromSettings)
+                {
+                    // Return back to Settings / Main Interface Grid as they were
+                    StartupOverlay.Visibility = Visibility.Collapsed;
+                    MainInterfaceGrid.Opacity = 1;
+                    _isStartupCompleted = true;
+                }
+                else
+                {
+                    // Resume the app startup where it left off
+                    if (_settingsService != null && _settingsService.Current.IsStartupLockEnabled)
+                    {
+                        LockContainer.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        await StartLoadingAndTransition(mainVm);
+                    }
+                }
+            }
+        }
 
         public NeumorphicMainWindow()
         {
             InitializeComponent();
             this.Loaded += NeumorphicMainWindow_Loaded;
             this.DpiChanged += (s, e) => ApplyDpiScaling();
+            this.PreviewKeyDown += NeumorphicMainWindow_PreviewKeyDown;
         }
 
         private void ApplyDpiScaling()
@@ -38,9 +320,15 @@ namespace Eternal.Views
                     dpiScale = dpi.DpiScaleX;
                 }
 
-                // Base design dimensions are 1300 x 800 physical pixels
-                double targetWidth = 1300 / dpiScale;
-                double targetHeight = 800 / dpiScale;
+                double userScale = 1.0;
+                if (_settingsService != null)
+                {
+                    userScale = _settingsService.Current.WindowScale;
+                }
+
+                // Base design dimensions are 1300 x 800, multiplied by user scale and divided by DPI scale to achieve true device-independent size
+                double targetWidth = (1300 * userScale) / dpiScale;
+                double targetHeight = (800 * userScale) / dpiScale;
 
                 // Make sure we fit within the screen work area
                 double workingWidth = SystemParameters.WorkArea.Width;
@@ -50,9 +338,9 @@ namespace Eternal.Views
                 {
                     double ratioX = workingWidth / targetWidth;
                     double ratioY = workingHeight / targetHeight;
-                    double scale = Math.Min(ratioX, ratioY) * 0.95;
-                    this.Width = targetWidth * scale;
-                    this.Height = targetHeight * scale;
+                    double limitScale = Math.Min(ratioX, ratioY) * 0.95;
+                    this.Width = targetWidth * limitScale;
+                    this.Height = targetHeight * limitScale;
                 }
                 else
                 {
@@ -65,7 +353,10 @@ namespace Eternal.Views
 
         private async void NeumorphicMainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // Resolve settings service first so DpiScaling has access to saved settings
+            _settingsService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ISettingsService>(App.ServiceProvider);
             ApplyDpiScaling();
+            
             // Perform Security/Anti-Debug Audit
             if (Eternal.Helpers.AntiDebugHelper.IsDebuggerDetected())
             {
@@ -78,11 +369,20 @@ namespace Eternal.Views
                 return;
             }
 
+            // Apply initial window scale and font scale to match saved configuration
             var mainVm = DataContext as MainViewModel;
-            if (mainVm == null) return;
+            if (mainVm != null)
+            {
+                mainVm.UpdateFontScale();
+                mainVm.UpdateWindowScale();
+            }
 
-            // Resolve settings service
-            _settingsService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ISettingsService>(App.ServiceProvider);
+            // Intercept and handle pending factory resets immediately on startup
+            if (_settingsService != null && _settingsService.Current.IsFactoryResetPending)
+            {
+                await TriggerFactoryReset();
+                return;
+            }
             
             // Check if Startup Lock is enabled
             if (_settingsService != null && _settingsService.Current.IsStartupLockEnabled)
@@ -233,7 +533,10 @@ namespace Eternal.Views
             var fadeOutOverlay = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.8));
             var fadeInInterface = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(1.0));
             
-            fadeOutOverlay.Completed += (s, ev) => StartupOverlay.Visibility = Visibility.Collapsed;
+            fadeOutOverlay.Completed += (s, ev) => {
+                StartupOverlay.Visibility = Visibility.Collapsed;
+                _isStartupCompleted = true;
+            };
 
             StartupOverlay.BeginAnimation(OpacityProperty, fadeOutOverlay);
             MainInterfaceGrid.BeginAnimation(OpacityProperty, fadeInInterface);
@@ -279,7 +582,7 @@ namespace Eternal.Views
             UpdateAttemptPins();
         }
 
-        private void LockoutTimer_Tick(object sender, EventArgs e)
+        private void LockoutTimer_Tick(object? sender, EventArgs e)
         {
             if (_settingsService?.Current.LockoutEnd.HasValue == true && _settingsService.Current.LockoutEnd > DateTime.Now)
             {
@@ -491,7 +794,53 @@ namespace Eternal.Views
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            var confirmWin = new Eternal.Views.Helpers.ExitConfirmWindow();
+            confirmWin.Owner = this;
+            if (confirmWin.ShowDialog() == true)
+            {
+                this.Close();
+            }
+        }
+
+        private void HeaderSearchBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var mainVm = DataContext as MainViewModel;
+            if (mainVm?.CommandPaletteVm != null)
+            {
+                mainVm.CommandPaletteVm.Open();
+            }
+        }
+
+        private void HeaderSearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            var mainVm = DataContext as MainViewModel;
+            if (mainVm?.CommandPaletteVm != null)
+            {
+                // Accessing the private search method indirectly by setting property to trigger community toolkit's OnSearchTextChanged
+                mainVm.CommandPaletteVm.SearchText = HeaderSearchBox.Text;
+                if (!mainVm.CommandPaletteVm.IsOpen && !string.IsNullOrEmpty(HeaderSearchBox.Text))
+                {
+                    mainVm.CommandPaletteVm.IsOpen = true;
+                }
+            }
+        }
+
+        private void SearchListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.ListBox listBox && listBox.SelectedItem != null)
+            {
+                var mainVm = DataContext as MainViewModel;
+                if (mainVm?.CommandPaletteVm != null)
+                {
+                    var selected = listBox.SelectedItem as ViewModels.Modules.CommandItem;
+                    if (selected != null)
+                    {
+                        mainVm.CommandPaletteVm.ExecuteSelected(selected);
+                        HeaderSearchBox.Text = string.Empty;
+                    }
+                }
+                listBox.SelectedItem = null;
+            }
         }
 
         private System.Windows.Point _dockStartPoint;
@@ -583,17 +932,31 @@ namespace Eternal.Views
             e.Handled = true;
         }
 
+        private bool _isPermanentlyExpanded = false;
+
+        private void LogoButton_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                _isPermanentlyExpanded = !_isPermanentlyExpanded;
+                vm.IsSidebarExpanded = _isPermanentlyExpanded;
+            }
+            e.Handled = true;
+        }
+
+        private void SidebarBorder_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            // Hover-to-expand disabled for now
+        }
+
+        private void SidebarBorder_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            // Hover-to-expand disabled for now
+        }
+
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var vm = this.DataContext as MainViewModel;
-            if (vm != null)
-            {
-                // Base design dimensions are 1300 x 800
-                double scaleX = e.NewSize.Width / 1300.0;
-                double scaleY = e.NewSize.Height / 800.0;
-                double targetScale = Math.Min(scaleX, scaleY);
-                vm.DisplayScale = Math.Max(0.5, Math.Min(2.0, targetScale));
-            }
+            // Manual DPI adjustment is controlled directly via settings.
         }
     }
 }

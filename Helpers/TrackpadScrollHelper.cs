@@ -44,13 +44,8 @@ namespace Eternal.Helpers
         {
             if (sender is ScrollViewer scrollViewer)
             {
-                // Native immediate scrolling to match Windows precision trackpads directly
-                double targetOffset = scrollViewer.VerticalOffset - e.Delta;
-
-                if (targetOffset < 0) targetOffset = 0;
-                if (targetOffset > scrollViewer.ScrollableHeight) targetOffset = scrollViewer.ScrollableHeight;
-
-                scrollViewer.ScrollToVerticalOffset(targetOffset);
+                // Scroll instantly by the system wheel delta to match native Windows behavior
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
                 e.Handled = true;
             }
         }

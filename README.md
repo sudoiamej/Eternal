@@ -1,4 +1,4 @@
-# Eternal System Intelligence (v3.1.0 Release)
+# Eternal System Intelligence (v3.2.0 Release)
 
 ![Eternal Banner](Assets/logo.png)
 

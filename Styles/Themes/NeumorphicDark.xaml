@@ -32,8 +32,8 @@
     <SolidColorBrush x:Key="CriticalBrush" Color="{StaticResource CriticalColor}"/>
     <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}"/>
 
-    <!-- Neon Accents (Dynamic selected accent color is preserved) -->
-    <Color x:Key="AccentColor">#00E5FF</Color>
+    <!-- Neon Accents (Strictly forced to original purple accent) -->
+    <Color x:Key="AccentColor">#7F00FF</Color>
     <Color x:Key="AccentSecondaryColor">#404555</Color>
     
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>

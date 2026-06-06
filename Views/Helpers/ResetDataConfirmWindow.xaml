@@ -38,8 +38,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="CANCEL" Style="{StaticResource SecondaryButton}" Margin="0,0,5,0" Click="Cancel_Click"/>
-                <Button Content="PURGE ALL DATA" Style="{StaticResource PrimaryButton}" Margin="5,0,0,0" BorderBrush="{DynamicResource CriticalBrush}" Background="#1AFF3B30" Click="Confirm_Click">
+                <Button Grid.Column="0" Content="CANCEL" Style="{StaticResource SecondaryButton}" Margin="0,0,5,0" Click="Cancel_Click"/>
+                <Button Grid.Column="1" Content="PURGE ALL DATA" Style="{StaticResource PrimaryButton}" Margin="5,0,0,0" BorderBrush="{DynamicResource CriticalBrush}" Background="#1AFF3B30" Click="Confirm_Click">
                     <Button.Resources>
                         <SolidColorBrush x:Key="AccentTextBrush" Color="White"/>
                     </Button.Resources>

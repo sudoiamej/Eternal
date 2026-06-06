@@ -153,7 +153,7 @@ namespace Eternal.Models
         public bool UseNeumorphicUI { get; set; } = true;
         public string NewUiGradiency { get; set; } = "Deep Space";
         public string Theme { get; set; } = "Dark";
-        public string ThemeAccentColor { get; set; } = "#0078D7";
+        public string ThemeAccentColor { get; set; } = "#7F00FF";
         public bool IsAutoUpdateEnabled { get; set; } = true;
         public bool MinimizeToTray { get; set; } = true;
         public bool IsAdvancedMode { get; set; } = false;
@@ -180,6 +180,8 @@ namespace Eternal.Models
         public string MachineFingerprint { get; set; } = "Unknown";
         
         // Monitoring & Performance
+        public double FontAdjustmentScale { get; set; } = 1.0;
+        public double WindowScale { get; set; } = 1.0;
         public int RefreshFrequency { get; set; } = 1000;
         public bool PreloadOnStartup { get; set; } = true;
         public string PollingProfile { get; set; } = "Balanced";
@@ -188,5 +190,6 @@ namespace Eternal.Models
         // Paths
         public string ExportFolderPath { get; set; } = string.Empty;
         public DateTime LastUpdateCheck { get; set; } = DateTime.MinValue;
+        public bool IsFactoryResetPending { get; set; } = false;
     }
 }

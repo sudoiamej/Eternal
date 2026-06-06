@@ -23,9 +23,7 @@
                                 <TextBlock Text="Select a global visual style (choose 'CarPlay' for Apple CarPlay minimalist black)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                             <ComboBox SelectedValue="{Binding SelectedTheme}" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                <system:String>Dark</system:String>
-                                <system:String>Gray</system:String>
-                                <system:String>HighContrast</system:String>
+                                <system:String>NeumorphicDark</system:String>
                                 <system:String>CarPlay</system:String>
                             </ComboBox>
                         </Grid>
@@ -100,6 +98,30 @@
                                 </Button>
                             </UniformGrid>
                         </StackPanel>
+
+                        <!-- Font Size Adjustment Setting -->
+                        <Grid Margin="0,20,0,10" IsEnabled="False" Opacity="0.5">
+                            <StackPanel>
+                                <TextBlock Text="Font Sizing Scale" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Scale application typography size dynamically." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Slider Value="{Binding SelectedFontScale}" Minimum="1.0" Maximum="1.5" Width="100" TickFrequency="0.05" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding SelectedFontScale, StringFormat='{}{0:F2}x'}" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Width="35"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Window / DPI Scaling Setting -->
+                        <Grid Margin="0,10,0,0" IsEnabled="False" Opacity="0.5">
+                            <StackPanel>
+                                <TextBlock Text="Window DPI Scale" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Adjust global workspace display layout scaling." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Slider Value="{Binding SelectedWindowScale}" Minimum="1.0" Maximum="1.6" Width="100" TickFrequency="0.05" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding SelectedWindowScale, StringFormat='{}{0:F2}x'}" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Width="35"/>
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </Border>
 

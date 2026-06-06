@@ -11,11 +11,12 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
-    <Version>3.1.0</Version>
-    <InformationalVersion>3.1.0</InformationalVersion>
+    <Version>3.2.0</Version>
+    <InformationalVersion>3.2.0</InformationalVersion>
     <Authors>Eternal Analytics</Authors>
     <Product>Eternal System Intelligence</Product>
     <Description>System Intelligence and Diagnostics Suite</Description>
+    <NoWarn>NU1701</NoWarn>
     
     <!-- Publish Configuration -->
     <PublishSingleFile>true</PublishSingleFile>

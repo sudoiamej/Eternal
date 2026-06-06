@@ -1,0 +1,40 @@
+{
+  "Security": [
+    {
+      "Path": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+      "ValueName": "ConsentPromptBehaviorAdmin",
+      "ExpectedValue": 5,
+      "Description": "UAC Prompt for Administrators"
+    },
+    {
+      "Path": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+      "ValueName": "EnableLUA",
+      "ExpectedValue": 1,
+      "Description": "User Account Control Enablement"
+    }
+  ],
+  "Shell": [
+    {
+      "Path": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+      "ValueName": "Shell",
+      "ExpectedValue": "explorer.exe",
+      "Description": "Default OS Desktop Shell"
+    }
+  ],
+  "Kernel": [
+    {
+      "Path": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager",
+      "ValueName": "ProtectionMode",
+      "ExpectedValue": 1,
+      "Description": "Session Manager Protection Mode"
+    }
+  ],
+  "Network": [
+    {
+      "Path": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+      "ValueName": "EnableICMPRedirect",
+      "ExpectedValue": 0,
+      "Description": "ICMP Redirect Protection"
+    }
+  ]
+}

@@ -46,6 +46,7 @@ namespace Eternal.ViewModels
         [ObservableProperty] private bool _isAdvancedMode = false;
         [ObservableProperty] private bool _isTestingModeActive = false;
         [ObservableProperty] private bool _isTelemetryHudOpen = true;
+        [ObservableProperty] private bool _isSidebarExpanded = false;
         public TestingViewModel TestingVm => App.ServiceProvider.GetRequiredService<TestingViewModel>();
         
         public AppSettings Settings => _settingsService.Current;
@@ -96,7 +97,8 @@ namespace Eternal.ViewModels
             ICreatorService creatorService,
             IEnvironmentService envService,
             IBatteryService batteryService,
-            ToastViewModel toastVm)
+            ToastViewModel toastVm,
+            CommandPaletteViewModel commandPaletteVm)
         {
             _loggingService = loggingService;
             _performanceService = performanceService;
@@ -107,10 +109,11 @@ namespace Eternal.ViewModels
             _envService = envService;
             _batteryService = batteryService;
             ToastVm = toastVm;
+            CommandPaletteVm = commandPaletteVm;
 
             Title = "Eternal System Intelligence";
             _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
-            _loggingService.Log($"Dev Preview Suite Version 3.1.0");
+            _loggingService.Log($"Dev Preview Suite Version 3.2.0");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
             _settingsService.SettingsChanged += OnSettingsChanged;
@@ -126,6 +129,56 @@ namespace Eternal.ViewModels
             _ = RefreshPorts();
             ApplyTheme(Settings.Theme);
             ApplyThemeColor();
+            UpdateFontScale();
+            UpdateWindowScale();
+        }
+
+        public void UpdateFontScale()
+        {
+            try
+            {
+                var app = System.Windows.Application.Current;
+                if (app != null)
+                {
+                    double fontScale = Math.Max(1.0, Settings.FontAdjustmentScale);
+                    app.Resources["GlobalFontScale"] = fontScale;
+                    // We can adjust standard FontSize resources dynamically
+                    app.Resources["H1FontSize"] = 28 * fontScale;
+                    app.Resources["H2FontSize"] = 18 * fontScale;
+                    app.Resources["BodyFontSize"] = 11 * fontScale;
+                    app.Resources["CaptionFontSize"] = 11 * fontScale;
+                }
+            }
+            catch { }
+        }
+
+        public void UpdateWindowScale()
+        {
+            try
+            {
+                var mainWin = System.Windows.Application.Current.MainWindow;
+                if (mainWin != null)
+                {
+                    double scale = Math.Max(1.0, Settings.WindowScale);
+                    DisplayScale = scale;
+
+                    double dpiScale = 1.0;
+                    var source = PresentationSource.FromVisual(mainWin);
+                    if (source != null && source.CompositionTarget != null)
+                    {
+                        dpiScale = source.CompositionTarget.TransformToDevice.M11;
+                    }
+                    else
+                    {
+                        var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(mainWin);
+                        dpiScale = dpi.DpiScaleX;
+                    }
+
+                    mainWin.Width = (1300 * scale) / dpiScale;
+                    mainWin.Height = (800 * scale) / dpiScale;
+                }
+            }
+            catch { }
         }
 
         private void OnSettingsChanged(object? sender, AppSettings settings)
@@ -133,6 +186,8 @@ namespace Eternal.ViewModels
             IsAdvancedMode = settings.IsAdvancedMode;
             ApplyTheme(settings.Theme);
             ApplyThemeColor();
+            UpdateFontScale();
+            UpdateWindowScale();
             InitializeNavigation();
         }
 
@@ -163,7 +218,8 @@ namespace Eternal.ViewModels
                 new NavigationItem("Registry", "Book", "Registry", 2, 2, 3),
                 new NavigationItem("Reports", "FileText", "Reports", 0, 1, 4),
                 new NavigationItem("Tools", "Wrench", "Tools", 1, 1, 5),
-                new NavigationItem("Guardian Tuning", "Gears", "Tuning", 1, 2, 6)
+                new NavigationItem("Guardian Tuning", "Gears", "Tuning", 1, 2, 6),
+                new NavigationItem("Baseline Audit", "Shield", "RegistryLexicon", 1, 1, 7)
             };
             var tempTelemetry = new List<NavigationItem>
             {
@@ -351,8 +407,7 @@ namespace Eternal.ViewModels
         {
             try
             {
-                bool isCarPlayActive = Settings.Theme == "CarPlay" && !Settings.UseLegacyUI;
-                var colorStr = isCarPlayActive ? "#FFFFFF" : Settings.ThemeAccentColor;
+                var colorStr = "#7F00FF"; // Force original purple accent
                 var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colorStr);
                 var resources = System.Windows.Application.Current.Resources;
                 
@@ -368,39 +423,11 @@ namespace Eternal.ViewModels
                 resources["AccentSecondaryColor"] = secondary;
                 resources["AccentSecondaryBrush"] = new System.Windows.Media.SolidColorBrush(secondary);
 
-                // Apply Background Gradiency for Modern UI
-                System.Windows.Media.Color stop1, stop2, stop3;
-                if (isCarPlayActive)
-                {
-                    stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#000000");
-                    stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#000000");
-                    stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#000000");
-                }
-                else
-                {
-                    switch (Settings.NewUiGradiency)
-                    {
-                        case "Nebula": 
-                            stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#10051A"); 
-                            stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1A0A2E"); 
-                            stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2B124C"); break;
-                        case "Aurora": 
-                            stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#051014"); 
-                            stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0A1A22"); 
-                            stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#122C34"); break;
-                        case "Crimson Flow": 
-                            stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1A0505"); 
-                            stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2E0A0A"); 
-                            stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#4C1212"); break;
-                        default: 
-                            stop1 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#05050A"); 
-                            stop2 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0D0D1A"); 
-                            stop3 = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1A1A30"); break;
-                    }
-                }
-                resources["BgGradientStop1"] = stop1;
-                resources["BgGradientStop2"] = stop2;
-                resources["BgGradientStop3"] = stop3;
+                // Apply solid backgrounds instead of dynamic gradients for performance
+                var solidBg = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#090A0E");
+                resources["BgGradientStop1"] = solidBg;
+                resources["BgGradientStop2"] = solidBg;
+                resources["BgGradientStop3"] = solidBg;
 
                 UpdateAccentTextContrast(color);
             }
@@ -652,6 +679,11 @@ namespace Eternal.ViewModels
                     var registryVm = sp.GetRequiredService<RegistryViewModel>();
                     CurrentView = registryVm; 
                     await registryVm.LoadRegistryCommand.ExecuteAsync(null); 
+                    break;
+                case "RegistryLexicon":
+                    var lexiconVm = sp.GetRequiredService<RegistryLexiconViewModel>();
+                    CurrentView = lexiconVm;
+                    await lexiconVm.LoadAuditCommand.ExecuteAsync(null);
                     break;
                 case "Boot": 
                     var bootVm = sp.GetRequiredService<BootViewModel>();

@@ -64,138 +64,233 @@
         <DataTemplate DataType="{x:Type vmm:ConfigEditorViewModel}"><vmv:ConfigEditorView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:WmiExplorerViewModel}"><vmv:WmiExplorerView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:AppProfilerViewModel}"><vmv:AppProfilerView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:RegistryLexiconViewModel}"><vmv:RegistryLexiconView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:TestingViewModel}"><vmv:TestingView/></DataTemplate>
     </Window.Resources>
     <Border Background="#090A0E" CornerRadius="24" BorderThickness="1.5" BorderBrush="#1CFFFFFF" ClipToBounds="True" Margin="0">
         <Grid>
             <Grid.LayoutTransform>
-                <ScaleTransform ScaleX="{Binding DisplayScale}" ScaleY="{Binding DisplayScale}"/>
+                <ScaleTransform ScaleX="{Binding Settings.WindowScale}" ScaleY="{Binding Settings.WindowScale}"/>
             </Grid.LayoutTransform>
-            <!-- 1. Car Startup Overlay -->
+            <!-- 1. Car Startup Overlay (macOS style layout: logo/branding centered at top, progress/tips centered at bottom) -->
             <Grid x:Name="StartupOverlay" Panel.ZIndex="1000" Background="#090A0E">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/> <!-- Logo & Brand Name Container -->
+                    <RowDefinition Height="2*"/> <!-- Progress Bar, Verbose Status & Tips Container -->
+                </Grid.RowDefinitions>
+
+                <!-- Version Footer in Upper Right (50-75% transparent: Opacity="0.4") -->
+                <TextBlock Text="v3.5 Beta" 
+                           Foreground="White" 
+                           FontSize="11" 
+                           FontWeight="Black" 
+                           Opacity="0.4" 
+                           HorizontalAlignment="Right" 
+                           VerticalAlignment="Top" 
+                           Margin="30"
+                           Grid.RowSpan="2"/>
+
+                <!-- Top Portion: Centered Logo and Brand Name -->
+                <StackPanel Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                     <!-- The Eternal Logo as the primary boot icon with Cinematic Glow -->
-                    <Image x:Name="BootLogo" Source="/Assets/logo.png" Width="180" Height="180" RenderOptions.BitmapScalingMode="HighQuality">
+                    <Image x:Name="BootLogo" Source="/Assets/logo.png" Width="140" Height="140" HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality">
                         <Image.RenderTransform>
-                            <ScaleTransform CenterX="90" CenterY="90" x:Name="BootLogoScale"/>
+                            <ScaleTransform CenterX="70" CenterY="70" x:Name="BootLogoScale"/>
                         </Image.RenderTransform>
                     </Image>
+                    <TextBlock Text="ETERNAL" Foreground="White" FontSize="26" FontWeight="Black" HorizontalAlignment="Center" Margin="0,15,0,0"/>
+                </StackPanel>
 
-                    <!-- LOCK CONTAINER (UNLOCK PHASE) -->
-                    <StackPanel x:Name="LockContainer" Visibility="Collapsed" Width="340" HorizontalAlignment="Center" Margin="0,30,0,0">
-                        <TextBlock x:Name="InputPromptText" Text="ENTER ACCESS PIN" Foreground="{DynamicResource TextSecondaryBrush}" 
-                                   FontSize="10" FontWeight="Bold" Margin="0,0,0,12" HorizontalAlignment="Center"/>
-                        
-                        <Grid x:Name="VisualPinContainer" HorizontalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                <!-- Bottom Portion: Verbose Status, Progress Bar, Tips, and Lock Screen -->
+                <Grid Grid.Row="1" VerticalAlignment="Top" Margin="0,30,0,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <!-- LOCK CONTAINER (UNLOCK PHASE) -->
+                        <StackPanel x:Name="LockContainer" Visibility="Collapsed" Width="340" HorizontalAlignment="Center">
+                            <TextBlock x:Name="InputPromptText" Text="ENTER ACCESS PIN" Foreground="{DynamicResource TextSecondaryBrush}" 
+                                       FontSize="10" FontWeight="Bold" Margin="0,0,0,12" HorizontalAlignment="Center"/>
+                            
+                            <Grid x:Name="VisualPinContainer" HorizontalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
 
-                            <Grid Grid.Column="0" HorizontalAlignment="Center" Cursor="Hand" MouseLeftButtonDown="VisualPinContainer_MouseLeftButtonDown" VerticalAlignment="Center">
-                                <!-- Invisible PasswordBox overlaying the 6 boxes for focus/input -->
-                                <PasswordBox x:Name="PinInput" MaxLength="6" Width="280" Height="46" Opacity="0.01" Background="Transparent" BorderThickness="0"
-                                             PasswordChanged="PinInput_PasswordChanged" KeyDown="PinInput_KeyDown" CaretBrush="Transparent"/>
-                                
-                                <!-- 6-Box Visual Layout -->
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" IsHitTestVisible="False" VerticalAlignment="Center">
-                                    <Border x:Name="Box1" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
-                                        <TextBlock x:Name="Text1" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    </Border>
-                                    <Border x:Name="Box2" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
-                                        <TextBlock x:Name="Text2" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    </Border>
-                                    <Border x:Name="Box3" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
-                                        <TextBlock x:Name="Text3" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    </Border>
-                                    <Border x:Name="Box4" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
-                                        <TextBlock x:Name="Text4" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    </Border>
-                                    <Border x:Name="Box5" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
-                                        <TextBlock x:Name="Text5" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    </Border>
-                                    <Border x:Name="Box6" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
-                                        <TextBlock x:Name="Text6" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    </Border>
-                                </StackPanel>
+                                <Grid Grid.Column="0" HorizontalAlignment="Center" Cursor="Hand" MouseLeftButtonDown="VisualPinContainer_MouseLeftButtonDown" VerticalAlignment="Center">
+                                    <!-- Invisible PasswordBox overlaying the 6 boxes for focus/input -->
+                                    <PasswordBox x:Name="PinInput" MaxLength="6" Width="280" Height="46" Opacity="0.01" Background="Transparent" BorderThickness="0"
+                                                 PasswordChanged="PinInput_PasswordChanged" KeyDown="PinInput_KeyDown" CaretBrush="Transparent"/>
+                                    
+                                    <!-- 6-Box Visual Layout -->
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" IsHitTestVisible="False" VerticalAlignment="Center">
+                                        <Border x:Name="Box1" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                            <TextBlock x:Name="Text1" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <Border x:Name="Box2" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                            <TextBlock x:Name="Text2" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <Border x:Name="Box3" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                            <TextBlock x:Name="Text3" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <Border x:Name="Box4" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                            <TextBlock x:Name="Text4" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <Border x:Name="Box5" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                            <TextBlock x:Name="Text5" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <Border x:Name="Box6" Width="40" Height="46" CornerRadius="10" Margin="3,0" BorderThickness="1.5" BorderBrush="{DynamicResource BorderBrush}" Background="#0AFFFFFF">
+                                            <TextBlock x:Name="Text6" Text="" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Side right-arrow action button -->
+                                <Button x:Name="UnlockButton" Grid.Column="1" Height="46" Width="50" Margin="10,0,0,0"
+                                        Style="{StaticResource PrimaryButton}" Click="Unlock_Click" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="ArrowRight" Width="14" Foreground="Black">
+                                        <fa:ImageAwesome.Effect>
+                                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
+                                        </fa:ImageAwesome.Effect>
+                                    </fa:ImageAwesome>
+                                </Button>
                             </Grid>
 
-                            <!-- Side right-arrow action button -->
-                            <Button x:Name="UnlockButton" Grid.Column="1" Height="46" Width="50" Margin="10,0,0,0"
-                                    Style="{StaticResource PrimaryButton}" Click="Unlock_Click" VerticalAlignment="Center">
-                                <fa:ImageAwesome Icon="ArrowRight" Width="14" Foreground="Black">
-                                    <fa:ImageAwesome.Effect>
-                                        <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
-                                    </fa:ImageAwesome.Effect>
-                                </fa:ImageAwesome>
-                            </Button>
-                        </Grid>
+                            <TextBlock x:Name="ErrorText" Text="Invalid access code" Foreground="{DynamicResource CriticalBrush}" 
+                                       FontSize="10" Margin="0,8,0,0" Visibility="Collapsed" HorizontalAlignment="Center" FontWeight="SemiBold"/>
 
-                        <TextBlock x:Name="ErrorText" Text="Invalid access code" Foreground="{DynamicResource CriticalBrush}" 
-                                   FontSize="10" Margin="0,8,0,0" Visibility="Collapsed" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+                            <!-- Attempt Status & Lockouts -->
+                            <StackPanel HorizontalAlignment="Center" Margin="0,15,0,0">
+                                <!-- Visual Attempt Pins -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="AttemptPinsPanel" Margin="0,5">
+                                    <Ellipse x:Name="Attempt1" Width="8" Height="8" Margin="5,0" Fill="{DynamicResource SuccessBrush}"/>
+                                    <Ellipse x:Name="Attempt2" Width="8" Height="8" Margin="5,0" Fill="{DynamicResource SuccessBrush}"/>
+                                    <Ellipse x:Name="Attempt3" Width="8" Height="8" Margin="5,0" Fill="{DynamicResource SuccessBrush}"/>
+                                </StackPanel>
+                                
+                                <StackPanel x:Name="LockoutPanel" Visibility="Collapsed" Margin="0,5">
+                                    <TextBlock Text="SECURITY LOCKOUT ACTIVE" Foreground="{DynamicResource CriticalBrush}" 
+                                               FontWeight="Bold" FontSize="11" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="LockoutTimerText" Text="Please wait 00:60" Foreground="{DynamicResource TextSecondaryBrush}" 
+                                               FontSize="10" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
 
-                        <!-- Attempt Status & Lockouts -->
-                        <StackPanel HorizontalAlignment="Center" Margin="0,15,0,0">
-                            <!-- Visual Attempt Pins -->
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="AttemptPinsPanel" Margin="0,5">
-                                <Ellipse x:Name="Attempt1" Width="8" Height="8" Margin="5,0" Fill="{DynamicResource SuccessBrush}"/>
-                                <Ellipse x:Name="Attempt2" Width="8" Height="8" Margin="5,0" Fill="{DynamicResource SuccessBrush}"/>
-                                <Ellipse x:Name="Attempt3" Width="8" Height="8" Margin="5,0" Fill="{DynamicResource SuccessBrush}"/>
-                            </StackPanel>
-                            
-                            <StackPanel x:Name="LockoutPanel" Visibility="Collapsed" Margin="0,5">
-                                <TextBlock Text="SECURITY LOCKOUT ACTIVE" Foreground="{DynamicResource CriticalBrush}" 
-                                           FontWeight="Bold" FontSize="11" HorizontalAlignment="Center"/>
-                                <TextBlock x:Name="LockoutTimerText" Text="Please wait 00:60" Foreground="{DynamicResource TextSecondaryBrush}" 
-                                           FontSize="10" HorizontalAlignment="Center" Margin="0,3,0,0"/>
-                            </StackPanel>
+                            <!-- Bottom Actions -->
+                            <Button Content="EXIT APPLICATION" Style="{StaticResource SecondaryButton}" Height="36" Width="180" Margin="0,20,0,0" Click="Exit_Click" HorizontalAlignment="Center"/>
                         </StackPanel>
 
-                        <!-- Bottom Actions -->
-                        <Button Content="EXIT APPLICATION" Style="{StaticResource SecondaryButton}" Height="36" Width="180" Margin="0,20,0,0" Click="Exit_Click" HorizontalAlignment="Center"/>
-                    </StackPanel>
-
-                    <!-- LOADING CONTAINER (STARTUP PHASE) -->
-                    <StackPanel x:Name="LoadingContainer" Visibility="Collapsed">
-                        <TextBlock x:Name="StartupStatusText" Text="ETERNAL SYSTEM INTELLIGENCE" Margin="0,40,0,0" FontSize="18" FontWeight="Black" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center" Opacity="0.9"/>
-                        <TextBlock Text="PREPARING WORKSPACE STATE" FontSize="11" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Opacity="0.4" Margin="0,10,0,0"/>
-                        <Border Width="300" Height="4" Background="#1C1C1E" CornerRadius="2" Margin="0,30,0,0" HorizontalAlignment="Center">
-                            <Border x:Name="TachometerSweep" Width="0" Height="4" Background="#FFFFFF" CornerRadius="2" HorizontalAlignment="Left">
-                                <Border.Effect>
-                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
-                                </Border.Effect>
+                        <!-- LOADING CONTAINER (STARTUP PHASE) -->
+                        <StackPanel x:Name="LoadingContainer" Visibility="Collapsed" HorizontalAlignment="Center">
+                            <TextBlock x:Name="StartupStatusText" Text="PREPARING WORKSPACE STATE" FontSize="11" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Opacity="0.6"/>
+                            <Border Width="300" Height="4" Background="#1C1C1E" CornerRadius="2" Margin="0,18,0,0" HorizontalAlignment="Center">
+                                <Border x:Name="TachometerSweep" Width="0" Height="4" Background="#FFFFFF" CornerRadius="2" HorizontalAlignment="Left">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
+                                    </Border.Effect>
+                                </Border>
                             </Border>
-                        </Border>
-                        <TextBlock x:Name="StartupTipText" Text="Loading system intelligence..." FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,15,0,0" Opacity="0.75" TextAlignment="Center" MaxWidth="280" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="StartupTipText" Text="Loading system intelligence..." FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,15,0,0" Opacity="0.75" TextAlignment="Center" MaxWidth="280" TextWrapping="Wrap"/>
+                        </StackPanel>
+
+                        <!-- FACTORY RESET DIALOG (INTERRUPT PHASE) -->
+                        <StackPanel x:Name="FactoryResetContainer" Visibility="Collapsed" HorizontalAlignment="Center" Width="320">
+                            <TextBlock Text="FACTORY RESET REQUESTED" FontSize="13" FontWeight="Black" Foreground="{DynamicResource CriticalBrush}" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                            <TextBlock Text="Enter existing passcode to confirm wipe:" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                            
+                            <PasswordBox x:Name="ResetPasscodeBox" MaxLength="6" Width="180" Height="36" Background="#0DFFFFFF" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1.5" Foreground="White" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                            
+                            <TextBlock x:Name="ResetErrorText" Text="Invalid passcode. Try again." Foreground="{DynamicResource CriticalBrush}" FontSize="10" Margin="0,0,0,12" Visibility="Collapsed" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="ConfirmResetBtn" Content="YES, CLEAR ALL" Click="ConfirmReset_Click" Style="{StaticResource PrimaryButton}" Height="36" Width="130" Margin="0,0,10,0"/>
+                                <Button x:Name="CancelResetBtn" Content="NO, CANCEL" Click="CancelReset_Click" Style="{StaticResource SecondaryButton}" Height="36" Width="110"/>
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
+                </Grid>
             </Grid>
 
             <!-- 2. Main Interface Content -->
             <Grid x:Name="MainInterfaceGrid" Opacity="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/> <!-- CarPlay Dock -->
+                    <ColumnDefinition Width="Auto"/> <!-- CarPlay Dock -->
                     <ColumnDefinition Width="*"/>  <!-- Main Content -->
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Background="#111218" CornerRadius="22,0,0,22" BorderThickness="0,0,1,0" BorderBrush="#15FFFFFF"
-                        AllowDrop="True" Drop="Dock_Drop" DragOver="Dock_DragOver">
+                <Border Grid.Column="0" x:Name="SidebarBorder" Background="#111218" CornerRadius="22,0,0,22" BorderThickness="0,0,1,0" BorderBrush="#15FFFFFF"
+                        AllowDrop="True" Drop="Dock_Drop" DragOver="Dock_DragOver"
+                        MouseEnter="SidebarBorder_MouseEnter" MouseLeave="SidebarBorder_MouseLeave">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Width" Value="80"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="True">
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Width" To="220" Duration="0:0:0.3">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <QuarticEase EasingMode="EaseOut"/>
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                    <DataTrigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Width" To="80" Duration="0:0:0.3">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <QuarticEase EasingMode="EaseOut"/>
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.ExitActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/> <!-- Home Button -->
+                        <RowDefinition Height="Auto"/> <!-- Home Button / Header -->
                         <RowDefinition Height="*"/>    <!-- Recent Apps -->
                         <RowDefinition Height="Auto"/> <!-- Status/Clock -->
                     </Grid.RowDefinitions>
 
-                    <!-- Home Button (Eternal Logo in circular CarPlay anchor) -->
-                    <!-- Home Button (Eternal Logo clickable only) -->
-                    <Button Grid.Row="0" Margin="10,25,10,10" Command="{Binding NavigateCommand}" CommandParameter="Home" Style="{StaticResource NeuLogoButton}">
-                        <Rectangle Fill="White" Width="28" Height="28" RenderOptions.BitmapScalingMode="HighQuality">
-                            <Rectangle.OpacityMask>
-                                <ImageBrush ImageSource="/Assets/logo.png" Stretch="Uniform"/>
-                            </Rectangle.OpacityMask>
-                        </Rectangle>
-                    </Button>
+                    <!-- Logo / Expand Toggle Header (HCI Principle: Affordance & Natural Mapping) -->
+                    <Grid Grid.Row="0" Margin="10,25,10,10">
+                        <Button Command="{Binding NavigateCommand}" 
+                                CommandParameter="Home" 
+                                MouseDoubleClick="LogoButton_MouseDoubleClick"
+                                Style="{StaticResource NeuLogoButton}"
+                                HorizontalAlignment="Left"
+                                Margin="15,0,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Rectangle Fill="White" Width="28" Height="28" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush ImageSource="/Assets/logo.png" Stretch="Uniform"/>
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                                <TextBlock Text="ETERNAL" 
+                                           Foreground="White" 
+                                           FontWeight="Black" 
+                                           FontSize="13" 
+                                           VerticalAlignment="Center" 
+                                           Margin="15,0,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
 
                     <!-- Dynamic Recent Apps / Category Workspaces (Touch-friendly, borderless, scrollable with hidden scrollbar) -->
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Focusable="False">
@@ -221,7 +316,25 @@
                                                 </MenuItem>
                                             </ContextMenu>
                                         </Button.ContextMenu>
-                                        <fa:ImageAwesome Icon="{Binding Icon}" Width="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                        <Grid Margin="10,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="White" VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Margin="15,0,0,0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
                                     </Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -240,11 +353,61 @@
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
-                            <fa:ImageAwesome Icon="Gear" Width="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            <Grid Margin="10,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <fa:ImageAwesome Grid.Column="0" Icon="Gear" Width="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Settings" Foreground="White" VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Margin="15,0,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
                         </Button>
-                        
-                        <TextBlock Text="{Binding CurrentTime}" Foreground="{DynamicResource TextBrush}" FontSize="12" FontWeight="Black" HorizontalAlignment="Center" Margin="0,15,0,0" Opacity="0.9"/>
-                        <TextBlock Text="{Binding BatteryPercentage}" Foreground="{DynamicResource SuccessBrush}" FontSize="10" FontWeight="Black" HorizontalAlignment="Center" Opacity="0.8"/>
+                        <!-- Status Info (HCI principle: Visibility of System Status. Clean layout adapting between collapsed and expanded states) -->
+                        <Grid Margin="0,15,0,0">
+                            <!-- Collapsed State: Stacked Vertically to prevent clipping -->
+                            <StackPanel x:Name="CollapsedStatusPanel" Orientation="Vertical" HorizontalAlignment="Center">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="{Binding CurrentTime}" Foreground="{DynamicResource TextBrush}" FontSize="11" FontWeight="Black" Opacity="0.9" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding BatteryPercentage}" Foreground="{DynamicResource AccentBrush}" FontSize="9" FontWeight="Black" Opacity="0.8" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <!-- Expanded State: Inline Horizontal for clean visual flow -->
+                            <StackPanel x:Name="ExpandedStatusPanel" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="{Binding CurrentTime}" Foreground="{DynamicResource TextBrush}" FontSize="12" FontWeight="Black" Opacity="0.9"/>
+                                <TextBlock Text="  |  " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding BatteryPercentage}" Foreground="{DynamicResource AccentBrush}" FontSize="11" FontWeight="Black" Opacity="0.8"/>
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -271,15 +434,95 @@
                         <TextBlock Text="{Binding Title}" Foreground="#A0A5B5" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                     
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,15,0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,15,0" VerticalAlignment="Center">
+                        <!-- Neumorphic Search Bar with Popup results -->
+                        <Grid Margin="0,0,15,0" Width="180" Height="30" VerticalAlignment="Center">
+                            <Border CornerRadius="8" Background="#0AFFFFFF" BorderBrush="#1CFFFFFF" BorderThickness="1.2">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <fa:ImageAwesome Icon="Search" Width="10" Foreground="#A0A5B5" Margin="8,0,5,0" IsHitTestVisible="False" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="HeaderSearchBox" Grid.Column="1" Background="Transparent" BorderThickness="0" Foreground="White" CaretBrush="White" 
+                                             FontSize="11" Margin="2,0,5,0" VerticalContentAlignment="Center"
+                                             Text="{Binding CommandPaletteVm.SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                             GotFocus="HeaderSearchBox_GotFocus"
+                                             TextChanged="HeaderSearchBox_TextChanged"/>
+                                </Grid>
+                            </Border>
+
+                            <Popup x:Name="SearchPopup" PlacementTarget="{Binding ElementName=HeaderSearchBox}" Placement="Bottom"
+                                   IsOpen="{Binding CommandPaletteVm.IsOpen, Mode=TwoWay}" StaysOpen="False" AllowsTransparency="True" Width="280">
+                                <Border Background="#14161F" BorderBrush="#2A2F3D" BorderThickness="1.5" CornerRadius="12" Padding="8" Margin="0,5,0,0">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="15" ShadowDepth="3" Direction="270" Color="Black" Opacity="0.6"/>
+                                    </Border.Effect>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="SEARCH RESULTS" FontSize="9" FontWeight="Black" Foreground="#A0A5B5" Opacity="0.5" Margin="5,2,5,8"/>
+                                        <ListBox Grid.Row="1" ItemsSource="{Binding CommandPaletteVm.FilteredCommands}" MaxHeight="300"
+                                                 Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                 SelectionChanged="SearchListBox_SelectionChanged">
+                                            <ListBox.ItemContainerStyle>
+                                                <Style TargetType="ListBoxItem">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                    <Setter Property="BorderThickness" Value="0"/>
+                                                    <Setter Property="Padding" Value="0"/>
+                                                    <Setter Property="Margin" Value="0,2"/>
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="ListBoxItem">
+                                                                <Border x:Name="Bg" CornerRadius="8" Background="Transparent" Padding="8,6">
+                                                                    <ContentPresenter />
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Background" Value="#1AFFFFFF"/>
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsSelected" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </ListBox.ItemContainerStyle>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Width="20" Height="20" CornerRadius="6" Background="#0CFFFFFF" Margin="0,0,10,0" VerticalAlignment="Center">
+                                                            <fa:ImageAwesome Icon="{Binding Icon}" Width="10" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                        </Border>
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding Name}" Foreground="White" FontSize="11" FontWeight="Bold"/>
+                                                            <TextBlock Text="{Binding Description}" Foreground="#A0A5B5" FontSize="9" TextTrimming="CharacterEllipsis" Margin="0,1,0,0"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Grid>
+                                </Border>
+                            </Popup>
+                        </Grid>
+
                         <!-- UI Toggle Button -->
                         <Button Command="{Binding ToggleUICommand}" Style="{StaticResource IconButton}" ToolTip="Switch to Legacy UI" 
-                                Visibility="{Binding IsUiToggleVisible, Converter={StaticResource VisibilityConverter}}" Margin="0,0,10,0">
+                                Visibility="{Binding IsUiToggleVisible, Converter={StaticResource VisibilityConverter}}" Margin="0,0,10,0" VerticalAlignment="Center">
                             <fa:ImageAwesome Icon="Exchange" Width="14" Foreground="{DynamicResource AccentBrush}"/>
                         </Button>
 
-                        <Button Click="MinimizeButton_Click" Style="{StaticResource IconButton}" Content="—" Foreground="{DynamicResource TextBrush}" FontSize="16" Width="40"/>
-                        <Button Click="CloseButton_Click" Style="{StaticResource IconButton}" Content="✕" Foreground="{DynamicResource CriticalBrush}" FontSize="16" Width="40"/>
+                        <Button Click="MinimizeButton_Click" Style="{StaticResource IconButton}" Content="—" Foreground="{DynamicResource TextBrush}" FontSize="16" Width="40" VerticalAlignment="Center"/>
+                        <Button Click="CloseButton_Click" Style="{StaticResource IconButton}" Content="✕" Foreground="{DynamicResource CriticalBrush}" FontSize="16" Width="40" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 

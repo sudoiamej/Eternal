@@ -1,6 +1,13 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:helpers="clr-namespace:Eternal.Views.Helpers">
+
+    <system:Double x:Key="GlobalFontScale">1.0</system:Double>
+    <system:Double x:Key="H1FontSize">28.0</system:Double>
+    <system:Double x:Key="H2FontSize">18.0</system:Double>
+    <system:Double x:Key="BodyFontSize">11.0</system:Double>
+    <system:Double x:Key="CaptionFontSize">11.0</system:Double>
 
     <!-- The actual color values are provided by the active Theme dictionary (Dark/Light/etc) -->
 
@@ -357,21 +364,21 @@
 
     <!-- Typography Hierarchy (HCI Rule 4) -->
     <Style TargetType="TextBlock" x:Key="H1">
-        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="FontSize" Value="{DynamicResource H1FontSize}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         <Setter Property="Margin" Value="0,0,0,24"/>
     </Style>
 
     <Style TargetType="TextBlock" x:Key="H2">
-        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontSize" Value="{DynamicResource H2FontSize}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         <Setter Property="Margin" Value="0,0,0,12"/>
     </Style>
 
     <Style TargetType="TextBlock" x:Key="Caption">
-        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontSize" Value="{DynamicResource CaptionFontSize}"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
     </Style>

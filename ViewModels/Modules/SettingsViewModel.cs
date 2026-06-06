@@ -18,7 +18,7 @@ namespace Eternal.ViewModels.Modules
         private readonly IUpdateService _updateService;
 
         [ObservableProperty] private AppSettings _settings;
-        [ObservableProperty] private string _appVersion = "3.1.0";
+        [ObservableProperty] private string _appVersion = "3.2.0";
         [ObservableProperty] private string _lastScanTime = "N/A";
         [ObservableProperty] private string _machineId = "Unknown";
 
@@ -92,6 +92,36 @@ namespace Eternal.ViewModels.Modules
             Main.ApplyThemeColor();
         }
 
+        public double SelectedFontScale
+        {
+            get => Settings.FontAdjustmentScale;
+            set
+            {
+                double constrainedVal = Math.Max(1.0, value);
+                if (Settings.FontAdjustmentScale != constrainedVal)
+                {
+                    Settings.FontAdjustmentScale = constrainedVal;
+                    OnPropertyChanged();
+                    Main.UpdateFontScale();
+                }
+            }
+        }
+
+        public double SelectedWindowScale
+        {
+            get => Settings.WindowScale;
+            set
+            {
+                double constrainedVal = Math.Max(1.0, value);
+                if (Settings.WindowScale != constrainedVal)
+                {
+                    Settings.WindowScale = constrainedVal;
+                    OnPropertyChanged();
+                    Main.UpdateWindowScale();
+                }
+            }
+        }
+
         [RelayCommand]
         private void ResetDefaults()
         {
@@ -106,6 +136,8 @@ namespace Eternal.ViewModels.Modules
             Settings.WmiTimeoutSeconds = defaults.WmiTimeoutSeconds;
             Settings.IsVerboseLoggingEnabled = defaults.IsVerboseLoggingEnabled;
             Settings.ThemeAccentColor = defaults.ThemeAccentColor;
+            Settings.FontAdjustmentScale = defaults.FontAdjustmentScale;
+            Settings.WindowScale = defaults.WindowScale;
             
             Settings.IsStartupLockEnabled = defaults.IsStartupLockEnabled;
             Settings.StartupLockPin = defaults.StartupLockPin;
@@ -114,6 +146,8 @@ namespace Eternal.ViewModels.Modules
             Settings.CurrentLockoutMinutes = 0;
             
             Main.ApplyThemeColor();
+            Main.UpdateFontScale();
+            Main.UpdateWindowScale();
             UpdateStartupRegistration();
             _settingsService.Save();
             Eternal.Views.Helpers.CustomNotificationWindow.Show("Settings restored to factory defaults.", "Settings", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Warning);
@@ -127,40 +161,10 @@ namespace Eternal.ViewModels.Modules
 
             if (confirmWin.ShowDialog() == true)
             {
-                try
+                var mainWindow = System.Windows.Application.Current.MainWindow as Eternal.Views.NeumorphicMainWindow;
+                if (mainWindow != null)
                 {
-                    // 1. Reset settings to default in memory
-                    Settings = new AppSettings();
-                    
-                    // 2. Clear startup registration
-                    Settings.RunAtStartup = false;
-                    UpdateStartupRegistration();
-
-                    // 3. Delete the local app data directory
-                    string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                    string folder = Path.Combine(appData, "EternalAnalytics");
-                    
-                    if (Directory.Exists(folder))
-                    {
-                        // Note: settings.json is usually in use if we don't handle it carefully, 
-                        // but since we are about to exit, we can try to delete everything else
-                        // and the file itself if possible.
-                        foreach (var file in Directory.GetFiles(folder))
-                        {
-                            try { File.Delete(file); } catch { }
-                        }
-                        foreach (var dir in Directory.GetDirectories(folder))
-                        {
-                            try { Directory.Delete(dir, true); } catch { }
-                        }
-                    }
-
-                    Eternal.Views.Helpers.CustomNotificationWindow.Show("Data purge complete. The application will now exit.", "Reset Successful", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Success);
-                    System.Windows.Application.Current.Shutdown();
-                }
-                catch (Exception ex)
-                {
-                    Eternal.Views.Helpers.CustomNotificationWindow.Show($"Purge failed: {ex.Message}", "Reset Error", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Error);
+                    mainWindow.ShowFactoryResetPromptFromSettings();
                 }
             }
         }

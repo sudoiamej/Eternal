@@ -124,6 +124,7 @@ namespace Eternal
             services.AddSingleton<IToastService, ToastNotificationService>();
             services.AddSingleton<IIntelligenceService, WindowsIntelligenceService>();
             services.AddSingleton<IRegistryService, WindowsRegistryService>();
+            services.AddSingleton<IRegistryLexiconService, WindowsRegistryLexiconService>();
             services.AddSingleton<ITuningService, WindowsTuningService>();
             services.AddSingleton<IBootService, WindowsBootService>();
             services.AddSingleton<IServicesService, WindowsServicesService>();
@@ -159,6 +160,7 @@ namespace Eternal
             // ViewModels - Functional Modules
             services.AddSingleton<RepairCenterViewModel>();
             services.AddSingleton<RegistryViewModel>();
+            services.AddSingleton<RegistryLexiconViewModel>();
             services.AddSingleton<BiosViewModel>();
             services.AddSingleton<SecurityViewModel>();
             services.AddSingleton<PerformanceViewModel>();
