@@ -1,0 +1,35 @@
+================================================================================
+          ETERNAL SYSTEM INTELLIGENCE - DASHBOARD LAYOUT PLAN
+================================================================================
+
+1. FEATURE OVERVIEW
+--------------------------------------------------------------------------------
+Provide the user with the ability to choose their preferred layout for the Main
+Dashboard. The application will support two layout variants:
+1. Grid / CarPlay Layout: A rich, interactive dashboard grid with widgets and
+   visual categories.
+2. List Layout: A compact, high-density telemetry list designed for technical
+   users.
+
+2. PROPOSED UX/UI DESIGN
+--------------------------------------------------------------------------------
+- Toggle Switch: Positioned on the top-right header or dashboard controls.
+- Visual Mode Icons: 
+  - [Grid]: Grid/CarPlay icon (LayoutGrid / Columns)
+  - [List]: List icon (List / AlignJustify)
+- Persistence: The user's choice is saved to the AppSettings JSON configuration
+  to persist across restarts.
+
+3. VM IMPLEMENTATION STEPS
+--------------------------------------------------------------------------------
+- AppSettings: Add `DashboardLayoutMode` property (enum `List`, `Grid`).
+- SettingsViewModel: Expose selection to settings screen.
+- DashboardViewModel: Expose binding for chosen view mode state, filtering
+  items accordingly.
+
+4. XAML IMPLEMENTATION STEPS
+--------------------------------------------------------------------------------
+- DashboardView.xaml: Use a ContentControl or VisualStateGroup to switch.
+- Grid Layout: Reuse the current premium CarPlay-inspired dashboard grid.
+- List Layout: Create a high-density, cleanly aligned tabular list view
+  of telemetry modules, metrics, and quick action buttons.
