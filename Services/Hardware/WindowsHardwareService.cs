@@ -267,24 +267,62 @@ namespace Eternal.Services.Hardware
                 var disks = new List<DiskInfo>();
                 try
                 {
-                    using var searcher = CreateSearcher("select Model, Size, Status, InterfaceType from Win32_DiskDrive");
-                    using var collection = searcher.Get();
+                    using var storageSearcher = new ManagementObjectSearcher(@"root\Microsoft\Windows\Storage", "SELECT FriendlyName, Size, HealthStatus, MediaType FROM MSFT_PhysicalDisk");
+                    using var collection = storageSearcher.Get();
                     foreach (ManagementObject obj in collection)
                     {
                         using (obj)
                         {
-                            string model = obj["Model"]?.ToString() ?? "Unknown";
+                            string model = obj["FriendlyName"]?.ToString() ?? "Unknown";
                             long bytes = global::System.Convert.ToInt64(obj["Size"] ?? 0);
                             string size = $"{bytes / (1024 * 1024 * 1024)} GB";
-                            string health = obj["Status"]?.ToString() ?? "Unknown";
-                            string interfaceType = obj["InterfaceType"]?.ToString() ?? "Unknown";
+                            
+                            int healthStatus = global::System.Convert.ToInt32(obj["HealthStatus"] ?? 0);
+                            string health = healthStatus switch
+                            {
+                                0 => "Healthy",
+                                1 => "Warning",
+                                2 => "Unhealthy",
+                                _ => "Unknown"
+                            };
+
+                            int mediaVal = global::System.Convert.ToInt32(obj["MediaType"] ?? 0);
+                            string interfaceType = mediaVal switch
+                            {
+                                3 => "HDD",
+                                4 => "SSD",
+                                5 => "SCM",
+                                _ => "Storage"
+                            };
+
                             disks.Add(new DiskInfo(model, size, health, interfaceType));
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    global::System.Diagnostics.Debug.WriteLine($"WMI Disk Scan Error: {ex.Message}");
+                    // Fallback to legacy Win32_DiskDrive
+                    try
+                    {
+                        using var searcher = CreateSearcher("select Model, Size, Status, InterfaceType from Win32_DiskDrive");
+                        using var collection = searcher.Get();
+                        foreach (ManagementObject obj in collection)
+                        {
+                            using (obj)
+                            {
+                                string model = obj["Model"]?.ToString() ?? "Unknown";
+                                long bytes = global::System.Convert.ToInt64(obj["Size"] ?? 0);
+                                string size = $"{bytes / (1024 * 1024 * 1024)} GB";
+                                string health = obj["Status"]?.ToString() ?? "Unknown";
+                                string interfaceType = obj["InterfaceType"]?.ToString() ?? "Unknown";
+                                disks.Add(new DiskInfo(model, size, health, interfaceType));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        global::System.Diagnostics.Debug.WriteLine($"WMI Disk Scan Error: {ex.Message}");
+                    }
                 }
 
                 // Critical WinPE Fallback: If no physical disks found via WMI, list partitions
@@ -453,15 +491,15 @@ namespace Eternal.Services.Hardware
                     foreach (ManagementObject obj in collection) {
                         using (obj)
                         {
-                            items.Add(new SystemSummaryItem("OS", "OS Name", obj["Caption"]?.ToString()));
-                            items.Add(new SystemSummaryItem("OS", "Version", obj["Version"]?.ToString()));
-                            items.Add(new SystemSummaryItem("OS", "Build Number", obj["BuildNumber"]?.ToString()));
-                            items.Add(new SystemSummaryItem("OS", "OS Manufacturer", obj["Manufacturer"]?.ToString()));
-                            items.Add(new SystemSummaryItem("OS", "System Name", obj["CSName"]?.ToString()));
-                            items.Add(new SystemSummaryItem("OS", "Architecture", obj["OSArchitecture"]?.ToString()));
-                            items.Add(new SystemSummaryItem("OS", "Boot Device", obj["BootDevice"]?.ToString()));
-                            items.Add(new SystemSummaryItem("OS", "Windows Directory", obj["WindowsDirectory"]?.ToString()));
-                            items.Add(new SystemSummaryItem("OS", "System Directory", obj["SystemDirectory"]?.ToString()));
+                            items.Add(new SystemSummaryItem("OS", "OS Name", obj["Caption"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("OS", "Version", obj["Version"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("OS", "Build Number", obj["BuildNumber"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("OS", "OS Manufacturer", obj["Manufacturer"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("OS", "System Name", obj["CSName"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("OS", "Architecture", obj["OSArchitecture"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("OS", "Boot Device", obj["BootDevice"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("OS", "Windows Directory", obj["WindowsDirectory"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("OS", "System Directory", obj["SystemDirectory"]?.ToString() ?? "Unknown"));
                         }
                     }
                 } catch (Exception ex) { global::System.Diagnostics.Debug.WriteLine($"WMI OS Scan Error: {ex.Message}"); }
@@ -473,17 +511,17 @@ namespace Eternal.Services.Hardware
                     foreach (ManagementObject obj in collection) {
                         using (obj)
                         {
-                            items.Add(new SystemSummaryItem("System", "System Manufacturer", obj["Manufacturer"]?.ToString()));
-                            items.Add(new SystemSummaryItem("System", "System Model", obj["Model"]?.ToString()));
-                            items.Add(new SystemSummaryItem("System", "System Type", obj["SystemType"]?.ToString()));
-                            items.Add(new SystemSummaryItem("System", "SKU Number", obj["SystemSKUNumber"]?.ToString()));
+                            items.Add(new SystemSummaryItem("System", "System Manufacturer", obj["Manufacturer"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("System", "System Model", obj["Model"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("System", "System Type", obj["SystemType"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("System", "SKU Number", obj["SystemSKUNumber"]?.ToString() ?? "Unknown"));
                             
                             ulong totalBytes = global::System.Convert.ToUInt64(obj["TotalPhysicalMemory"] ?? 0);
                             string memoryStr = (totalBytes / (1024 * 1024 * 1024)).ToString() + " GB";
                             items.Add(new SystemSummaryItem("System", "Total Physical Memory", memoryStr));
                             
-                            items.Add(new SystemSummaryItem("System", "Domain", obj["Domain"]?.ToString()));
-                            items.Add(new SystemSummaryItem("System", "User Name", obj["UserName"]?.ToString()));
+                            items.Add(new SystemSummaryItem("System", "Domain", obj["Domain"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("System", "User Name", obj["UserName"]?.ToString() ?? "Unknown"));
                         }
                     }
                 } catch (Exception ex) { global::System.Diagnostics.Debug.WriteLine($"WMI ComputerSystem Scan Error: {ex.Message}"); }
@@ -495,7 +533,7 @@ namespace Eternal.Services.Hardware
                     foreach (ManagementObject obj in collection) {
                         using (obj)
                         {
-                            items.Add(new SystemSummaryItem("Firmware", "BIOS Version/Date", obj["SMBIOSBIOSVersion"]?.ToString()));
+                            items.Add(new SystemSummaryItem("Firmware", "BIOS Version/Date", obj["SMBIOSBIOSVersion"]?.ToString() ?? "Unknown"));
                             
                             string smbios = (obj["SMBIOSMajorVersion"]?.ToString() ?? "0") + "." + (obj["SMBIOSMinorVersion"]?.ToString() ?? "0");
                             items.Add(new SystemSummaryItem("Firmware", "SMBIOS Version", smbios));
@@ -515,9 +553,9 @@ namespace Eternal.Services.Hardware
                     foreach (ManagementObject obj in collection) {
                         using (obj)
                         {
-                            items.Add(new SystemSummaryItem("Board", "BaseBoard Manufacturer", obj["Manufacturer"]?.ToString()));
-                            items.Add(new SystemSummaryItem("Board", "BaseBoard Product", obj["Product"]?.ToString()));
-                            items.Add(new SystemSummaryItem("Board", "BaseBoard Version", obj["Version"]?.ToString()));
+                            items.Add(new SystemSummaryItem("Board", "BaseBoard Manufacturer", obj["Manufacturer"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("Board", "BaseBoard Product", obj["Product"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("Board", "BaseBoard Version", obj["Version"]?.ToString() ?? "Unknown"));
                         }
                     }
                 } catch (Exception ex) { global::System.Diagnostics.Debug.WriteLine($"WMI BaseBoard Scan Error: {ex.Message}"); }
@@ -529,8 +567,8 @@ namespace Eternal.Services.Hardware
                     foreach (ManagementObject obj in collection) {
                         using (obj)
                         {
-                            items.Add(new SystemSummaryItem("Processor", "Name", obj["Name"]?.ToString()));
-                            items.Add(new SystemSummaryItem("Processor", "Description", obj["Description"]?.ToString()));
+                            items.Add(new SystemSummaryItem("Processor", "Name", obj["Name"]?.ToString() ?? "Unknown"));
+                            items.Add(new SystemSummaryItem("Processor", "Description", obj["Description"]?.ToString() ?? "Unknown"));
                             
                             string l2 = (obj["L2CacheSize"]?.ToString() ?? "0") + " KB";
                             string l3 = (obj["L3CacheSize"]?.ToString() ?? "0") + " KB";

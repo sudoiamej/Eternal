@@ -12,15 +12,15 @@ namespace Eternal.ViewModels.Modules
     {
         private readonly IHardwareService _hardwareService;
 
-        [ObservableProperty] private CpuInfo _cpu;
-        [ObservableProperty] private GpuInfo _gpu;
-        [ObservableProperty] private RamInfo _ram;
-        [ObservableProperty] private List<DiskInfo> _disks;
-        [ObservableProperty] private MotherboardInfo _motherboard;
-        [ObservableProperty] private List<SystemSummaryItem> _detailedInfo;
+        [ObservableProperty] private CpuInfo? _cpu;
+        [ObservableProperty] private GpuInfo? _gpu;
+        [ObservableProperty] private RamInfo? _ram;
+        [ObservableProperty] private List<DiskInfo> _disks = new();
+        [ObservableProperty] private MotherboardInfo? _motherboard;
+        [ObservableProperty] private List<SystemSummaryItem> _detailedInfo = new();
         [ObservableProperty] private bool _hasError;
-        [ObservableProperty] private string _errorMessage;
-        [ObservableProperty] private string _errorDetails;
+        [ObservableProperty] private string? _errorMessage;
+        [ObservableProperty] private string? _errorDetails;
 
         public HardwareViewModel(IHardwareService hardwareService)
         {
@@ -29,6 +29,22 @@ namespace Eternal.ViewModels.Modules
         }
 
         public CommunityToolkit.Mvvm.Input.IAsyncRelayCommand LoadDataCommand { get; }
+        
+        [RelayCommand]
+        private void ViewDetails()
+        {
+            if (DetailedInfo == null || DetailedInfo.Count == 0) return;
+            
+            var properties = new List<PropertyItem>();
+            foreach (var item in DetailedInfo)
+            {
+                properties.Add(new PropertyItem(item.Property, item.Value));
+            }
+            
+            var detailWin = new Eternal.Views.Helpers.DetailWindow("System Diagnostics", "ADVANCED DATA SUMMARY", properties);
+            detailWin.Owner = System.Windows.Application.Current.MainWindow;
+            detailWin.ShowDialog();
+        }
 
         public override void ReleaseMemory()
         {

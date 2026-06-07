@@ -181,48 +181,26 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- 6. Detailed System Summary (msinfo32 style) -->
+                <!-- 6. Detailed System Summary (Triggered as Subwindow) -->
                 <StackPanel Margin="0,30,0,0" Visibility="{Binding DataContext.IsAdvancedMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource VisibilityConverter}}">
                     <TextBlock Text="DETAILED SYSTEM SUMMARY (MSINFO32)" Style="{StaticResource Caption}" Margin="0,0,0,15"/>
-                    <Border Style="{StaticResource StandardCard}" Padding="0">
-                        <StackPanel>
-                            <!-- Search/Filter Header -->
-                            <Border Background="#11FFFFFF" Padding="15,10" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <fa:ImageAwesome Icon="Search" Width="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                    <TextBox Grid.Column="1" Background="Transparent" BorderThickness="0" Foreground="White" 
-                                             VerticalContentAlignment="Center" 
-                                             FontSize="12" x:Name="PropertyFilter"
-                                             ToolTip="Filter properties..."/>
-                                </Grid>
-                            </Border>
-
-                            <!-- Property Grid -->
-                            <ItemsControl ItemsSource="{Binding DetailedInfo}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Padding="15,10" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="250"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding Property}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding Value}" Foreground="White" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                                                <Border Grid.Column="2" Background="#11FFFFFF" Padding="6,2" CornerRadius="2">
-                                                    <TextBlock Text="{Binding Category}" FontSize="8" Foreground="{DynamicResource AccentSecondaryBrush}" FontWeight="Bold"/>
-                                                </Border>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
+                    <Border Style="{StaticResource StandardCard}" Padding="25">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Full Diagnostic Report Available" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
+                                <TextBlock Text="Detailed hardware, firmware, and OS summary logs matching msinfo32 standards." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <Button Grid.Column="1" Command="{Binding ViewDetailsCommand}" Style="{StaticResource PrimaryAction}" Padding="20,10" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="ListAlt" Width="12" Foreground="Black" Margin="0,0,10,0"/>
+                                    <TextBlock Text="VIEW DIAGNOSTIC BLUEPRINT" FontWeight="Black" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
                     </Border>
                 </StackPanel>
             </StackPanel>

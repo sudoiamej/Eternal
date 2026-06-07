@@ -10,7 +10,7 @@ namespace Eternal.Services.Security
 {
     public class WindowsPrivacyService : IPrivacyService
     {
-        private List<PrivacyPolicy> _policies;
+        private List<PrivacyPolicy> _policies = new();
 
         public WindowsPrivacyService()
         {

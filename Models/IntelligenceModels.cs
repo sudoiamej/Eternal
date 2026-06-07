@@ -146,8 +146,15 @@ namespace Eternal.Models
         public int TotalCount => Groups.Sum(g => g.Count);
     }
 
+    public enum DashboardLayoutMode
+    {
+        Grid,
+        List
+    }
+
     public class AppSettings
     {
+        public DashboardLayoutMode DashboardLayoutMode { get; set; } = DashboardLayoutMode.Grid;
         public string AppVersion { get; set; } = "3.0.0";
         public bool UseLegacyUI { get => false; set { } }
         public bool UseNeumorphicUI { get; set; } = true;

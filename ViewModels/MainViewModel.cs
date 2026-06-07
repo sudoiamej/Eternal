@@ -34,6 +34,7 @@ namespace Eternal.ViewModels
         private readonly ICreatorService _creatorService;
         private readonly IEnvironmentService _envService;
         private readonly IBatteryService _batteryService;
+        private readonly IScalingService _scalingService;
         private DispatcherTimer? _statusTimer;
 
         public ToastViewModel ToastVm { get; }
@@ -97,6 +98,7 @@ namespace Eternal.ViewModels
             ICreatorService creatorService,
             IEnvironmentService envService,
             IBatteryService batteryService,
+            IScalingService scalingService,
             ToastViewModel toastVm,
             CommandPaletteViewModel commandPaletteVm)
         {
@@ -108,8 +110,14 @@ namespace Eternal.ViewModels
             _creatorService = creatorService;
             _envService = envService;
             _batteryService = batteryService;
+            _scalingService = scalingService;
             ToastVm = toastVm;
-            CommandPaletteVm = commandPaletteVm;
+            _commandPaletteVm = commandPaletteVm;
+
+            _systemItems = new ObservableCollection<NavigationItem>();
+            _telemetryItems = new ObservableCollection<NavigationItem>();
+            _monitoringItems = new ObservableCollection<NavigationItem>();
+            _supportItems = new ObservableCollection<NavigationItem>();
 
             Title = "Eternal System Intelligence";
             _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
@@ -120,6 +128,9 @@ namespace Eternal.ViewModels
 
             IsPeMode = _envService.IsPeMode;
             InitializeNavigation();
+
+            // Set default view after navigation collections are initialized
+            _currentView = App.ServiceProvider.GetRequiredService<HomeGridDashboardViewModel>();
 
             if (Settings.IsAutoUpdateEnabled)
             {
@@ -137,17 +148,7 @@ namespace Eternal.ViewModels
         {
             try
             {
-                var app = System.Windows.Application.Current;
-                if (app != null)
-                {
-                    double fontScale = Math.Max(1.0, Settings.FontAdjustmentScale);
-                    app.Resources["GlobalFontScale"] = fontScale;
-                    // We can adjust standard FontSize resources dynamically
-                    app.Resources["H1FontSize"] = 28 * fontScale;
-                    app.Resources["H2FontSize"] = 18 * fontScale;
-                    app.Resources["BodyFontSize"] = 11 * fontScale;
-                    app.Resources["CaptionFontSize"] = 11 * fontScale;
-                }
+                _scalingService.UpdateScales(Settings.WindowScale, Settings.FontAdjustmentScale);
             }
             catch { }
         }
@@ -156,27 +157,8 @@ namespace Eternal.ViewModels
         {
             try
             {
-                var mainWin = System.Windows.Application.Current.MainWindow;
-                if (mainWin != null)
-                {
-                    double scale = Math.Max(1.0, Settings.WindowScale);
-                    DisplayScale = scale;
-
-                    double dpiScale = 1.0;
-                    var source = PresentationSource.FromVisual(mainWin);
-                    if (source != null && source.CompositionTarget != null)
-                    {
-                        dpiScale = source.CompositionTarget.TransformToDevice.M11;
-                    }
-                    else
-                    {
-                        var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(mainWin);
-                        dpiScale = dpi.DpiScaleX;
-                    }
-
-                    mainWin.Width = (1300 * scale) / dpiScale;
-                    mainWin.Height = (800 * scale) / dpiScale;
-                }
+                _scalingService.UpdateScales(Settings.WindowScale, Settings.FontAdjustmentScale);
+                DisplayScale = _scalingService.UiScale;
             }
             catch { }
         }
@@ -827,7 +809,10 @@ namespace Eternal.ViewModels
                     compVm.Resume(); 
                     break;
                 case "WindowsUpdate": 
-                    CurrentView = sp.GetRequiredService<WindowsUpdateViewModel>(); 
+                    var wuVm = sp.GetRequiredService<WindowsUpdateViewModel>();
+                    CurrentView = wuVm; 
+                    await wuVm.CheckForUpdatesCommand.ExecuteAsync(null);
+                    await wuVm.LoadUpdatesCommand.ExecuteAsync(null);
                     break;
                 case "DismImaging": 
                     CurrentView = sp.GetRequiredService<DismImagingViewModel>(); 

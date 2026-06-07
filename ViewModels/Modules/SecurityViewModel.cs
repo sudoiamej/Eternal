@@ -15,7 +15,7 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private List<ServiceInfo> _services = new();
         [ObservableProperty] private List<BitLockerStatus> _bitLockerVolumes = new();
         [ObservableProperty] private REAgentStatus? _reAgent;
-        [ObservableProperty] private DefenderStatus _defender;
+        [ObservableProperty] private DefenderStatus? _defender;
 
         public SecurityViewModel(ISecurityService securityService)
         {

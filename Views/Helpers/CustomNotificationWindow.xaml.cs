@@ -21,7 +21,7 @@ namespace Eternal.Views.Helpers
             InitializeComponent();
         }
 
-        public static bool? Show(string message, string title = "NOTIFICATION", NotificationType type = NotificationType.Info, bool showCancel = false, Window owner = null)
+        public static bool? Show(string message, string title = "NOTIFICATION", NotificationType type = NotificationType.Info, bool showCancel = false, Window? owner = null)
         {
             var win = new CustomNotificationWindow();
             if (owner != null)

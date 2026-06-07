@@ -39,7 +39,7 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     
-                                    <TextBlock Grid.Column="0" Text="{Binding Key}" Opacity="0.6" VerticalAlignment="Top" Margin="0,2,0,0">
+                                    <TextBlock Grid.Column="0" Text="{Binding Name}" Opacity="0.6" VerticalAlignment="Top" Margin="0,2,0,0">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
                                                 <Style.Triggers>
@@ -57,7 +57,7 @@
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Key}" Value="Anomaly Detected">
+                                                    <DataTrigger Binding="{Binding Name}" Value="Anomaly Detected">
                                                         <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
                                                         <Setter Property="FontWeight" Value="Bold"/>
                                                     </DataTrigger>

@@ -31,6 +31,18 @@
             <Style TargetType="ScrollViewer">
                 <Setter Property="helpers:TrackpadScrollHelper.EnableTrackpadScrolling" Value="True"/>
                 <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
+                <Setter Property="UseLayoutRounding" Value="True"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+            </Style>
+
+            <Style TargetType="UserControl">
+                <Setter Property="UseLayoutRounding" Value="True"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+            </Style>
+
+            <Style TargetType="Window">
+                <Setter Property="UseLayoutRounding" Value="True"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

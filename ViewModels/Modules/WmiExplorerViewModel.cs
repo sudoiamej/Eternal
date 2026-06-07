@@ -10,9 +10,9 @@ namespace Eternal.ViewModels.Modules
     public partial class WmiExplorerViewModel : BaseViewModel
     {
         [ObservableProperty] private string _query = "SELECT * FROM Win32_OperatingSystem";
-        [ObservableProperty] private DataTable _results;
-        [ObservableProperty] private string _executionTime;
-        [ObservableProperty] private string _errorMessage;
+        [ObservableProperty] private DataTable? _results;
+        [ObservableProperty] private string _executionTime = string.Empty;
+        [ObservableProperty] private string? _errorMessage;
 
         public WmiExplorerViewModel()
         {

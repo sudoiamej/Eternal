@@ -10,10 +10,10 @@ namespace Eternal.Services.System
     public class WindowsPerformanceService : IPerformanceService
     {
         private readonly ISettingsService _settingsService;
-        private PerformanceCounter _cpuCounter;
-        private PerformanceCounter _diskCounter;
+        private PerformanceCounter? _cpuCounter;
+        private PerformanceCounter? _diskCounter;
         private bool _isInitialized = false;
-        private global::System.Threading.Timer _pollingTimer;
+        private global::System.Threading.Timer? _pollingTimer;
         private int _isUpdating = 0;
         private readonly EnumerationOptions _wmiOptions = new EnumerationOptions { Timeout = TimeSpan.FromSeconds(5) };
 
@@ -41,7 +41,7 @@ namespace Eternal.Services.System
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
 
-        public event EventHandler<PerformanceSnapshot> Updated;
+        public event EventHandler<PerformanceSnapshot>? Updated;
         public PerformanceSnapshot CurrentSnapshot { get; private set; } = new PerformanceSnapshot(0, 0, 0, 0);
 
         private ManagementObjectSearcher CreateSearcher(string query) 

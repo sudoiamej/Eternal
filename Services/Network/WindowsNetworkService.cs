@@ -36,7 +36,7 @@ namespace Eternal.Services.Network
                     
                     while (!reader.EndOfStream)
                     {
-                        string line = reader.ReadLine()?.Trim();
+                        string? line = reader.ReadLine()?.Trim();
                         if (string.IsNullOrEmpty(line)) continue;
 
                         if (!line.StartsWith("TCP", StringComparison.OrdinalIgnoreCase) && 
@@ -63,7 +63,7 @@ namespace Eternal.Services.Network
 
                                 if (int.TryParse(parts[pidIndex], out int pid))
                                 {
-                                    processCache.TryGetValue(pid, out string procName);
+                                    processCache.TryGetValue(pid, out string? procName);
                                     procName ??= "Unknown";
                                     connections.Add(new NetworkConnection(protocol, local, remote, state, pid, procName));
                                 }
@@ -91,7 +91,7 @@ namespace Eternal.Services.Network
                         var instances = category.GetInstanceNames();
                         
                         // Find closest match because WMI names and Performance Counter names differ slightly (e.g. #2, #3 suffix)
-                        string bestMatch = instances.FirstOrDefault(i => i.Equals(instanceName, StringComparison.OrdinalIgnoreCase))
+                        string? bestMatch = instances.FirstOrDefault(i => i.Equals(instanceName, StringComparison.OrdinalIgnoreCase))
                                          ?? instances.FirstOrDefault(i => instanceName.Contains(i, StringComparison.OrdinalIgnoreCase) || i.Contains(instanceName, StringComparison.OrdinalIgnoreCase));
 
                         if (bestMatch != null)

@@ -10,7 +10,7 @@ namespace Eternal.Services.System
     public interface ILoggingService
     {
         IReadOnlyList<LogEntry> Logs { get; }
-        event EventHandler<LogEntry> NewLogAdded;
+        event EventHandler<LogEntry>? NewLogAdded;
         void Log(string message, string level = "INFO");
         void Clear();
         Task<List<LogEntry>> GetSystemEventsAsync(int count = 100);
@@ -23,7 +23,7 @@ namespace Eternal.Services.System
         private readonly ISettingsService _settings;
 
         public IReadOnlyList<LogEntry> Logs => _logs;
-        public event EventHandler<LogEntry> NewLogAdded;
+        public event EventHandler<LogEntry>? NewLogAdded;
 
         public WindowsLoggingService(ISettingsService settings)
         {

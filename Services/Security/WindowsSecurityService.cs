@@ -114,7 +114,7 @@ namespace Eternal.Services.Security
                             foreach (var name in root.GetSubKeyNames())
                             {
                                 using var subkey = root.OpenSubKey(name);
-                                string appName = subkey?.GetValue("DisplayName")?.ToString();
+                                string? appName = subkey?.GetValue("DisplayName")?.ToString();
                                 if (!string.IsNullOrEmpty(appName))
                                 {
                                     software.Add(new SoftwareInfo(

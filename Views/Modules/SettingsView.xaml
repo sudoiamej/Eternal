@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:m="clr-namespace:Eternal.Models"
              mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="800">
     <Border Padding="40">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -100,7 +101,7 @@
                         </StackPanel>
 
                         <!-- Font Size Adjustment Setting -->
-                        <Grid Margin="0,20,0,10" IsEnabled="False" Opacity="0.5">
+                        <Grid Margin="0,20,0,10">
                             <StackPanel>
                                 <TextBlock Text="Font Sizing Scale" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                 <TextBlock Text="Scale application typography size dynamically." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -112,7 +113,7 @@
                         </Grid>
 
                         <!-- Window / DPI Scaling Setting -->
-                        <Grid Margin="0,10,0,0" IsEnabled="False" Opacity="0.5">
+                        <Grid Margin="0,10,0,0">
                             <StackPanel>
                                 <TextBlock Text="Window DPI Scale" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                 <TextBlock Text="Adjust global workspace display layout scaling." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -121,6 +122,18 @@
                                 <Slider Value="{Binding SelectedWindowScale}" Minimum="1.0" Maximum="1.6" Width="100" TickFrequency="0.05" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                 <TextBlock Text="{Binding SelectedWindowScale, StringFormat='{}{0:F2}x'}" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Width="35"/>
                             </StackPanel>
+                        </Grid>
+
+                        <!-- Dashboard Layout Mode Setting -->
+                        <Grid Margin="0,20,0,10">
+                            <StackPanel>
+                                <TextBlock Text="Dashboard Layout Mode" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBlock Text="Choose preferred visualization layout for system dashboard." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ComboBox SelectedItem="{Binding SelectedDashboardLayoutMode}" Width="120" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <m:DashboardLayoutMode>Grid</m:DashboardLayoutMode>
+                                <m:DashboardLayoutMode>List</m:DashboardLayoutMode>
+                            </ComboBox>
                         </Grid>
                     </StackPanel>
                 </Border>

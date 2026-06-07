@@ -13,6 +13,7 @@ namespace Eternal.Views
     public partial class NeumorphicMainWindow : Window
     {
         private ISettingsService _settingsService = null!;
+        private IScalingService _scalingService = null!;
         private System.Windows.Threading.DispatcherTimer _lockoutTimer = null!;
         private const string OverridePin = "000000";
         private bool _isStartupCompleted = false;
@@ -172,10 +173,10 @@ namespace Eternal.Views
                     // Unregister startup if needed
                     try
                     {
-                        string path = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+                        string? path = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
                         if (!string.IsNullOrEmpty(path))
                         {
-                            using Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+                            using Microsoft.Win32.RegistryKey? key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
                             key?.DeleteValue("EternalSystemIntelligence", false);
                         }
                     }
@@ -300,7 +301,13 @@ namespace Eternal.Views
         {
             InitializeComponent();
             this.Loaded += NeumorphicMainWindow_Loaded;
-            this.DpiChanged += (s, e) => ApplyDpiScaling();
+            this.DpiChanged += (s, e) => {
+                if (_scalingService != null)
+                {
+                    _scalingService.UpdateDpiScale(e.NewDpi.DpiScaleX);
+                }
+                ApplyDpiScaling();
+            };
             this.PreviewKeyDown += NeumorphicMainWindow_PreviewKeyDown;
         }
 
@@ -308,6 +315,11 @@ namespace Eternal.Views
         {
             try
             {
+                if (_scalingService == null)
+                {
+                    _scalingService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IScalingService>(App.ServiceProvider);
+                }
+
                 double dpiScale = 1.0;
                 var source = PresentationSource.FromVisual(this);
                 if (source != null && source.CompositionTarget != null)
@@ -320,15 +332,10 @@ namespace Eternal.Views
                     dpiScale = dpi.DpiScaleX;
                 }
 
-                double userScale = 1.0;
-                if (_settingsService != null)
-                {
-                    userScale = _settingsService.Current.WindowScale;
-                }
+                _scalingService.UpdateDpiScale(dpiScale);
 
-                // Base design dimensions are 1300 x 800, multiplied by user scale and divided by DPI scale to achieve true device-independent size
-                double targetWidth = (1300 * userScale) / dpiScale;
-                double targetHeight = (800 * userScale) / dpiScale;
+                double targetWidth = 1300 * _scalingService.EffectiveUiScale;
+                double targetHeight = 800 * _scalingService.EffectiveUiScale;
 
                 // Make sure we fit within the screen work area
                 double workingWidth = SystemParameters.WorkArea.Width;
@@ -355,6 +362,23 @@ namespace Eternal.Views
         {
             // Resolve settings service first so DpiScaling has access to saved settings
             _settingsService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ISettingsService>(App.ServiceProvider);
+            _scalingService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IScalingService>(App.ServiceProvider);
+            _scalingService.ScalingChanged += (s, ev) => ApplyDpiScaling();
+
+            double dpiScale = 1.0;
+            var source = PresentationSource.FromVisual(this);
+            if (source != null && source.CompositionTarget != null)
+            {
+                dpiScale = source.CompositionTarget.TransformToDevice.M11;
+            }
+            else
+            {
+                var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(this);
+                dpiScale = dpi.DpiScaleX;
+            }
+            _scalingService.Initialize(dpiScale);
+            _scalingService.UpdateScales(_settingsService.Current.WindowScale, _settingsService.Current.FontAdjustmentScale);
+
             ApplyDpiScaling();
             
             // Perform Security/Anti-Debug Audit
@@ -435,7 +459,10 @@ namespace Eternal.Views
             else
             {
                 // Bypassed: Directly run the loading / startup sequence
-                await StartLoadingAndTransition(mainVm);
+                if (mainVm != null)
+                {
+                    await StartLoadingAndTransition(mainVm);
+                }
             }
         }
 
@@ -861,9 +888,12 @@ namespace Eternal.Views
             {
                 if (sender is System.Windows.Controls.Button button && button.CommandParameter != null)
                 {
-                    string viewName = button.CommandParameter.ToString();
-                    string dragData = "Unpin:" + viewName;
-                    DragDrop.DoDragDrop(button, dragData, System.Windows.DragDropEffects.Move);
+                    string? viewName = button.CommandParameter.ToString();
+                    if (viewName != null)
+                    {
+                        string dragData = "Unpin:" + viewName;
+                        DragDrop.DoDragDrop(button, dragData, System.Windows.DragDropEffects.Move);
+                    }
                 }
             }
         }
@@ -872,7 +902,7 @@ namespace Eternal.Views
         {
             if (e.Data.GetDataPresent(System.Windows.DataFormats.StringFormat))
             {
-                string data = (string)e.Data.GetData(System.Windows.DataFormats.StringFormat);
+                string? data = e.Data.GetData(System.Windows.DataFormats.StringFormat) as string;
                 if (data != null && data.StartsWith("Unpin:"))
                 {
                     e.Effects = System.Windows.DragDropEffects.Move;

@@ -10,7 +10,7 @@ namespace Eternal.Services.System
 {
     public class WindowsTuningService : ITuningService
     {
-        private List<SystemTweak> _tweaks;
+        private List<SystemTweak> _tweaks = new();
 
         private readonly ISettingsService _settingsService;
         private readonly ILoggingService _loggingService;
@@ -160,7 +160,7 @@ namespace Eternal.Services.System
                     RegistryPath = @"HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32",
                     RegistryValue = "",
                     AppliedValue = "",
-                    DefaultValue = null,
+                    DefaultValue = "",
                     MinBuild = Eternal.Helpers.OsHelper.Build_Win11_21H2,
                     ValueKind = RegistryValueKind.String
                 },
@@ -322,7 +322,11 @@ namespace Eternal.Services.System
                 }
                 else
                 {
-                    key.SetValue(name, value.ToString(), kind);
+                    string? strVal = value?.ToString();
+                    if (strVal != null)
+                    {
+                        key.SetValue(name, strVal, kind);
+                    }
                 }
             }
         }

@@ -10,14 +10,14 @@ namespace Eternal.Services.System
         AppSettings Current { get; }
         void Save();
         void Load();
-        event EventHandler<AppSettings> SettingsChanged;
+        event EventHandler<AppSettings>? SettingsChanged;
     }
 
     public class SettingsService : ISettingsService
     {
         private readonly string _filePath;
         public AppSettings Current { get; private set; }
-        public event EventHandler<AppSettings> SettingsChanged;
+        public event EventHandler<AppSettings>? SettingsChanged;
 
         public SettingsService()
         {
@@ -56,8 +56,8 @@ namespace Eternal.Services.System
                     if (tempSettings == null || string.IsNullOrEmpty(tempSettings.AppVersion) || tempSettings.AppVersion != "3.0.0")
                     {
                         // Clean app data directory contents to avoid schema conflict
-                        string folder = Path.GetDirectoryName(_filePath);
-                        if (Directory.Exists(folder))
+                        string? folder = Path.GetDirectoryName(_filePath);
+                        if (folder != null && Directory.Exists(folder))
                         {
                             foreach (var file in Directory.GetFiles(folder))
                             {

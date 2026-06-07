@@ -22,35 +22,41 @@ namespace Eternal.ViewModels.Modules
         private readonly IToolkitService _toolkitService;
         private readonly IToastService _toastService;
         private readonly IEnvironmentService _envService;
+        private readonly ISettingsService _settingsService;
+        private readonly IRegistryLexiconService _lexiconService;
 
         private TrustScore? _lastTrustScore;
 
-        [ObservableProperty] private string _cpuName;
-        [ObservableProperty] private string _gpuName;
-        [ObservableProperty] private string _ramTotal;
-        [ObservableProperty] private string _osVersion;
-        [ObservableProperty] private string _secureBootStatus;
+        [ObservableProperty] private string _cpuName = string.Empty;
+        [ObservableProperty] private string _gpuName = string.Empty;
+        [ObservableProperty] private string _ramTotal = string.Empty;
+        [ObservableProperty] private string _osVersion = string.Empty;
+        [ObservableProperty] private string _secureBootStatus = string.Empty;
         
-        [ObservableProperty] private string _trustScoreIndex;
-        [ObservableProperty] private string _trustScoreExplanation;
+        [ObservableProperty] private string _trustScoreIndex = "N/A";
+        [ObservableProperty] private string _trustScoreExplanation = string.Empty;
         [ObservableProperty] private int _startupScore;
         [ObservableProperty] private int _driverScore;
         [ObservableProperty] private int _systemFileScore;
         [ObservableProperty] private int _networkScore;
         [ObservableProperty] private TrustLevel _trustLevel;
         
-        [ObservableProperty] private string _systemStatusText;
-        [ObservableProperty] private string _systemStatusExplanation;
+        [ObservableProperty] private string _systemStatusText = "Unknown";
+        [ObservableProperty] private string _systemStatusExplanation = string.Empty;
         [ObservableProperty] private SeverityLevel _highestSeverity;
-        [ObservableProperty] private List<RootCause> _rootCauses;
+        [ObservableProperty] private List<RootCause> _rootCauses = new();
 
         [ObservableProperty] private bool _hasError;
-        [ObservableProperty] private string _errorMessage;
-        [ObservableProperty] private string _errorDetails;
+        [ObservableProperty] private string _errorMessage = string.Empty;
+        [ObservableProperty] private string _errorDetails = string.Empty;
 
         [ObservableProperty] private bool _isPeMode;
 
-        public DashboardViewModel(IHardwareService hardwareService, IBiosService biosService, ISecurityService securityService, IIntelligenceService intelligenceService, IToolkitService toolkitService, IToastService toastService, IEnvironmentService envService)
+        [ObservableProperty] private int _driftCount;
+        [ObservableProperty] private int _totalLexiconItems;
+        [ObservableProperty] private double _driftPercentage;
+
+        public DashboardViewModel(IHardwareService hardwareService, IBiosService biosService, ISecurityService securityService, IIntelligenceService intelligenceService, IToolkitService toolkitService, IToastService toastService, IEnvironmentService envService, ISettingsService settingsService, IRegistryLexiconService lexiconService)
         {
             _hardwareService = hardwareService;
             _biosService = biosService;
@@ -59,9 +65,32 @@ namespace Eternal.ViewModels.Modules
             _toolkitService = toolkitService;
             _toastService = toastService;
             _envService = envService;
+            _settingsService = settingsService;
+            _lexiconService = lexiconService;
             
             IsPeMode = _envService.IsPeMode;
             LoadDashboardCommand = new AsyncRelayCommand(LoadDashboardAsync);
+            _settingsService.SettingsChanged += (s, e) => OnPropertyChanged(nameof(CurrentLayoutMode));
+        }
+
+        public DashboardLayoutMode CurrentLayoutMode
+        {
+            get => _settingsService.Current.DashboardLayoutMode;
+            set
+            {
+                if (_settingsService.Current.DashboardLayoutMode != value)
+                {
+                    _settingsService.Current.DashboardLayoutMode = value;
+                    OnPropertyChanged();
+                    _settingsService.Save();
+                }
+            }
+        }
+
+        [RelayCommand]
+        private void ToggleLayoutMode()
+        {
+            CurrentLayoutMode = CurrentLayoutMode == DashboardLayoutMode.Grid ? DashboardLayoutMode.List : DashboardLayoutMode.Grid;
         }
 
         public IAsyncRelayCommand LoadDashboardCommand { get; }
@@ -135,6 +164,12 @@ namespace Eternal.ViewModels.Modules
                     }
 
                     RootCauses = await rootCauseTask;
+
+                    // Analyze Registry Baseline Drift
+                    var driftList = await _lexiconService.AnalyzeSystemDriftAsync();
+                    DriftCount = driftList.Count(d => d.IsDrifted);
+                    TotalLexiconItems = driftList.Count;
+                    DriftPercentage = TotalLexiconItems > 0 ? (double)(TotalLexiconItems - DriftCount) / TotalLexiconItems * 100 : 100;
                 }
             }, "Syncing Intelligence Engine...");
         }
@@ -186,6 +221,16 @@ namespace Eternal.ViewModels.Modules
         private void ExportBrief()
         {
             _toastService.ShowInfo("Brief export integrated into Reports module.");
+        }
+
+        [RelayCommand]
+        private async Task RealignSystem()
+        {
+            var mainVm = System.Windows.Application.Current.MainWindow.DataContext as MainViewModel;
+            if (mainVm != null)
+            {
+                await mainVm.Navigate("RegistryLexicon");
+            }
         }
     }
 }

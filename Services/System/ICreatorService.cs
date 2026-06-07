@@ -35,27 +35,27 @@ namespace Eternal.Services.System
     public class ProcessSecurityInfo
     {
         public int PID { get; set; }
-        public string Name { get; set; }
-        public string Path { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Path { get; set; } = string.Empty;
         public bool IsSigned { get; set; }
-        public string Signer { get; set; }
+        public string Signer { get; set; } = string.Empty;
         public string Description { get; set; } = "Suspicious activity detected";
     }
 
     public class PersistenceEntry
     {
-        public string Location { get; set; }
-        public string Name { get; set; }
-        public string Command { get; set; }
-        public string Type { get; set; } // Registry, Task, Startup
+        public string Location { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Command { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty; // Registry, Task, Startup
     }
 
     public class PortInfo
     {
-        public string Protocol { get; set; }
-        public string LocalAddress { get; set; }
+        public string Protocol { get; set; } = string.Empty;
+        public string LocalAddress { get; set; } = string.Empty;
         public int Port { get; set; }
-        public string ProcessName { get; set; }
+        public string ProcessName { get; set; } = string.Empty;
         public int PID { get; set; }
     }
 }

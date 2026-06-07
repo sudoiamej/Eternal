@@ -65,6 +65,20 @@ namespace Eternal.ViewModels.Modules
             }
         }
 
+        public DashboardLayoutMode SelectedDashboardLayoutMode
+        {
+            get => Settings.DashboardLayoutMode;
+            set
+            {
+                if (Settings.DashboardLayoutMode != value)
+                {
+                    Settings.DashboardLayoutMode = value;
+                    OnPropertyChanged();
+                    _settingsService.Save();
+                }
+            }
+        }
+
         public SettingsViewModel(MainViewModel main, ISettingsService settingsService, IUpdateService updateService)
         {
             Main = main;
@@ -206,14 +220,17 @@ namespace Eternal.ViewModels.Modules
                 string path = Process.GetCurrentProcess().MainModule?.FileName;
                 if (string.IsNullOrEmpty(path)) return;
 
-                using RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
-                if (Settings.RunAtStartup)
+                using RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+                if (key != null)
                 {
-                    key?.SetValue("EternalSystemIntelligence", $"\"{path}\"");
-                }
-                else
-                {
-                    key?.DeleteValue("EternalSystemIntelligence", false);
+                    if (Settings.RunAtStartup)
+                    {
+                        key.SetValue("EternalSystemIntelligence", $"\"{path}\"");
+                    }
+                    else
+                    {
+                        key.DeleteValue("EternalSystemIntelligence", false);
+                    }
                 }
             }
             catch { }

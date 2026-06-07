@@ -6,7 +6,7 @@ namespace Eternal.Views.Helpers
     public partial class RadialGauge : System.Windows.Controls.UserControl
     {
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(double), typeof(RadialGauge), new PropertyMetadata(0.0, OnValueChanged));
+            DependencyProperty.Register("Value", typeof(object), typeof(RadialGauge), new PropertyMetadata(0.0, OnValueChanged));
 
         public static readonly DependencyProperty StrokeProperty =
             DependencyProperty.Register("Stroke", typeof(System.Windows.Media.Brush), typeof(RadialGauge), new PropertyMetadata(System.Windows.Media.Brushes.White));
@@ -20,9 +20,9 @@ namespace Eternal.Views.Helpers
         public static readonly DependencyProperty GlowColorProperty =
             DependencyProperty.Register("GlowColor", typeof(System.Windows.Media.Color), typeof(RadialGauge), new PropertyMetadata(System.Windows.Media.Colors.White));
 
-        public double Value
+        public object Value
         {
-            get => (double)GetValue(ValueProperty);
+            get => GetValue(ValueProperty);
             set => SetValue(ValueProperty, value);
         }
 
@@ -66,7 +66,21 @@ namespace Eternal.Views.Helpers
 
         private void UpdateGauge()
         {
-            double percentage = Math.Clamp(Value, 0, 100);
+            double valParsed = 0.0;
+            if (Value is double dVal)
+            {
+                valParsed = dVal;
+            }
+            else if (Value is int iVal)
+            {
+                valParsed = iVal;
+            }
+            else if (Value != null && double.TryParse(Value.ToString(), out double pVal))
+            {
+                valParsed = pVal;
+            }
+
+            double percentage = Math.Clamp(valParsed, 0, 100);
             double angle = (percentage / 100.0) * 360;
             
             // WPF ArcSegment Math

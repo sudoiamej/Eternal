@@ -17,7 +17,7 @@ namespace Eternal
 {
     public partial class App : Application
     {
-        public static IServiceProvider ServiceProvider { get; private set; }
+        public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -145,6 +145,7 @@ namespace Eternal
             services.AddSingleton<IDriversService, WindowsDriversService>();
             services.AddSingleton<IUserGroupService, WindowsUserGroupService>();
             services.AddSingleton<IFeatureIntegrityService, WindowsFeatureIntegrityService>();
+            services.AddSingleton<IScalingService, WindowsScalingService>();
 
             // ViewModels - Core (Singleton)
             services.AddSingleton<MainViewModel>();

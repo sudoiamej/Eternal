@@ -54,10 +54,13 @@ namespace Eternal.ViewModels.Modules
             try
             {
                 var updates = await _updateService.GetAvailableUpdatesAsync();
-                AvailableUpdates.Clear();
-                foreach (var update in updates) AvailableUpdates.Add(update);
-
-                StatusMessage = AvailableUpdates.Any() ? $"{AvailableUpdates.Count} updates available" : "You're up to date";
+                
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    AvailableUpdates.Clear();
+                    foreach (var update in updates) AvailableUpdates.Add(update);
+                    StatusMessage = AvailableUpdates.Any() ? $"{AvailableUpdates.Count} updates available" : "You're up to date";
+                });
             }
             catch (Exception ex)
             {
@@ -76,8 +79,11 @@ namespace Eternal.ViewModels.Modules
             try
             {
                 var history = await _updateService.GetInstalledUpdatesAsync();
-                InstalledUpdates.Clear();
-                foreach (var update in history) InstalledUpdates.Add(update);
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    InstalledUpdates.Clear();
+                    foreach (var update in history) InstalledUpdates.Add(update);
+                });
             }
             catch { }
         }

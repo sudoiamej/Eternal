@@ -12,7 +12,7 @@ namespace Eternal.ViewModels.Modules
         private readonly ISettingsService _settingsService;
         private readonly IToastService _toastService;
 
-        [ObservableProperty] private string _rawJson;
+        [ObservableProperty] private string _rawJson = string.Empty;
         [ObservableProperty] private bool _isModified;
 
         public ConfigEditorViewModel(ISettingsService settingsService, IToastService toastService)

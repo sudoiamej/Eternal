@@ -393,7 +393,7 @@ namespace Eternal.Services.System
             catch (Exception ex) { return (false, ex.Message); }
         }
 
-        private FileSystemWatcher _ransomWatcher;
+        private FileSystemWatcher? _ransomWatcher;
         public async Task<(bool Success, string Message)> EnableRansomGuardAsync(bool enable)
         {
             if (IsSimulated) return (true, $"[SIMULATION] Ransom Guard {(enable ? "Activated" : "Deactivated")}");

@@ -22,14 +22,14 @@ namespace Eternal.ViewModels.Modules
             _bootService = bootService;
             LoadCommand = new AsyncRelayCommand(LoadRecordsAsync);
             SaveTimeoutCommand = new AsyncRelayCommand(SaveTimeoutAsync);
-            ToggleSafeBootCommand = new AsyncRelayCommand<BootRecord>(ToggleSafeBootAsync);
-            DeleteEntryCommand = new AsyncRelayCommand<BootRecord>(DeleteEntryAsync);
+            ToggleSafeBootCommand = new AsyncRelayCommand<BootRecord?>(ToggleSafeBootAsync);
+            DeleteEntryCommand = new AsyncRelayCommand<BootRecord?>(DeleteEntryAsync);
         }
 
         public IAsyncRelayCommand LoadCommand { get; }
         public IAsyncRelayCommand SaveTimeoutCommand { get; }
-        public IAsyncRelayCommand<BootRecord> ToggleSafeBootCommand { get; }
-        public IAsyncRelayCommand<BootRecord> DeleteEntryCommand { get; }
+        public IAsyncRelayCommand<BootRecord?> ToggleSafeBootCommand { get; }
+        public IAsyncRelayCommand<BootRecord?> DeleteEntryCommand { get; }
 
         private async Task LoadRecordsAsync()
         {
@@ -51,7 +51,7 @@ namespace Eternal.ViewModels.Modules
             }, "Saving boot timeout...");
         }
 
-        private async Task ToggleSafeBootAsync(BootRecord record)
+        private async Task ToggleSafeBootAsync(BootRecord? record)
         {
             if (record == null) return;
             await ExecuteBusyActionAsync(async () =>
@@ -65,7 +65,7 @@ namespace Eternal.ViewModels.Modules
             }, "Updating safe boot mode...");
         }
 
-        private async Task DeleteEntryAsync(BootRecord record)
+        private async Task DeleteEntryAsync(BootRecord? record)
         {
             if (record == null) return;
             await ExecuteBusyActionAsync(async () =>
