@@ -157,7 +157,7 @@ namespace Eternal.Models
         public DashboardLayoutMode DashboardLayoutMode { get; set; } = DashboardLayoutMode.Grid;
         public string AppVersion { get; set; } = "3.0.0";
         public bool UseLegacyUI { get => false; set { } }
-        public bool UseNeumorphicUI { get; set; } = true;
+        public bool UseNeumorphicUI { get; set; } = false;
         public string NewUiGradiency { get; set; } = "Deep Space";
         public string Theme { get; set; } = "Dark";
         public string ThemeAccentColor { get; set; } = "#7F00FF";

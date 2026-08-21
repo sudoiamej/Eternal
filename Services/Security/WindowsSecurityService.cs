@@ -315,5 +315,117 @@ namespace Eternal.Services.Security
                 _ => "Other"
             };
         }
+
+        public Task<List<ThreatInfo>> ScanSystemThreatsAsync()
+        {
+            return Task.Run(() =>
+            {
+                var threats = new List<ThreatInfo>();
+
+                // 1. Hosts File Audit
+                try
+                {
+                    string hostsPath = global::System.IO.Path.Combine(Environment.SystemDirectory, @"drivers\etc\hosts");
+                    if (global::System.IO.File.Exists(hostsPath))
+                    {
+                        var lines = global::System.IO.File.ReadAllLines(hostsPath);
+                        int suspiciousCount = 0;
+                        foreach (var line in lines)
+                        {
+                            var trimmed = line.Trim();
+                            if (trimmed.StartsWith("#") || string.IsNullOrWhiteSpace(trimmed)) continue;
+                            
+                            // Check if line maps a domain to an external IP
+                            var parts = trimmed.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                            if (parts.Length >= 2)
+                            {
+                                string ip = parts[0];
+                                if (ip != "127.0.0.1" && ip != "::1" && ip != "localhost")
+                                {
+                                    suspiciousCount++;
+                                }
+                            }
+                        }
+
+                        if (suspiciousCount > 0)
+                        {
+                            threats.Add(new ThreatInfo("Network Integrity", $"{suspiciousCount} custom domain mapping(s) detected in system hosts file.", "WARNING", true));
+                        }
+                        else
+                        {
+                            threats.Add(new ThreatInfo("Network Integrity", "System hosts file is clean. No rogue mapping anomalies.", "SECURE", false));
+                        }
+                    }
+                }
+                catch
+                {
+                    threats.Add(new ThreatInfo("Network Integrity", "Could not access hosts file registry descriptors.", "UNRESOLVED", false));
+                }
+
+                // 2. Startup Directory Audit
+                try
+                {
+                    var startupPaths = new[]
+                    {
+                        Environment.GetFolderPath(Environment.SpecialFolder.Startup),
+                        Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup)
+                    };
+
+                    int startupCount = 0;
+                    foreach (var path in startupPaths)
+                    {
+                        if (global::System.IO.Directory.Exists(path))
+                        {
+                            var files = global::System.IO.Directory.GetFiles(path);
+                            foreach (var file in files)
+                            {
+                                string ext = global::System.IO.Path.GetExtension(file).ToLower();
+                                if (ext == ".lnk" || ext == ".exe" || ext == ".vbs" || ext == ".bat" || ext == ".ps1")
+                                {
+                                    startupCount++;
+                                }
+                            }
+                        }
+                    }
+
+                    if (startupCount > 2)
+                    {
+                        threats.Add(new ThreatInfo("Startup Persistence", $"{startupCount} files found in Startup folders. Audit recommended.", "NOTICE", false));
+                    }
+                    else
+                    {
+                        threats.Add(new ThreatInfo("Startup Persistence", "Startup folder directories are highly lean.", "SECURE", false));
+                    }
+                }
+                catch { }
+
+                // 3. User & Temp Directory Active Services Audit
+                try
+                {
+                    using var searcher = CreateSearcher("select Name, PathName from Win32_Service");
+                    int rogueServiceCount = 0;
+                    foreach (var obj in searcher.Get())
+                    {
+                        string path = obj["PathName"]?.ToString().ToLower() ?? "";
+                        if (path.Contains(@"\users\") || path.Contains(@"\appdata\") || path.Contains(@"\temp\"))
+                        {
+                            rogueServiceCount++;
+                        }
+                    }
+
+                    if (rogueServiceCount > 0)
+                    {
+                        threats.Add(new ThreatInfo("Active Process Context", $"{rogueServiceCount} background service(s) running out of user profile directories.", "CRITICAL", true));
+                    }
+                    else
+                    {
+                        threats.Add(new ThreatInfo("Active Process Context", "All active background services are executing from system paths.", "SECURE", false));
+                    }
+                }
+                catch { }
+
+                return threats;
+            });
+        }
     }
 }

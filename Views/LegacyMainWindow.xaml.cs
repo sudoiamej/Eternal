@@ -91,11 +91,30 @@ namespace Eternal.Views
             var vm = this.DataContext as MainViewModel;
             if (vm != null)
             {
-                // Calculate proportional scale based on both dimensions to prevent vertical or horizontal clipping
-                double scaleX = e.NewSize.Width / 1400.0;
-                double scaleY = e.NewSize.Height / 800.0;
+                double scaleX = e.NewSize.Width / 1280.0;
+                double scaleY = e.NewSize.Height / 720.0;
                 double targetScale = Math.Min(scaleX, scaleY);
-                vm.DisplayScale = Math.Max(0.5, Math.Min(2.0, targetScale));
+                vm.UpdateFitScale(Math.Max(0.5, Math.Min(2.0, targetScale)));
+            }
+        }
+
+        private void Window_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            if (System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.Control)
+            {
+                var vm = this.DataContext as MainViewModel;
+                if (vm != null)
+                {
+                    if (e.Delta > 0)
+                    {
+                        vm.ZoomInCommand.Execute(null);
+                    }
+                    else
+                    {
+                        vm.ZoomOutCommand.Execute(null);
+                    }
+                    e.Handled = true;
+                }
             }
         }
 

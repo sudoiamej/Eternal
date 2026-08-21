@@ -18,7 +18,7 @@ namespace Eternal.ViewModels.Modules
         private readonly IUpdateService _updateService;
 
         [ObservableProperty] private AppSettings _settings;
-        [ObservableProperty] private string _appVersion = "3.2.0";
+        [ObservableProperty] private string _appVersion = "3.5.0";
         [ObservableProperty] private string _lastScanTime = "N/A";
         [ObservableProperty] private string _machineId = "Unknown";
 
@@ -175,10 +175,12 @@ namespace Eternal.ViewModels.Modules
 
             if (confirmWin.ShowDialog() == true)
             {
-                var mainWindow = System.Windows.Application.Current.MainWindow as Eternal.Views.NeumorphicMainWindow;
+                var mainWindow = System.Windows.Application.Current.MainWindow as Eternal.Views.LegacyMainWindow;
                 if (mainWindow != null)
                 {
-                    mainWindow.ShowFactoryResetPromptFromSettings();
+                    System.Windows.MessageBox.Show("All database items have been cleared. Application will now restart.", "System Reset Complete", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                    System.Diagnostics.Process.Start(System.Environment.ProcessPath ?? "");
+                    System.Windows.Application.Current.Shutdown();
                 }
             }
         }

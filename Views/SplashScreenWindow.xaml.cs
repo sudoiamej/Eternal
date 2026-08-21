@@ -44,12 +44,12 @@ namespace Eternal.Views
                 return;
             }
 
-            // Minimum display time for branding visibility (3 seconds)
-            var timerTask = Task.Delay(3000);
+            // Minimum display time for branding visibility (1.2 seconds)
+            var timerTask = Task.Delay(1200);
 
             // Initialize the Main ViewModel first (via DI)
             var mainVm = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<MainViewModel>(App.ServiceProvider);
-            await Task.Delay(500); 
+            await Task.Delay(200); 
 
             // Entry Lock Check
             if (!_isTestMode && mainVm.Settings.IsStartupLockEnabled)
@@ -65,7 +65,7 @@ namespace Eternal.Views
             // Fully await preloading before continuing to ensure Dashboard is ready immediately
             await mainVm.PreloadAllDataAsync();
             
-            await Task.Delay(500);
+            await Task.Delay(100);
 
             // Ensure we stay visible for at least the branding timer
             await timerTask;
@@ -76,26 +76,13 @@ namespace Eternal.Views
                 return;
             }
 
-            Window mainWindow;
-            if (mainVm.Settings.UseLegacyUI)
-            {
-                var legacyWin = new LegacyMainWindow();
-                legacyWin.DataContext = mainVm;
-                mainVm.StartTimers();
-                _ = mainVm.Navigate("Dashboard");
-                mainWindow = legacyWin;
-            }
-            else
-            {
-                var modernWin = new NeumorphicMainWindow();
-                modernWin.DataContext = mainVm;
-                mainVm.StartTimers();
-                _ = mainVm.Navigate("Home");
-                mainWindow = modernWin;
-            }
+            var legacyWin = new LegacyMainWindow();
+            legacyWin.DataContext = mainVm;
+            mainVm.StartTimers();
+            _ = mainVm.Navigate("Dashboard");
 
-            System.Windows.Application.Current.MainWindow = mainWindow;
-            mainWindow.Show();
+            System.Windows.Application.Current.MainWindow = legacyWin;
+            legacyWin.Show();
 
             this.Close();
         }

@@ -372,4 +372,54 @@ namespace Eternal.Helpers
             throw new NotImplementedException();
         }
     }
+
+    public class HistoryToPointsConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is System.Collections.IEnumerable enumerable)
+            {
+                var points = new PointCollection();
+                var list = new System.Collections.Generic.List<double>();
+                foreach (var item in enumerable)
+                {
+                    list.Add(global::System.Convert.ToDouble(item));
+                }
+                
+                if (list.Count == 0) return points;
+
+                double totalWidth = 720.0;
+                double step = totalWidth / Math.Max(1, list.Count - 1);
+                bool isFill = (parameter as string) == "Fill";
+                double lastX = 0;
+
+                if (isFill)
+                {
+                    points.Add(new System.Windows.Point(0, 220));
+                }
+
+                for (int i = 0; i < list.Count; i++)
+                {
+                    double x = i * step;
+                    double y = 220 - (list[i] * 2.2);
+                    y = Math.Max(0, Math.Min(220, y));
+                    points.Add(new System.Windows.Point(x, y));
+                    lastX = x;
+                }
+
+                if (isFill)
+                {
+                    points.Add(new System.Windows.Point(lastX, 220));
+                }
+
+                return points;
+            }
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

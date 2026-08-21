@@ -19,7 +19,7 @@ namespace Eternal.Views.Helpers
         {
             if (PinInput.Password == DeveloperEnvironment.DevAccessPin)
             {
-                ConsoleStatusText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
+                ConsoleStatusText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(58, 134, 255));
                 ConsoleStatusText.Text = "SYS:\\> success: signature_match. unlocking system modules...";
                 PinInput.IsEnabled = false;
                 await Task.Delay(800); // Give user a brief moment to see success feedback
@@ -28,7 +28,7 @@ namespace Eternal.Views.Helpers
             }
             else
             {
-                ConsoleStatusText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 51, 51));
+                ConsoleStatusText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 58, 58));
                 ConsoleStatusText.Text = "SYS:\\> error: access_denied. cryptographic signature invalid.";
                 PinInput.Clear();
                 
@@ -59,7 +59,7 @@ namespace Eternal.Views.Helpers
 
         private void PinInput_PasswordChanged(object sender, RoutedEventArgs e)
         {
-            ConsoleStatusText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 0));
+            ConsoleStatusText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(58, 134, 255));
             ConsoleStatusText.Text = $"SYS:\\> status: crypt_key_buffering [length: {PinInput.Password.Length}]";
         }
 

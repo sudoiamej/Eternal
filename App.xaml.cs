@@ -23,10 +23,12 @@ namespace Eternal
         {
             try
             {
-                // Perform Security/Anti-Debug Audit
-                if (Eternal.Helpers.AntiDebugHelper.IsDebuggerDetected())
+                // Perform Security/Anti-Debug & Anti-Tamper/VM Sandbox Audit
+                if (Eternal.Helpers.AntiDebugHelper.IsDebuggerDetected() || 
+                    Eternal.Helpers.AntiTamperHelper.IsVirtualMachineDetected() ||
+                    Eternal.Helpers.AntiTamperHelper.VerifyExecutionTiming())
                 {
-                    System.Windows.MessageBox.Show("For the protection and safety of the application, debugging this application without permission is not allowed.", 
+                    System.Windows.MessageBox.Show("Application execution halted. Security violations, sandbox virtualization, or timing anomalies detected.", 
                         "Security Warning", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Stop);
                     Environment.Exit(0);
                     return;
@@ -76,12 +78,9 @@ namespace Eternal
                     return;
                 }
 
-                var mainVm = ServiceProvider.GetRequiredService<MainViewModel>();
-                var mainWindow = new Views.NeumorphicMainWindow();
-                mainWindow.DataContext = mainVm;
-                
-                System.Windows.Application.Current.MainWindow = mainWindow;
-                mainWindow.Show();
+                var splashScreen = new Views.SplashScreenWindow();
+                System.Windows.Application.Current.MainWindow = splashScreen;
+                splashScreen.Show();
             }
             catch (Exception ex)
             {

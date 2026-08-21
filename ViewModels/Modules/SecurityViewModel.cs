@@ -14,6 +14,7 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private List<StartupProgram> _startups = new();
         [ObservableProperty] private List<ServiceInfo> _services = new();
         [ObservableProperty] private List<BitLockerStatus> _bitLockerVolumes = new();
+        [ObservableProperty] private List<ThreatInfo> _threats = new();
         [ObservableProperty] private REAgentStatus? _reAgent;
         [ObservableProperty] private DefenderStatus? _defender;
 
@@ -30,6 +31,7 @@ namespace Eternal.ViewModels.Modules
             Startups = new();
             Services = new();
             BitLockerVolumes = new();
+            Threats = new();
             ReAgent = null;
         }
 
@@ -43,14 +45,16 @@ namespace Eternal.ViewModels.Modules
                 var defenderTask = _securityService.GetDefenderStatusAsync();
                 var bitLockerTask = _securityService.GetBitLockerStatusAsync();
                 var reAgentTask = _securityService.GetREAgentStatusAsync();
+                var threatsTask = _securityService.ScanSystemThreatsAsync();
 
-                await Task.WhenAll(startupsTask, servicesTask, defenderTask, bitLockerTask, reAgentTask);
+                await Task.WhenAll(startupsTask, servicesTask, defenderTask, bitLockerTask, reAgentTask, threatsTask);
 
                 Startups = await startupsTask;
                 Services = await servicesTask;
                 Defender = await defenderTask;
                 BitLockerVolumes = await bitLockerTask;
                 ReAgent = await reAgentTask;
+                Threats = await threatsTask;
             } 
             catch { }
             finally { IsLoading = false; }

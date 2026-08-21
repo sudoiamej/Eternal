@@ -16,15 +16,20 @@ namespace Eternal.ViewModels.Modules
     public partial class ProcessIntelligenceViewModel : BaseViewModel
     {
         private readonly IProcessService _processService;
+        private readonly Eternal.Services.Network.INetworkService _networkService;
         private DispatcherTimer? _refreshTimer;
 
         public ObservableCollection<ProcessDetail> FlatProcesses { get; } = new();
+        public ObservableCollection<NetworkConnection> ActiveConnections { get; } = new();
         [ObservableProperty] private int _totalProcessCount;
         [ObservableProperty] private ProcessDetail? _selectedProcess;
 
-        public ProcessIntelligenceViewModel(IProcessService processService)
+        public ProcessIntelligenceViewModel(
+            IProcessService processService,
+            Eternal.Services.Network.INetworkService networkService)
         {
             _processService = processService;
+            _networkService = networkService;
             LoadCommand = new AsyncRelayCommand(LoadDataAsync);
             ShowDetailsCommand = new AsyncRelayCommand<ProcessDetail>(ShowDetails);
             SelectProcessCommand = new RelayCommand<ProcessDetail>(SelectProcess);
@@ -39,6 +44,30 @@ namespace Eternal.ViewModels.Modules
         private void SelectProcess(ProcessDetail? process)
         {
             SelectedProcess = process;
+        }
+
+        partial void OnSelectedProcessChanged(ProcessDetail? oldValue, ProcessDetail? newValue)
+        {
+            _ = UpdateActiveConnections(newValue);
+        }
+
+        private async Task UpdateActiveConnections(ProcessDetail? process)
+        {
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => ActiveConnections.Clear());
+            if (process == null) return;
+            try
+            {
+                var connections = await _networkService.GetActiveConnectionsAsync();
+                var processConnections = connections.Where(c => c.PID == process.PID).ToList();
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var conn in processConnections)
+                    {
+                        ActiveConnections.Add(conn);
+                    }
+                });
+            }
+            catch { }
         }
 
         public override void Activate()

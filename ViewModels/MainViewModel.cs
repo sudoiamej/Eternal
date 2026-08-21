@@ -69,6 +69,8 @@ namespace Eternal.ViewModels
         [ObservableProperty] private string _batteryPercentage = "100%";
         [ObservableProperty] private bool _isPeMode = false;
         [ObservableProperty] private double _displayScale = 1.0;
+        private double _fitScale = 1.0;
+        private double _userZoomMultiplier = 1.0;
         [ObservableProperty] private bool _isUiToggleVisible = false;
 
         [ObservableProperty] private ObservableCollection<NavigationItem> _systemItems;
@@ -121,7 +123,7 @@ namespace Eternal.ViewModels
 
             Title = "Eternal System Intelligence";
             _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
-            _loggingService.Log($"Dev Preview Suite Version 3.2.0");
+            _loggingService.Log($"Dev Preview Suite Version 3.5.0");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
             _settingsService.SettingsChanged += OnSettingsChanged;
@@ -142,6 +144,26 @@ namespace Eternal.ViewModels
             ApplyThemeColor();
             UpdateFontScale();
             UpdateWindowScale();
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var batteryInfo = await _batteryService.GetBatteryInfoAsync();
+                    if (batteryInfo == null)
+                    {
+                        await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                        {
+                            var batteryItem = TelemetryItems.FirstOrDefault(item => item.ViewName == "Battery");
+                            if (batteryItem != null)
+                            {
+                                TelemetryItems.Remove(batteryItem);
+                            }
+                        });
+                    }
+                }
+                catch { }
+            });
         }
 
         public void UpdateFontScale()
@@ -419,22 +441,9 @@ namespace Eternal.ViewModels
         private string _activeTheme = "";
         private void ApplyTheme(string themeName)
         {
-            if (Settings.UseLegacyUI)
+            if (themeName != "Dark" && themeName != "Light")
             {
-                // CarPlay theme is exclusively for Modern Neumorphic UI and should not affect Legacy UI.
-                // If CarPlay is selected globally, fall back to "Dark" for the Legacy UI.
-                if (themeName == "CarPlay")
-                {
-                    themeName = "Dark";
-                }
-            }
-            else
-            {
-                // If in Neumorphic UI mode, we force the NeumorphicDark theme unless CarPlay is selected
-                if (themeName != "CarPlay")
-                {
-                    themeName = "NeumorphicDark";
-                }
+                themeName = "Dark";
             }
 
             if (_activeTheme == themeName) return;
@@ -498,14 +507,37 @@ namespace Eternal.ViewModels
             _toastService.ShowInfo("DEEP MEMORY REFRESH: Complete");
         }
 
-        [RelayCommand]
-        private void ZoomIn() => DisplayScale = Math.Min(2.0, DisplayScale + 0.1);
+        public void UpdateFitScale(double fitScale)
+        {
+            _fitScale = fitScale;
+            DisplayScale = _fitScale * _userZoomMultiplier;
+        }
+
+        public string ZoomPercentageString => $"{(_userZoomMultiplier * 100):0}%";
 
         [RelayCommand]
-        private void ZoomOut() => DisplayScale = Math.Max(0.5, DisplayScale - 0.1);
+        private void ZoomIn()
+        {
+            _userZoomMultiplier = Math.Min(2.0, _userZoomMultiplier + 0.1);
+            DisplayScale = _fitScale * _userZoomMultiplier;
+            OnPropertyChanged(nameof(ZoomPercentageString));
+        }
 
         [RelayCommand]
-        private void ResetZoom() => DisplayScale = 1.0;
+        private void ZoomOut()
+        {
+            _userZoomMultiplier = Math.Max(0.5, _userZoomMultiplier - 0.1);
+            DisplayScale = _fitScale * _userZoomMultiplier;
+            OnPropertyChanged(nameof(ZoomPercentageString));
+        }
+
+        [RelayCommand]
+        private void ResetZoom()
+        {
+            _userZoomMultiplier = 1.0;
+            DisplayScale = _fitScale * _userZoomMultiplier;
+            OnPropertyChanged(nameof(ZoomPercentageString));
+        }
 
         [RelayCommand]
         private void ToggleTelemetryHud() => IsTelemetryHudOpen = !IsTelemetryHudOpen;

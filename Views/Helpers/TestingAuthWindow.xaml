@@ -5,41 +5,42 @@
         Title="Developer Access" Height="280" Width="350"
         WindowStyle="None" AllowsTransparency="True"
         WindowStartupLocation="CenterOwner" Background="Transparent"
-        MouseLeftButtonDown="Window_MouseLeftButtonDown">
-    <Border Background="#12121A" CornerRadius="12" BorderBrush="#00FF00" BorderThickness="1.5">
-        <Grid Margin="20">
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
+    
+    <Border Background="#000000" CornerRadius="10" BorderBrush="#1D1D22" BorderThickness="1">
+        <Grid Margin="25">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Monospace Terminal Area -->
-            <Border Grid.Row="0" Background="#0A0A0F" CornerRadius="8" BorderBrush="#20FFFFFF" BorderThickness="1" Padding="15">
+            <!-- Console Terminal Area (Workstation Style) -->
+            <Border Grid.Row="0" Background="#050508" CornerRadius="8" BorderBrush="#1D1D22" BorderThickness="1" Padding="15">
                 <StackPanel>
-                    <TextBlock Text="ETERNAL SYSTEM INTELLIGENCE v10.0" FontFamily="Consolas" FontSize="11" Foreground="#00FF00" Opacity="0.7"/>
-                    <TextBlock Text="DEV ACCESS GATEWAY - AUTHORIZATION REQUIRED" FontFamily="Consolas" FontSize="11" Foreground="#00FF00" Margin="0,5,0,15"/>
-                    <TextBlock Text="WARNING: High-level system bypass triggers enabled." FontFamily="Consolas" FontSize="10" Foreground="#FF3333" Margin="0,0,0,10"/>
+                    <TextBlock Text="ETERNAL SYSTEM INTELLIGENCE v10.0" FontFamily="Consolas" FontSize="11" Foreground="#A2A2A9" Opacity="0.7"/>
+                    <TextBlock Text="DEV ACCESS GATEWAY - AUTH REQUIRED" FontFamily="Consolas" FontSize="11" Foreground="#FFFFFF" Margin="0,5,0,15" FontWeight="Bold"/>
+                    <TextBlock Text="WARNING: High-level system bypass triggers enabled." FontFamily="Consolas" FontSize="10" Foreground="#FF3A3A" Margin="0,0,0,12"/>
                     
-                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                        <TextBlock Text="SYS:\> enter_pin_code: " FontFamily="Consolas" FontSize="12" Foreground="#00FF00" VerticalAlignment="Center"/>
-                        <PasswordBox x:Name="PinInput" Background="Transparent" BorderThickness="0" Foreground="#00FF00" CaretBrush="#00FF00" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Padding="0" MaxLength="6" Width="100" HorizontalAlignment="Left" KeyDown="PinInput_KeyDown" PasswordChanged="PinInput_PasswordChanged"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                        <TextBlock Text="SYS:\> enter_pin_code: " FontFamily="Consolas" FontSize="12" Foreground="#3A86FF" VerticalAlignment="Center"/>
+                        <PasswordBox x:Name="PinInput" Background="Transparent" BorderThickness="0" Foreground="#FFFFFF" CaretBrush="#3A86FF" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Padding="0" MaxLength="6" Width="100" HorizontalAlignment="Left" KeyDown="PinInput_KeyDown" PasswordChanged="PinInput_PasswordChanged"/>
                     </StackPanel>
                     
-                    <TextBlock x:Name="ConsoleStatusText" Text="SYS:\> status: crypt_key_idle" FontFamily="Consolas" FontSize="11" Foreground="#FFFF00" Margin="0,15,0,0" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="ConsoleStatusText" Text="SYS:\> status: crypt_key_idle" FontFamily="Consolas" FontSize="11" Foreground="#3A86FF" Margin="0,15,0,0" TextWrapping="Wrap"/>
                 </StackPanel>
             </Border>
 
-            <!-- Console Actions -->
-            <Grid Grid.Row="1" Margin="0,15,0,0">
+            <!-- Action Buttons -->
+            <Grid Grid.Row="1" Margin="0,20,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="ABORT" Style="{StaticResource SecondaryButton}" Margin="0,0,5,0" Click="Cancel_Click" FontFamily="Consolas" FontSize="11"/>
-                <Button Grid.Column="1" Content="EXECUTE" Style="{StaticResource PrimaryButton}" Margin="5,0,0,0" Click="Authorize_Click" Background="#008800" BorderBrush="#00FF00" Foreground="White" FontFamily="Consolas" FontSize="11"/>
+                <Button Grid.Column="0" Content="ABORT" Style="{StaticResource SecondaryButton}" Margin="0,0,5,0" Click="Cancel_Click" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Height="36"/>
+                <Button Grid.Column="1" Content="EXECUTE" Style="{StaticResource PrimaryButton}" Margin="5,0,0,0" Click="Authorize_Click" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Height="36"/>
             </Grid>
         </Grid>
     </Border>
 </Window>
-
-

@@ -1,10 +1,15 @@
-# Eternal System Intelligence (v3.2.0 Release)
+# Eternal System Intelligence (v3.5.0 Release)
 
 ![Eternal Banner](Assets/logo.png)
 
 **Eternal System Intelligence** is a Windows diagnostic, recovery, and optimization suite. Built for power users, system administrators, and forensic experts, it provides deep hardware telemetry, proactive system maintenance tools, and offline PE recovery systems.
 
 ## 🚀 Key Features
+
+### 🛡️ System Hardening & Threat Intelligence (NEW in v3.5.0)
+* **Anti-Reverse Engineering & VM Detection (RASP):** Execution timing audits and WMI baseboard/BIOS/GPU sweeps dynamically prevent execution in hypervisor tracing sandboxes.
+* **Process Sockets Port Mapper:** Instantly correlates running PIDs with active TCP/UDP port states, local bindings, and remote connection endpoints.
+* **Vector Telemetry Graphing:** Hardware-accelerated line contours and area fills (`Polyline`/`Polygon`) visualize CPU, RAM, and Disk active history over time.
 
 ### 🛠️ Professional Technician's Belt (NEW in v3.0.0)
 Advanced diagnostics and system rescue tools:

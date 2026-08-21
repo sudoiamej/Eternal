@@ -12,8 +12,10 @@ namespace Eternal.Services.Security
         Task<List<DriverSignatureInfo>> GetDriverSignaturesAsync();
         Task<REAgentStatus> GetREAgentStatusAsync();
         Task<List<BitLockerStatus>> GetBitLockerStatusAsync();
+        Task<List<ThreatInfo>> ScanSystemThreatsAsync();
     }
 
+    public record ThreatInfo(string Category, string Description, string Status, bool IsThreat);
     public record StartupProgram(string Name, string Path, string Location);
     public record DefenderStatus(bool RealTimeProtection, bool AntivirusEnabled);
     public record ServiceInfo(string Name, string DisplayName, string Status, string StartMode);

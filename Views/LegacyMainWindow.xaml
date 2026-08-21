@@ -16,6 +16,9 @@
         Icon="pack://application:,,,/Assets/icon.ico"
         KeyDown="Window_KeyDown"
         SizeChanged="Window_SizeChanged"
+        PreviewMouseWheel="Window_PreviewMouseWheel"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
         Opacity="0">
 
     <Window.Triggers>
@@ -43,10 +46,7 @@
     </Window.Triggers>
 
     <Window.Background>
-        <RadialGradientBrush Center="0.5,0.4" GradientOrigin="0.5,0.4" RadiusX="0.8" RadiusY="0.8">
-            <GradientStop Color="{DynamicResource BackgroundGradientColor}" Offset="0"/>
-            <GradientStop Color="{DynamicResource BackgroundColor}" Offset="1"/>
-        </RadialGradientBrush>
+        <SolidColorBrush Color="{DynamicResource BackgroundColor}"/>
     </Window.Background>
 
     <Window.InputBindings>
@@ -100,6 +100,9 @@
         <DataTemplate DataType="{x:Type vmm:ConfigEditorViewModel}"><vmv:ConfigEditorView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:WmiExplorerViewModel}"><vmv:WmiExplorerView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:AppProfilerViewModel}"><vmv:AppProfilerView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:HomeGridDashboardViewModel}"><vmv:HomeGridDashboard/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:CategoryGridViewModel}"><vmv:CategoryGridView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:RegistryLexiconViewModel}"><vmv:RegistryLexiconView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:TestingViewModel}"><vmv:TestingView/></DataTemplate>
     </Window.Resources>
 
@@ -112,391 +115,214 @@
             <ScaleTransform ScaleX="{Binding DisplayScale}" ScaleY="{Binding DisplayScale}"/>
         </Grid.LayoutTransform>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <!-- Main Structure -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Titlebar / Header -->
+                <RowDefinition Height="*"/>    <!-- Main Body Workspace -->
+                <RowDefinition Height="Auto"/> <!-- Bottom Status Bar -->
+            </Grid.RowDefinitions>
 
-        <!-- Top Status Bar (HCI: Persistent Context) -->
-        <Border Grid.Row="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Panel.ZIndex="11" Background="{DynamicResource BackgroundBrush}">
-            <Grid Margin="15,0">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <!-- Menu Toggle Logo -->
-                    <ToggleButton x:Name="MenuToggle" Background="Transparent" BorderThickness="0" Margin="0,0,20,0" Cursor="Hand">
-                        <ToggleButton.Template>
-                            <ControlTemplate TargetType="ToggleButton">
-                                <Border Background="Transparent" Padding="5">
-                                    <Image Source="/Assets/logo.png" Width="24" Height="24">
-                                        <Image.Style>
-                                            <Style TargetType="Image">
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Effect">
-                                                            <Setter.Value>
-                                                                <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </Trigger>
-                                                    <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
-                                                        <Setter Property="Effect">
-                                                            <Setter.Value>
-                                                                <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Image.Style>
-                                    </Image>
+            <!-- Row 0: Workstation Header -->
+            <Border Grid.Row="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Height="45">
+                <Grid Margin="15,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/> <!-- App ID / Logo -->
+                        <ColumnDefinition Width="*"/>    <!-- Search / Title -->
+                        <ColumnDefinition Width="Auto"/> <!-- Action Buttons -->
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Image Source="/Assets/logo.png" Width="22" Height="22" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True"/>
+                        <TextBlock Text="ETERNAL" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="DIAGNOSTICS" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Search Actions -->
+                    <Button Grid.Column="1" Command="{Binding CommandPaletteVm.OpenCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="300" Height="28" Style="{StaticResource IconButton}">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{DynamicResource BackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6">
+                                    <Grid Margin="10,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <fa:ImageAwesome Grid.Column="0" Icon="Search" Width="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Column="1" Text="Search actions... (Ctrl+K)" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                                    </Grid>
                                 </Border>
                             </ControlTemplate>
-                        </ToggleButton.Template>
-                    </ToggleButton>
-
-                    <TextBlock Text="System Status: " Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                    <TextBlock Text="Healthy" Foreground="#4CAF50" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                    
-                    <Button Command="{Binding CommandPaletteVm.OpenCommand}" Style="{StaticResource IconButton}" Margin="20,0,0,0" ToolTip="Universal Search (Ctrl+K)" FocusVisualStyle="{StaticResource FocusVisual}">
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Search" Width="14" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.5" Margin="0,0,8,0"/>
-                            <Border Background="#20FFFFFF" CornerRadius="4" Padding="5,2" VerticalAlignment="Center">
-                                <TextBlock Text="CTRL + K" FontSize="8" FontWeight="Black" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.6"/>
-                            </Border>
-                        </StackPanel>
+                        </Button.Template>
                     </Button>
-                </StackPanel>
 
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0" VerticalAlignment="Center">
-                        <fa:ImageAwesome Icon="Microchip" Foreground="{DynamicResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="CPU: " Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding CpuUsage}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                        <ProgressBar Value="{Binding CpuUsageValue}" Width="40" Style="{StaticResource GlowingProgressBar}" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0" VerticalAlignment="Center">
-                        <fa:ImageAwesome Icon="Tasks" Foreground="{DynamicResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="RAM: " Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding RamUsage}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                        <ProgressBar Value="{Binding RamUsageValue}" Width="40" Style="{StaticResource GlowingProgressBar}" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <fa:ImageAwesome Icon="ClockOutline" Foreground="{DynamicResource TextSecondaryBrush}" Width="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Uptime: " Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding Uptime}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
 
-                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="15,0"/>
+            <!-- Row 1: Workspace split -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/> <!-- Left Sidebar -->
+                    <ColumnDefinition Width="*"/>   <!-- Main Content Canvas -->
+                </Grid.ColumnDefinitions>
 
-                    <Button Command="{Binding ToggleUICommand}" Style="{StaticResource IconButton}" ToolTip="Switch to Modern UI">
-                        <fa:ImageAwesome Icon="Exchange" Width="14" Foreground="{DynamicResource AccentBrush}"/>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- Main Workspace (HCI: Elastic Sidebar) -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- Sidebar Drawer -->
-            <Border Grid.Column="0" x:Name="MainSidebar" 
-                    Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0"
-                    Width="0" HorizontalAlignment="Left">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="0" Direction="0" ShadowDepth="0" Opacity="0" Color="Transparent"/>
-                </Border.Effect>
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Style.Triggers>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding IsChecked, ElementName=MenuToggle}" Value="False"/>
-                                    <Condition Binding="{Binding IsMouseOver, ElementName=MenuToggle}" Value="False"/>
-                                    <Condition Binding="{Binding IsMouseOver, ElementName=MainSidebar}" Value="False"/>
-                                </MultiDataTrigger.Conditions>
-                                <MultiDataTrigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="Width" To="0" Duration="0:0:0.3">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseIn"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </MultiDataTrigger.EnterActions>
-                                <MultiDataTrigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="Width" To="260" Duration="0:0:0.4">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </MultiDataTrigger.ExitActions>
-                            </MultiDataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-                <Grid Width="260">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Sidebar Header -->
-                    <StackPanel Grid.Row="0" Margin="25,25,25,15">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="ETERNAL" FontSize="18" FontWeight="Black" Foreground="{DynamicResource TextBrush}"/>
-                            <Border Background="#9B59B6" CornerRadius="3" VerticalAlignment="Center" Margin="8,0,0,0" Padding="5,1">
-                                <TextBlock Text="DEV PREVIEW" FontSize="8" FontWeight="Black" Foreground="#FFFFFF"/>
-                            </Border>
-                        </StackPanel>
-                        <TextBlock Text="SYSTEM INTELLIGENCE" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Opacity="0.6" Margin="0,0,0,15"/>
-
-                        <!-- Nav Sorting -->
-                        <ComboBox SelectedValue="{Binding NavSortOption}" SelectedValuePath="Tag"
-                                    Background="Transparent" BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}"
-                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Padding="8,4"
-                                    HorizontalAlignment="Stretch">
-                            <ComboBoxItem Content="Default" Tag="{x:Static vm:NavigationSortOption.Default}"/>
-                            <ComboBoxItem Content="Level" Tag="{x:Static vm:NavigationSortOption.Level}"/>
-                            <ComboBoxItem Content="Easy to Hard" Tag="{x:Static vm:NavigationSortOption.EasyToHard}"/>
-                            <ComboBoxItem Content="Alphabetical" Tag="{x:Static vm:NavigationSortOption.Alphabetical}"/>
-                            <ComboBoxItem Content="Safe to Dangerous" Tag="{x:Static vm:NavigationSortOption.SafeToDangerous}"/>
-                            <ComboBox.Style>
-                                <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="ComboBox">
-                                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
-                                                    <Grid Width="240">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="50"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <ContentPresenter Content="{TemplateBinding SelectionBoxItem}" Margin="10,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                                        <fa:ImageAwesome Grid.Column="1" Icon="Sort" Width="10" Foreground="{TemplateBinding Foreground}" Margin="0,0,10,0"/>
-                                                        <Popup Name="PART_Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
-                                                            <Border Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" MinWidth="{TemplateBinding ActualWidth}">
-                                                                <ScrollViewer SnapsToDevicePixels="True">
-                                                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
-                                                                </ScrollViewer>
-                                                            </Border>
-                                                        </Popup>
-                                                    </Grid>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </ComboBox.Style>
-                        </ComboBox>
-                    </StackPanel>
-
-                    <!-- Navigation -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" VirtualizingPanel.ScrollUnit="Pixel">
-                        <StackPanel Margin="10,0">
+                <!-- Left Sidebar -->
+                <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Margin="10,15,10,15">
                             <StackPanel.Resources>
                                 <DataTemplate x:Key="NavItemTemplate">
                                     <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding ViewName}"
-                                            HorizontalContentAlignment="Left"
-                                            Margin="0,1"
-                                            Padding="0"
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            Height="40">
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Stretch"
+                                            Margin="0,2" Padding="0" Background="Transparent" BorderThickness="0" Height="32">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate TargetType="Button">
-                                                            <Border Background="{TemplateBinding Background}" CornerRadius="4">
-                                                                <ContentPresenter/>
+                                                            <Border x:Name="ItemBorder" Background="Transparent" CornerRadius="6" Padding="10,0">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="24"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="12" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                                        <fa:ImageAwesome.Style>
+                                                                            <Style TargetType="fa:ImageAwesome">
+                                                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                                                                    </DataTrigger>
+                                                                                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </fa:ImageAwesome.Style>
+                                                                    </fa:ImageAwesome>
+                                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" FontSize="12" Margin="8,0,0,0">
+                                                                        <TextBlock.Style>
+                                                                            <Style TargetType="TextBlock">
+                                                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                                                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                                    </DataTrigger>
+                                                                                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </TextBlock.Style>
+                                                                    </TextBlock>
+                                                                </Grid>
                                                             </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource AccentSecondaryBrush}"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
                                                         </ControlTemplate>
                                                     </Setter.Value>
                                                 </Setter>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="Background">
-                                                            <Setter.Value>
-                                                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                                                                    <GradientStop Color="{DynamicResource AccentColor}" Offset="0"/>
-                                                                    <GradientStop Color="Transparent" Offset="0.8"/>
-                                                                </LinearGradientBrush>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                        <Setter Property="Opacity" Value="0.8"/>
+                                                        <Setter Property="Background" Value="{DynamicResource AccentSecondaryBrush}"/>
                                                     </DataTrigger>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Background">
-                                                            <Setter.Value>
-                                                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                                                                    <GradientStop Color="{DynamicResource AccentColor}" Offset="0"/>
-                                                                    <GradientStop Color="Transparent" Offset="1"/>
-                                                                </LinearGradientBrush>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                        <Setter Property="Opacity" Value="1.0"/>
-                                                    </Trigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Button.Style>
-                                        <Grid Width="240">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="50"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <Border x:Name="ActiveMark" Style="{StaticResource ActiveMarker}" Margin="0,0,0,0">
-                                                <Border.Effect>
-                                                    <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
-                                                </Border.Effect>
-                                            </Border>
-
-                                            <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="14" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                <fa:ImageAwesome.Style>
-                                                    <Style TargetType="fa:ImageAwesome">
-                                                        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                                                                <Setter Property="Foreground" Value="White"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </fa:ImageAwesome.Style>
-                                            </fa:ImageAwesome>
-                                            
-                                            <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" FontSize="13" Margin="5,0,0,0">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-                                                                <Setter Property="FontWeight" Value="SemiBold"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                                                                <Setter Property="Foreground" Value="White"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </Grid>
                                     </Button>
                                 </DataTemplate>
                             </StackPanel.Resources>
 
-                            <TextBlock Text="SYSTEM" Style="{StaticResource Caption}" Margin="15,10,0,10" Opacity="0.5"/>
+                             <!-- Navigation Items grouped by headers -->
+                            <TextBlock Text="SYSTEM DIAGNOSTICS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="10,0,0,8"/>
                             <ItemsControl ItemsSource="{Binding SystemItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-
-                            <TextBlock Text="CORE TELEMETRY" Style="{StaticResource Caption}" Margin="15,20,0,10" Opacity="0.5"/>
+                            
+                            <TextBlock Text="TELEMETRY &amp; HARDWARE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="10,20,0,8"/>
                             <ItemsControl ItemsSource="{Binding TelemetryItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-
-                            <TextBlock Text="ACTIVE MONITORING" Style="{StaticResource Caption}" Margin="15,20,0,10" Opacity="0.5"/>
+                            
+                            <TextBlock Text="OPTIMIZATION &amp; REPAIR" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="10,20,0,8"/>
                             <ItemsControl ItemsSource="{Binding MonitoringItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-
-                            <TextBlock Text="SUPPORT &amp; SAFETY" Style="{StaticResource Caption}" Margin="15,20,0,10" Opacity="0.5"/>
+                            
+                            <TextBlock Text="SUPPORT &amp; WINDOWS PE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="10,20,0,8"/>
                             <ItemsControl ItemsSource="{Binding SupportItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
 
-                            <TextBlock Text="DEVELOPER TOOLKIT" Margin="15,20,0,10" Opacity="0.5" 
-                                       Visibility="{Binding IsTestingModeActive, Converter={StaticResource VisibilityConverter}}"
-                                       Style="{StaticResource Caption}"/>
-                            <ItemsControl ItemsSource="{Binding DevToolkitItems}" ItemTemplate="{StaticResource NavItemTemplate}"
-                                          Visibility="{Binding IsTestingModeActive, Converter={StaticResource VisibilityConverter}}"/>
+                            <StackPanel Visibility="{Binding IsTestingModeActive, Converter={StaticResource VisibilityConverter}}">
+                                <TextBlock Text="DEV TESTING" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="10,20,0,8"/>
+                                <ItemsControl ItemsSource="{Binding DevToolkitItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
+                            </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
+                </Border>
+
+                <!-- Center Main Canvas -->
+                <Border Grid.Column="1" Background="{DynamicResource BackgroundBrush}" Padding="0" ClipToBounds="True">
+                    <ContentControl Content="{Binding CurrentView}"/>
+                </Border>
+            </Grid>
+
+            <!-- Row 2: Status bar -->
+            <Border Grid.Row="2" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Height="28">
+                <Grid Margin="15,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Uptime -->
+                        <fa:ImageAwesome Icon="ClockOutline" Foreground="{DynamicResource TextSecondaryBrush}" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Uptime}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center" Margin="0,0,20,0"/>
+
+                        <!-- CPU Usage -->
+                        <fa:ImageAwesome Icon="Microchip" Foreground="{DynamicResource TextSecondaryBrush}" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="CPU:" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <TextBlock Text="{Binding CpuUsage}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center" Margin="0,0,20,0"/>
+
+                        <!-- RAM Usage -->
+                        <fa:ImageAwesome Icon="Tasks" Foreground="{DynamicResource TextSecondaryBrush}" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="RAM:" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <TextBlock Text="{Binding RamUsage}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Background="#1000FFAA" CornerRadius="4" Padding="6,2" Margin="0,0,15,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="4" Height="4" Fill="{DynamicResource SuccessBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="WORKSTATION ENGINE: ACTIVE" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <TextBlock Text="{Binding ZoomPercentageString, StringFormat='ZOOM: {0}'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                        <TextBlock Text="v3.5.0" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center"/>
+                    </StackPanel>
                 </Grid>
             </Border>
-
-            <!-- Main Content Area -->
-            <ContentControl Grid.Column="1" Content="{Binding CurrentView}"/>
         </Grid>
 
-        <!-- Global Toast Notifications Overlay -->
-        <ItemsControl Grid.Row="0" Grid.RowSpan="2" VerticalAlignment="Top" HorizontalAlignment="Right" 
-                      Margin="20" Panel.ZIndex="999" ItemsSource="{Binding ToastVm.ActiveToasts}">
+        <!-- Global Overlays -->
+        <ItemsControl VerticalAlignment="Top" HorizontalAlignment="Right" Margin="20" Panel.ZIndex="999" ItemsSource="{Binding ToastVm.ActiveToasts}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Background="{DynamicResource SidebarBrush}" CornerRadius="6" Margin="0,0,0,10" 
-                            BorderThickness="1" Width="300" Opacity="0">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Style.Triggers>
-                                    <EventTrigger RoutedEvent="Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3"/>
-                                                <ThicknessAnimation Storyboard.TargetProperty="Margin" From="100,0,-100,10" To="0,0,0,10" Duration="0:0:0.4">
-                                                    <ThicknessAnimation.EasingFunction>
-                                                        <CubicEase EasingMode="EaseOut"/>
-                                                    </ThicknessAnimation.EasingFunction>
-                                                </ThicknessAnimation>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <Border.BorderBrush>
-                            <Binding Path="Severity">
-                                <Binding.Converter>
-                                    <converters:SeverityToBrushConverter/>
-                                </Binding.Converter>
-                            </Binding>
-                        </Border.BorderBrush>
-                        <Border Padding="15">
-                            <Grid Width="240">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="50"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <fa:ImageAwesome Width="14" Margin="0,0,12,0" VerticalAlignment="Center">
-                                    <fa:ImageAwesome.Style>
-                                        <Style TargetType="fa:ImageAwesome">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Severity}" Value="Success">
-                                                    <Setter Property="Icon" Value="CheckCircle"/>
-                                                    <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Severity}" Value="Info">
-                                                    <Setter Property="Icon" Value="InfoCircle"/>
-                                                    <Setter Property="Foreground" Value="{DynamicResource InfoBrush}"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Severity}" Value="Warning">
-                                                    <Setter Property="Icon" Value="ExclamationTriangle"/>
-                                                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Severity}" Value="Error">
-                                                    <Setter Property="Icon" Value="TimesCircle"/>
-                                                    <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </fa:ImageAwesome.Style>
-                                </fa:ImageAwesome>
-                                <TextBlock Grid.Column="1" Text="{Binding Message}" Foreground="White" FontSize="12" TextWrapping="Wrap"/>
-                            </Grid>
-                        </Border>
+                    <Border Background="{DynamicResource CardBrush}" CornerRadius="6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,0,8" Padding="15,10">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="{Binding Severity, Converter={StaticResource CategoryToIconConverter}, ConverterParameter='Toast'}" 
+                                            Width="12" Margin="0,0,10,0" 
+                                            Foreground="{Binding Severity, Converter={StaticResource SeverityToBrushConverter}}"/>
+                            <TextBlock Text="{Binding Message}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center"/>
+                        </StackPanel>
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <!-- Global Command Palette Overlay -->
-        <ContentControl Grid.Row="0" Grid.RowSpan="2" Panel.ZIndex="100" 
-                        Content="{Binding CommandPaletteVm}"
-                        Visibility="{Binding CommandPaletteVm.IsOpen, Converter={StaticResource VisibilityConverter}}"/>
+        <ContentControl Panel.ZIndex="400" Content="{Binding CommandPaletteVm}" Visibility="{Binding CommandPaletteVm.IsOpen, Converter={StaticResource VisibilityConverter}}"/>
     </Grid>
 </Window>

@@ -11,8 +11,8 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
-    <Version>3.2.0</Version>
-    <InformationalVersion>3.2.0</InformationalVersion>
+    <Version>3.5.0</Version>
+    <InformationalVersion>3.5.0</InformationalVersion>
     <Authors>Eternal Analytics</Authors>
     <Product>Eternal System Intelligence</Product>
     <Description>System Intelligence and Diagnostics Suite</Description>
@@ -52,12 +52,8 @@
     <Page Remove="Templated UI\**" />
     <ApplicationDefinition Remove="Templated UI\**" />
 
-    <Compile Remove="Views\LegacyMainWindow.xaml.cs" />
-    <Page Remove="Views\LegacyMainWindow.xaml" />
-    <Compile Remove="Views\MainWindow.xaml.cs" />
-    <Page Remove="Views\MainWindow.xaml" />
-    <Compile Remove="Views\SplashScreenWindow.xaml.cs" />
-    <Page Remove="Views\SplashScreenWindow.xaml" />
+
+
   </ItemGroup>
 
   <ItemGroup>

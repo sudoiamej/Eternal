@@ -5,9 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:vm="clr-namespace:Eternal.ViewModels.Modules"
+             xmlns:helpers="clr-namespace:Eternal.Helpers"
              mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1100">
     
     <UserControl.Resources>
+        <helpers:HistoryToPointsConverter x:Key="HistoryToPointsConverter"/>
         <!-- Spatial Entrance Animation -->
         <Storyboard x:Key="EntranceAnim">
             <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
@@ -145,58 +147,61 @@
                                 <TextBlock Style="{StaticResource HistoryTitleStyle}" FontSize="12"/>
                                 <TextBlock Text="Dynamic sensor trend calculated via kernel delta pooling." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Opacity="0.6" FontWeight="Bold" Margin="0,8,0,0"/>
                             </StackPanel>
+                             <Grid Grid.Row="1" Height="220" ClipToBounds="True" Width="720" HorizontalAlignment="Left">
+                                 <!-- CPU Graph -->
+                                 <Grid>
+                                     <Grid.Style>
+                                         <Style TargetType="Grid">
+                                             <Setter Property="Visibility" Value="Collapsed"/>
+                                             <Style.Triggers>
+                                                 <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Cpu}">
+                                                     <Setter Property="Visibility" Value="Visible"/>
+                                                 </DataTrigger>
+                                             </Style.Triggers>
+                                         </Style>
+                                     </Grid.Style>
+                                     <Polygon Points="{Binding CpuHistory, Converter={StaticResource HistoryToPointsConverter}, ConverterParameter=Fill}"
+                                              Fill="#153A86FF" Opacity="0.6"/>
+                                     <Polyline Points="{Binding CpuHistory, Converter={StaticResource HistoryToPointsConverter}}"
+                                               Stroke="{DynamicResource AccentBrush}" StrokeThickness="2"/>
+                                 </Grid>
 
-                            <ItemsControl Grid.Row="1" VerticalAlignment="Bottom" Height="220" ClipToBounds="True">
-                                <ItemsControl.Style>
-                                    <Style TargetType="ItemsControl">
-                                        <Setter Property="ItemsSource" Value="{Binding CpuHistory}"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Ram}">
-                                                <Setter Property="ItemsSource" Value="{Binding RamHistory}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Disk}">
-                                                <Setter Property="ItemsSource" Value="{Binding DiskHistory}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ItemsControl.Style>
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <UniformGrid Columns="60" Rows="1" VerticalAlignment="Bottom"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Margin="1,0" VerticalAlignment="Bottom" CornerRadius="3">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
-                                                    <Setter Property="Opacity" Value="0.6"/>
-                                                    <Setter Property="Height" Value="{Binding}"/>
-                                                    <Setter Property="RenderTransform">
-                                                        <Setter.Value><ScaleTransform ScaleY="2.0"/></Setter.Value>
-                                                    </Setter>
-                                                    <Setter Property="RenderTransformOrigin" Value="0.5,1"/>
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Opacity" Value="1.0"/>
-                                                            <Setter Property="Effect">
-                                                                <Setter.Value><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></Setter.Value>
-                                                            </Setter>
-                                                        </Trigger>
-                                                        <DataTrigger Binding="{Binding DataContext.SelectedHistory, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static vm:HistoryType.Ram}">
-                                                            <Setter Property="Background" Value="{DynamicResource InfoBrush}"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding DataContext.SelectedHistory, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static vm:HistoryType.Disk}">
-                                                            <Setter Property="Background" Value="{DynamicResource WarningBrush}"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                 <!-- RAM Graph -->
+                                 <Grid>
+                                     <Grid.Style>
+                                         <Style TargetType="Grid">
+                                             <Setter Property="Visibility" Value="Collapsed"/>
+                                             <Style.Triggers>
+                                                 <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Ram}">
+                                                     <Setter Property="Visibility" Value="Visible"/>
+                                                 </DataTrigger>
+                                             </Style.Triggers>
+                                         </Style>
+                                     </Grid.Style>
+                                     <Polygon Points="{Binding RamHistory, Converter={StaticResource HistoryToPointsConverter}, ConverterParameter=Fill}"
+                                              Fill="#1500D5FF" Opacity="0.6"/>
+                                     <Polyline Points="{Binding RamHistory, Converter={StaticResource HistoryToPointsConverter}}"
+                                               Stroke="{DynamicResource InfoBrush}" StrokeThickness="2"/>
+                                 </Grid>
+
+                                 <!-- Disk Graph -->
+                                 <Grid>
+                                     <Grid.Style>
+                                         <Style TargetType="Grid">
+                                             <Setter Property="Visibility" Value="Collapsed"/>
+                                             <Style.Triggers>
+                                                 <DataTrigger Binding="{Binding SelectedHistory}" Value="{x:Static vm:HistoryType.Disk}">
+                                                     <Setter Property="Visibility" Value="Visible"/>
+                                                 </DataTrigger>
+                                             </Style.Triggers>
+                                         </Style>
+                                     </Grid.Style>
+                                     <Polygon Points="{Binding DiskHistory, Converter={StaticResource HistoryToPointsConverter}, ConverterParameter=Fill}"
+                                              Fill="#15FFB300" Opacity="0.6"/>
+                                     <Polyline Points="{Binding DiskHistory, Converter={StaticResource HistoryToPointsConverter}}"
+                                               Stroke="{DynamicResource WarningBrush}" StrokeThickness="2"/>
+                                 </Grid>
+                             </Grid>
 
                             <!-- Grid Lines -->
                             <Grid Grid.Row="1" IsHitTestVisible="False" Opacity="0.05">

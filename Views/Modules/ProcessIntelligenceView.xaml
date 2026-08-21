@@ -234,6 +234,43 @@
                                 <TextBlock Text="{Binding SelectedProcess.Path}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" TextWrapping="Wrap" FontWeight="Bold" LineHeight="16"/>
                             </StackPanel>
                         </Border>
+
+                        <!-- Active Network Connections Card -->
+                        <Border Style="{StaticResource StandardCard}" Margin="0,20,0,0" Padding="20">
+                            <StackPanel>
+                                <TextBlock Text="ACTIVE SOCKET CONNECTIONS" Style="{StaticResource Caption}" Margin="0,0,0,15" Opacity="0.7"/>
+                                
+                                <ItemsControl ItemsSource="{Binding ActiveConnections}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="#1D1D22" BorderThickness="0,0,0,1" Padding="0,8">
+                                                <StackPanel>
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding Protocol}" FontWeight="Bold" FontSize="10" Foreground="{DynamicResource AccentBrush}"/>
+                                                        <TextBlock Text="{Binding State}" HorizontalAlignment="Right" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
+                                                    </Grid>
+                                                    <TextBlock Text="{Binding LocalAddress, StringFormat='{}Local: {0}'}" FontSize="10" Foreground="White" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="{Binding RemoteAddress, StringFormat='{}Remote: {0}'}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                
+                                <TextBlock Text="No active network sockets detected." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" HorizontalAlignment="Center" Margin="0,10,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ActiveConnections.Count}" Value="0">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
 

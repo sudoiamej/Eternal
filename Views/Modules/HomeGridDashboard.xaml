@@ -5,91 +5,111 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="1100">
+             d:DesignHeight="700" d:DesignWidth="900"
+             SnapsToDevicePixels="True"
+             UseLayoutRounding="True">
 
-    <Grid Margin="40">
+    <Grid Margin="30">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,50">
-            <TextBlock Text="ETERNAL DASHBOARD" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" FontWeight="Black" Opacity="0.7"/>
-            <TextBlock Text="Select a Workspace" Foreground="{DynamicResource TextBrush}" FontSize="36" FontWeight="Black"/>
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="10,0,10,30">
+            <TextBlock Text="ETERNAL SYSTEM INTELLIGENCE" Foreground="#A2A2A9" FontSize="10" FontWeight="Bold"/>
+            <TextBlock Text="Workspace Directory" Foreground="#FFFFFF" FontSize="28" FontWeight="Light" Margin="0,5,0,0"/>
         </StackPanel>
 
-        <UniformGrid Grid.Row="1" Columns="2" Rows="2" Margin="10">
-            <!-- Diagnostics -->
-            <Button Style="{StaticResource CarPlayAppTile}" Width="360" Height="200" Margin="15"
-                    Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                    CommandParameter="Category_Diagnostics"
-                    PreviewMouseLeftButtonDown="Tile_PreviewMouseLeftButtonDown"
-                    PreviewMouseMove="Tile_PreviewMouseMove">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource DiagnosticsPlateBrush}">
-                        <Border.Effect>
-                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
-                        </Border.Effect>
-                        <fa:ImageAwesome Icon="Search" Width="24" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Border>
-                    <TextBlock Text="DIAGNOSTICS" FontSize="18" FontWeight="Black" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Hardware, Storage, Battery" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Opacity="0.6" Margin="0,4,0,0"/>
-                </StackPanel>
-            </Button>
+        <!-- Bento Workstations -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <UniformGrid Columns="2" Rows="2" VerticalAlignment="Top">
+                
+                <!-- Card 1: System Diagnostics -->
+                <Border Margin="10" Background="#000000" BorderBrush="#1D1D22" BorderThickness="1" CornerRadius="8" Padding="20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                            <fa:ImageAwesome Icon="Search" Width="14" Foreground="#3A86FF" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="SYSTEM DIAGNOSTICS" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Run automated scans and inspect underlying machine assets: bios configurations, system boards, storage diagnostics, battery wear limits, and thermals." 
+                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16" Height="65"/>
+                        <Button Grid.Row="2" Content="OPEN DIAGNOSTICS" Height="32" Margin="0,15,0,0" 
+                                Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                CommandParameter="Category_Diagnostics"
+                                Style="{StaticResource PrimaryAction}"/>
+                    </Grid>
+                </Border>
 
-            <!-- Tuning & Repair -->
-            <Button Style="{StaticResource CarPlayAppTile}" Width="360" Height="200" Margin="15"
-                    Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                    CommandParameter="Category_Tuning"
-                    PreviewMouseLeftButtonDown="Tile_PreviewMouseLeftButtonDown"
-                    PreviewMouseMove="Tile_PreviewMouseMove">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource TuningPlateBrush}">
-                        <Border.Effect>
-                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
-                        </Border.Effect>
-                        <fa:ImageAwesome Icon="Wrench" Width="24" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Border>
-                    <TextBlock Text="TUNING &amp; REPAIR" FontSize="18" FontWeight="Black" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Guardian Debloater, Registry" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Opacity="0.6" Margin="0,4,0,0"/>
-                </StackPanel>
-            </Button>
+                <!-- Card 2: Tuning & Repair -->
+                <Border Margin="10" Background="#000000" BorderBrush="#1D1D22" BorderThickness="1" CornerRadius="8" Padding="20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                            <fa:ImageAwesome Icon="Wrench" Width="14" Foreground="#3A86FF" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="TUNING &amp; REPAIR" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Realign system state registries, debloat telemetry packages, tune startup configurations, repair damaged system files (SFC), and manage local users." 
+                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16" Height="65"/>
+                        <Button Grid.Row="2" Content="OPEN TUNING TOOLKIT" Height="32" Margin="0,15,0,0" 
+                                Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                CommandParameter="Category_Tuning"
+                                Style="{StaticResource PrimaryAction}"/>
+                    </Grid>
+                </Border>
 
-            <!-- Monitoring -->
-            <Button Style="{StaticResource CarPlayAppTile}" Width="360" Height="200" Margin="15"
-                    Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                    CommandParameter="Category_Monitoring"
-                    PreviewMouseLeftButtonDown="Tile_PreviewMouseLeftButtonDown"
-                    PreviewMouseMove="Tile_PreviewMouseMove">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource MonitoringPlateBrush}">
-                        <Border.Effect>
-                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
-                        </Border.Effect>
-                        <fa:ImageAwesome Icon="LineChart" Width="24" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Border>
-                    <TextBlock Text="MONITORING" FontSize="18" FontWeight="Black" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Performance, Network" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Opacity="0.6" Margin="0,4,0,0"/>
-                </StackPanel>
-            </Button>
+                <!-- Card 3: Active Monitoring -->
+                <Border Margin="10" Background="#000000" BorderBrush="#1D1D22" BorderThickness="1" CornerRadius="8" Padding="20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                            <fa:ImageAwesome Icon="LineChart" Width="14" Foreground="#3A86FF" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="ACTIVE MONITORING" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Trace local process intelligence, view hardware stress performance charts, examine network port connections, and monitor running background services." 
+                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16" Height="65"/>
+                        <Button Grid.Row="2" Content="OPEN MONITORING" Height="32" Margin="0,15,0,0" 
+                                Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                CommandParameter="Category_Monitoring"
+                                Style="{StaticResource PrimaryAction}"/>
+                    </Grid>
+                </Border>
 
-            <!-- Support & Tools -->
-            <Button Style="{StaticResource CarPlayAppTile}" Width="360" Height="200" Margin="15"
-                    Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                    CommandParameter="Category_Support"
-                    PreviewMouseLeftButtonDown="Tile_PreviewMouseLeftButtonDown"
-                    PreviewMouseMove="Tile_PreviewMouseMove">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,0,12" HorizontalAlignment="Center" Background="{DynamicResource SupportPlateBrush}">
-                        <Border.Effect>
-                            <DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
-                        </Border.Effect>
-                        <fa:ImageAwesome Icon="LifeRing" Width="24" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Border>
-                    <TextBlock Text="SUPPORT &amp; TOOLS" FontSize="18" FontWeight="Black" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Logs, Update, Recovery" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Opacity="0.6" Margin="0,4,0,0"/>
-                </StackPanel>
-            </Button>
-        </UniformGrid>
+                <!-- Card 4: Support & Tools -->
+                <Border Margin="10" Background="#000000" BorderBrush="#1D1D22" BorderThickness="1" CornerRadius="8" Padding="20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                            <fa:ImageAwesome Icon="LifeRing" Width="14" Foreground="#3A86FF" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="SUPPORT &amp; WINDOWS PE" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Inspect log profiles, trigger Windows Update audits, access system snapshot files, flash deployment packages (DISM), and run diagnostic utilities." 
+                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16" Height="65"/>
+                        <Button Grid.Row="2" Content="OPEN SUPPORT DIRECTORY" Height="32" Margin="0,15,0,0" 
+                                Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                CommandParameter="Category_Support"
+                                Style="{StaticResource PrimaryAction}"/>
+                    </Grid>
+                </Border>
+
+            </UniformGrid>
+        </ScrollViewer>
     </Grid>
 </UserControl>

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="800">
-    <Border Padding="40">
+    <Border Padding="20">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/> <!-- Header -->
@@ -95,6 +95,50 @@
                             </Grid>
                         </Border>
                     </Grid>
+
+                    <!-- Threat Intelligence Audit -->
+                    <TextBlock Text="SYSTEM THREAT INTELLIGENCE AUDIT" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
+                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,30">
+                        <DataGrid ItemsSource="{Binding Threats}" AutoGenerateColumns="False" 
+                                  IsReadOnly="True" Background="Transparent" BorderThickness="0" 
+                                  RowBackground="Transparent" GridLinesVisibility="None"
+                                  Foreground="{DynamicResource TextBrush}" CanUserAddRows="False">
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#0DFFFFFF"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                    <Setter Property="Padding" Value="10,5"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="CATEGORY" Binding="{Binding Category}" Width="150"/>
+                                <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Description}" Width="*"/>
+                                <DataGridTemplateColumn Header="STATUS" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Status}" FontWeight="Bold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsThreat}" Value="True">
+                                                                <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="WARNING">
+                                                                <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
 
                     <!-- 3. BitLocker Encryption -->
                     <TextBlock Text="BITLOCKER &amp; DEVICE ENCRYPTION" Style="{StaticResource Caption}" Margin="0,0,0,10"/>

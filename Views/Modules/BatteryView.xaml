@@ -180,7 +180,7 @@
         </Border>
 
         <!-- No Battery Detected Overlay -->
-        <Border Grid.ColumnSpan="2" Background="{DynamicResource MainBackgroundBrush}" Visibility="{Binding NoBatteryDetected, Converter={StaticResource VisibilityConverter}}">
+        <Border Grid.ColumnSpan="2" Background="{DynamicResource BackgroundBrush}" Visibility="{Binding NoBatteryDetected, Converter={StaticResource VisibilityConverter}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <fa:ImageAwesome Icon="BatteryEmpty" Foreground="{DynamicResource TextSecondaryBrush}" Width="64" Margin="0,0,0,30" Opacity="0.3"/>
                 <TextBlock Text="NO BATTERY ARCHITECTURE DETECTED" FontSize="20" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,10"/>
