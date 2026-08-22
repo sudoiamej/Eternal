@@ -277,21 +277,23 @@ namespace Eternal.Views
                 _notifyIcon = null;
             }
         }
-        private void OverlayEnterButton_Click(object sender, RoutedEventArgs e)
+        private async void OverlayEnterButton_Click(object sender, RoutedEventArgs e)
         {
             if (DataContext is ViewModels.MainViewModel vm)
             {
-                vm.UnlockWorkstation();
+                string pwd = OverlayPasswordBox.Password;
+                await vm.AuthenticateWithPasswordAsync(pwd);
             }
         }
 
-        private void OverlayPasswordBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private async void OverlayPasswordBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Enter)
             {
                 if (DataContext is ViewModels.MainViewModel vm)
                 {
-                    vm.UnlockWorkstation();
+                    string pwd = OverlayPasswordBox.Password;
+                    await vm.AuthenticateWithPasswordAsync(pwd);
                 }
             }
         }

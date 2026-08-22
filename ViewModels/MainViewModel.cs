@@ -93,6 +93,9 @@ namespace Eternal.ViewModels
         [ObservableProperty] private double _loginOverlayOpacity = 1.0;
         [ObservableProperty] private string _authStatusMessage = "Enter password/PIN or select Windows Hello to authenticate.";
         [ObservableProperty] private string _authStatusColor = "#888896";
+        [ObservableProperty] private bool _isPasswordAuthEnabled = true;
+        [ObservableProperty] private bool _isWindowsHelloAuthEnabled = true;
+        [ObservableProperty] private bool _hasBlankPassword = false;
 
         [ObservableProperty] private bool _isPostAuthSplashVisible = false;
         [ObservableProperty] private double _postAuthSplashOpacity = 0.0;
@@ -192,6 +195,10 @@ namespace Eternal.ViewModels
             {
                 IsAuthenticated = true;
                 _loggingService.Log("WinPE Environment Detected: Bypassing User Authentication to launch directly into Workstation Dashboard.");
+            }
+            else
+            {
+                _ = AuditAuthEnvironmentAsync();
             }
             InitializeNavigation();
 
@@ -629,20 +636,142 @@ namespace Eternal.ViewModels
                 PostAuthSplashOpacity = i / 10.0;
                 await Task.Delay(40);
             }
-
             IsPostAuthSplashVisible = false;
+        }
+
+        public async Task AuditAuthEnvironmentAsync()
+        {
+            if (IsPeMode) return;
+
+            bool isPasswordless = false;
+            try
+            {
+                using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\PasswordLess\Device");
+                if (key != null)
+                {
+                    var val = key.GetValue("DevicePasswordLessBuildVersion");
+                    if (val is int iVal && iVal == 2)
+                    {
+                        isPasswordless = true;
+                    }
+                }
+            }
+            catch { }
+
+            bool isHelloAvailable = false;
+            try
+            {
+                var securityService = App.ServiceProvider?.GetService<ISecurityService>();
+                if (securityService != null)
+                {
+                    isHelloAvailable = await securityService.IsWindowsHelloAvailableAsync();
+                }
+            }
+            catch { }
+
+            bool isBlankPasswordValid = await Task.Run(() => ValidateUserPassword(LoginUsername, ""));
+            HasBlankPassword = isBlankPasswordValid;
+
+            if (isPasswordless)
+            {
+                IsPasswordAuthEnabled = false;
+                IsWindowsHelloAuthEnabled = isHelloAvailable;
+                AuthStatusColor = "#00E5FF";
+                AuthStatusMessage = "Passwordless Sign-In Active. Please authenticate with Windows Hello.";
+            }
+            else if (!isHelloAvailable)
+            {
+                IsPasswordAuthEnabled = true;
+                IsWindowsHelloAuthEnabled = false;
+
+                if (isBlankPasswordValid)
+                {
+                    AuthStatusColor = "#10B981";
+                    AuthStatusMessage = "No password set on account. Click ENTER WORKSTATION to proceed.";
+                }
+                else
+                {
+                    AuthStatusColor = "#888896";
+                    AuthStatusMessage = "Enter Windows Account Password to authenticate.";
+                }
+            }
+            else
+            {
+                IsPasswordAuthEnabled = true;
+                IsWindowsHelloAuthEnabled = true;
+
+                if (isBlankPasswordValid)
+                {
+                    AuthStatusColor = "#10B981";
+                    AuthStatusMessage = "No password set on account. Click ENTER WORKSTATION or use Windows Hello.";
+                }
+                else
+                {
+                    AuthStatusColor = "#888896";
+                    AuthStatusMessage = "Enter password/PIN or select Windows Hello to authenticate.";
+                }
+            }
+        }
+
+        public bool ValidateUserPassword(string username, string password)
+        {
+            if (string.IsNullOrWhiteSpace(username)) username = Environment.UserName;
+
+            string domain = ".";
+            if (username.Contains("\\"))
+            {
+                var parts = username.Split('\\');
+                domain = parts[0];
+                username = parts[1];
+            }
+
+            const int LOGON32_LOGON_INTERACTIVE = 2;
+            const int LOGON32_PROVIDER_DEFAULT = 0;
+
+            IntPtr token = IntPtr.Zero;
+            bool isValid = LogonUser(username, domain, password ?? "", LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, out token);
+
+            if (isValid && token != IntPtr.Zero)
+            {
+                CloseHandle(token);
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task AuthenticateWithPasswordAsync(string password)
+        {
+            if (IsPostAuthSplashVisible || IsBlackoutActive) return;
+
+            AuthStatusColor = "#00E5FF";
+            AuthStatusMessage = "Validating user account credentials...";
+
+            bool isValid = await Task.Run(() => ValidateUserPassword(LoginUsername, password));
+
+            if (isValid)
+            {
+                AuthStatusColor = "#10B981";
+                AuthStatusMessage = "Credentials Verified Successfully.";
+                await StartPostAuthSequenceAsync();
+            }
+            else
+            {
+                AuthStatusColor = "#EF4444";
+                AuthStatusMessage = "Invalid Windows Password / PIN. Access Denied.";
+            }
         }
 
         public void UnlockWorkstation()
         {
             if (IsPostAuthSplashVisible) return;
-            _ = StartPostAuthSequenceAsync();
+            _ = AuthenticateWithPasswordAsync("");
         }
 
         [RelayCommand]
-        private void AuthenticateWithPassword(string password)
+        private async Task AuthenticateWithPasswordCommandAsync(string password)
         {
-            UnlockWorkstation();
+            await AuthenticateWithPasswordAsync(password);
         }
 
         [RelayCommand]

@@ -653,7 +653,7 @@
                     </StackPanel>
 
                     <!-- Password Input Field -->
-                    <StackPanel Margin="0,0,0,22">
+                    <StackPanel Margin="0,0,0,22" IsEnabled="{Binding IsPasswordAuthEnabled}" Visibility="{Binding IsPasswordAuthEnabled, Converter={StaticResource VisibilityConverter}}">
                         <TextBlock Text="WINDOWS ACCOUNT PASSWORD / PIN" Style="{StaticResource Caption}" FontSize="9" Foreground="#888896" Margin="0,0,0,8"/>
                         <Border Background="#0D0D14" BorderBrush="#1F1F2E" BorderThickness="1" CornerRadius="8" Padding="14,10">
                             <Grid>
@@ -662,13 +662,13 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <fa:ImageAwesome Grid.Column="0" Icon="Lock" Width="14" Foreground="#888896" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                <PasswordBox Grid.Column="1" x:Name="OverlayPasswordBox" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="14" KeyDown="OverlayPasswordBox_KeyDown"/>
+                                <PasswordBox Grid.Column="1" x:Name="OverlayPasswordBox" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="14" KeyDown="OverlayPasswordBox_KeyDown" IsEnabled="{Binding IsPasswordAuthEnabled}"/>
                             </Grid>
                         </Border>
                     </StackPanel>
 
                     <!-- Enter Button -->
-                    <Button Click="OverlayEnterButton_Click" Style="{StaticResource PrimaryButton}" Height="46" Cursor="Hand" Margin="0,0,0,12">
+                    <Button Click="OverlayEnterButton_Click" IsEnabled="{Binding IsPasswordAuthEnabled}" Visibility="{Binding IsPasswordAuthEnabled, Converter={StaticResource VisibilityConverter}}" Style="{StaticResource PrimaryButton}" Height="46" Cursor="Hand" Margin="0,0,0,12">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <fa:ImageAwesome Icon="Key" Width="14" Foreground="Black" Margin="0,0,10,0" VerticalAlignment="Center"/>
                             <TextBlock Text="ENTER WORKSTATION" FontWeight="Black" FontSize="12" Foreground="Black" VerticalAlignment="Center"/>
@@ -676,7 +676,7 @@
                     </Button>
 
                     <!-- Windows Hello Button -->
-                    <Button Click="OverlayWindowsHelloButton_Click" Style="{StaticResource StandardButton}" Height="40" Cursor="Hand">
+                    <Button Click="OverlayWindowsHelloButton_Click" IsEnabled="{Binding IsWindowsHelloAuthEnabled}" Visibility="{Binding IsWindowsHelloAuthEnabled, Converter={StaticResource VisibilityConverter}}" Style="{StaticResource StandardButton}" Height="40" Cursor="Hand">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <fa:ImageAwesome Icon="Windows" Width="12" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Use Windows Hello PIN / Biometrics" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
