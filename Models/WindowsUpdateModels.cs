@@ -19,4 +19,15 @@ namespace Eternal.Models
         public WindowsUpdateStatus Status { get; set; }
         public string SupportUrl { get; set; } = string.Empty;
     }
+
+    public class WindowsLifecycleInfo
+    {
+        public string Edition { get; set; } = string.Empty;
+        public string DisplayVersion { get; set; } = string.Empty;
+        public string BuildNumber { get; set; } = string.Empty;
+        public DateTime EolDate { get; set; }
+        public int DaysRemaining { get; set; }
+        public string Status { get; set; } = "SUPPORTED";
+        public bool IsEol => DaysRemaining <= 0;
+    }
 }

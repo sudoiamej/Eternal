@@ -9,6 +9,7 @@
                 <ResourceDictionary Source="pack://application:,,,/Styles/Colors.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Styles/Animations.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Styles/NeumorphicControls.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Styles/LegacyModernStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
             <helpers:ValueToVisibilityConverter x:Key="VisibilityConverter"/>
@@ -38,11 +39,24 @@
             <Style TargetType="UserControl">
                 <Setter Property="UseLayoutRounding" Value="True"/>
                 <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+                <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
             </Style>
 
             <Style TargetType="Window">
                 <Setter Property="UseLayoutRounding" Value="True"/>
                 <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+                <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+            </Style>
+
+            <Style TargetType="TextBlock">
+                <Setter Property="UseLayoutRounding" Value="True"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+                <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

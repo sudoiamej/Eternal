@@ -15,6 +15,10 @@ namespace Eternal.Views
         {
             _isTestMode = isTestMode;
             InitializeComponent();
+            if (FindName("UserGreetingTextBlock") is System.Windows.Controls.TextBlock greetingTb)
+            {
+                greetingTb.Text = $"Hello, {Environment.UserName}!";
+            }
             _ = SafeStartLoadingAsync();
         }
 
@@ -49,12 +53,37 @@ namespace Eternal.Views
 
             // Initialize the Main ViewModel first (via DI)
             var mainVm = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<MainViewModel>(App.ServiceProvider);
-            await Task.Delay(200); 
+            var settingsService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ISettingsService>(App.ServiceProvider);
+            await Task.Delay(200);
+
+            // First-Run Initializer Wizard (Engages full hardware baseline scan on new installation)
+            if (!_isTestMode && mainVm.Settings.IsFirstRun)
+            {
+                var firstRunWindow = new Eternal.Views.Helpers.FirstRunSetupWindow();
+                bool? setupResult = firstRunWindow.ShowDialog();
+                if (setupResult == true)
+                {
+                    mainVm.Settings.IsFirstRun = false;
+                    settingsService.Save();
+
+                    // Calibration successful -> proceed directly to main window shell
+                    var mainWin = new LegacyMainWindow();
+                    mainWin.DataContext = mainVm;
+                    mainVm.StartTimers();
+                    _ = mainVm.Navigate("Dashboard");
+
+                    System.Windows.Application.Current.MainWindow = mainWin;
+                    mainWin.Show();
+
+                    this.Close();
+                    return;
+                }
+            }
 
             // Entry Lock Check
             if (!_isTestMode && mainVm.Settings.IsStartupLockEnabled)
             {
-                var lockWindow = new Eternal.Views.Helpers.EntryLockWindow(Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ISettingsService>(App.ServiceProvider));
+                var lockWindow = new Eternal.Views.Helpers.EntryLockWindow(settingsService);
                 if (lockWindow.ShowDialog() != true)
                 {
                     this.Close();

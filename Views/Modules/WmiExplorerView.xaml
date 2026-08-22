@@ -5,24 +5,43 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="1000">
-    <Grid Margin="40">
+             d:DesignHeight="650" d:DesignWidth="1000">
+    <Grid Margin="30">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/> <!-- Header -->
-            <RowDefinition Height="Auto"/> <!-- Input -->
-            <RowDefinition Height="*"/>    <!-- Results -->
+            <RowDefinition Height="Auto"/> <!-- Preset Bar -->
+            <RowDefinition Height="Auto"/> <!-- Query Input -->
+            <RowDefinition Height="*"/>    <!-- Results Grid -->
             <RowDefinition Height="Auto"/> <!-- Footer -->
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,30">
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
             <TextBlock Text="ETERNAL SYSTEM WORKSPACE" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
-            <TextBlock Text="WMI Query Explorer" Style="{StaticResource H1}" Margin="0"/>
-            <TextBlock Text="Run raw WMI queries against the local machine. Use SQL-like syntax." Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <TextBlock Text="WMI Telemetry Explorer" Style="{StaticResource H1}" Margin="0,2,0,4"/>
+            <TextBlock Text="Run raw WQL queries against local CIM/WMI repositories with bare-metal precision." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
         </StackPanel>
 
-        <!-- Input Area -->
-        <Border Grid.Row="1" Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+        <!-- Presets Quick Bar -->
+        <Border Grid.Row="1" Background="#14141C" BorderBrush="#252535" BorderThickness="1" CornerRadius="8" Padding="12,8" Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <fa:ImageAwesome Icon="List" Width="11" Foreground="{DynamicResource AccentBrush}" Margin="0,0,6,0"/>
+                    <TextBlock Text="PRESETS:" FontSize="10" FontWeight="Bold" Foreground="#9E9EA8" VerticalAlignment="Center"/>
+                </StackPanel>
+                <ComboBox Grid.Column="1" ItemsSource="{Binding Presets}" SelectedItem="{Binding Query}" 
+                          Height="28" FontSize="11" VerticalContentAlignment="Center"
+                          Background="#1C1C26" Foreground="#FFFFFF" BorderBrush="#333348">
+                </ComboBox>
+            </Grid>
+        </Border>
+
+        <!-- Query Input Area -->
+        <Border Grid.Row="2" Style="{StaticResource StandardCard}" Margin="0,0,0,15" Padding="15">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -30,59 +49,68 @@
                 </Grid.ColumnDefinitions>
                 <TextBox Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" 
                          Style="{StaticResource ModernTextBox}" 
-                         Height="45" VerticalContentAlignment="Center" FontSize="14"
-                         FontFamily="Consolas"/>
+                         Height="42" VerticalContentAlignment="Center" FontSize="13"
+                         FontFamily="Consolas" Foreground="#FFFFFF" Background="#161620" BorderBrush="#2F2F42">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding ExecuteQueryCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
                 <Button Grid.Column="1" Command="{Binding ExecuteQueryCommand}" 
-                        Style="{StaticResource PrimaryButton}" Margin="15,0,0,0" Width="120">
+                        Style="{StaticResource PrimaryButton}" Margin="12,0,0,0" Width="130" Height="42" Cursor="Hand">
                     <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="Play" Width="12" Foreground="Black" Margin="0,0,10,0"/>
+                        <fa:ImageAwesome Icon="Play" Width="12" Foreground="Black" Margin="0,0,8,0"/>
                         <TextBlock Text="EXECUTE" FontSize="11" FontWeight="Black"/>
                     </StackPanel>
                 </Button>
             </Grid>
         </Border>
 
-        <!-- Results Area -->
-        <Border Grid.Row="2" Style="{StaticResource StandardCard}" Padding="5">
+        <!-- Results Grid Area -->
+        <Border Grid.Row="3" Style="{StaticResource StandardCard}" Padding="6">
             <Grid>
                 <DataGrid ItemsSource="{Binding Results}" 
                           Style="{StaticResource NeuDataGrid}"
                           AutoGenerateColumns="True"
                           HeadersVisibility="Column"
                           VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Auto">
-                    <!-- DataGrid defaults to auto-generating columns from DataTable -->
+                          HorizontalScrollBarVisibility="Auto"
+                          IsReadOnly="True"
+                          GridLinesVisibility="Horizontal">
                 </DataGrid>
 
                 <!-- Busy Overlay -->
-                <Border Background="#AA000000" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}" CornerRadius="15">
+                <Border Background="#CC0A0A0F" Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}" CornerRadius="12">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <fa:ImageAwesome Icon="Spinner" Spin="True" Width="48" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,20"/>
-                        <TextBlock Text="Executing WMI Query..." Foreground="White" FontWeight="Bold"/>
+                        <fa:ImageAwesome Icon="Spinner" Spin="True" Width="36" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,15"/>
+                        <TextBlock Text="Querying WMI Repository..." Foreground="White" FontWeight="Bold" FontSize="12"/>
                     </StackPanel>
                 </Border>
 
                 <!-- Error Overlay -->
-                <Border Background="#AA330000" Visibility="{Binding ErrorMessage, Converter={StaticResource VisibilityConverter}}" CornerRadius="15">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20">
-                        <fa:ImageAwesome Icon="ExclamationTriangle" Width="48" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,0,20"/>
-                        <TextBlock Text="WMI Query Error" Foreground="White" FontWeight="Black" FontSize="18" HorizontalAlignment="Center"/>
-                        <TextBlock Text="{Binding ErrorMessage}" Foreground="#FFCCCC" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0"/>
-                        <Button Content="DISMISS" Command="{Binding ExecuteQueryCommand}" Style="{StaticResource StandardButton}" Margin="0,20,0,0" Width="100"/>
+                <Border Background="#DD1A0A0F" Visibility="{Binding ErrorMessage, Converter={StaticResource VisibilityConverter}}" CornerRadius="12">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="25" MaxWidth="550">
+                        <fa:ImageAwesome Icon="ExclamationTriangle" Width="36" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,0,15"/>
+                        <TextBlock Text="WMI Query Execution Error" Foreground="White" FontWeight="Black" FontSize="15" HorizontalAlignment="Center"/>
+                        <Border Background="#2A1015" BorderBrush="{DynamicResource CriticalBrush}" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,12,0,0">
+                            <TextBlock Text="{Binding ErrorMessage}" Foreground="#FFB3B3" TextWrapping="Wrap" FontSize="11" FontFamily="Consolas" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        </Border>
+                        <Button Content="DISMISS ERROR" Command="{Binding DismissErrorCommand}" Style="{StaticResource StandardButton}" Margin="0,16,0,0" Width="140" Height="32" Cursor="Hand"/>
                     </StackPanel>
                 </Border>
             </Grid>
         </Border>
 
-        <!-- Footer -->
-        <Grid Grid.Row="3" Margin="0,15,0,0">
+        <!-- Footer Stats Bar -->
+        <Grid Grid.Row="4" Margin="0,12,0,0">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Execution Time: " Foreground="{DynamicResource TextSecondaryBrush}"/>
-                <TextBlock Text="{Binding ExecutionTime}" Foreground="{DynamicResource TextBrush}" FontWeight="Bold"/>
+                <fa:ImageAwesome Icon="ClockO" Width="10" Foreground="#7A7A88" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Execution Time: " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+                <TextBlock Text="{Binding ExecutionTime}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="Rows Returned: " Foreground="{DynamicResource TextSecondaryBrush}"/>
-                <TextBlock Text="{Binding Results.Rows.Count}" Foreground="{DynamicResource TextBrush}" FontWeight="Bold"/>
+                <fa:ImageAwesome Icon="Table" Width="10" Foreground="#7A7A88" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Rows Returned: " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+                <TextBlock Text="{Binding Results.Rows.Count, FallbackValue=0}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11"/>
             </StackPanel>
         </Grid>
     </Grid>

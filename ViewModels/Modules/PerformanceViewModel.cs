@@ -31,12 +31,21 @@ namespace Eternal.ViewModels.Modules
             _performanceService = performanceService;
             LoadCommand = new AsyncRelayCommand(UpdateAsync);
             SelectHistoryCommand = new RelayCommand<HistoryType>(type => SelectedHistory = type);
+
+            // Pre-seed initial history buffer for immediate trend line rendering
+            for (int i = 0; i < 30; i++)
+            {
+                CpuHistory.Add(0);
+                RamHistory.Add(0);
+                DiskHistory.Add(0);
+            }
         }
 
         public override void Activate()
         {
             if (_isActive) return;
             _isActive = true;
+            _performanceService.ResumePolling();
             _performanceService.Updated += OnPerformanceUpdated;
             _ = UpdateAsync();
         }
@@ -72,6 +81,10 @@ namespace Eternal.ViewModels.Modules
                 UpdateHistory(CpuHistory, CurrentCpu);
                 UpdateHistory(RamHistory, CurrentRam);
                 UpdateHistory(DiskHistory, CurrentDisk);
+
+                OnPropertyChanged(nameof(CpuHistory));
+                OnPropertyChanged(nameof(RamHistory));
+                OnPropertyChanged(nameof(DiskHistory));
             });
         }
 

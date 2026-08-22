@@ -25,6 +25,22 @@ namespace Eternal.Views
             
             // Adjust window dimensions dynamically to fit under 100% and 125% DPI scale boundaries
             AdjustWindowSizeToWorkingArea();
+
+            this.StateChanged += (s, e) =>
+            {
+                var vm = this.DataContext as MainViewModel;
+                if (vm != null)
+                {
+                    if (this.WindowState == WindowState.Minimized)
+                    {
+                        vm.PauseBackgroundWork();
+                    }
+                    else
+                    {
+                        vm.ResumeBackgroundWork();
+                    }
+                }
+            };
         }
 
         private void AdjustWindowSizeToWorkingArea()
@@ -167,6 +183,46 @@ namespace Eternal.Views
                 _notifyIcon.Visible = false;
                 _notifyIcon.Dispose();
                 _notifyIcon = null;
+            }
+        }
+        private void OverlayEnterButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ViewModels.MainViewModel vm)
+            {
+                vm.AuthenticateWithPasswordCommand.Execute(OverlayPasswordBox.Password);
+            }
+        }
+
+        private void OverlayPasswordBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                if (DataContext is ViewModels.MainViewModel vm)
+                {
+                    vm.AuthenticateWithPasswordCommand.Execute(OverlayPasswordBox.Password);
+                }
+            }
+        }
+
+        private int _userGreetingClickCount = 0;
+        private DateTime _lastUserGreetingClick = DateTime.MinValue;
+
+        private void UserGreetingBadge_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if ((DateTime.Now - _lastUserGreetingClick).TotalSeconds > 1.8)
+            {
+                _userGreetingClickCount = 0;
+            }
+
+            _lastUserGreetingClick = DateTime.Now;
+            _userGreetingClickCount++;
+
+            if (_userGreetingClickCount >= 5)
+            {
+                _userGreetingClickCount = 0;
+                var netUserWin = new Helpers.NetUserInspectorWindow();
+                netUserWin.Owner = this;
+                netUserWin.ShowDialog();
             }
         }
     }

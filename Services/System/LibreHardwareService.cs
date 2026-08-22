@@ -11,36 +11,49 @@ namespace Eternal.Services.System
 
     public class WindowsLibreHardwareService : ILibreHardwareService, IDisposable
     {
-        private readonly Computer _computer;
-        private readonly UpdateVisitor _visitor;
+        private Computer? _computer;
+        private UpdateVisitor? _visitor;
         private bool _isOpened = false;
+        private readonly object _lock = new object();
 
-        public Computer Computer => _computer;
-
-        public WindowsLibreHardwareService()
+        public Computer Computer
         {
-            _computer = new Computer
+            get
             {
-                IsCpuEnabled = true,
-                IsGpuEnabled = true,
-                IsMemoryEnabled = true,
-                IsMotherboardEnabled = true,
-                IsStorageEnabled = true,
-                IsNetworkEnabled = true,
-                IsBatteryEnabled = true
-            };
-            _visitor = new UpdateVisitor();
-            try
-            {
-                _computer.Open();
-                _isOpened = true;
+                EnsureInitialized();
+                return _computer!;
             }
-            catch { }
+        }
+
+        private void EnsureInitialized()
+        {
+            if (_isOpened) return;
+            lock (_lock)
+            {
+                if (_isOpened) return;
+                try
+                {
+                    _computer = new Computer
+                    {
+                        IsCpuEnabled = true,
+                        IsGpuEnabled = true,
+                        IsMemoryEnabled = true,
+                        IsMotherboardEnabled = true,
+                        IsStorageEnabled = true,
+                        IsNetworkEnabled = true,
+                        IsBatteryEnabled = true
+                    };
+                    _visitor = new UpdateVisitor();
+                    _computer.Open();
+                    _isOpened = true;
+                }
+                catch { }
+            }
         }
 
         public void Update()
         {
-            if (!_isOpened) return;
+            if (!_isOpened || _computer == null || _visitor == null) return;
             try
             {
                 _computer.Accept(_visitor);
@@ -50,9 +63,14 @@ namespace Eternal.Services.System
 
         public void Dispose()
         {
-            if (_isOpened)
+            if (_isOpened && _computer != null)
             {
-                try { _computer.Close(); } catch { }
+                try 
+                { 
+                    _computer.Close(); 
+                    _isOpened = false;
+                } 
+                catch { }
             }
         }
     }

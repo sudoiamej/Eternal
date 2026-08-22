@@ -29,7 +29,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Left: Hierarchical Disk Layout (HCI: Visibility of System Status) -->
-        <Border Grid.Column="0" Padding="35" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+        <Border Grid.Column="0" Padding="24" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
             <ScrollViewer VerticalScrollBarVisibility="Auto" VirtualizingPanel.ScrollUnit="Pixel">
                 <StackPanel>
                     <StackPanel Style="{StaticResource ModuleHeaderStyle}">

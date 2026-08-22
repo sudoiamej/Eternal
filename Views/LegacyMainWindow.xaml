@@ -10,7 +10,7 @@
         xmlns:helpers="clr-namespace:Eternal.Views.Helpers"
         xmlns:converters="clr-namespace:Eternal.Helpers"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="720" Width="1280"
+        Title="{Binding Title}" Height="780" Width="1340"
         Style="{StaticResource ModernWindow}"
         WindowStartupLocation="CenterScreen"
         Icon="pack://application:,,,/Assets/icon.ico"
@@ -19,23 +19,26 @@
         PreviewMouseWheel="Window_PreviewMouseWheel"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        RenderOptions.BitmapScalingMode="HighQuality"
         Opacity="0">
 
     <Window.Triggers>
         <EventTrigger RoutedEvent="Window.Loaded">
             <BeginStoryboard>
                 <Storyboard>
-                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6">
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.5">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseOut"/>
                         </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
-                    <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" From="0.98" To="1.0" Duration="0:0:0.8">
+                    <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" From="0.98" To="1.0" Duration="0:0:0.5">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseOut"/>
                         </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
-                    <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" From="0.98" To="1.0" Duration="0:0:0.8">
+                    <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" From="0.98" To="1.0" Duration="0:0:0.5">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseOut"/>
                         </DoubleAnimation.EasingFunction>
@@ -45,8 +48,9 @@
         </EventTrigger>
     </Window.Triggers>
 
+    <!-- Pure AMOLED Dark Window Background -->
     <Window.Background>
-        <SolidColorBrush Color="{DynamicResource BackgroundColor}"/>
+        <SolidColorBrush Color="#000000"/>
     </Window.Background>
 
     <Window.InputBindings>
@@ -60,6 +64,7 @@
     </Window.InputBindings>
 
     <Window.Resources>
+        <!-- Module View DataTemplates -->
         <DataTemplate DataType="{x:Type vmm:DashboardViewModel}"><vmv:DashboardView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:HardwareViewModel}"><vmv:HardwareView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:PEModeViewModel}"><vmv:PEModeView/></DataTemplate>
@@ -104,6 +109,87 @@
         <DataTemplate DataType="{x:Type vmm:CategoryGridViewModel}"><vmv:CategoryGridView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:RegistryLexiconViewModel}"><vmv:RegistryLexiconView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:TestingViewModel}"><vmv:TestingView/></DataTemplate>
+
+        <!-- Pure AMOLED Dynamic Navigation Rail Item Template -->
+        <DataTemplate x:Key="FluentNavItemTemplate">
+            <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    CommandParameter="{Binding ViewName}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Margin="0,2" Padding="0" Background="Transparent" BorderThickness="0" Height="36"
+                    ToolTip="{Binding Name}">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="ItemBorder" Background="Transparent" CornerRadius="8" Padding="10,0" Margin="4,0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition x:Name="IconCol" Width="28"/> <!-- Icon Container -->
+                                                <ColumnDefinition Width="*"/>    <!-- Text Label -->
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Icon -->
+                                            <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="15" Height="15" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                <fa:ImageAwesome.Style>
+                                                    <Style TargetType="fa:ImageAwesome">
+                                                        <Setter Property="Foreground" Value="#888896"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </fa:ImageAwesome.Style>
+                                            </fa:ImageAwesome>
+
+                                            <!-- Text Title -->
+                                            <TextBlock x:Name="NavText" Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" FontSize="12" Margin="8,0,0,0" TextTrimming="CharacterEllipsis">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#888896"/>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="#14141E"/>
+                                        </Trigger>
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="#121C2B"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                                            <Setter TargetName="ItemBorder" Property="Padding" Value="4,0"/>
+                                            <Setter TargetName="ItemBorder" Property="Margin" Value="2,0"/>
+                                            <Setter TargetName="IconCol" Property="Width" Value="*"/>
+                                        </DataTrigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid RenderTransformOrigin="0.5,0.5">
@@ -115,214 +201,430 @@
             <ScaleTransform ScaleX="{Binding DisplayScale}" ScaleY="{Binding DisplayScale}"/>
         </Grid.LayoutTransform>
 
-        <!-- Main Structure -->
+        <!-- Application Pure AMOLED Layout -->
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/> <!-- Titlebar / Header -->
-                <RowDefinition Height="*"/>    <!-- Main Body Workspace -->
-                <RowDefinition Height="Auto"/> <!-- Bottom Status Bar -->
+                <RowDefinition Height="50"/> <!-- AMOLED Top Command Bar -->
+                <RowDefinition Height="*"/>  <!-- Navigation Rail + Main View Area -->
+                <RowDefinition Height="32"/> <!-- Diagnostics Status Footer Bar -->
             </Grid.RowDefinitions>
 
-            <!-- Row 0: Workstation Header -->
-            <Border Grid.Row="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Height="45">
-                <Grid Margin="15,0">
+            <!-- Row 0: Pure AMOLED Header -->
+            <Border Grid.Row="0" Background="#000000" BorderBrush="#1C1C26" BorderThickness="0,0,0,1">
+                <Grid Margin="12,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/> <!-- App ID / Logo -->
-                        <ColumnDefinition Width="*"/>    <!-- Search / Title -->
-                        <ColumnDefinition Width="Auto"/> <!-- Action Buttons -->
+                        <ColumnDefinition Width="Auto"/> <!-- Hamburger Toggle + Brand Emblem -->
+                        <ColumnDefinition Width="*"/>    <!-- Quick Search Command Palette -->
+                        <ColumnDefinition Width="Auto"/> <!-- Right Actions / System Info -->
                     </Grid.ColumnDefinitions>
 
+                    <!-- Left: Nav Toggle & Eternal Emblem -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Image Source="/Assets/logo.png" Width="22" Height="22" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True"/>
-                        <TextBlock Text="ETERNAL" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center"/>
-                        <TextBlock Text="DIAGNOSTICS" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                        <!-- Sidebar Collapsible Toggle Button -->
+                        <Button Command="{Binding ToggleSidebarCommand}" Style="{StaticResource FluentNavToggleStyle}" ToolTip="Toggle Collapsible Navigation Rail">
+                            <fa:ImageAwesome Icon="Bars" Width="14" Foreground="#888896"/>
+                        </Button>
+
+                        <Image Source="/Assets/logo.png" Width="22" Height="22" Margin="4,0,10,0" RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True"/>
+                        
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="ETERNAL" FontWeight="Bold" FontSize="12" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                <Border Background="#1A0078D4" CornerRadius="4" Padding="6,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="SYSTEM INTELLIGENCE" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
+                                </Border>
+                                
+                                <!-- VS Debugger Attached / Testing Mode Pill Badge -->
+                                <Border Visibility="{Binding IsVsDebuggerAttached, Converter={StaticResource VisibilityConverter}}" Background="#30EF4444" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Ellipse Width="5" Height="5" Fill="#EF4444" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="VS DEBUGGER ATTACHED • TESTING MODE" FontSize="8" FontWeight="Black" Foreground="#EF4444" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
 
-                    <!-- Search Actions -->
-                    <Button Grid.Column="1" Command="{Binding CommandPaletteVm.OpenCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="300" Height="28" Style="{StaticResource IconButton}">
+                    <!-- Center: AMOLED Search Action Bar -->
+                    <Button Grid.Column="1" Command="{Binding CommandPaletteVm.OpenCommand}" HorizontalAlignment="Stretch" MaxWidth="420" VerticalAlignment="Center" Height="32" Margin="20,0" Cursor="Hand">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
-                                <Border Background="{DynamicResource BackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6">
-                                    <Grid Margin="10,0">
+                                <Border x:Name="SearchBorder" Background="#08080C" BorderBrush="#1C1C28" BorderThickness="1" CornerRadius="8">
+                                    <Grid Margin="12,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <fa:ImageAwesome Grid.Column="0" Icon="Search" Width="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                        <TextBlock Grid.Column="1" Text="Search actions... (Ctrl+K)" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                                        <fa:ImageAwesome Grid.Column="0" Icon="Search" Width="12" Foreground="#666675" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <TextBlock Grid.Column="1" Text="Search actions &amp; diagnostic macros..." FontSize="11" Foreground="#666675" VerticalAlignment="Center"/>
+                                        <Border Grid.Column="2" Background="#161622" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                                            <TextBlock Text="Ctrl + K" FontSize="9" FontWeight="SemiBold" Foreground="#888896"/>
+                                        </Border>
                                     </Grid>
                                 </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="SearchBorder" Property="Background" Value="#101018"/>
+                                        <Setter TargetName="SearchBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
 
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"/>
+                    <!-- Right: Quick Status Actions & User Identity -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- WinPE Mode Pill (If Active) -->
+                        <Border Visibility="{Binding IsPeMode, Converter={StaticResource VisibilityConverter}}" Background="#201400" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="6" Padding="8,3" Margin="0,0,10,0">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:ImageAwesome Icon="ExclamationTriangle" Width="10" Foreground="#F59E0B" Margin="0,0,6,0"/>
+                                <TextBlock Text="WINPE RECOVERY MODE" FontSize="9" FontWeight="Bold" Foreground="#F59E0B"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- User Greeting & Windows Role Badge (5-click Net User Inspector) -->
+                        <Border MouseLeftButtonDown="UserGreetingBadge_MouseLeftButtonDown" Cursor="Hand" IsEnabled="{Binding IsAuthenticated}" Background="#0C0C14" BorderBrush="#1F1F2E" BorderThickness="1" CornerRadius="8" Padding="10,4" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="UserCircle" Width="12" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding CurrentUserGreeting}" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <Border Background="#1A0078D4" CornerRadius="4" Padding="5,1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding UserRoleBadge}" FontSize="8" FontWeight="Black" Foreground="{DynamicResource AccentBrush}"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Settings Quick Access Button (Upper Right) -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Settings" IsEnabled="{Binding IsAuthenticated}" Style="{StaticResource FluentHeaderIconButton}" ToolTip="Settings" Margin="0,0,6,0">
+                            <fa:ImageAwesome Icon="Gear" Width="13" Foreground="White"/>
+                        </Button>
+
+                        <!-- Eternal Console Quick Access Button -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Console" IsEnabled="{Binding IsAuthenticated}" Style="{StaticResource FluentHeaderIconButton}" ToolTip="Eternal Diagnostic Console" Margin="0,0,6,0">
+                            <fa:ImageAwesome Icon="Terminal" Width="13" Foreground="White"/>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
 
-            <!-- Row 1: Workspace split -->
+            <!-- Row 1: Workspace Split (Pure AMOLED Sidebar + Content Area) -->
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="220"/> <!-- Left Sidebar -->
-                    <ColumnDefinition Width="*"/>   <!-- Main Content Canvas -->
+                    <!-- Sidebar Column width bound to IsSidebarExpanded -->
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Left Sidebar -->
-                <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        <StackPanel Margin="10,15,10,15">
-                            <StackPanel.Resources>
-                                <DataTemplate x:Key="NavItemTemplate">
-                                    <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding ViewName}"
-                                            HorizontalAlignment="Stretch"
-                                            HorizontalContentAlignment="Stretch"
-                                            Margin="0,2" Padding="0" Background="Transparent" BorderThickness="0" Height="32">
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="Button">
-                                                            <Border x:Name="ItemBorder" Background="Transparent" CornerRadius="6" Padding="10,0">
-                                                                <Grid>
-                                                                    <Grid.ColumnDefinitions>
-                                                                        <ColumnDefinition Width="24"/>
-                                                                        <ColumnDefinition Width="*"/>
-                                                                    </Grid.ColumnDefinitions>
-                                                                    <fa:ImageAwesome Grid.Column="0" Icon="{Binding Icon}" Width="12" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                                        <fa:ImageAwesome.Style>
-                                                                            <Style TargetType="fa:ImageAwesome">
-                                                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                                                                                <Style.Triggers>
-                                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
-                                                                                    </DataTrigger>
-                                                                                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                                                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-                                                                                    </DataTrigger>
-                                                                                </Style.Triggers>
-                                                                            </Style>
-                                                                        </fa:ImageAwesome.Style>
-                                                                    </fa:ImageAwesome>
-                                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" FontSize="12" Margin="8,0,0,0">
-                                                                        <TextBlock.Style>
-                                                                            <Style TargetType="TextBlock">
-                                                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                                                                                <Style.Triggers>
-                                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-                                                                                        <Setter Property="FontWeight" Value="SemiBold"/>
-                                                                                    </DataTrigger>
-                                                                                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                                                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-                                                                                    </DataTrigger>
-                                                                                </Style.Triggers>
-                                                                            </Style>
-                                                                        </TextBlock.Style>
-                                                                    </TextBlock>
-                                                                </Grid>
-                                                            </Border>
-                                                            <ControlTemplate.Triggers>
-                                                                <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource AccentSecondaryBrush}"/>
-                                                                </Trigger>
-                                                            </ControlTemplate.Triggers>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="Background" Value="{DynamicResource AccentSecondaryBrush}"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
-                                </DataTemplate>
-                            </StackPanel.Resources>
+                <!-- Pure AMOLED Navigation Rail Container -->
+                <Border Grid.Column="0" Background="#000000" BorderBrush="#1C1C26" BorderThickness="0,0,1,0">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Width" Value="230"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
+                                    <Setter Property="Width" Value="64"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    
+                    <ScrollViewer Style="{StaticResource ThinDarkScrollViewer}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" ScrollViewer.PanningMode="VerticalOnly">
+                        <StackPanel Margin="6,12,6,12">
+                            <!-- Category: System Diagnostics -->
+                            <TextBlock Text="SYSTEM DIAGNOSTICS" FontSize="9" FontWeight="Bold" Foreground="#555562" Margin="10,4,0,6">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <ItemsControl ItemsSource="{Binding SystemItems}" ItemTemplate="{StaticResource FluentNavItemTemplate}"/>
+                            
+                            <!-- Category: Telemetry & Hardware -->
+                            <TextBlock Text="TELEMETRY &amp; HARDWARE" FontSize="9" FontWeight="Bold" Foreground="#555562" Margin="10,16,0,6">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <ItemsControl ItemsSource="{Binding TelemetryItems}" ItemTemplate="{StaticResource FluentNavItemTemplate}"/>
+                            
+                            <!-- Category: Optimization & Repair -->
+                            <TextBlock Text="OPTIMIZATION &amp; REPAIR" FontSize="9" FontWeight="Bold" Foreground="#555562" Margin="10,16,0,6">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <ItemsControl ItemsSource="{Binding MonitoringItems}" ItemTemplate="{StaticResource FluentNavItemTemplate}"/>
+                            
+                            <!-- Category: Support & WinPE -->
+                            <TextBlock Text="SUPPORT &amp; WINDOWS PE" FontSize="9" FontWeight="Bold" Foreground="#555562" Margin="10,16,0,6">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <ItemsControl ItemsSource="{Binding SupportItems}" ItemTemplate="{StaticResource FluentNavItemTemplate}"/>
 
-                             <!-- Navigation Items grouped by headers -->
-                            <TextBlock Text="SYSTEM DIAGNOSTICS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="10,0,0,8"/>
-                            <ItemsControl ItemsSource="{Binding SystemItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-                            
-                            <TextBlock Text="TELEMETRY &amp; HARDWARE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="10,20,0,8"/>
-                            <ItemsControl ItemsSource="{Binding TelemetryItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-                            
-                            <TextBlock Text="OPTIMIZATION &amp; REPAIR" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="10,20,0,8"/>
-                            <ItemsControl ItemsSource="{Binding MonitoringItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-                            
-                            <TextBlock Text="SUPPORT &amp; WINDOWS PE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="10,20,0,8"/>
-                            <ItemsControl ItemsSource="{Binding SupportItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
-
+                            <!-- Category: Dev Testing -->
                             <StackPanel Visibility="{Binding IsTestingModeActive, Converter={StaticResource VisibilityConverter}}">
-                                <TextBlock Text="DEV TESTING" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="10,20,0,8"/>
-                                <ItemsControl ItemsSource="{Binding DevToolkitItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
+                                <TextBlock Text="DEV TESTING" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="10,16,0,6">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <ItemsControl ItemsSource="{Binding DevToolkitItems}" ItemTemplate="{StaticResource FluentNavItemTemplate}"/>
                             </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </Border>
 
-                <!-- Center Main Canvas -->
-                <Border Grid.Column="1" Background="{DynamicResource BackgroundBrush}" Padding="0" ClipToBounds="True">
-                    <ContentControl Content="{Binding CurrentView}"/>
-                </Border>
+                <!-- Main Content Canvas with Pure AMOLED Background -->
+                <Grid Grid.Column="1" Background="#000000">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Canvas Sub-Header Title -->
+                        <RowDefinition Height="*"/>    <!-- View Host -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Active View Breadcrumb Bar -->
+                    <Border Grid.Row="0" Background="#000000" BorderBrush="#1C1C26" BorderThickness="0,0,0,1" Padding="16,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="FolderOpen" Width="13" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding CurrentViewTitle}" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding ZoomPercentageString, StringFormat='Scale: {0}'}" FontSize="10" Foreground="#666675" Margin="0,0,10,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Dynamic View Host (AMOLED Deep Dark Base) -->
+                    <Border Grid.Row="1" Background="#040406" Padding="0" ClipToBounds="True">
+                        <ContentControl Content="{Binding CurrentView}"/>
+                    </Border>
+                </Grid>
             </Grid>
 
-            <!-- Row 2: Status bar -->
-            <Border Grid.Row="2" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Height="28">
-                <Grid Margin="15,0">
+            <!-- Row 2: Diagnostics Status Footer Bar (Pure AMOLED Telemetry) -->
+            <Border Grid.Row="2" Background="#000000" BorderBrush="#1C1C26" BorderThickness="0,1,0,0">
+                <Grid Margin="16,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
+                    <!-- Left: Telemetry Metrics -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- Uptime -->
-                        <fa:ImageAwesome Icon="ClockOutline" Foreground="{DynamicResource TextSecondaryBrush}" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding Uptime}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                        <!-- System Uptime -->
+                        <fa:ImageAwesome Icon="History" Foreground="#666675" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Uptime:" Foreground="#666675" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <TextBlock Text="{Binding Uptime}" Foreground="#CCCCCC" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,24,0"/>
 
-                        <!-- CPU Usage -->
-                        <fa:ImageAwesome Icon="Microchip" Foreground="{DynamicResource TextSecondaryBrush}" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="CPU:" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="{Binding CpuUsage}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                        <!-- CPU Load Bar -->
+                        <fa:ImageAwesome Icon="Microchip" Foreground="{DynamicResource AccentBrush}" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="CPU:" Foreground="#666675" FontSize="10" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <Border Width="60" Height="6" Background="#161622" CornerRadius="3" VerticalAlignment="Center" Margin="0,0,6,0">
+                            <ProgressBar Value="{Binding CpuUsageValue}" Minimum="0" Maximum="100" Background="Transparent" Foreground="{DynamicResource AccentBrush}" BorderThickness="0"/>
+                        </Border>
+                        <TextBlock Text="{Binding CpuUsage}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center" Margin="0,0,24,0"/>
 
-                        <!-- RAM Usage -->
-                        <fa:ImageAwesome Icon="Tasks" Foreground="{DynamicResource TextSecondaryBrush}" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="RAM:" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="{Binding RamUsage}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                        <!-- RAM Load Bar -->
+                        <fa:ImageAwesome Icon="Tasks" Foreground="#10B981" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="RAM:" Foreground="#666675" FontSize="10" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <Border Width="60" Height="6" Background="#161622" CornerRadius="3" VerticalAlignment="Center" Margin="0,0,6,0">
+                            <ProgressBar Value="{Binding RamUsageValue}" Minimum="0" Maximum="100" Background="Transparent" Foreground="#10B981" BorderThickness="0"/>
+                        </Border>
+                        <TextBlock Text="{Binding RamUsage}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center" Margin="0,0,24,0"/>
                     </StackPanel>
 
+                    <!-- Right: Engine & Security Status -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Border Background="#1000FFAA" CornerRadius="4" Padding="6,2" Margin="0,0,15,0">
+                        <!-- VS Debugger Active / Testing Mode Footer Pill -->
+                        <Border Visibility="{Binding IsVsDebuggerAttached, Converter={StaticResource VisibilityConverter}}" Background="#25EF4444" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="4" Padding="8,2" Margin="0,0,10,0">
                             <StackPanel Orientation="Horizontal">
-                                <Ellipse Width="4" Height="4" Fill="{DynamicResource SuccessBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="WORKSTATION ENGINE: ACTIVE" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
+                                <Ellipse Width="5" Height="5" Fill="#EF4444" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="VS DEBUGGER ACTIVE: TESTING MODE" FontSize="9" FontWeight="Bold" Foreground="#EF4444" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>
-                        <TextBlock Text="{Binding ZoomPercentageString, StringFormat='ZOOM: {0}'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,15,0"/>
-                        <TextBlock Text="v3.5.0" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center"/>
+
+                        <Border Background="#1000FF99" BorderBrush="#1C00FF99" BorderThickness="1" CornerRadius="4" Padding="8,2" Margin="0,0,12,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="5" Height="5" Fill="#10B981" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="WORKSTATION ENGINE: ONLINE" FontSize="9" FontWeight="Bold" Foreground="#10B981" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <TextBlock Text="v3.5.0 RC2" Foreground="#555562" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
 
-        <!-- Global Overlays -->
-        <ItemsControl VerticalAlignment="Top" HorizontalAlignment="Right" Margin="20" Panel.ZIndex="999" ItemsSource="{Binding ToastVm.ActiveToasts}">
+        <!-- Global Toast Notification Overlays -->
+        <ItemsControl VerticalAlignment="Top" HorizontalAlignment="Right" Margin="20,60,20,0" Panel.ZIndex="999" ItemsSource="{Binding ToastVm.ActiveToasts}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Background="{DynamicResource CardBrush}" CornerRadius="6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,0,8" Padding="15,10">
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="{Binding Severity, Converter={StaticResource CategoryToIconConverter}, ConverterParameter='Toast'}" 
-                                            Width="12" Margin="0,0,10,0" 
+                    <Border Background="#0C0C14" CornerRadius="8" BorderBrush="#26263A" BorderThickness="1" Margin="0,0,0,10" Padding="14,10" Width="320">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="270" Color="#000000" Opacity="0.7"/>
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <fa:ImageAwesome Grid.Column="0" Icon="{Binding Severity, Converter={StaticResource CategoryToIconConverter}, ConverterParameter='Toast'}" 
+                                            Width="14" Height="14" Margin="0,0,12,0" VerticalAlignment="Center"
                                             Foreground="{Binding Severity, Converter={StaticResource SeverityToBrushConverter}}"/>
-                            <TextBlock Text="{Binding Message}" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center"/>
-                        </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{Binding Message}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        </Grid>
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
+        <!-- Command Palette Modal Overlay Host -->
         <ContentControl Panel.ZIndex="400" Content="{Binding CommandPaletteVm}" Visibility="{Binding CommandPaletteVm.IsOpen, Converter={StaticResource VisibilityConverter}}"/>
+
+        <!-- Embedded Full-Bleed AMOLED Strict Login Overlay (Active when IsAuthenticated is False) -->
+        <Grid Visibility="{Binding IsAuthenticated, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Panel.ZIndex="999" Background="#030305">
+            <StackPanel x:Name="LoginContainerPanel" Width="420" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" Opacity="0">
+                <StackPanel.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="LoginScale" ScaleX="0.94" ScaleY="0.94"/>
+                        <TranslateTransform x:Name="LoginTranslate" Y="20"/>
+                    </TransformGroup>
+                </StackPanel.RenderTransform>
+                <StackPanel.Triggers>
+                    <EventTrigger RoutedEvent="StackPanel.Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="LoginContainerPanel" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetName="LoginScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.3">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetName="LoginScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.3">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetName="LoginTranslate" Storyboard.TargetProperty="Y" To="0" Duration="0:0:0.3">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </StackPanel.Triggers>
+                <!-- Header Branding -->
+                <StackPanel HorizontalAlignment="Center" Margin="0,0,0,30">
+                    <Image Source="/Assets/logo.png" Width="72" Height="72" HorizontalAlignment="Center" Margin="0,0,0,18">
+                        <Image.Effect>
+                            <DropShadowEffect Color="#0078D4" BlurRadius="30" ShadowDepth="0" Opacity="0.5"/>
+                        </Image.Effect>
+                    </Image>
+                    <TextBlock Text="ETERNAL" FontSize="28" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+                    <TextBlock Text="STRICT WORKSTATION IDENTITY" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" Margin="0,4,0,0" Opacity="0.9"/>
+                </StackPanel>
+
+                <!-- Auth Input Form -->
+                <StackPanel Margin="0,0,0,10">
+                    <!-- User Profile Field -->
+                    <StackPanel Margin="0,0,0,18">
+                        <TextBlock Text="WINDOWS USER PROFILE" Style="{StaticResource Caption}" FontSize="9" Foreground="#888896" Margin="0,0,0,8"/>
+                        <Border Background="#0D0D14" BorderBrush="#1F1F2E" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <fa:ImageAwesome Grid.Column="0" Icon="User" Width="14" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding CurrentUsernameOnly}" FontSize="13" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Password Input Field -->
+                    <StackPanel Margin="0,0,0,22">
+                        <TextBlock Text="WINDOWS ACCOUNT PASSWORD / PIN" Style="{StaticResource Caption}" FontSize="9" Foreground="#888896" Margin="0,0,0,8"/>
+                        <Border Background="#0D0D14" BorderBrush="#1F1F2E" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <fa:ImageAwesome Grid.Column="0" Icon="Lock" Width="14" Foreground="#888896" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <PasswordBox Grid.Column="1" x:Name="OverlayPasswordBox" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="14" KeyDown="OverlayPasswordBox_KeyDown"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Enter Button -->
+                    <Button Click="OverlayEnterButton_Click" Style="{StaticResource PrimaryButton}" Height="46" Cursor="Hand" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <fa:ImageAwesome Icon="Key" Width="14" Foreground="Black" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="ENTER WORKSTATION" FontWeight="Black" FontSize="12" Foreground="Black" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Windows Hello Button -->
+                    <Button Command="{Binding TriggerWindowsHelloCommand}" Style="{StaticResource StandardButton}" Height="40" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <fa:ImageAwesome Icon="Windows" Width="12" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Use Windows Hello PIN / Biometrics" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Footer Status -->
+                <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0">
+                    <TextBlock Text="{Binding AuthStatusMessage}" FontSize="10" Foreground="{Binding AuthStatusColor}" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

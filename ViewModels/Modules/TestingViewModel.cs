@@ -20,6 +20,7 @@ namespace Eternal.ViewModels.Modules
             _integrityService = integrityService;
             _toastService = toastService;
             RunDiagnosticsCommand = new AsyncRelayCommand(RunDiagnosticsAsync);
+            _ = RunDiagnosticsAsync();
         }
 
         public IAsyncRelayCommand RunDiagnosticsCommand { get; }

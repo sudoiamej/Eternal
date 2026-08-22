@@ -66,12 +66,21 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">
-                                <Button Command="{Binding RebootSystemCommand}" Style="{StaticResource PrimaryAction}" Padding="15,10" Margin="0,0,15,0"
+                                <Button Command="{Binding RebootSystemCommand}" Style="{StaticResource PrimaryAction}" Padding="15,10" Margin="0,0,10,0"
                                         Background="{DynamicResource WarningBrush}"
                                         Visibility="{Binding IsRebootRequired, Converter={StaticResource VisibilityConverter}}">
                                     <StackPanel Orientation="Horizontal">
                                         <fa:ImageAwesome Icon="Refresh" Width="12" Foreground="White" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                         <TextBlock Text="REBOOT NOW" FontWeight="Bold"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Command="{Binding DismissRebootFlagCommand}" Style="{StaticResource PrimaryAction}" Padding="12,10" Margin="0,0,15,0"
+                                        Background="#242436" ToolTip="Clear stale Windows reboot flags from registry if no updates are pending."
+                                        Visibility="{Binding IsRebootRequired, Converter={StaticResource VisibilityConverter}}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="Times" Width="10" Foreground="#A0A0B0" Margin="0,0,8,0"/>
+                                        <TextBlock Text="CLEAR REBOOT FLAG" FontSize="11" FontWeight="Bold" Foreground="#D0D0DC"/>
                                     </StackPanel>
                                 </Button>
 
@@ -104,6 +113,43 @@
                                         <TextBlock Text="CHECK FOR UPDATES" FontWeight="Bold"/>
                                     </StackPanel>
                                 </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Windows OS Lifecycle & EOL Expiration Audit -->
+                    <TextBlock Text="WINDOWS OS LIFECYCLE &amp; EOL AUDIT" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10"/>
+                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,25" Padding="18">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="{Binding LifecycleInfo.Edition}" FontSize="13" FontWeight="Black" Foreground="#FFFFFF" Margin="0,0,10,0"/>
+                                    <Border Background="#1A3A86FF" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding LifecycleInfo.DisplayVersion, StringFormat='Version {0}'}" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Build: " FontSize="10" Foreground="#888896" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding LifecycleInfo.BuildNumber}" FontSize="10" Foreground="#A0A0B0" Margin="0,0,15,0"/>
+                                    <TextBlock Text="Servicing EOL Date: " FontSize="10" Foreground="#888896" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding LifecycleInfo.EolDate, StringFormat='{}{0:D}'}" FontSize="10" Foreground="#FFFFFF" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Border Background="#154CAF50" BorderBrush="#4CAF50" BorderThickness="1" CornerRadius="6" Padding="10,5">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="Shield" Width="11" Foreground="#4CAF50" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding LifecycleInfo.Status}" FontSize="10" FontWeight="Black" Foreground="#4CAF50" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <TextBlock Text="{Binding LifecycleInfo.DaysRemaining, StringFormat='{}{0} Days Remaining'}" 
+                                           FontSize="10" FontWeight="Bold" Foreground="#888896" HorizontalAlignment="Right" Margin="0,6,0,0"/>
                             </StackPanel>
                         </Grid>
                     </Border>

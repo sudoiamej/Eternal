@@ -154,7 +154,13 @@ namespace Eternal.Helpers
                 return true;
             }
 
-            // Layer 5: Forensic Process Target List
+            // Layer 5: Hardware Breakpoint Register Audit (DR0-DR3)
+            if (AreHardwareBreakpointsPresent())
+            {
+                return true;
+            }
+
+            // Layer 6: Forensic Process Target List
             string[] suspiciousNames = { "dnspy", "x64dbg", "windbg", "ida64", "processhacker", "cheatengine" };
             try
             {
@@ -173,6 +179,53 @@ namespace Eternal.Helpers
             }
             catch { }
 
+            return false;
+        }
+
+        [DllImport("ntdll.dll", SetLastError = true)]
+        private static extern int NtSetInformationThread(IntPtr threadHandle, int threadInformationClass, IntPtr threadInformation, int threadInformationLength);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr GetCurrentThread();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool GetThreadContext(IntPtr hThread, ref CONTEXT64 lpContext);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct CONTEXT64
+        {
+            public ulong P1Home; public ulong P2Home; public ulong P3Home; public ulong P4Home; public ulong P5Home; public ulong P6Home;
+            public uint ContextFlags; public uint MxCsr;
+            public ushort SegCs; public ushort SegDs; public ushort SegEs; public ushort SegFs; public ushort SegGs; public ushort SegSs;
+            public uint EFlags;
+            public ulong Dr0; public ulong Dr1; public ulong Dr2; public ulong Dr3; public ulong Dr6; public ulong Dr7;
+        }
+
+        public static void HideThreadFromDebugger()
+        {
+            try
+            {
+                if (IsDeveloperExceptionActive()) return;
+                NtSetInformationThread(GetCurrentThread(), 0x11, IntPtr.Zero, 0); // 0x11 = ThreadHideFromDebugger
+            }
+            catch { }
+        }
+
+        public static bool AreHardwareBreakpointsPresent()
+        {
+            try
+            {
+                if (IsDeveloperExceptionActive()) return false;
+                var ctx = new CONTEXT64 { ContextFlags = 0x00010010 }; // CONTEXT_DEBUG_REGISTERS
+                if (GetThreadContext(GetCurrentThread(), ref ctx))
+                {
+                    if (ctx.Dr0 != 0 || ctx.Dr1 != 0 || ctx.Dr2 != 0 || ctx.Dr3 != 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch { }
             return false;
         }
     }

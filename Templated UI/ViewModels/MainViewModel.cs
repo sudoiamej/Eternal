@@ -166,7 +166,7 @@ namespace Eternal.ViewModels
                 TelemetryItems = FilterNav(new List<NavigationItem>
                 {
                     new NavigationItem("Hardware", "Microchip", "Hardware", 0, 0, 0),
-                    new NavigationItem("Battery Lab", "Bolt", "Battery", 0, 0, 1),
+                    new NavigationItem("Battery Lab", "BatteryFull", "Battery", 0, 0, 1),
                     new NavigationItem("Stress Test", "Flash", "StressTest", 1, 1, 2),
                     new NavigationItem("PC Rating", "Trophy", "PcRating", 0, 0, 3),
                     new NavigationItem("Thermal", "ThermometerThreeQuarters", "Thermal", 0, 0, 4),

@@ -76,13 +76,6 @@ namespace Eternal.Services.System
                     }
                     
                     Current = tempSettings;
-                    
-                    // Seamless transition: Upgrade old default pin '1234' to the new user pin '072906'
-                    if (Current.StartupLockPin == "1234")
-                    {
-                        Current.StartupLockPin = "072906";
-                        Save();
-                    }
                 }
                 else
                 {

@@ -143,7 +143,27 @@ namespace Eternal.Services.Hardware
                             name = obj["Name"]?.ToString() ?? name;
                             driver = obj["DriverVersion"]?.ToString() ?? driver;
                             long bytes = global::System.Convert.ToInt64(obj["AdapterRAM"] ?? 0);
-                            vram = $"{bytes / (1024 * 1024)} MB";
+                            long mb = bytes / (1024 * 1024);
+                            vram = mb >= 1024 ? $"{mb / 1024.0:F1} GB Dedicated VRAM" : $"{mb} MB VRAM";
+
+                            try
+                            {
+                                using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000");
+                                if (key != null)
+                                {
+                                    var memObj = key.GetValue("HardwareInformation.MemorySize");
+                                    if (memObj is byte[] bytesArr && bytesArr.Length >= 4)
+                                    {
+                                        long totalMem = BitConverter.ToUInt32(bytesArr, 0);
+                                        if (totalMem > 0)
+                                        {
+                                            long regMb = totalMem / (1024 * 1024);
+                                            vram = regMb >= 1024 ? $"{regMb / 1024.0:F1} GB Dedicated VRAM" : $"{regMb} MB VRAM";
+                                        }
+                                    }
+                                }
+                            }
+                            catch { }
                             break;
                         }
                     }
@@ -157,13 +177,17 @@ namespace Eternal.Services.Hardware
                 try
                 {
                     using var perfSearcher = new ManagementObjectSearcher(@"root\cimv2", "select Temperature from Win32_PerfFormattedData_GPUPerformanceCounters_GPUDevice");
-                    foreach (ManagementObject obj in perfSearcher.Get())
+                    using var perfCollection = perfSearcher.Get();
+                    foreach (ManagementObject obj in perfCollection)
                     {
-                        double pTemp = Convert.ToDouble(obj["Temperature"]);
-                        if (pTemp > 0 && pTemp < 120)
+                        using (obj)
                         {
-                            temp = $"{pTemp:F0}°C";
-                            break;
+                            double pTemp = Convert.ToDouble(obj["Temperature"]);
+                            if (pTemp > 0 && pTemp < 120)
+                            {
+                                temp = $"{pTemp:F0}°C";
+                                break;
+                            }
                         }
                     }
                 }
@@ -313,7 +337,8 @@ namespace Eternal.Services.Hardware
                                 string model = obj["Model"]?.ToString() ?? "Unknown";
                                 long bytes = global::System.Convert.ToInt64(obj["Size"] ?? 0);
                                 string size = $"{bytes / (1024 * 1024 * 1024)} GB";
-                                string health = obj["Status"]?.ToString() ?? "Unknown";
+                                string rawStatus = obj["Status"]?.ToString() ?? "Unknown";
+                                string health = rawStatus.Equals("OK", StringComparison.OrdinalIgnoreCase) ? "Healthy" : rawStatus;
                                 string interfaceType = obj["InterfaceType"]?.ToString() ?? "Unknown";
                                 disks.Add(new DiskInfo(model, size, health, interfaceType));
                             }

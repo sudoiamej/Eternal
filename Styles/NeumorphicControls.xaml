@@ -256,6 +256,11 @@
 
     <Style x:Key="StandardButton" TargetType="Button" BasedOn="{StaticResource PrimaryAction}"/>
 
+    <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryAction}">
+        <Setter Property="Background" Value="#EF4444"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
     <Style x:Key="ModernTextBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}"/>
 
     <Style x:Key="ModernPasswordBox" TargetType="PasswordBox">
@@ -385,6 +390,62 @@
                 </BeginStoryboard>
             </EventTrigger>
         </Style.Triggers>
+    </Style>
+
+    <!-- Global Touchscreen Touch-Panning & Inertia Defaults for ScrollViewer -->
+    <Style TargetType="ScrollViewer">
+        <Setter Property="ScrollViewer.PanningMode" Value="VerticalOnly"/>
+        <Setter Property="ScrollViewer.PanningDeceleration" Value="0.001"/>
+        <Setter Property="ScrollViewer.PanningRatio" Value="1.0"/>
+        <Setter Property="Stylus.IsFlicksEnabled" Value="True"/>
+        <Setter Property="Stylus.IsTapFeedbackEnabled" Value="True"/>
+        <Setter Property="Stylus.IsTouchFeedbackEnabled" Value="True"/>
+    </Style>
+
+    <!-- Custom Ultra-Thin 3px Dark ScrollBar Style -->
+    <Style x:Key="ThinDarkScrollBar" TargetType="ScrollBar">
+        <Setter Property="Width" Value="3"/>
+        <Setter Property="MinWidth" Value="3"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid x:Name="Bg" SnapsToDevicePixels="true" Background="Transparent">
+                        <Track x:Name="PART_Track" IsDirectionReversed="true">
+                            <Track.Thumb>
+                                <Thumb x:Name="Thumb">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border Background="#333348" CornerRadius="1.5" Margin="0"/>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ThinDarkScrollViewer" TargetType="ScrollViewer">
+        <Setter Property="ScrollViewer.PanningMode" Value="VerticalOnly"/>
+        <Setter Property="ScrollViewer.PanningDeceleration" Value="0.001"/>
+        <Setter Property="Stylus.IsFlicksEnabled" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Column="0" Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" CanContentScroll="{TemplateBinding CanContentScroll}"/>
+                        <ScrollBar x:Name="PART_VerticalScrollBar" Grid.Column="1" Style="{StaticResource ThinDarkScrollBar}" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Value="{TemplateBinding VerticalOffset}" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" ViewportSize="{TemplateBinding ViewportHeight}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

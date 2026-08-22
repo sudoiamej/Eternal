@@ -11,6 +11,8 @@ namespace Eternal.Services.System
         Task<PerformanceSnapshot> GetCurrentSnapshotAsync();
         void StartPolling();
         void StopPolling();
+        void PausePolling();
+        void ResumePolling();
     }
 
     public record PerformanceSnapshot(float CpuUsage, float RamUsage, float DiskUsage, float NetworkUsage);

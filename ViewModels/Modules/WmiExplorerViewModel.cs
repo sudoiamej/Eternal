@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
+using System.Linq;
 using System.Management;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,8 +15,22 @@ namespace Eternal.ViewModels.Modules
     {
         [ObservableProperty] private string _query = "SELECT * FROM Win32_OperatingSystem";
         [ObservableProperty] private DataTable? _results;
-        [ObservableProperty] private string _executionTime = string.Empty;
+        [ObservableProperty] private string _executionTime = "0 ms";
         [ObservableProperty] private string? _errorMessage;
+
+        public ObservableCollection<string> Presets { get; } = new()
+        {
+            "SELECT * FROM Win32_OperatingSystem",
+            "SELECT * FROM Win32_Processor",
+            "SELECT * FROM Win32_PhysicalMemory",
+            "SELECT * FROM Win32_DiskDrive",
+            "SELECT * FROM Win32_LogicalDisk",
+            "SELECT * FROM Win32_NetworkAdapterConfiguration WHERE IPEnabled = True",
+            "SELECT * FROM Win32_BIOS",
+            "SELECT * FROM Win32_BaseBoard",
+            "SELECT * FROM Win32_VideoController",
+            "SELECT * FROM Win32_Service WHERE State = 'Running'"
+        };
 
         public WmiExplorerViewModel()
         {
@@ -21,48 +39,84 @@ namespace Eternal.ViewModels.Modules
         }
 
         [RelayCommand]
+        private void SelectPresetQuery(string preset)
+        {
+            if (!string.IsNullOrWhiteSpace(preset))
+            {
+                Query = preset;
+                _ = ExecuteQuery();
+            }
+        }
+
+        [RelayCommand]
+        private void DismissError()
+        {
+            ErrorMessage = null;
+        }
+
+        [RelayCommand]
         private async Task ExecuteQuery()
         {
+            if (string.IsNullOrWhiteSpace(Query))
+            {
+                ErrorMessage = "Query cannot be empty. Please enter a valid WQL query (e.g. SELECT * FROM Win32_OperatingSystem).";
+                return;
+            }
+
             IsBusy = true;
-            ErrorMessage = string.Empty;
-            Results = null;
-            var sw = System.Diagnostics.Stopwatch.StartNew();
+            ErrorMessage = null;
+            var sw = Stopwatch.StartNew();
 
             try
             {
-                await Task.Run(() =>
+                var dt = await Task.Run(() =>
                 {
-                    var searcher = new ManagementObjectSearcher(Query);
-                    var collection = searcher.Get();
-                    var dt = new DataTable();
+                    var dataTable = new DataTable();
+                    var options = new EnumerationOptions { Timeout = TimeSpan.FromSeconds(10) };
+                    var selectQuery = new ObjectQuery(Query.Trim());
+
+                    using var searcher = new ManagementObjectSearcher(new ManagementScope(@"root\cimv2"), selectQuery, options);
+                    using var collection = searcher.Get();
 
                     bool columnsCreated = false;
 
                     foreach (ManagementObject obj in collection)
                     {
-                        if (!columnsCreated)
+                        using (obj)
                         {
-                            foreach (var prop in obj.Properties)
+                            if (!columnsCreated)
                             {
-                                dt.Columns.Add(prop.Name, typeof(string));
+                                foreach (PropertyData prop in obj.Properties)
+                                {
+                                    if (!dataTable.Columns.Contains(prop.Name))
+                                    {
+                                        dataTable.Columns.Add(prop.Name, typeof(string));
+                                    }
+                                }
+                                columnsCreated = true;
                             }
-                            columnsCreated = true;
-                        }
 
-                        var row = dt.NewRow();
-                        foreach (var prop in obj.Properties)
-                        {
-                            row[prop.Name] = prop.Value?.ToString() ?? "null";
+                            var row = dataTable.NewRow();
+                            foreach (PropertyData prop in obj.Properties)
+                            {
+                                if (dataTable.Columns.Contains(prop.Name))
+                                {
+                                    row[prop.Name] = FormatWmiValue(prop.Value);
+                                }
+                            }
+                            dataTable.Rows.Add(row);
                         }
-                        dt.Rows.Add(row);
                     }
 
-                    Results = dt;
+                    return dataTable;
                 });
+
+                Results = dt;
             }
             catch (Exception ex)
             {
-                ErrorMessage = ex.Message;
+                Results = null;
+                ErrorMessage = $"WMI Query Error: {ex.Message}";
             }
             finally
             {
@@ -70,6 +124,21 @@ namespace Eternal.ViewModels.Modules
                 ExecutionTime = $"{sw.ElapsedMilliseconds} ms";
                 IsBusy = false;
             }
+        }
+
+        private static string FormatWmiValue(object? val)
+        {
+            if (val == null) return "null";
+            if (val is Array arr)
+            {
+                var list = new List<string>();
+                foreach (var item in arr)
+                {
+                    if (item != null) list.Add(item.ToString() ?? "");
+                }
+                return list.Count > 0 ? string.Join(", ", list) : "[]";
+            }
+            return val.ToString() ?? "";
         }
     }
 }

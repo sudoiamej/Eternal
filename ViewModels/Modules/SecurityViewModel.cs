@@ -59,5 +59,34 @@ namespace Eternal.ViewModels.Modules
             catch { }
             finally { IsLoading = false; }
         }
+
+        [ObservableProperty] private string _repairLog = string.Empty;
+        [ObservableProperty] private bool _isRepairing = false;
+
+        [RelayCommand]
+        private async Task RunSystemRepairAsync()
+        {
+            if (IsRepairing) return;
+            IsRepairing = true;
+            RepairLog = "[START] Initiating System File Checker (SFC) and DISM Component Store Repair...\n";
+
+            var progress = new System.Progress<string>(line =>
+            {
+                RepairLog += line + "\n";
+            });
+
+            try
+            {
+                await _securityService.RunSystemRepairAsync(progress);
+            }
+            catch (System.Exception ex)
+            {
+                RepairLog += $"[ERROR] Repair failed: {ex.Message}\n";
+            }
+            finally
+            {
+                IsRepairing = false;
+            }
+        }
     }
 }

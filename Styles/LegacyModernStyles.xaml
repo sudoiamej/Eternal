@@ -1,0 +1,63 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fa="http://schemas.fontawesome.io/icons/">
+
+    <!-- Fluent Pure AMOLED Dark Colors & Brushes -->
+    <SolidColorBrush x:Key="FluentWindowBackground" Color="#000000"/>
+    <SolidColorBrush x:Key="FluentHeaderBackground" Color="#000000"/>
+    <SolidColorBrush x:Key="FluentSidebarBackground" Color="#000000"/>
+    <SolidColorBrush x:Key="FluentCardBackground" Color="#08080C"/>
+    <SolidColorBrush x:Key="FluentSubtleBackground" Color="#101017"/>
+    <SolidColorBrush x:Key="FluentHoverBackground" Color="#181822"/>
+    <SolidColorBrush x:Key="FluentSelectedBackground" Color="#0078D4"/>
+
+    <SolidColorBrush x:Key="FluentBorderBrush" Color="#1A1A24"/>
+    <SolidColorBrush x:Key="FluentLightBorderBrush" Color="#262634"/>
+
+    <SolidColorBrush x:Key="FluentTextPrimary" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="FluentTextSecondary" Color="#9999A5"/>
+    <SolidColorBrush x:Key="FluentTextMuted" Color="#555562"/>
+
+    <SolidColorBrush x:Key="FluentAccent" Color="#0078D4"/>
+    <SolidColorBrush x:Key="FluentAccentGlow" Color="#1A0078D4"/>
+    <SolidColorBrush x:Key="FluentAccentHover" Color="#1F8AD2"/>
+
+    <!-- Fluent Drop Shadow for Cards -->
+    <DropShadowEffect x:Key="FluentCardShadow" BlurRadius="12" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.6"/>
+    <DropShadowEffect x:Key="FluentHeaderShadow" BlurRadius="8" ShadowDepth="1" Direction="270" Color="#000000" Opacity="0.5"/>
+
+    <!-- Header Icon Button Style -->
+    <Style x:Key="FluentHeaderIconButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource FluentTextSecondary}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource FluentHoverBackground}"/>
+                            <Setter Property="Foreground" Value="{StaticResource FluentTextPrimary}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource FluentSubtleBackground}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Nav Rail Toggle Hamburger Button -->
+    <Style x:Key="FluentNavToggleStyle" TargetType="Button" BasedOn="{StaticResource FluentHeaderIconButton}">
+        <Setter Property="Width" Value="36"/>
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="Margin" Value="0,0,10,0"/>
+    </Style>
+
+</ResourceDictionary>

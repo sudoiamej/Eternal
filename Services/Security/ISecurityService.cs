@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,6 +14,9 @@ namespace Eternal.Services.Security
         Task<REAgentStatus> GetREAgentStatusAsync();
         Task<List<BitLockerStatus>> GetBitLockerStatusAsync();
         Task<List<ThreatInfo>> ScanSystemThreatsAsync();
+        Task<bool> IsWindowsHelloAvailableAsync();
+        Task<bool> AuthenticateWithWindowsHelloAsync(string message);
+        Task RunSystemRepairAsync(IProgress<string> progress);
     }
 
     public record ThreatInfo(string Category, string Description, string Status, bool IsThreat);

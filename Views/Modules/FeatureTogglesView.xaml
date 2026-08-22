@@ -42,7 +42,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ToggleButton IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                                  IsEnabled="{Binding IsHardDisabled, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"
+                                                  IsEnabled="{Binding IsHardDisabled, Converter={StaticResource InvertBooleanConverter}}"
                                                   Style="{StaticResource ModernSwitch}" HorizontalAlignment="Center"
                                                   ToolTip="{Binding DisabledReason}">
                                         <ToggleButton.LayoutTransform>

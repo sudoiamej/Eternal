@@ -38,7 +38,7 @@
                             <TextBlock Text="SYSTEM DIAGNOSTICS" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Grid.Row="1" Text="Run automated scans and inspect underlying machine assets: bios configurations, system boards, storage diagnostics, battery wear limits, and thermals." 
-                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16" Height="65"/>
+                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16"/>
                         <Button Grid.Row="2" Content="OPEN DIAGNOSTICS" Height="32" Margin="0,15,0,0" 
                                 Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
                                 CommandParameter="Category_Diagnostics"
@@ -59,7 +59,7 @@
                             <TextBlock Text="TUNING &amp; REPAIR" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Grid.Row="1" Text="Realign system state registries, debloat telemetry packages, tune startup configurations, repair damaged system files (SFC), and manage local users." 
-                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16" Height="65"/>
+                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16"/>
                         <Button Grid.Row="2" Content="OPEN TUNING TOOLKIT" Height="32" Margin="0,15,0,0" 
                                 Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
                                 CommandParameter="Category_Tuning"
@@ -80,7 +80,7 @@
                             <TextBlock Text="ACTIVE MONITORING" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Grid.Row="1" Text="Trace local process intelligence, view hardware stress performance charts, examine network port connections, and monitor running background services." 
-                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16" Height="65"/>
+                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16"/>
                         <Button Grid.Row="2" Content="OPEN MONITORING" Height="32" Margin="0,15,0,0" 
                                 Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
                                 CommandParameter="Category_Monitoring"
@@ -101,7 +101,7 @@
                             <TextBlock Text="SUPPORT &amp; WINDOWS PE" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Grid.Row="1" Text="Inspect log profiles, trigger Windows Update audits, access system snapshot files, flash deployment packages (DISM), and run diagnostic utilities." 
-                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16" Height="65"/>
+                                   Foreground="#A2A2A9" FontSize="11" TextWrapping="Wrap" LineHeight="16"/>
                         <Button Grid.Row="2" Content="OPEN SUPPORT DIRECTORY" Height="32" Margin="0,15,0,0" 
                                 Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
                                 CommandParameter="Category_Support"

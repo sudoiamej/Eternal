@@ -1,8 +1,8 @@
 using System;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
-using System.Windows.Threading;
-using Eternal.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Eternal.Services.Security;
 using Eternal.Services.System;
 
 namespace Eternal.Views.Helpers
@@ -10,255 +10,70 @@ namespace Eternal.Views.Helpers
     public partial class EntryLockWindow : Window
     {
         private readonly ISettingsService _settingsService;
-        private readonly DispatcherTimer _lockoutTimer;
-        private const string OverridePin = "000000";
+        private readonly ISecurityService? _securityService;
 
         public EntryLockWindow(ISettingsService settingsService)
         {
             InitializeComponent();
             _settingsService = settingsService;
-            
-            _lockoutTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-            _lockoutTimer.Tick += LockoutTimer_Tick;
+            _securityService = App.ServiceProvider?.GetService<ISecurityService>();
 
-            CheckLockoutState();
-            UpdateAttemptPins();
-            PinInput.Focus();
+            _ = InitializeWindowsHelloAsync();
         }
 
-        private void CheckLockoutState()
+        private async Task InitializeWindowsHelloAsync()
         {
-            var settings = _settingsService.Current;
-            if (settings.LockoutEnd.HasValue && settings.LockoutEnd > DateTime.Now)
+            await Task.Delay(400); // Smooth entrance animation delay
+
+            if (_securityService != null)
             {
-                EnableLockoutUI();
-            }
-            else
-            {
-                DisableLockoutUI();
+                bool isAvailable = await _securityService.IsWindowsHelloAvailableAsync();
+                if (!isAvailable)
+                {
+                    StatusSubtext.Text = "Windows Hello System PIN is not configured on this device.";
+                    ErrorText.Text = "Windows Hello unavailable. System security bypassed for local session.";
+                    ErrorText.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    // Auto-trigger Windows Hello System OS Prompt on load
+                    await TriggerWindowsHelloAuthAsync();
+                }
             }
         }
 
-        private void EnableLockoutUI()
+        private async Task TriggerWindowsHelloAuthAsync()
         {
-            LockoutPanel.Visibility = Visibility.Visible;
-            AttemptPinsPanel.Visibility = Visibility.Collapsed;
-            VisualPinContainer.Visibility = Visibility.Collapsed;
-            InputPromptText.Visibility = Visibility.Collapsed;
-            UnlockButton.IsEnabled = false;
-            PinInput.IsEnabled = false;
+            if (_securityService == null) return;
+
+            WindowsHelloButton.IsEnabled = false;
             ErrorText.Visibility = Visibility.Collapsed;
-            _lockoutTimer.Start();
-            UpdateTimerText();
-        }
+            StatusSubtext.Text = "Prompting Windows Hello System Security...";
 
-        private void DisableLockoutUI()
-        {
-            LockoutPanel.Visibility = Visibility.Collapsed;
-            AttemptPinsPanel.Visibility = Visibility.Visible;
-            VisualPinContainer.Visibility = Visibility.Visible;
-            InputPromptText.Visibility = Visibility.Visible;
-            UnlockButton.IsEnabled = true;
-            PinInput.IsEnabled = true;
-            PinInput.Focus();
-            _lockoutTimer.Stop();
-            UpdateAttemptPins();
-        }
+            bool authenticated = await _securityService.AuthenticateWithWindowsHelloAsync("Authenticate to access Eternal Workstation");
 
-        private void LockoutTimer_Tick(object sender, EventArgs e)
-        {
-            if (_settingsService.Current.LockoutEnd.HasValue && _settingsService.Current.LockoutEnd > DateTime.Now)
+            if (authenticated)
             {
-                UpdateTimerText();
-            }
-            else
-            {
-                _settingsService.Current.LockoutEnd = null;
-                _settingsService.Save();
-                DisableLockoutUI();
-            }
-        }
-
-        private void UpdateTimerText()
-        {
-            var remaining = _settingsService.Current.LockoutEnd.Value - DateTime.Now;
-            LockoutTimerText.Text = $"Please wait {remaining.Minutes:D2}:{remaining.Seconds:D2}";
-        }
-
-        private void VisualPinContainer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            PinInput.Focus();
-        }
-
-        private void PinInput_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            UpdatePinVisuals();
-        }
-
-        private void UpdatePinVisuals()
-        {
-            if (PinInput == null || Box1 == null || Text1 == null) return;
-
-            int len = PinInput.Password.Length;
-            var boxes = new[] { Box1, Box2, Box3, Box4, Box5, Box6 };
-            var texts = new[] { Text1, Text2, Text3, Text4, Text5, Text6 };
-            
-            var accentBrush = (System.Windows.Media.Brush)FindResource("AccentBrush");
-            var borderBrush = (System.Windows.Media.Brush)FindResource("BorderBrush");
-            var backgroundBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(10, 255, 255, 255)); // #0AFFFFFF
-            var activeBackground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(20, 255, 255, 255)); // #14FFFFFF
-
-            for (int i = 0; i < 6; i++)
-            {
-                if (i < len)
-                {
-                    texts[i].Text = "●"; // Masked character
-                    boxes[i].BorderBrush = accentBrush;
-                    boxes[i].Background = activeBackground;
-                }
-                else
-                {
-                    texts[i].Text = string.Empty;
-                    boxes[i].BorderBrush = (i == len) ? accentBrush : borderBrush; // Glow active target box!
-                    boxes[i].Background = (i == len) ? activeBackground : backgroundBrush;
-                }
-            }
-        }
-
-        private void UpdateAttemptPins()
-        {
-            if (Attempt1 == null || Attempt2 == null || Attempt3 == null || _settingsService?.Current == null) return;
-
-            var settings = _settingsService.Current;
-            int failed = settings.FailedAttemptsCount;
-            var pins = new[] { Attempt1, Attempt2, Attempt3 };
-            var successBrush = (System.Windows.Media.Brush)FindResource("SuccessBrush");
-            var criticalBrush = (System.Windows.Media.Brush)FindResource("CriticalBrush");
-
-            for (int i = 0; i < 3; i++)
-            {
-                if (i < failed)
-                {
-                    pins[i].Fill = criticalBrush;
-                }
-                else
-                {
-                    pins[i].Fill = successBrush;
-                }
-            }
-        }
-
-        private void TriggerShake(UIElement element)
-        {
-            var doubleAnim = new System.Windows.Media.Animation.DoubleAnimation
-            {
-                From = 1.0,
-                To = 1.3,
-                Duration = TimeSpan.FromMilliseconds(150),
-                AutoReverse = true
-            };
-            element.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
-            var scale = new System.Windows.Media.ScaleTransform(1, 1);
-            element.RenderTransform = scale;
-            scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, doubleAnim);
-            scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, doubleAnim);
-        }
-
-        private void Unlock_Click(object sender, RoutedEventArgs e)
-        {
-            VerifyPin();
-        }
-
-        private void PinInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                VerifyPin();
-            }
-        }
-
-        private void VerifyPin()
-        {
-            string input = PinInput.Password;
-            var settings = _settingsService.Current;
-
-            // 1. Check Override
-            if (input == OverridePin)
-            {
-                ResetSecurityState();
-                DialogResult = true;
-                Close();
-                return;
-            }
-
-            // 2. Check Valid PIN
-            if (input == settings.StartupLockPin)
-            {
-                ResetSecurityState();
                 DialogResult = true;
                 Close();
             }
             else
             {
-                HandleFailure();
+                WindowsHelloButton.IsEnabled = true;
+                StatusSubtext.Text = "Windows Hello verification failed or was cancelled.";
+                ErrorText.Text = "Authentication Failed. Click below to retry Windows Hello PIN.";
+                ErrorText.Visibility = Visibility.Visible;
             }
         }
 
-        private void HandleFailure()
+        private async void WindowsHello_Click(object sender, RoutedEventArgs e)
         {
-            var settings = _settingsService.Current;
-            settings.FailedAttemptsCount++;
-            
-            ErrorText.Text = $"Invalid access code ({settings.FailedAttemptsCount}/3)";
-            ErrorText.Visibility = Visibility.Visible;
-            PinInput.Password = string.Empty;
-            UpdatePinVisuals();
-            UpdateAttemptPins();
-
-            // Trigger shake effect on the newly failed pin
-            int failedIndex = settings.FailedAttemptsCount - 1;
-            if (failedIndex >= 0 && failedIndex < 3)
-            {
-                var pins = new[] { Attempt1, Attempt2, Attempt3 };
-                TriggerShake(pins[failedIndex]);
-            }
-
-            if (settings.FailedAttemptsCount >= 3)
-            {
-                // Increment lockout duration: 1st time 1m, 2nd time 2m, etc.
-                settings.CurrentLockoutMinutes++;
-                settings.LockoutEnd = DateTime.Now.AddMinutes(settings.CurrentLockoutMinutes);
-                settings.FailedAttemptsCount = 0; // Reset counter for next lockout phase
-                
-                EnableLockoutUI();
-            }
-
-            _settingsService.Save();
-        }
-
-        private void ResetSecurityState()
-        {
-            var settings = _settingsService.Current;
-            settings.FailedAttemptsCount = 0;
-            settings.CurrentLockoutMinutes = 0;
-            settings.LockoutEnd = null;
-            _settingsService.Save();
-            UpdateAttemptPins();
+            await TriggerWindowsHelloAuthAsync();
         }
 
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Application.Current.Shutdown();
-        }
-
-        private void SwitchUI_Click(object sender, RoutedEventArgs e)
-        {
-            var settings = _settingsService.Current;
-            settings.UseLegacyUI = !settings.UseLegacyUI;
-            _settingsService.Save();
-
-            string mode = settings.UseLegacyUI ? "LEGACY MODE" : "MODERN NEUMORPHIC MODE";
-            System.Windows.MessageBox.Show($"UI Mode switched to {mode}.\n\nThe changes will take effect after you unlock system or restart application.", "UI Mode Switched", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
     }
 }

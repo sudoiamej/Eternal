@@ -207,6 +207,25 @@
                         </DataGrid>
                     </Border>
 
+                    <!-- 4. System Component Store Repair (SFC & DISM) -->
+                    <TextBlock Text="SYSTEM COMPONENT INTEGRITY &amp; REPAIR" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10"/>
+                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,25" Padding="16">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="Automated DISM &amp; System File Checker (SFC)" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                    <TextBlock Text="Run automated Windows system image repair and component store integrity verification." FontSize="10" Foreground="#888896"/>
+                                </StackPanel>
+                                <Button Command="{Binding RunSystemRepairCommand}" Content="RUN SYSTEM REPAIR (SFC &amp; DISM)" Style="{StaticResource PrimaryButton}" Height="32" Padding="16,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+                            <Border Background="#0A0A10" BorderBrush="#1C1C28" BorderThickness="1" CornerRadius="8" Padding="12" Height="110">
+                                <ScrollViewer x:Name="RepairScrollViewer" VerticalScrollBarVisibility="Auto">
+                                    <TextBlock Text="{Binding RepairLog}" FontFamily="Consolas" FontSize="10" Foreground="#A0A0B0" TextWrapping="Wrap" LineHeight="16"/>
+                                </ScrollViewer>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
                     <!-- 5. System Services -->
                     <TextBlock Text="ACTIVE SYSTEM SERVICES" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
                     <Border Style="{StaticResource StandardCard}">

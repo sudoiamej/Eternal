@@ -54,12 +54,21 @@ namespace Eternal.ViewModels.Modules
             try
             {
                 var updates = await _updateService.GetAvailableUpdatesAsync();
+                IsRebootRequired = await _updateService.IsRebootRequiredAsync();
                 
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     AvailableUpdates.Clear();
                     foreach (var update in updates) AvailableUpdates.Add(update);
-                    StatusMessage = AvailableUpdates.Any() ? $"{AvailableUpdates.Count} updates available" : "You're up to date";
+
+                    if (AvailableUpdates.Any())
+                    {
+                        StatusMessage = $"{AvailableUpdates.Count} update{(AvailableUpdates.Count == 1 ? "" : "s")} available";
+                    }
+                    else
+                    {
+                        StatusMessage = "You're up to date";
+                    }
                 });
             }
             catch (Exception ex)
@@ -142,6 +151,18 @@ namespace Eternal.ViewModels.Modules
             }
         }
 
+        [RelayCommand]
+        private async Task DismissRebootFlagAsync()
+        {
+            await _updateService.ClearRebootFlagAsync();
+            IsRebootRequired = false;
+            if (!AvailableUpdates.Any())
+            {
+                StatusMessage = "You're up to date";
+            }
+            Eternal.Views.Helpers.CustomNotificationWindow.Show("Pending reboot flags cleared from system registry.", "Windows Update", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Success);
+        }
+
         private async Task ExecuteInstallAsync(List<string> ids)
         {
             IsInstalling = true;
@@ -197,17 +218,15 @@ namespace Eternal.ViewModels.Modules
             }
         }
 
+        [ObservableProperty] private WindowsLifecycleInfo? _lifecycleInfo;
+
         private async Task RefreshStatusAsync()
         {
             var status = await _updateService.GetPauseStatusAsync();
             IsPaused = status.IsPaused;
             PauseUntil = status.ResumeDate;
             IsRebootRequired = await _updateService.IsRebootRequiredAsync();
-            
-            if (IsRebootRequired)
-            {
-                StatusMessage = "System restart recommended to complete updates.";
-            }
+            LifecycleInfo = await _updateService.GetWindowsLifecycleInfoAsync();
         }
     }
 }

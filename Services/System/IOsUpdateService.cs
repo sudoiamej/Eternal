@@ -15,6 +15,8 @@ namespace Eternal.Services.System
         Task<bool> InstallUpdatesAsync(List<string> updateIds);
         Task<bool> DownloadAndInstallUpdatesAsync(List<string> updateIds, IProgress<double> progress);
         Task<bool> IsRebootRequiredAsync();
+        Task ClearRebootFlagAsync();
         Task RebootSystemAsync();
+        Task<WindowsLifecycleInfo> GetWindowsLifecycleInfoAsync();
     }
 }

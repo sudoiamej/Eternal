@@ -154,6 +154,7 @@ namespace Eternal.Models
 
     public class AppSettings
     {
+        public bool IsFirstRun { get; set; } = true;
         public DashboardLayoutMode DashboardLayoutMode { get; set; } = DashboardLayoutMode.Grid;
         public string AppVersion { get; set; } = "3.0.0";
         public bool UseLegacyUI { get => false; set { } }
@@ -164,6 +165,7 @@ namespace Eternal.Models
         public bool IsAutoUpdateEnabled { get; set; } = true;
         public bool MinimizeToTray { get; set; } = true;
         public bool IsAdvancedMode { get; set; } = false;
+        public bool IsSidebarExpanded { get; set; } = true;
         public List<string> DisabledFeatures { get; set; } = new();
         public List<string> PinnedFeatures { get; set; } = new() { "Processes", "Storage", "Dashboard" };
 
@@ -178,7 +180,7 @@ namespace Eternal.Models
 
         // Security & Environment
         public bool IsStartupLockEnabled { get; set; } = false;
-        public string StartupLockPin { get; set; } = "072906";
+        public bool UseWindowsHelloPin { get; set; } = true;
         public int FailedAttemptsCount { get; set; } = 0;
         public int CurrentLockoutMinutes { get; set; } = 0;
         public DateTime? LockoutEnd { get; set; }

@@ -427,5 +427,80 @@ namespace Eternal.Services.Security
                 return threats;
             });
         }
+
+        public async Task<bool> IsWindowsHelloAvailableAsync()
+        {
+            try
+            {
+                var ucvAvailability = await global::Windows.Security.Credentials.UI.UserConsentVerifier.CheckAvailabilityAsync();
+                return ucvAvailability == global::Windows.Security.Credentials.UI.UserConsentVerifierAvailability.Available;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> AuthenticateWithWindowsHelloAsync(string message)
+        {
+            try
+            {
+                var ucvAvailability = await global::Windows.Security.Credentials.UI.UserConsentVerifier.CheckAvailabilityAsync();
+                if (ucvAvailability == global::Windows.Security.Credentials.UI.UserConsentVerifierAvailability.Available)
+                {
+                    var result = await global::Windows.Security.Credentials.UI.UserConsentVerifier.RequestVerificationAsync(message);
+                    return result == global::Windows.Security.Credentials.UI.UserConsentVerificationResult.Verified;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task RunSystemRepairAsync(IProgress<string> progress)
+        {
+            await Task.Run(async () =>
+            {
+                progress.Report("[DISM] Starting Windows System Component Store Check & Repair...");
+                await ExecuteCommandProgressAsync("dism.exe", "/online /cleanup-image /restorehealth", progress);
+
+                progress.Report("[SFC] Starting System File Checker Integrity Audit...");
+                await ExecuteCommandProgressAsync("sfc.exe", "/scannow", progress);
+
+                progress.Report("[COMPLETE] System Image & Integrity Restoration Completed Successfully!");
+            });
+        }
+
+        private async Task ExecuteCommandProgressAsync(string fileName, string args, IProgress<string> progress)
+        {
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = args,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                using var proc = new Process { StartInfo = psi };
+                proc.OutputDataReceived += (s, e) => { if (!string.IsNullOrEmpty(e.Data)) progress.Report(e.Data); };
+                proc.ErrorDataReceived += (s, e) => { if (!string.IsNullOrEmpty(e.Data)) progress.Report($"[ERR] {e.Data}"); };
+
+                proc.Start();
+                proc.BeginOutputReadLine();
+                proc.BeginErrorReadLine();
+
+                await proc.WaitForExitAsync();
+            }
+            catch (Exception ex)
+            {
+                progress.Report($"[EXCEPT] Error executing {fileName}: {ex.Message}");
+            }
+        }
     }
 }

@@ -18,7 +18,7 @@ namespace Eternal.ViewModels.Modules
         private readonly IUpdateService _updateService;
 
         [ObservableProperty] private AppSettings _settings;
-        [ObservableProperty] private string _appVersion = "3.5.0";
+        [ObservableProperty] private string _appVersion = "3.5.0 RC2";
         [ObservableProperty] private string _lastScanTime = "N/A";
         [ObservableProperty] private string _machineId = "Unknown";
 
@@ -34,34 +34,6 @@ namespace Eternal.ViewModels.Modules
                 var aboutWin = new Eternal.Views.Helpers.AboutVersionWindow();
                 aboutWin.Owner = System.Windows.Application.Current.MainWindow;
                 aboutWin.ShowDialog();
-            }
-        }
-
-        public string SelectedTheme
-        {
-            get => Settings.Theme;
-            set
-            {
-                if (Settings.Theme != value)
-                {
-                    Settings.Theme = value;
-                    OnPropertyChanged();
-                    Main.ApplyThemeColor(); // This will trigger theme refresh
-                }
-            }
-        }
-
-        public string SelectedGradiency
-        {
-            get => Settings.NewUiGradiency;
-            set
-            {
-                if (Settings.NewUiGradiency != value)
-                {
-                    Settings.NewUiGradiency = value;
-                    OnPropertyChanged();
-                    Main.ApplyThemeColor();
-                }
             }
         }
 
@@ -91,6 +63,7 @@ namespace Eternal.ViewModels.Modules
             MachineId = fingerprintService.GetFingerprint();
             Settings.MachineFingerprint = MachineId;
         }
+
         [RelayCommand]
         private void SaveConfig()
         {
@@ -102,8 +75,13 @@ namespace Eternal.ViewModels.Modules
         [RelayCommand]
         private void SetThemeColor(string hexColor)
         {
-            Settings.ThemeAccentColor = hexColor;
-            Main.ApplyThemeColor();
+            if (!string.IsNullOrWhiteSpace(hexColor))
+            {
+                Settings.ThemeAccentColor = hexColor;
+                OnPropertyChanged(nameof(Settings));
+                Main.ApplyThemeColor();
+                _settingsService.Save();
+            }
         }
 
         public double SelectedFontScale
@@ -141,7 +119,6 @@ namespace Eternal.ViewModels.Modules
         {
             var defaults = new AppSettings();
             Settings.RefreshFrequency = defaults.RefreshFrequency;
-            Settings.PreloadOnStartup = defaults.PreloadOnStartup;
             Settings.IsAdvancedMode = defaults.IsAdvancedMode;
             Settings.PollingProfile = defaults.PollingProfile;
             Settings.RunAtStartup = defaults.RunAtStartup;
@@ -149,12 +126,13 @@ namespace Eternal.ViewModels.Modules
             Settings.ExportFolderPath = defaults.ExportFolderPath;
             Settings.WmiTimeoutSeconds = defaults.WmiTimeoutSeconds;
             Settings.IsVerboseLoggingEnabled = defaults.IsVerboseLoggingEnabled;
-            Settings.ThemeAccentColor = defaults.ThemeAccentColor;
+            Settings.ThemeAccentColor = "#0078D4";
             Settings.FontAdjustmentScale = defaults.FontAdjustmentScale;
             Settings.WindowScale = defaults.WindowScale;
+            Settings.IsSidebarExpanded = defaults.IsSidebarExpanded;
+            Settings.IsAutoUpdateEnabled = defaults.IsAutoUpdateEnabled;
             
             Settings.IsStartupLockEnabled = defaults.IsStartupLockEnabled;
-            Settings.StartupLockPin = defaults.StartupLockPin;
             Settings.LockoutEnd = null;
             Settings.FailedAttemptsCount = 0;
             Settings.CurrentLockoutMinutes = 0;
@@ -164,40 +142,54 @@ namespace Eternal.ViewModels.Modules
             Main.UpdateWindowScale();
             UpdateStartupRegistration();
             _settingsService.Save();
+
+            OnPropertyChanged(nameof(Settings));
+            OnPropertyChanged(nameof(SelectedWindowScale));
+            OnPropertyChanged(nameof(SelectedFontScale));
+
             Eternal.Views.Helpers.CustomNotificationWindow.Show("Settings restored to factory defaults.", "Settings", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Warning);
+        }
+
+        [RelayCommand]
+        private void ResetCalibrationData()
+        {
+            var result = System.Windows.MessageBox.Show(
+                "Are you sure you want to reset all hardware baseline calibration profiles, custom modes, and telemetry caches?\n\nThis will re-trigger the initial hardware calibration scan upon next application startup.",
+                "Reset Calibration & Hardware Baseline",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Warning);
+
+            if (result == System.Windows.MessageBoxResult.Yes)
+            {
+                Settings.IsFirstRun = true;
+                Settings.UseLegacyUI = false;
+                Settings.FontAdjustmentScale = 1.0;
+                Settings.WindowScale = 1.0;
+                Settings.PollingProfile = "Balanced";
+                Settings.IsStartupLockEnabled = false;
+                Settings.IsAdvancedMode = false;
+                Settings.IsVerboseLoggingEnabled = false;
+
+                _settingsService.Save();
+
+            OnPropertyChanged(nameof(Settings));
+            OnPropertyChanged(nameof(SelectedWindowScale));
+            OnPropertyChanged(nameof(SelectedFontScale));
+
+                Eternal.Views.Helpers.CustomNotificationWindow.Show(
+                    "Hardware calibration & workstation state reset successfully. Calibration scan will run on next boot.", 
+                    "Calibration Reset", 
+                    Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Success);
+            }
         }
 
         [RelayCommand]
         private void ClearAllData()
         {
-            var confirmWin = new Eternal.Views.Helpers.ResetDataConfirmWindow();
-            confirmWin.Owner = System.Windows.Application.Current.MainWindow;
-
-            if (confirmWin.ShowDialog() == true)
-            {
-                var mainWindow = System.Windows.Application.Current.MainWindow as Eternal.Views.LegacyMainWindow;
-                if (mainWindow != null)
-                {
-                    System.Windows.MessageBox.Show("All database items have been cleared. Application will now restart.", "System Reset Complete", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-                    System.Diagnostics.Process.Start(System.Environment.ProcessPath ?? "");
-                    System.Windows.Application.Current.Shutdown();
-                }
-            }
+            ResetCalibrationData();
         }
 
-        [RelayCommand]
-        private void ChangeStartupPin()
-        {
-            var editWin = new Eternal.Views.Helpers.StartupPinEditWindow();
-            editWin.Owner = System.Windows.Application.Current.MainWindow;
-            
-            if (editWin.ShowDialog() == true)
-            {
-                Settings.StartupLockPin = editWin.NewPin;
-                _settingsService.Save();
-                Eternal.Views.Helpers.CustomNotificationWindow.Show("Startup Access Code updated successfully.", "Security", Eternal.Views.Helpers.CustomNotificationWindow.NotificationType.Success);
-            }
-        }
+
 
         [RelayCommand]
         private async Task CheckForUpdates()

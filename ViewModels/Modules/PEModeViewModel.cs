@@ -40,7 +40,11 @@ namespace Eternal.ViewModels.Modules
                 await Task.Delay(500); 
                 var disks = await _hardwareService.GetDiskInfoAsync();
                 bool allDisksHealthy = true;
-                foreach(var d in disks) { if (d.Health != "OK" && d.Health != "Unknown") allDisksHealthy = false; }
+                foreach(var d in disks) 
+                { 
+                    if (d.Health != "OK" && d.Health != "Healthy" && d.Health != "Unknown") 
+                        allDisksHealthy = false; 
+                }
 
                 SystemDriveStatus = allDisksHealthy ? (disks.Count > 0 ? "Healthy" : "No Disks Detected") : "Errors Detected";
                 BootRecordStatus = "Valid (Offline Check)";

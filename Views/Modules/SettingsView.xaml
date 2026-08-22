@@ -6,8 +6,8 @@
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:m="clr-namespace:Eternal.Models"
-             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="900">
-    <Border Padding="30">
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="950">
+    <Border Padding="30" Background="#000000">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/> <!-- Header -->
@@ -15,9 +15,10 @@
             </Grid.RowDefinitions>
 
             <!-- Header Section -->
-            <StackPanel Grid.Row="0" Style="{StaticResource ModuleHeaderStyle}" Margin="0,0,0,30">
-                <TextBlock Text="ETERNAL › SYSTEM INTELLIGENCE" Style="{StaticResource HeaderBreadcrumb}"/>
-                <TextBlock Text="Application Settings" Style="{StaticResource H1}" Margin="0"/>
+            <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                <TextBlock Text="ETERNAL › SYSTEM INTELLIGENCE" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}"/>
+                <TextBlock Text="Application Settings" Style="{StaticResource H1}" Margin="0,2,0,4"/>
+                <TextBlock Text="Configure core workstation preferences, scaling multipliers, security handshake PIN, and live telemetry parameters." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
             </StackPanel>
 
             <!-- Split Panel -->
@@ -28,13 +29,13 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Left Sidebar Category Selector -->
-                <ListBox x:Name="SettingsMenu" SelectedIndex="0" Grid.Column="0" Background="Transparent" BorderThickness="0" Margin="0,0,20,0">
+                <ListBox x:Name="SettingsMenu" SelectedIndex="0" Grid.Column="0" Background="#040406" BorderBrush="#1C1C28" BorderThickness="1" Margin="0,0,20,0">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Background" Value="Transparent"/>
                             <Setter Property="BorderThickness" Value="0"/>
-                            <Setter Property="Padding" Value="15,12"/>
-                            <Setter Property="Margin" Value="0,0,0,6"/>
+                            <Setter Property="Padding" Value="14,12"/>
+                            <Setter Property="Margin" Value="4,4,4,4"/>
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ListBoxItem">
@@ -43,10 +44,10 @@
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="ItemBorder" Property="Background" Value="#15FFFFFF"/>
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="#121C2B"/>
                                             </Trigger>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="ItemBorder" Property="Background" Value="#0DFFFFFF"/>
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="#14141E"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -57,26 +58,26 @@
 
                     <ListBoxItem>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="PaintBrush" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,12,0"/>
-                            <TextBlock Text="Appearance" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                            <fa:ImageAwesome Icon="PaintBrush" Width="13" Foreground="{DynamicResource AccentBrush}" Margin="0,0,12,0"/>
+                            <TextBlock Text="Appearance &amp; Scaling" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
                     <ListBoxItem>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Flash" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,12,0"/>
-                            <TextBlock Text="Telemetry &amp; Engine" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                            <fa:ImageAwesome Icon="Flash" Width="13" Foreground="{DynamicResource InfoBrush}" Margin="0,0,12,0"/>
+                            <TextBlock Text="Telemetry &amp; Engine" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
                     <ListBoxItem>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Shield" Width="14" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,12,0"/>
-                            <TextBlock Text="Data &amp; Privacy" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                            <fa:ImageAwesome Icon="Shield" Width="13" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,12,0"/>
+                            <TextBlock Text="Data &amp; Intelligence" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
                     <ListBoxItem>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{DynamicResource WarningBrush}" Margin="0,0,12,0"/>
-                            <TextBlock Text="Security &amp; About" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                            <fa:ImageAwesome Icon="Lock" Width="13" Foreground="{DynamicResource WarningBrush}" Margin="0,0,12,0"/>
+                            <TextBlock Text="Security &amp; System" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
                 </ListBox>
@@ -88,7 +89,7 @@
                         <RowDefinition Height="Auto"/> <!-- Actions Footer -->
                     </Grid.RowDefinitions>
 
-                    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="0,0,0,20">
+                    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="0,0,0,15">
                         <TabControl SelectedIndex="{Binding SelectedIndex, ElementName=SettingsMenu}" Background="Transparent" BorderThickness="0">
                             <TabControl.ItemContainerStyle>
                                 <Style TargetType="TabItem">
@@ -96,127 +97,85 @@
                                 </Style>
                             </TabControl.ItemContainerStyle>
 
-                            <!-- Tab 1: Appearance & Theme -->
+                            <!-- Tab 1: Appearance & Scaling -->
                             <TabItem>
                                 <StackPanel>
-                                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                                    <Border Style="{StaticResource StandardCard}" Background="#060609" BorderBrush="#1C1C28" Margin="0,0,0,15" Padding="20">
                                         <StackPanel>
-                                            <TextBlock Text="APPEARANCE &amp; THEME" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                                            <TextBlock Text="APPEARANCE &amp; ACCENT SYSTEM" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,15"/>
 
-                                            <!-- Interface Theme Selector (Global) -->
-                                            <Grid Margin="0,0,0,20">
-                                                <StackPanel>
-                                                    <TextBlock Text="Interface Theme" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Select a global visual style (Dark vs Light)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                                </StackPanel>
-                                                <ComboBox SelectedValue="{Binding SelectedTheme}" SelectedValuePath="Tag" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                    <ComboBoxItem Content="Dark" Tag="Dark"/>
-                                                    <ComboBoxItem Content="Light" Tag="Light"/>
-                                                </ComboBox>
-                                            </Grid>
-
-                                            <!-- Modern Gradiency Selector -->
-                                            <Grid Margin="0,0,0,20">
-                                                <Grid.Style>
-                                                    <Style TargetType="Grid">
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Settings.UseLegacyUI}" Value="True">
-                                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding SelectedTheme}" Value="CarPlay">
-                                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Grid.Style>
-                                                <StackPanel>
-                                                    <TextBlock Text="Modern Background Gradiency" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Select a neural background profile for the modern workspace." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                                </StackPanel>
-                                                <ComboBox SelectedValue="{Binding SelectedGradiency}" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                    <system:String>Deep Space</system:String>
-                                                    <system:String>Nebula</system:String>
-                                                    <system:String>Aurora</system:String>
-                                                    <system:String>Crimson Flow</system:String>
-                                                </ComboBox>
-                                            </Grid>
-
-                                            <!-- System Accent Color -->
-                                            <StackPanel>
-                                                <StackPanel.Style>
-                                                    <Style TargetType="StackPanel">
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding SelectedTheme}" Value="CarPlay">
-                                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </StackPanel.Style>
-                                                
-                                                <TextBlock Text="System Accent Color" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,10"/>
-                                                <TextBlock Text="Choose a primary color for the application interface." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+                                            <!-- System Accent Color Palette -->
+                                            <StackPanel Margin="0,0,0,20">
+                                                <TextBlock Text="System Accent Color" FontWeight="Bold" Foreground="#FFFFFF" FontSize="13"/>
+                                                <TextBlock Text="Select a primary accent color for application highlights, icons, and focus rings." FontSize="10" Foreground="#888896" Margin="0,2,0,12"/>
 
                                                 <UniformGrid Columns="8" HorizontalAlignment="Left">
-                                                    <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#9B59B6">
-                                                        <Border Width="20" Height="20" Background="#9B59B6" CornerRadius="10"/>
+                                                    <!-- Blue -->
+                                                    <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Padding="4" Command="{Binding SetThemeColorCommand}" CommandParameter="#0078D4" Cursor="Hand" ToolTip="Fluent Blue">
+                                                        <Border Width="24" Height="24" Background="#0078D4" CornerRadius="12" BorderBrush="#FFFFFF" BorderThickness="1"/>
                                                     </Button>
-                                                    <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#3498DB">
-                                                        <Border Width="20" Height="20" Background="#3498DB" CornerRadius="10"/>
+                                                    <!-- Purple -->
+                                                    <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Padding="4" Command="{Binding SetThemeColorCommand}" CommandParameter="#7F00FF" Cursor="Hand" ToolTip="Neon Purple">
+                                                        <Border Width="24" Height="24" Background="#7F00FF" CornerRadius="12" BorderBrush="#FFFFFF" BorderThickness="1"/>
                                                     </Button>
-                                                    <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#2ECC71">
-                                                        <Border Width="20" Height="20" Background="#2ECC71" CornerRadius="10"/>
+                                                    <!-- Cyan -->
+                                                    <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Padding="4" Command="{Binding SetThemeColorCommand}" CommandParameter="#00B4D8" Cursor="Hand" ToolTip="Electric Cyan">
+                                                        <Border Width="24" Height="24" Background="#00B4D8" CornerRadius="12" BorderBrush="#FFFFFF" BorderThickness="1"/>
                                                     </Button>
-                                                    <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#E74C3C">
-                                                        <Border Width="20" Height="20" Background="#E74C3C" CornerRadius="10"/>
+                                                    <!-- Emerald -->
+                                                    <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Padding="4" Command="{Binding SetThemeColorCommand}" CommandParameter="#10B981" Cursor="Hand" ToolTip="Emerald Green">
+                                                        <Border Width="24" Height="24" Background="#10B981" CornerRadius="12" BorderBrush="#FFFFFF" BorderThickness="1"/>
                                                     </Button>
-                                                    <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#F1C40F">
-                                                        <Border Width="20" Height="20" Background="#F1C40F" CornerRadius="10"/>
+                                                    <!-- Amber -->
+                                                    <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Padding="4" Command="{Binding SetThemeColorCommand}" CommandParameter="#F59E0B" Cursor="Hand" ToolTip="Amber Gold">
+                                                        <Border Width="24" Height="24" Background="#F59E0B" CornerRadius="12" BorderBrush="#FFFFFF" BorderThickness="1"/>
                                                     </Button>
-                                                    <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#E67E22">
-                                                        <Border Width="20" Height="20" Background="#E67E22" CornerRadius="10"/>
+                                                    <!-- Crimson -->
+                                                    <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Padding="4" Command="{Binding SetThemeColorCommand}" CommandParameter="#EF4444" Cursor="Hand" ToolTip="Crimson Red">
+                                                        <Border Width="24" Height="24" Background="#EF4444" CornerRadius="12" BorderBrush="#FFFFFF" BorderThickness="1"/>
                                                     </Button>
-                                                    <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#1ABC9C">
-                                                        <Border Width="20" Height="20" Background="#1ABC9C" CornerRadius="10"/>
+                                                    <!-- Pink -->
+                                                    <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Padding="4" Command="{Binding SetThemeColorCommand}" CommandParameter="#EC4899" Cursor="Hand" ToolTip="Cyber Pink">
+                                                        <Border Width="24" Height="24" Background="#EC4899" CornerRadius="12" BorderBrush="#FFFFFF" BorderThickness="1"/>
                                                     </Button>
-                                                    <Button Style="{StaticResource IconButton}" Padding="5" Command="{Binding SetThemeColorCommand}" CommandParameter="#607D8B">
-                                                        <Border Width="20" Height="20" Background="#607D8B" CornerRadius="10"/>
+                                                    <!-- Slate Indigo -->
+                                                    <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Padding="4" Command="{Binding SetThemeColorCommand}" CommandParameter="#6366F1" Cursor="Hand" ToolTip="Indigo Slate">
+                                                        <Border Width="24" Height="24" Background="#6366F1" CornerRadius="12" BorderBrush="#FFFFFF" BorderThickness="1"/>
                                                     </Button>
                                                 </UniformGrid>
                                             </StackPanel>
 
                                             <!-- Font Size Adjustment Setting -->
-                                            <Grid Margin="0,20,0,10">
+                                            <Grid Margin="0,10,0,15">
                                                 <StackPanel>
-                                                    <TextBlock Text="Font Sizing Scale" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Scale application typography size dynamically." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Typography Font Scaling" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Scale text elements dynamically across all module views." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                    <Slider Value="{Binding SelectedFontScale}" Minimum="1.0" Maximum="1.5" Width="100" TickFrequency="0.05" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                                    <TextBlock Text="{Binding SelectedFontScale, StringFormat='{}{0:F2}x'}" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Width="35"/>
+                                                    <Slider Value="{Binding SelectedFontScale}" Minimum="1.0" Maximum="1.5" Width="120" TickFrequency="0.05" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                                    <TextBlock Text="{Binding SelectedFontScale, StringFormat='{}{0:F2}x'}" FontWeight="Bold" Foreground="#FFFFFF" FontSize="11" Width="40"/>
                                                 </StackPanel>
                                             </Grid>
 
                                             <!-- Window / DPI Scaling Setting -->
-                                            <Grid Margin="0,10,0,0">
+                                            <Grid Margin="0,0,0,15">
                                                 <StackPanel>
-                                                    <TextBlock Text="Window DPI Scale" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Adjust global workspace display layout scaling." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Window DPI Multiplier" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Adjust master workspace scaling multiplier with pixel-snap locking." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                    <Slider Value="{Binding SelectedWindowScale}" Minimum="1.0" Maximum="1.6" Width="100" TickFrequency="0.05" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                                    <TextBlock Text="{Binding SelectedWindowScale, StringFormat='{}{0:F2}x'}" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Width="35"/>
+                                                    <Slider Value="{Binding SelectedWindowScale}" Minimum="1.0" Maximum="1.6" Width="120" TickFrequency="0.05" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                                    <TextBlock Text="{Binding SelectedWindowScale, StringFormat='{}{0:F2}x'}" FontWeight="Bold" Foreground="#FFFFFF" FontSize="11" Width="40"/>
                                                 </StackPanel>
                                             </Grid>
 
                                             <!-- Dashboard Layout Mode Setting -->
-                                            <Grid Margin="0,20,0,10">
+                                            <Grid Margin="0,0,0,5">
                                                 <StackPanel>
-                                                    <TextBlock Text="Dashboard Layout Mode" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Choose preferred visualization layout for system dashboard." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Dashboard Layout View" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Choose grid vs list layout representation for main dashboard." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
-                                                <ComboBox SelectedItem="{Binding SelectedDashboardLayoutMode}" Width="120" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <ComboBox SelectedItem="{Binding SelectedDashboardLayoutMode}" Width="120" HorizontalAlignment="Right" VerticalAlignment="Center" Background="#161622" Foreground="White" BorderBrush="#333348">
                                                     <m:DashboardLayoutMode>Grid</m:DashboardLayoutMode>
                                                     <m:DashboardLayoutMode>List</m:DashboardLayoutMode>
                                                 </ComboBox>
@@ -229,55 +188,47 @@
                             <!-- Tab 2: Telemetry & Engine -->
                             <TabItem>
                                 <StackPanel>
-                                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                                    <Border Style="{StaticResource StandardCard}" Background="#060609" BorderBrush="#1C1C28" Margin="0,0,0,15" Padding="20">
                                         <StackPanel>
-                                            <TextBlock Text="TELEMETRY &amp; PERFORMANCE" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                                            <TextBlock Text="TELEMETRY &amp; ENGINE CONTROL" Style="{StaticResource Caption}" Foreground="{DynamicResource InfoBrush}" Margin="0,0,0,15"/>
                                             
                                             <Grid Margin="0,0,0,15">
                                                 <StackPanel>
-                                                    <TextBlock Text="Run at Windows Startup" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Automatically launch Eternal when you sign in." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Run at Windows Startup" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Automatically launch Eternal system intelligence when Windows boots." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
                                                 <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.RunAtStartup}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
 
                                             <Grid Margin="0,0,0,15">
                                                 <StackPanel>
-                                                    <TextBlock Text="Minimize to System Tray" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Keep the app running in the background when closed." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Minimize to System Tray" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Keep workstation monitoring running in background notification tray." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
                                                 <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.MinimizeToTray}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
 
                                             <Grid Margin="0,0,0,15">
                                                 <StackPanel>
-                                                    <TextBlock Text="Telemetry Polling Profile" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Optimize sensor updates for battery or accuracy." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Telemetry Polling Profile" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Optimize hardware sensor sampling rate for accuracy vs power consumption." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
-                                                <ComboBox SelectedValue="{Binding Settings.PollingProfile}" Width="120" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <ComboBox SelectedValue="{Binding Settings.PollingProfile}" Width="130" HorizontalAlignment="Right" VerticalAlignment="Center" Background="#161622" Foreground="White" BorderBrush="#333348">
                                                     <system:String>Balanced</system:String>
                                                     <system:String>High</system:String>
                                                     <system:String>PowerSaver</system:String>
                                                 </ComboBox>
                                             </Grid>
 
-                                            <Grid Margin="0,0,0,15">
+                                            <Grid Margin="0,0,0,5">
                                                 <StackPanel>
-                                                    <TextBlock Text="Refresh Frequency" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Set interval for live telemetry updates (seconds)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Live Refresh Interval" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Set telemetry update frequency interval (seconds)." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                    <Slider Value="{Binding Settings.RefreshFrequency}" Minimum="1" Maximum="10" Width="100" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                                    <TextBlock Text="{Binding Settings.RefreshFrequency, StringFormat='{}{0}s'}" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Width="25"/>
+                                                    <Slider Value="{Binding Settings.RefreshFrequency}" Minimum="1" Maximum="10" Width="120" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                                    <TextBlock Text="{Binding Settings.RefreshFrequency, StringFormat='{}{0}s'}" FontWeight="Bold" Foreground="#FFFFFF" FontSize="11" Width="30"/>
                                                 </StackPanel>
-                                            </Grid>
-
-                                            <Grid>
-                                                <StackPanel>
-                                                    <TextBlock Text="Preload Data on Startup" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Loads system metrics in background during app launch." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                                </StackPanel>
-                                                <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.PreloadOnStartup}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
                                         </StackPanel>
                                     </Border>
@@ -287,105 +238,116 @@
                             <!-- Tab 3: Data & Privacy -->
                             <TabItem>
                                 <StackPanel>
-                                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                                    <Border Style="{StaticResource StandardCard}" Background="#060609" BorderBrush="#1C1C28" Margin="0,0,0,15" Padding="20">
                                         <StackPanel>
-                                            <TextBlock Text="DATA &amp; PRIVACY" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                                            <TextBlock Text="DATA &amp; PRIVACY PREFERENCES" Style="{StaticResource Caption}" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,0,15"/>
 
-                                            <StackPanel Margin="0,0,0,15">
-                                                <TextBlock Text="Intelligence Export Path" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                <TextBlock Text="Default folder for saving intelligence reports (.json)." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+                                            <StackPanel Margin="0,0,0,18">
+                                                <TextBlock Text="Intelligence Report Export Folder" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                <TextBlock Text="Default folder location for saving diagnostic export reports (.json)." FontSize="10" Foreground="#888896" Margin="0,2,0,8"/>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBox Text="{Binding Settings.ExportFolderPath}" IsReadOnly="True" Background="#0DFFFFFF" BorderBrush="{DynamicResource BorderBrush}" Padding="8,5" Foreground="{DynamicResource TextBrush}"/>
-                                                    <Button Grid.Column="1" Command="{Binding SelectExportFolderCommand}" Content="Browse" Margin="8,0,0,0" Padding="15,0" Style="{StaticResource PrimaryAction}"/>
+                                                    <TextBox Text="{Binding Settings.ExportFolderPath}" IsReadOnly="True" Background="#12121C" BorderBrush="#2A2A3A" Padding="10,6" Foreground="#FFFFFF" FontFamily="Consolas" FontSize="11"/>
+                                                    <Button Grid.Column="1" Command="{Binding SelectExportFolderCommand}" Content="Browse" Margin="8,0,0,0" Padding="16,0" Style="{StaticResource PrimaryButton}" Height="32"/>
                                                 </Grid>
                                             </StackPanel>
 
                                             <Grid Margin="0,0,0,15">
                                                 <StackPanel>
-                                                    <TextBlock Text="WMI Query Timeout" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Seconds to wait for low-level system responses." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="WMI Query Execution Timeout" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Maximum seconds allowed before timing out WMI hardware requests." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                    <Slider Value="{Binding Settings.WmiTimeoutSeconds}" Minimum="2" Maximum="30" Width="100" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                                    <TextBlock Text="{Binding Settings.WmiTimeoutSeconds, StringFormat='{}{0}s'}" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Width="25"/>
+                                                    <Slider Value="{Binding Settings.WmiTimeoutSeconds}" Minimum="2" Maximum="30" Width="120" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                                    <TextBlock Text="{Binding Settings.WmiTimeoutSeconds, StringFormat='{}{0}s'}" FontWeight="Bold" Foreground="#FFFFFF" FontSize="11" Width="30"/>
                                                 </StackPanel>
                                             </Grid>
 
                                             <Grid Margin="0,0,0,15">
                                                 <StackPanel>
-                                                    <TextBlock Text="Verbose Session Logging" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Capture detailed app actions in the 'System Logs' tab." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Verbose Session Logging" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Capture trace-level execution logs in system log viewer." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
                                                 <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.IsVerboseLoggingEnabled}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
 
-                                            <Grid>
+                                            <Grid Margin="0,0,0,5">
                                                 <StackPanel>
-                                                    <TextBlock Text="Advanced Intelligence Mode" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Enables deep telemetry and raw system identifiers." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Advanced Telemetry Mode" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Expose low-level hardware GUIDs and raw engine diagnostics." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
                                                 <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.IsAdvancedMode}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Reset Calibration & Baseline Card -->
+                                    <Border Style="{StaticResource StandardCard}" Background="#060609" BorderBrush="#1C1C28" Margin="0,0,0,15" Padding="20">
+                                        <StackPanel>
+                                            <TextBlock Text="CALIBRATION &amp; HARDWARE BASELINE RESET" Style="{StaticResource Caption}" Foreground="{DynamicResource CriticalBrush}" Margin="0,0,0,15"/>
+
+                                            <Grid Margin="0,0,0,5">
+                                                <StackPanel>
+                                                    <TextBlock Text="Reset Hardware Baseline &amp; Calibrations" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Clear all stored hardware baseline caches, custom modes, and trigger the First-Run Hardware Scan on next boot." FontSize="10" Foreground="#888896" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <Button Command="{Binding ResetCalibrationDataCommand}" Content="Reset Calibration Baseline" Style="{StaticResource DangerButton}" Padding="16,6" Height="32" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
                             </TabItem>
 
-                            <!-- Tab 4: Security & About -->
+                            <!-- Tab 4: Security & System -->
                             <TabItem>
                                 <StackPanel>
                                     <!-- Security Card -->
-                                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                                    <Border Style="{StaticResource StandardCard}" Background="#060609" BorderBrush="#1C1C28" Margin="0,0,0,15" Padding="20">
                                         <StackPanel>
-                                            <TextBlock Text="SECURITY &amp; LOCKS" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                                            <TextBlock Text="SECURITY &amp; ACCESS CONTROL" Style="{StaticResource Caption}" Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,15"/>
 
                                             <Grid Margin="0,0,0,15">
                                                 <StackPanel>
-                                                    <TextBlock Text="Startup Entry Lock" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Require a 6-digit access code when the application starts." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Startup Entry Lock (Windows Hello)" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Require Windows Hello system PIN, fingerprint, or facial recognition on application boot." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
                                                 <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.IsStartupLockEnabled}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
 
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,15">
-                                                <Button Command="{Binding ChangeStartupPinCommand}" Content="Change Access Code" Style="{StaticResource SecondaryButton}" Padding="15,8"/>
-                                            </StackPanel>
-
-                                            <Grid>
+                                            <Grid Margin="0,0,0,15">
                                                 <StackPanel>
-                                                    <TextBlock Text="Automatic Update Checks" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
-                                                    <TextBlock Text="Automatically check for new versions on app startup." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Automatic Update Checks" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Periodically check for new engine releases on startup." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>
                                                 <ToggleButton Style="{StaticResource ModernSwitch}" IsChecked="{Binding Settings.IsAutoUpdateEnabled}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
 
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,15,0,0">
-                                                <Button Command="{Binding CheckForUpdatesCommand}" Content="Check for Updates" Style="{StaticResource PrimaryAction}" Padding="15,8"/>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0" Visibility="Collapsed">
+                                                <Button Command="{Binding CheckForUpdatesCommand}" Content="Check for Updates" Style="{StaticResource PrimaryButton}" Padding="16,6" Height="32"/>
                                                 <TextBlock Text="{Binding Settings.LastUpdateCheck, StringFormat='Last checked: {0:g}'}" 
-                                                           FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" 
+                                                           FontSize="10" Foreground="#888896" 
                                                            VerticalAlignment="Center" Margin="15,0,0,0"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </Border>
 
                                     <!-- About Card -->
-                                    <Border Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                                    <Border Style="{StaticResource StandardCard}" Background="#060609" BorderBrush="#1C1C28" Margin="0,0,0,15" Padding="20">
                                         <StackPanel>
-                                            <TextBlock Text="ABOUT ETERNAL" Style="{StaticResource Caption}" Margin="0,0,0,20"/>
+                                            <TextBlock Text="ABOUT WORKSTATION INTELLIGENCE" Style="{StaticResource Caption}" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,15"/>
                                             <Grid>
                                                 <StackPanel>
                                                     <Button Command="{Binding VersionClickedCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
                                                             Background="Transparent" BorderThickness="0" HorizontalAlignment="Left" Padding="0" Margin="0">
-                                                        <TextBlock Text="{Binding AppVersion, StringFormat='Version: {0}'}" FontWeight="Bold" Foreground="White"/>
+                                                        <TextBlock Text="{Binding AppVersion, StringFormat='Version: {0}'}" FontWeight="Bold" Foreground="White" FontSize="13"/>
                                                     </Button>
-                                                    <TextBlock Text="Compatible with: Windows 10 &amp; 11 (64-bit)" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="Compatible with: Windows 10 &amp; 11 (64-bit Architecture)" FontSize="10" Foreground="#888896" Margin="0,2,0,0"/>
                                                 </StackPanel>
                                                 <StackPanel HorizontalAlignment="Right">
-                                                    <TextBlock Text="MACHINE FINGERPRINT" Style="{StaticResource Caption}" FontSize="8" HorizontalAlignment="Right"/>
+                                                    <TextBlock Text="MACHINE FINGERPRINT" Style="{StaticResource Caption}" FontSize="8" HorizontalAlignment="Right" Foreground="#888896"/>
                                                     <TextBlock Text="{Binding MachineId}" FontFamily="Consolas" FontSize="11" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
                                                 </StackPanel>
                                             </Grid>
@@ -397,21 +359,26 @@
                     </ScrollViewer>
 
                     <!-- Actions Footer -->
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Content="Reset Defaults" Command="{Binding ResetDefaultsCommand}" Style="{StaticResource IconButton}" Padding="20,10" Margin="0,0,10,0"/>
-                        <Button Command="{Binding ClearAllDataCommand}" Style="{StaticResource IconButton}" Padding="20,10" Margin="0,0,10,0" BorderBrush="{DynamicResource CriticalBrush}">
-                            <StackPanel Orientation="Horizontal">
-                                <fa:ImageAwesome Icon="Trash" Width="12" Margin="0,0,10,0" Foreground="{DynamicResource CriticalBrush}"/>
-                                <TextBlock Text="Reset All Application Data" Foreground="{DynamicResource CriticalBrush}"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Command="{Binding SaveConfigCommand}" Style="{StaticResource PrimaryAction}" Padding="25,10">
-                            <StackPanel Orientation="Horizontal">
-                                <fa:ImageAwesome Icon="Save" Width="12" Margin="0,0,10,0" Foreground="White"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
-                                <TextBlock Text="COMMIT SETTINGS" FontWeight="Bold"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
+                    <Grid Grid.Row="1" Margin="0,10,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <Button Content="Reset Factory Defaults" Command="{Binding ResetDefaultsCommand}" Style="{StaticResource StandardButton}" Padding="16,8" Height="36" Cursor="Hand"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Command="{Binding ClearAllDataCommand}" Style="{StaticResource StandardButton}" Padding="16,8" Height="36" Margin="0,0,10,0" BorderBrush="{DynamicResource CriticalBrush}" Cursor="Hand">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Trash" Width="12" Margin="0,0,8,0" Foreground="{DynamicResource CriticalBrush}"/>
+                                    <TextBlock Text="Clear All App Data" Foreground="{DynamicResource CriticalBrush}" FontWeight="Bold" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding SaveConfigCommand}" Style="{StaticResource PrimaryButton}" Padding="20,8" Height="36" Cursor="Hand">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Save" Width="12" Margin="0,0,8,0" Foreground="Black"/>
+                                    <TextBlock Text="SAVE CONFIGURATION" FontWeight="Black" FontSize="11"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Grid>
         </Grid>

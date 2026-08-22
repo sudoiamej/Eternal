@@ -31,7 +31,7 @@
                             
                             <Grid Margin="0,0,0,20">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <fa:ImageAwesome Icon="ClockOutline" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,15,0"/>
+                                    <fa:ImageAwesome Icon="History" Width="14" Foreground="{DynamicResource AccentBrush}" Margin="0,0,15,0"/>
                                     <StackPanel>
                                         <TextBlock Text="Enable Background Polling" FontWeight="Bold" Foreground="White"/>
                                         <TextBlock Text="Toggles the 1-second performance monitoring timer (CPU/RAM/Disk)." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>

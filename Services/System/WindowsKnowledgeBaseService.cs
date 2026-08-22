@@ -63,12 +63,68 @@ namespace Eternal.Services.System
                     Icon = "Medkit"
                 },
                 new HelpArticle {
-                    Id = "Processes",
-                    Category = "Diagnostics",
-                    Title = "Process Intelligence",
-                    Description = "Real-time process telemetry.",
-                    Content = "The Process Intelligence module monitors active kernel threads, memory loads, and disk operations in real-time. Modeled after the Windows Task Manager, it exposes active PIDs, status responses, and exact hardware consumption per process. Select any row to inspect paths, evaluate live load graphs, or run high-privilege process termination tasks.",
-                    Icon = "Cube"
+                    Id = "Hardware",
+                    Category = "Hardware",
+                    Title = "Hardware Intelligence & Sensors",
+                    Description = "CPU, GPU, RAM, and Motherboard diagnostics.",
+                    Content = "Inspect physical hardware architecture, 64-bit VRAM calculations, thermal sensors, and clock frequencies. Live sensors update dynamically using low-overhead telemetry.",
+                    Icon = "Microchip"
+                },
+                new HelpArticle {
+                    Id = "Display",
+                    Category = "Hardware",
+                    Title = "Display Architecture & Spatial Map",
+                    Description = "Multi-monitor topology and resolutions.",
+                    Content = "Analyze spatial monitor arrangements, EDID manufacturer data, refresh rates, HDR capabilities, and display scale factors. Drag and re-arrange spatial monitor layouts.",
+                    Icon = "Desktop"
+                },
+                new HelpArticle {
+                    Id = "Security",
+                    Category = "Security",
+                    Title = "System Repair & Security Audit",
+                    Description = "SFC, DISM, and Security Hardening.",
+                    Content = "Run DISM /RestoreHealth and SFC /Scannow component store repairs with live terminal log output. Inspect anti-tamper state, hardware breakpoint detection, and security posture.",
+                    Icon = "Shield"
+                },
+                new HelpArticle {
+                    Id = "Drivers",
+                    Category = "Hardware",
+                    Title = "Driver Management & Audit",
+                    Description = "Device driver verification and export.",
+                    Content = "Audit installed kernel and device drivers, verify digital signatures, check provider details, and export driver packages for system backup or recovery deployment.",
+                    Icon = "Sliders"
+                },
+                new HelpArticle {
+                    Id = "Services",
+                    Category = "System",
+                    Title = "Services & Startup Control",
+                    Description = "Windows Services and autoruns.",
+                    Content = "Manage Windows Background Services and startup autorun entries. Start, stop, enable, or disable background services with real-time status updates.",
+                    Icon = "Cog"
+                },
+                new HelpArticle {
+                    Id = "Registry",
+                    Category = "System",
+                    Title = "Registry Lexicon & System Keys",
+                    Description = "Deep Windows registry inspection.",
+                    Content = "Navigate system registry hives, analyze key definitions, and inspect key values with integrated safety checks and description tooltips.",
+                    Icon = "Book"
+                },
+                new HelpArticle {
+                    Id = "Network",
+                    Category = "Telemetry",
+                    Title = "Network Architecture & Adapters",
+                    Description = "Ethernet, Wi-Fi, and active sockets.",
+                    Content = "Monitor active network interfaces, IP addresses, MAC IDs, link speeds, gateway paths, and active socket connections in real-time.",
+                    Icon = "Globe"
+                },
+                new HelpArticle {
+                    Id = "Settings",
+                    Category = "System",
+                    Title = "Settings & Custom Calibration",
+                    Description = "App scale, themes, and calibration.",
+                    Content = "Adjust application scaling with automatic persistence, toggle accent themes, manage startup lockouts, and reset hardware calibration baselines.",
+                    Icon = "Gear"
                 }
             };
         }

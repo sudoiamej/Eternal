@@ -73,6 +73,23 @@ namespace Eternal.Services.System
             _pollingTimer = null;
         }
 
+        public void PausePolling()
+        {
+            _pollingTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+        }
+
+        public void ResumePolling()
+        {
+            if (_pollingTimer == null)
+            {
+                StartPolling();
+            }
+            else
+            {
+                _pollingTimer.Change(0, 1000);
+            }
+        }
+
         private async Task DoUpdateAsync()
         {
             if (!_settingsService.Current.EnableWmiPolling) return;

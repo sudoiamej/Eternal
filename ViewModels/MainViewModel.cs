@@ -83,13 +83,61 @@ namespace Eternal.ViewModels
         
         [ObservableProperty] private CommandPaletteViewModel _commandPaletteVm;
 
+        [ObservableProperty] private string _userRoleBadge = "STANDARD USER";
+        [ObservableProperty] private bool _isAdminUser = false;
+        [ObservableProperty] private bool _isStandardUser = true;
+        [ObservableProperty] private bool _isGuestUser = false;
+
+        [ObservableProperty] private bool _isAuthenticated = false;
+        [ObservableProperty] private string _authStatusMessage = "Identity verification required to proceed.";
+        [ObservableProperty] private string _authStatusColor = "#888896";
+
+        public string CurrentUserGreeting => $"Hello, {Environment.UserName}!";
+        public string CurrentUsernameOnly => Environment.UserName;
+
         partial void OnNavSortOptionChanged(NavigationSortOption value) => SortNavigation();
         
         partial void OnCurrentViewChanged(BaseViewModel value)
         {
             OnPropertyChanged(nameof(IsHomeActive));
             OnPropertyChanged(nameof(IsSettingsActive));
+            OnPropertyChanged(nameof(CurrentViewTitle));
         }
+
+        public string CurrentViewTitle
+        {
+            get
+            {
+                if (CurrentView == null) return "System Dashboard";
+                var name = CurrentView.GetType().Name.Replace("ViewModel", "");
+                return name switch
+                {
+                    "HomeGridDashboard" => "System Dashboard",
+                    "Dashboard" => "System Dashboard",
+                    "ProcessIntelligence" => "Process Intelligence",
+                    "RepairCenter" => "Doctor Repair Center",
+                    "DismImaging" => "DISM Custom OS Flasher",
+                    "PEMode" => "Windows PE Recovery Suite",
+                    "HardwareStress" => "Hardware Stress Suite",
+                    "RegistryLexicon" => "Registry Triage Lexicon",
+                    "UserManagement" => "User Account Triage",
+                    "WindowsUpdate" => "Windows Update Diagnostics",
+                    "FileForensics" => "File Forensics & PE Parser",
+                    "Hardware" => "Hardware Diagnostics",
+                    "Performance" => "Performance Intelligence",
+                    "Security" => "Security & Threat Audit",
+                    "Storage" => "Storage & Partition Map",
+                    "Network" => "Network Diagnostics",
+                    "Tuning" => "Guardian Tuning Engine",
+                    "Console" => "Eternal Diagnostic Console",
+                    "Boot" => "Boot Architecture (BCD)",
+                    "WmiExplorer" => "WMI Telemetry Explorer",
+                    _ => name
+                };
+            }
+        }
+
+        public bool IsVsDebuggerAttached => System.Diagnostics.Debugger.IsAttached || Eternal.Helpers.AntiDebugHelper.IsDeveloperExceptionActive();
 
         public MainViewModel(
             ILoggingService loggingService, 
@@ -123,11 +171,13 @@ namespace Eternal.ViewModels
 
             Title = "Eternal System Intelligence";
             _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
-            _loggingService.Log($"Dev Preview Suite Version 3.5.0");
+            _loggingService.Log($"Dev Preview Suite Version 3.5.0 RC2");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
+            IsSidebarExpanded = _settingsService.Current.IsSidebarExpanded;
             _settingsService.SettingsChanged += OnSettingsChanged;
 
+            AuditUserPermissions();
             IsPeMode = _envService.IsPeMode;
             InitializeNavigation();
 
@@ -179,8 +229,13 @@ namespace Eternal.ViewModels
         {
             try
             {
+                if (Settings.WindowScale >= 0.5 && Settings.WindowScale <= 2.0)
+                {
+                    _userZoomMultiplier = Settings.WindowScale;
+                }
                 _scalingService.UpdateScales(Settings.WindowScale, Settings.FontAdjustmentScale);
-                DisplayScale = _scalingService.UiScale;
+                DisplayScale = _scalingService.UiScale * _fitScale * _userZoomMultiplier;
+                OnPropertyChanged(nameof(ZoomPercentageString));
             }
             catch { }
         }
@@ -229,7 +284,7 @@ namespace Eternal.ViewModels
             {
                 new NavigationItem("Hardware", "Microchip", "Hardware", 0, 0, 0),
                 new NavigationItem("Displays", "Desktop", "Display", 0, 0, 1),
-                new NavigationItem("Battery Lab", "Bolt", "Battery", 0, 0, 2),
+                new NavigationItem("Battery Lab", "BatteryFull", "Battery", 0, 0, 2),
                 new NavigationItem("Stress Test", "Flash", "StressTest", 1, 1, 3),
                 new NavigationItem("PC Rating", "Trophy", "PcRating", 0, 0, 4),
                 new NavigationItem("Thermal", "ThermometerThreeQuarters", "Thermal", 0, 0, 5),
@@ -257,10 +312,9 @@ namespace Eternal.ViewModels
                 new NavigationItem("Time Machine", "ClockOutline", "Snapshots", 1, 1, 2),
                 new NavigationItem("DISM Imaging", "Archive", "DismImaging", 1, 2, 3),
                 new NavigationItem("Windows Update", "Refresh", "WindowsUpdate", 0, 0, 4),
-                new NavigationItem("Settings", "Gear", "Settings", 0, 0, 5),
-                new NavigationItem("System Logs", "Bars", "Logs", 0, 0, 6),
-                new NavigationItem("Help", "QuestionCircle", "Help", 0, 0, 7),
-                new NavigationItem("PE Mode", "Medkit", "PeMode", 1, 1, 8)
+                new NavigationItem("System Logs", "Bars", "Logs", 0, 0, 5),
+                new NavigationItem("Help", "QuestionCircle", "Help", 0, 0, 6),
+                new NavigationItem("PE Mode", "Medkit", "PeMode", 1, 1, 7)
             };
 
             allItems.AddRange(tempSystem);
@@ -360,6 +414,128 @@ namespace Eternal.ViewModels
             PersistenceEntries.Clear();
         }
 
+        private void AuditUserPermissions()
+        {
+            try
+            {
+                var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+                var principal = new System.Security.Principal.WindowsPrincipal(identity);
+
+                if (principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator))
+                {
+                    UserRoleBadge = "ADMINISTRATOR";
+                    IsAdminUser = true;
+                    IsStandardUser = false;
+                    IsGuestUser = false;
+                }
+                else if (principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Guest))
+                {
+                    UserRoleBadge = "GUEST USER";
+                    IsAdminUser = false;
+                    IsStandardUser = false;
+                    IsGuestUser = true;
+                }
+                else
+                {
+                    UserRoleBadge = "STANDARD USER";
+                    IsAdminUser = false;
+                    IsStandardUser = true;
+                    IsGuestUser = false;
+                }
+            }
+            catch
+            {
+                UserRoleBadge = "STANDARD USER";
+                IsAdminUser = false;
+                IsStandardUser = true;
+                IsGuestUser = false;
+            }
+        }
+        [System.Runtime.InteropServices.DllImport("advapi32.dll", SetLastError = true, CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        private static extern bool LogonUser(
+            string lpszUsername,
+            string lpszDomain,
+            string lpszPassword,
+            int dwLogonType,
+            int dwLogonProvider,
+            out IntPtr phToken);
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool CloseHandle(IntPtr handle);
+
+        [RelayCommand]
+        private async Task TriggerWindowsHello()
+        {
+            AuthStatusColor = "#888896";
+            AuthStatusMessage = "Verifying identity with Windows Hello...";
+
+            try
+            {
+                var securityService = App.ServiceProvider?.GetService<ISecurityService>();
+                if (securityService != null)
+                {
+                    bool isHelloAvailable = await securityService.IsWindowsHelloAvailableAsync();
+                    if (isHelloAvailable)
+                    {
+                        bool verified = await securityService.AuthenticateWithWindowsHelloAsync("Authenticate to unlock Eternal System Intelligence");
+                        if (verified)
+                        {
+                            IsAuthenticated = true;
+                            return;
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            AuthStatusColor = "#F59E0B";
+            AuthStatusMessage = "Windows Hello PIN skipped or unavailable. Enter Windows password below.";
+        }
+
+        [RelayCommand]
+        private void AuthenticateWithPassword(string password)
+        {
+            string username = Environment.UserName;
+            string domain = Environment.UserDomainName;
+
+            IntPtr token = IntPtr.Zero;
+            bool isValid = LogonUser(username, domain, password ?? "", 2, 0, out token);
+
+            if (isValid)
+            {
+                if (token != IntPtr.Zero) CloseHandle(token);
+                IsAuthenticated = true;
+                return;
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                AuthStatusColor = "#F59E0B";
+                AuthStatusMessage = "Windows account requires a password or Windows Hello PIN.";
+            }
+            else
+            {
+                AuthStatusColor = "#EF4444";
+                AuthStatusMessage = "Incorrect Windows password. Please try again.";
+            }
+        }
+
+        [RelayCommand]
+        private void EmergencyRecoveryAuth()
+        {
+            // STRICT HARDENED LOGIN: Emergency token bypass disabled. Authenticate with Windows Account Password or Windows Hello.
+            AuthStatusColor = "#EF4444";
+            AuthStatusMessage = "Emergency recovery bypass disabled. Authenticate with Password or Windows Hello.";
+        }
+
+        [RelayCommand]
+        private void ToggleSidebar()
+        {
+            IsSidebarExpanded = !IsSidebarExpanded;
+            Settings.IsSidebarExpanded = IsSidebarExpanded;
+            _settingsService.Save();
+        }
+
         [RelayCommand]
         private void ToggleUI()
         {
@@ -411,14 +587,14 @@ namespace Eternal.ViewModels
         {
             try
             {
-                var colorStr = "#7F00FF"; // Force original purple accent
+                var colorStr = string.IsNullOrWhiteSpace(Settings?.ThemeAccentColor) ? "#0078D4" : Settings.ThemeAccentColor;
                 var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colorStr);
                 var resources = System.Windows.Application.Current.Resources;
                 
                 resources["AccentColor"] = color;
                 resources["AccentBrush"] = new System.Windows.Media.SolidColorBrush(color);
 
-                // Derive secondary color (darker version for gradients/depth)
+                // Derive secondary color (darker version for depth)
                 var secondary = System.Windows.Media.Color.FromRgb(
                     (byte)(color.R * 0.7),
                     (byte)(color.G * 0.7),
@@ -427,8 +603,8 @@ namespace Eternal.ViewModels
                 resources["AccentSecondaryColor"] = secondary;
                 resources["AccentSecondaryBrush"] = new System.Windows.Media.SolidColorBrush(secondary);
 
-                // Apply solid backgrounds instead of dynamic gradients for performance
-                var solidBg = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#090A0E");
+                // Apply AMOLED black solid backgrounds
+                var solidBg = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#000000");
                 resources["BgGradientStop1"] = solidBg;
                 resources["BgGradientStop2"] = solidBg;
                 resources["BgGradientStop3"] = solidBg;
@@ -510,7 +686,7 @@ namespace Eternal.ViewModels
         public void UpdateFitScale(double fitScale)
         {
             _fitScale = fitScale;
-            DisplayScale = _fitScale * _userZoomMultiplier;
+            DisplayScale = _scalingService.UiScale * _fitScale * _userZoomMultiplier;
         }
 
         public string ZoomPercentageString => $"{(_userZoomMultiplier * 100):0}%";
@@ -518,16 +694,20 @@ namespace Eternal.ViewModels
         [RelayCommand]
         private void ZoomIn()
         {
-            _userZoomMultiplier = Math.Min(2.0, _userZoomMultiplier + 0.1);
-            DisplayScale = _fitScale * _userZoomMultiplier;
+            _userZoomMultiplier = Math.Min(2.0, Math.Round(_userZoomMultiplier + 0.05, 2));
+            Settings.WindowScale = _userZoomMultiplier;
+            _settingsService.Save();
+            DisplayScale = _scalingService.UiScale * _fitScale * _userZoomMultiplier;
             OnPropertyChanged(nameof(ZoomPercentageString));
         }
 
         [RelayCommand]
         private void ZoomOut()
         {
-            _userZoomMultiplier = Math.Max(0.5, _userZoomMultiplier - 0.1);
-            DisplayScale = _fitScale * _userZoomMultiplier;
+            _userZoomMultiplier = Math.Max(0.5, Math.Round(_userZoomMultiplier - 0.05, 2));
+            Settings.WindowScale = _userZoomMultiplier;
+            _settingsService.Save();
+            DisplayScale = _scalingService.UiScale * _fitScale * _userZoomMultiplier;
             OnPropertyChanged(nameof(ZoomPercentageString));
         }
 
@@ -535,12 +715,24 @@ namespace Eternal.ViewModels
         private void ResetZoom()
         {
             _userZoomMultiplier = 1.0;
-            DisplayScale = _fitScale * _userZoomMultiplier;
+            Settings.WindowScale = 1.0;
+            _settingsService.Save();
+            DisplayScale = _scalingService.UiScale * _fitScale * _userZoomMultiplier;
             OnPropertyChanged(nameof(ZoomPercentageString));
         }
 
         [RelayCommand]
         private void ToggleTelemetryHud() => IsTelemetryHudOpen = !IsTelemetryHudOpen;
+
+        public void PauseBackgroundWork()
+        {
+            _performanceService.PausePolling();
+        }
+
+        public void ResumeBackgroundWork()
+        {
+            _performanceService.ResumePolling();
+        }
 
         public void StartTimers()
         {
@@ -644,6 +836,8 @@ namespace Eternal.ViewModels
         [RelayCommand]
         public async Task Navigate(string viewName)
         {
+            if (!IsAuthenticated) return;
+
             // Polymorphically deactivate the outgoing view to systematically release memory
             // and suspend background polling loops across the entire application.
             if (CurrentView != null)
@@ -801,7 +995,7 @@ namespace Eternal.ViewModels
                 case "Snapshots": 
                     var snapVm = sp.GetRequiredService<SnapshotsViewModel>();
                     CurrentView = snapVm; 
-                    await snapVm.LoadSnapshotsCommand.ExecuteAsync(null); 
+                    _ = snapVm.LoadSnapshotsCommand.ExecuteAsync(null); 
                     break;
                 case "Forensics": 
                     CurrentView = sp.GetRequiredService<FileForensicsViewModel>(); 
@@ -823,17 +1017,17 @@ namespace Eternal.ViewModels
                 case "Users": 
                     var userVm = sp.GetRequiredService<UserManagementViewModel>();
                     CurrentView = userVm; 
-                    await userVm.LoadDataCommand.ExecuteAsync(null);
+                    _ = userVm.LoadDataCommand.ExecuteAsync(null);
                     break;
                 case "Tuning": 
                     var tuneVm = sp.GetRequiredService<TuningViewModel>();
                     CurrentView = tuneVm; 
-                    await tuneVm.LoadTweaksCommand.ExecuteAsync(null);
+                    _ = tuneVm.LoadTweaksCommand.ExecuteAsync(null);
                     break;
                 case "Console": 
                     var consoleVm = sp.GetRequiredService<ConsoleViewModel>();
                     CurrentView = consoleVm;
-                    await consoleVm.StartConsoleCommand.ExecuteAsync(null);
+                    _ = consoleVm.StartConsoleCommand.ExecuteAsync(null);
                     break;
                 case "Components": 
                     var compVm = sp.GetRequiredService<ComponentsViewModel>();
@@ -843,8 +1037,7 @@ namespace Eternal.ViewModels
                 case "WindowsUpdate": 
                     var wuVm = sp.GetRequiredService<WindowsUpdateViewModel>();
                     CurrentView = wuVm; 
-                    await wuVm.CheckForUpdatesCommand.ExecuteAsync(null);
-                    await wuVm.LoadUpdatesCommand.ExecuteAsync(null);
+                    _ = wuVm.LoadUpdatesCommand.ExecuteAsync(null);
                     break;
                 case "DismImaging": 
                     CurrentView = sp.GetRequiredService<DismImagingViewModel>(); 

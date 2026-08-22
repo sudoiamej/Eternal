@@ -34,7 +34,7 @@ namespace Eternal.ViewModels.Modules
             // Intelligence
             _allCommands.Add(new CommandItem("PC Scanner", "Run full system intelligence scan", "Search", "PcScanner", "Intelligence"));
             _allCommands.Add(new CommandItem("Sentinel Privacy", "Windows telemetry and permission audit", "EyeSlash", "Privacy", "Security"));
-            _allCommands.Add(new CommandItem("Battery Lab", "Advanced ACPI battery diagnostics", "Bolt", "Battery", "Hardware"));
+            _allCommands.Add(new CommandItem("Battery Lab", "Advanced ACPI battery diagnostics", "BatteryFull", "Battery", "Hardware"));
             _allCommands.Add(new CommandItem("WinSAT Rating", "Benchmark Windows Experience Index", "Trophy", "PcRating", "Performance"));
             
             // Hardware

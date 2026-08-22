@@ -31,7 +31,7 @@
                         </StackPanel>
 
                         <!-- PE Environment Status Badge (HCI Rule 7: System Status) -->
-                        <Border Grid.Column="1" Padding="15,8" CornerRadius="4" VerticalAlignment="Center">
+                        <Border Grid.Column="1" Padding="15,8" CornerRadius="4" VerticalAlignment="Center" HorizontalAlignment="Right">
                             <Border.Style>
                                 <Style TargetType="Border">
                                     <Setter Property="Background" Value="#1A4CAF50"/>
@@ -42,8 +42,8 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <StackPanel Orientation="Horizontal">
-                                <fa:ImageAwesome Icon="InfoCircle" Width="12" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="InfoCircle" Width="12" Height="12" Margin="0,0,8,0" VerticalAlignment="Center">
                                     <fa:ImageAwesome.Style>
                                         <Style TargetType="fa:ImageAwesome">
                                             <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
@@ -55,7 +55,7 @@
                                         </Style>
                                     </fa:ImageAwesome.Style>
                                 </fa:ImageAwesome>
-                                <TextBlock Text="{Binding StatusMessage}" FontSize="11" FontWeight="Bold">
+                                <TextBlock Text="{Binding StatusMessage}" FontSize="11" FontWeight="Bold" VerticalAlignment="Center">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
@@ -68,8 +68,8 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                        CommandParameter="Help" Style="{StaticResource IconButton}" ToolTip="Open Knowledge Base" Margin="15,0,0,0" VerticalAlignment="Center">
-                                    <fa:ImageAwesome Icon="QuestionCircleOutline" Width="10" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
+                                        CommandParameter="Help" Style="{StaticResource IconButton}" ToolTip="Open Knowledge Base" Margin="12,0,0,0" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="QuestionCircleOutline" Width="12" Height="12" Foreground="{DynamicResource TextSecondaryBrush}"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                                 </Button>
                             </StackPanel>
                         </Border>
