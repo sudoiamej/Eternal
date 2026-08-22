@@ -11,5 +11,6 @@ namespace Eternal.Services.System
         Task<bool> SetBootTimeoutAsync(int seconds);
         Task<bool> ToggleSafeBootAsync(string identifier, bool enable);
         Task<bool> DeleteBootEntryAsync(string identifier);
+        Task<bool> RepairOfflineBcdAsync(string driveLetter);
     }
 }

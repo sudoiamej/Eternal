@@ -37,7 +37,7 @@
                         <StackPanel>
                             <Grid Margin="0,0,0,14">
                                 <TextBlock Text="Version" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                                <TextBlock Text="3.5.0 RC2" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                <TextBlock Text="3.5.0 (Stable)" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Grid>
                             <Grid Margin="0,0,0,14">
                                 <TextBlock Text="Milestone" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>

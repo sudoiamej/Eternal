@@ -12,6 +12,7 @@ namespace Eternal.ViewModels.Modules
 
         [ObservableProperty] private BiosInfo _bios = default!;
         [ObservableProperty] private UefiStatus _uefi = default!;
+        [ObservableProperty] private UefiIntegrityAudit _integrityAudit = default!;
 
         public BiosViewModel(IBiosService biosService)
         {
@@ -27,7 +28,8 @@ namespace Eternal.ViewModels.Modules
             {
                 Bios = await _biosService.GetBiosInfoAsync();
                 Uefi = await _biosService.GetUefiStatusAsync();
-            }, "Loading BIOS Information...");
+                IntegrityAudit = await _biosService.AuditUefiIntegrityAsync();
+            }, "Auditing Firmware Security & UEFI DBX...");
         }
     }
 }

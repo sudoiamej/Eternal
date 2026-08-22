@@ -88,8 +88,10 @@ namespace Eternal
                 if (ex.InnerException != null) details += "\n\nInner: " + ex.InnerException.ToString();
                 
                 global::System.Diagnostics.Debug.WriteLine($"BOOT FAILURE: {ex.Message}");
-                // Instead of Shutdown, we attempt to show the Splash or an Incompatibility window if possible
-                // for recovery. If essential services are missing, Windows will eventually kill it.
+                // Fallback to splash screen recovery window if main window initialization fails
+                var splashFallback = new Views.SplashScreenWindow();
+                System.Windows.Application.Current.MainWindow = splashFallback;
+                splashFallback.Show();
             }
 
             base.OnStartup(e);

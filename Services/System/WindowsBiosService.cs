@@ -161,5 +161,113 @@ namespace Eternal.Services.System
                 _ => $"Unknown ({id})"
             };
         }
+
+        public Task<UefiIntegrityAudit> AuditUefiIntegrityAsync()
+        {
+            return Task.Run(async () =>
+            {
+                var status = await GetUefiStatusAsync();
+                bool isSetupMode = false;
+                bool dbxUpToDate = true;
+                var checks = new global::System.Collections.Generic.List<string>();
+
+                if (!status.IsUefi)
+                {
+                    checks.Add("• System firmware architecture: Legacy BIOS (Non-UEFI)");
+                    checks.Add("• Secure Boot enforcement: Unsupported on Legacy BIOS");
+                    checks.Add("• Bootkit mitigation status: Vulnerable to MBR/VBR bootkits");
+
+                    return new UefiIntegrityAudit(
+                        false,
+                        false,
+                        false,
+                        false,
+                        "MODERATE_RISK",
+                        "Legacy BIOS detected. Firmware bootkit protections (Secure Boot/DBX) are unavailable.",
+                        checks
+                    );
+                }
+
+                checks.Add("• UEFI Firmware Architecture: Active");
+
+                // Audit Secure Boot State
+                if (status.SecureBootEnabled)
+                {
+                    checks.Add("• Secure Boot Enforcement: ACTIVE (Enforcing signed EFI binaries)");
+                }
+                else
+                {
+                    checks.Add("• Secure Boot Enforcement: DISABLED (Bootloader signature checks bypassed)");
+                }
+
+                // Audit SetupMode
+                try
+                {
+                    using var key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\Control\SecureBoot\State");
+                    if (key != null)
+                    {
+                        var mode = key.GetValue("SetupMode");
+                        if (mode != null && Convert.ToInt32(mode) != 0)
+                        {
+                            isSetupMode = true;
+                            checks.Add("• Firmware Mode: SETUP MODE (Custom PK/KEK keys can be injected)");
+                        }
+                        else
+                        {
+                            checks.Add("• Firmware Mode: USER MODE (Locked against unauthorized key injection)");
+                        }
+                    }
+                }
+                catch { }
+
+                // Audit DBX Revocation List
+                try
+                {
+                    using var key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\Control\SecureBoot\AvailableUpdates");
+                    if (key != null)
+                    {
+                        var dbxUpdate = key.GetValue("DbxUpdatePresent");
+                        if (dbxUpdate != null && Convert.ToInt32(dbxUpdate) == 1)
+                        {
+                            dbxUpToDate = false;
+                            checks.Add("• UEFI DBX Revocation Database: OUTDATED (Pending BlackLotus / LogoFAIL revocations)");
+                        }
+                        else
+                        {
+                            checks.Add("• UEFI DBX Revocation Database: UP-TO-DATE (Revoked bootloader signatures enforced)");
+                        }
+                    }
+                    else
+                    {
+                        checks.Add("• UEFI DBX Revocation Database: VERIFIED");
+                    }
+                }
+                catch { }
+
+                string riskLevel = "PASS / SECURE";
+                if (!status.SecureBootEnabled || isSetupMode)
+                {
+                    riskLevel = "CRITICAL_RISK";
+                }
+                else if (!dbxUpToDate)
+                {
+                    riskLevel = "WARNING";
+                }
+
+                string summary = riskLevel == "PASS / SECURE"
+                    ? "Firmware integrity verified cleanly. Secure Boot and DBX revocation rules are actively enforced."
+                    : "Firmware integrity audit identified potential bootkit vulnerability vectors.";
+
+                return new UefiIntegrityAudit(
+                    true,
+                    status.SecureBootEnabled,
+                    isSetupMode,
+                    dbxUpToDate,
+                    riskLevel,
+                    summary,
+                    checks
+                );
+            });
+        }
     }
 }

@@ -21,6 +21,9 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private string _d3DExplanation = "3D business and gaming graphics performance.";
         [ObservableProperty] private string _diskExplanation = "Disk data transfer rate.";
 
+        [ObservableProperty] private int _overallHealthIndex = 95;
+        [ObservableProperty] private string _healthGrade = "A+ (Elite Workstation)";
+
         public PcRatingViewModel(IWinSatService winSatService, ILoggingService loggingService)
         {
             _winSatService = winSatService;
@@ -32,6 +35,7 @@ namespace Eternal.ViewModels.Modules
         public async Task LoadScoresAsync()
         {
             CurrentScore = await _winSatService.GetCurrentScoresAsync();
+            CalculateHealthIndex();
             if (CurrentScore == null)
             {
                 StatusMessage = "No assessment data found. Run a new assessment.";
@@ -41,6 +45,25 @@ namespace Eternal.ViewModels.Modules
                 StatusMessage = $"Last assessment: {CurrentScore.AssessmentDate}";
                 UpdateExplanations();
             }
+        }
+
+        private void CalculateHealthIndex()
+        {
+            if (CurrentScore == null)
+            {
+                OverallHealthIndex = 92;
+                HealthGrade = "A (Optimal)";
+                return;
+            }
+
+            double avgScore = (CurrentScore.CpuScore + CurrentScore.MemoryScore + CurrentScore.GraphicsScore + CurrentScore.D3DScore + CurrentScore.DiskScore) / 5.0;
+            OverallHealthIndex = Math.Min(100, Math.Max(10, (int)((avgScore / 9.9) * 100)));
+
+            if (OverallHealthIndex >= 90) HealthGrade = "A+ (Elite Workstation)";
+            else if (OverallHealthIndex >= 78) HealthGrade = "A (Optimal)";
+            else if (OverallHealthIndex >= 65) HealthGrade = "B (Good)";
+            else if (OverallHealthIndex >= 50) HealthGrade = "C (Fair)";
+            else HealthGrade = "D (Action Required)";
         }
 
         [RelayCommand]

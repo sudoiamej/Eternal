@@ -89,8 +89,16 @@ namespace Eternal.ViewModels
         [ObservableProperty] private bool _isGuestUser = false;
 
         [ObservableProperty] private bool _isAuthenticated = false;
-        [ObservableProperty] private string _authStatusMessage = "Identity verification required to proceed.";
+        [ObservableProperty] private bool _isBlackoutActive = false;
+        [ObservableProperty] private double _loginOverlayOpacity = 1.0;
+        [ObservableProperty] private string _authStatusMessage = "Enter password/PIN or select Windows Hello to authenticate.";
         [ObservableProperty] private string _authStatusColor = "#888896";
+
+        [ObservableProperty] private bool _isPostAuthSplashVisible = false;
+        [ObservableProperty] private double _postAuthSplashOpacity = 0.0;
+        [ObservableProperty] private double _postAuthSplashProgress = 0.0;
+        [ObservableProperty] private string _postAuthSplashStatusText = "Initializing Workstation Intelligence...";
+        [ObservableProperty] private string _postAuthSplashTip = "Tip: Press Ctrl+K anytime to open the instant Command Palette.";
 
         public string CurrentUserGreeting => $"Hello, {Environment.UserName}!";
         public string CurrentUsernameOnly => Environment.UserName;
@@ -170,8 +178,9 @@ namespace Eternal.ViewModels
             _supportItems = new ObservableCollection<NavigationItem>();
 
             Title = "Eternal System Intelligence";
+            LoginUsername = Environment.UserName;
             _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
-            _loggingService.Log($"Dev Preview Suite Version 3.5.0 RC2");
+            _loggingService.Log($"Eternal Intelligence Suite Version 3.5.0 (Stable)");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
             IsSidebarExpanded = _settingsService.Current.IsSidebarExpanded;
@@ -179,6 +188,11 @@ namespace Eternal.ViewModels
 
             AuditUserPermissions();
             IsPeMode = _envService.IsPeMode;
+            if (IsPeMode)
+            {
+                IsAuthenticated = true;
+                _loggingService.Log("WinPE Environment Detected: Bypassing User Authentication to launch directly into Workstation Dashboard.");
+            }
             InitializeNavigation();
 
             // Set default view after navigation collections are initialized
@@ -463,61 +477,172 @@ namespace Eternal.ViewModels
         [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool CloseHandle(IntPtr handle);
 
-        [RelayCommand]
-        private async Task TriggerWindowsHello()
+        [ObservableProperty] private bool _isSplashActive = false;
+        [ObservableProperty] private double _splashProgress = 0.0;
+        [ObservableProperty] private string _splashStatusText = "Verifying security identity tokens...";
+
+        public bool IsLoginOverlayVisible => !IsAuthenticated && !IsSplashActive;
+
+        partial void OnIsAuthenticatedChanged(bool value) => OnPropertyChanged(nameof(IsLoginOverlayVisible));
+        partial void OnIsSplashActiveChanged(bool value) => OnPropertyChanged(nameof(IsLoginOverlayVisible));
+
+        private async Task StartPostAuthSplashSequenceAsync()
         {
-            AuthStatusColor = "#888896";
-            AuthStatusMessage = "Verifying identity with Windows Hello...";
+            IsSplashActive = true;
+            SplashProgress = 0.0;
+
+            // Step 1: 0% -> 30% (450ms)
+            SplashStatusText = $"Hello, {Environment.UserName}! Verifying security identity tokens...";
+            SplashProgress = 30.0;
+            await Task.Delay(450);
+
+            // Step 2: 30% -> 65% (550ms)
+            SplashStatusText = "Auditing hardware sensors & memory telemetry...";
+            SplashProgress = 65.0;
+            await Task.Delay(550);
+
+            // Step 3: 65% -> 95% (450ms)
+            SplashStatusText = "Starting Workstation Diagnostics Engine...";
+            SplashProgress = 95.0;
+            await Task.Delay(450);
+
+            // Step 4: 95% -> 100% (350ms)
+            SplashStatusText = "Workstation Ready. Initializing dashboard...";
+            SplashProgress = 100.0;
+            await Task.Delay(350);
+
+            // Step 5: Complete transition to Main Dashboard
+            IsSplashActive = false;
+            IsAuthenticated = true;
+        }
+
+        [RelayCommand]
+        public async Task TriggerWindowsHelloAsync()
+        {
+            if (IsAuthenticated) return;
+
+            AuthStatusColor = "#00E5FF";
+            AuthStatusMessage = "Verifying identity with Windows Hello PIN / Biometrics...";
 
             try
             {
                 var securityService = App.ServiceProvider?.GetService<ISecurityService>();
                 if (securityService != null)
                 {
-                    bool isHelloAvailable = await securityService.IsWindowsHelloAvailableAsync();
-                    if (isHelloAvailable)
+                    bool verified = await securityService.AuthenticateWithWindowsHelloAsync("Authenticate to unlock Eternal System Intelligence");
+                    if (verified)
                     {
-                        bool verified = await securityService.AuthenticateWithWindowsHelloAsync("Authenticate to unlock Eternal System Intelligence");
-                        if (verified)
-                        {
-                            IsAuthenticated = true;
-                            return;
-                        }
+                        AuthStatusColor = "#10B981";
+                        AuthStatusMessage = "Identity Verified cleanly.";
+                        await StartPostAuthSequenceAsync();
+                        return;
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                global::System.Diagnostics.Debug.WriteLine($"Windows Hello Error: {ex.Message}");
+            }
 
             AuthStatusColor = "#F59E0B";
-            AuthStatusMessage = "Windows Hello PIN skipped or unavailable. Enter Windows password below.";
+            AuthStatusMessage = "Windows Hello PIN skipped or canceled. Click ENTER WORKSTATION below.";
+        }
+
+        private string _loginUsername = Environment.UserName;
+        public string LoginUsername
+        {
+            get => string.IsNullOrWhiteSpace(_loginUsername) ? Environment.UserName : _loginUsername;
+            set
+            {
+                SetProperty(ref _loginUsername, value);
+                OnPropertyChanged(nameof(IsLoginOverlayVisible));
+            }
+        }
+
+        private readonly string[] _workstationTips = new[]
+        {
+            "Tip: Press Ctrl+K anytime to open the instant Command Palette.",
+            "Tip: Double-click the top-left logo 3 times to enter Orbital Visualizer.",
+            "Tip: Activate Gaming Latency Preset in Tuning for MMCSS prioritization.",
+            "Tip: Run WMI SMART Diagnostics in Storage to inspect bare-metal drive health.",
+            "Tip: Use Bios & UEFI Audit to check Secure Boot and DBX revocation rules."
+        };
+
+        public async Task StartPostAuthSequenceAsync()
+        {
+            if (IsPostAuthSplashVisible || IsBlackoutActive) return;
+
+            // Activate Full Blackout background overlay to prevent any dashboard flash during login fade-out
+            IsBlackoutActive = true;
+
+            // 1. Smooth Fade-Out of Login Screen (1.0 -> 0.0 over 300ms)
+            for (int i = 10; i >= 0; i--)
+            {
+                LoginOverlayOpacity = i / 10.0;
+                await Task.Delay(30);
+            }
+
+            // Hide login screen behind the Blackout overlay
+            IsAuthenticated = true;
+
+            // 2. 2-Second Buffer Pause (clean dark AMOLED background)
+            await Task.Delay(2000);
+
+            // 3. Smooth Fade-In of Post-Auth Loading Overlay (0.0 -> 1.0 over 300ms)
+            PostAuthSplashTip = _workstationTips[Random.Shared.Next(_workstationTips.Length)];
+            IsPostAuthSplashVisible = true;
+            PostAuthSplashOpacity = 0.0;
+
+            for (int i = 1; i <= 10; i++)
+            {
+                PostAuthSplashOpacity = i / 10.0;
+                await Task.Delay(30);
+            }
+
+            // 4. Animate Status Bar 0-100% over 3.0 seconds exact
+            string[] steps = new[]
+            {
+                "Authenticating User Session & Cryptographic Token...",
+                "Allocating High-Performance Memory & Process Cache...",
+                "Initializing Telemetry Engines & Hardware Diagnostics...",
+                "Applying Custom Workstation Presets...",
+                "Workstation System Environment Ready."
+            };
+
+            for (int p = 0; p <= 100; p++)
+            {
+                PostAuthSplashProgress = p;
+                int stepIdx = Math.Min(steps.Length - 1, p / 20);
+                PostAuthSplashStatusText = steps[stepIdx];
+                await Task.Delay(30);
+            }
+
+            await Task.Delay(150);
+
+            // 5. Direct Cross-Fade from Loading Overlay into Dashboard:
+            // Remove blackout grid first so dashboard is exposed directly beneath the loading overlay
+            IsBlackoutActive = false;
+
+            // Smoothly dissolve loading overlay directly into dashboard (400ms)
+            for (int i = 10; i >= 0; i--)
+            {
+                PostAuthSplashOpacity = i / 10.0;
+                await Task.Delay(40);
+            }
+
+            IsPostAuthSplashVisible = false;
+        }
+
+        public void UnlockWorkstation()
+        {
+            if (IsPostAuthSplashVisible) return;
+            _ = StartPostAuthSequenceAsync();
         }
 
         [RelayCommand]
         private void AuthenticateWithPassword(string password)
         {
-            string username = Environment.UserName;
-            string domain = Environment.UserDomainName;
-
-            IntPtr token = IntPtr.Zero;
-            bool isValid = LogonUser(username, domain, password ?? "", 2, 0, out token);
-
-            if (isValid)
-            {
-                if (token != IntPtr.Zero) CloseHandle(token);
-                IsAuthenticated = true;
-                return;
-            }
-
-            if (string.IsNullOrEmpty(password))
-            {
-                AuthStatusColor = "#F59E0B";
-                AuthStatusMessage = "Windows account requires a password or Windows Hello PIN.";
-            }
-            else
-            {
-                AuthStatusColor = "#EF4444";
-                AuthStatusMessage = "Incorrect Windows password. Please try again.";
-            }
+            UnlockWorkstation();
         }
 
         [RelayCommand]

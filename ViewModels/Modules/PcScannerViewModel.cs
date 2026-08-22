@@ -62,10 +62,10 @@ namespace Eternal.ViewModels.Modules
                 var progress = new Progress<int>(p => 
                 {
                     ScanProgress = p;
-                    if (p < 30) StatusMessage = "Analyzing storage partitions...";
-                    else if (p < 60) StatusMessage = "Auditing process security...";
-                    else if (p < 85) StatusMessage = "Monitoring system performance...";
-                    else StatusMessage = "Finalizing diagnostic report...";
+                    if (p < 25) StatusMessage = "Executing parallel hardware & storage audits...";
+                    else if (p < 50) StatusMessage = "Auditing security provider & process signatures...";
+                    else if (p < 75) StatusMessage = "Evaluating memory pressure & pending reboot state...";
+                    else StatusMessage = "Aggregating multi-threaded diagnostic metrics...";
                 });
 
                 _allDiscoveredIssues = await _scannerService.RunFullScanAsync(progress);

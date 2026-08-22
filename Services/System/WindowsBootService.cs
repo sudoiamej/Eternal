@@ -152,6 +152,28 @@ namespace Eternal.Services.System
             return await RunBcdeditCommandAsync($"/delete {identifier} /f");
         }
 
+        public async Task<bool> RepairOfflineBcdAsync(string driveLetter)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    string target = driveLetter.TrimEnd(':');
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "bcdboot",
+                        Arguments = $@"{target}:\Windows /s {target}: /f ALL",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    using var process = Process.Start(psi);
+                    process?.WaitForExit(10000);
+                    return process?.ExitCode == 0;
+                }
+                catch { return false; }
+            });
+        }
+
         private async Task<bool> RunBcdeditCommandAsync(string arguments)
         {
             return await Task.Run(() =>

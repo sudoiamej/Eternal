@@ -95,6 +95,28 @@ namespace Eternal.ViewModels.Modules
         }
 
         [RelayCommand]
+        private async Task ApplyGamingPreset()
+        {
+            if (IsBusy) return;
+            IsBusy = true;
+            StatusMessage = "Applying Low-Latency Gaming Profile...";
+
+            try
+            {
+                await _tuningService.ApplyTweakAsync("perf_game_dvr");
+                await _tuningService.ApplyTweakAsync("perf_mmcss_priority");
+                await _tuningService.ApplyTweakAsync("perf_network_nagle");
+                await LoadTweaksAsync();
+                StatusMessage = "Gaming Low-Latency Profile applied successfully!";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Failed to apply gaming profile: {ex.Message}";
+            }
+            finally { IsBusy = false; }
+        }
+
+        [RelayCommand]
         private async Task CreateRestorePoint()
         {
             StatusMessage = "Creating system restore point...";

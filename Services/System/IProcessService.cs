@@ -9,5 +9,6 @@ namespace Eternal.Services.System
         Task<List<ProcessDetail>> GetRunningProcessesAsync();
         Task<bool> KillProcessAsync(int pid);
         Task<ExtendedProcessInfo> GetExtendedProcessInfoAsync(ProcessDetail process);
+        Task<List<string>> GetLoadedModulesAsync(int pid);
     }
 }

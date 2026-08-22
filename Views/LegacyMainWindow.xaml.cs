@@ -9,6 +9,28 @@ namespace Eternal.Views
     public partial class LegacyMainWindow : Window
     {
         private bool _canClose = false;
+        private bool _isFullscreen = false;
+        private WindowStyle _previousWindowStyle = WindowStyle.SingleBorderWindow;
+        private WindowState _previousWindowState = WindowState.Normal;
+
+        public void ToggleFullscreen()
+        {
+            if (!_isFullscreen)
+            {
+                _previousWindowStyle = this.WindowStyle;
+                _previousWindowState = this.WindowState;
+
+                this.WindowStyle = WindowStyle.None;
+                this.WindowState = WindowState.Maximized;
+                _isFullscreen = true;
+            }
+            else
+            {
+                this.WindowStyle = _previousWindowStyle;
+                this.WindowState = _previousWindowState;
+                _isFullscreen = false;
+            }
+        }
         private NotifyIcon? _notifyIcon;
 
         /// <summary>
@@ -60,9 +82,40 @@ namespace Eternal.Views
             catch { }
         }
 
-        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private readonly System.Windows.Input.Key[] _konamiCode = new[]
         {
-            if (e.Key == System.Windows.Input.Key.T && 
+            System.Windows.Input.Key.Up, System.Windows.Input.Key.Up,
+            System.Windows.Input.Key.Down, System.Windows.Input.Key.Down,
+            System.Windows.Input.Key.Left, System.Windows.Input.Key.Right,
+            System.Windows.Input.Key.Left, System.Windows.Input.Key.Right,
+            System.Windows.Input.Key.B, System.Windows.Input.Key.A
+        };
+        private int _konamiIndex = 0;
+
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            var actualKey = e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key;
+
+            // Ignore standalone modifier key presses so they don't break the Konami sequence
+            if (actualKey == System.Windows.Input.Key.LeftShift || actualKey == System.Windows.Input.Key.RightShift ||
+                actualKey == System.Windows.Input.Key.LeftCtrl || actualKey == System.Windows.Input.Key.RightCtrl ||
+                actualKey == System.Windows.Input.Key.LeftAlt || actualKey == System.Windows.Input.Key.RightAlt ||
+                actualKey == System.Windows.Input.Key.Capital || actualKey == System.Windows.Input.Key.LWin ||
+                actualKey == System.Windows.Input.Key.RWin)
+            {
+                return;
+            }
+
+            // Toggle Fullscreen on F11
+            if (actualKey == System.Windows.Input.Key.F11)
+            {
+                ToggleFullscreen();
+                e.Handled = true;
+                return;
+            }
+
+            // Testing Auth Hotkey: Ctrl + Shift + Alt + T
+            if (actualKey == System.Windows.Input.Key.T && 
                 System.Windows.Input.Keyboard.Modifiers == (System.Windows.Input.ModifierKeys.Control | System.Windows.Input.ModifierKeys.Shift | System.Windows.Input.ModifierKeys.Alt))
             {
                 var authWindow = new Eternal.Views.Helpers.TestingAuthWindow();
@@ -72,6 +125,45 @@ namespace Eternal.Views
                     var vm = this.DataContext as MainViewModel;
                     vm?.ActivateTestingMode();
                 }
+                return;
+            }
+
+            // BSOD Hotkey: Ctrl + Shift + Alt + B
+            if (actualKey == System.Windows.Input.Key.B &&
+                (System.Windows.Input.Keyboard.Modifiers & System.Windows.Input.ModifierKeys.Control) != 0 &&
+                (System.Windows.Input.Keyboard.Modifiers & System.Windows.Input.ModifierKeys.Shift) != 0 &&
+                (System.Windows.Input.Keyboard.Modifiers & System.Windows.Input.ModifierKeys.Alt) != 0)
+            {
+                var bsodWin = new Helpers.BsodSimulatorWindow();
+                bsodWin.Owner = this;
+                bsodWin.ShowDialog();
+                return;
+            }
+
+            // ESC to close Matrix mode
+            if (actualKey == System.Windows.Input.Key.Escape && MatrixOverlayGrid.Visibility == Visibility.Visible)
+            {
+                MatrixOverlayGrid.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            // Konami Code Sequence
+            if (actualKey == _konamiCode[_konamiIndex])
+            {
+                _konamiIndex++;
+                if (_konamiIndex >= _konamiCode.Length)
+                {
+                    _konamiIndex = 0;
+                    MatrixOverlayGrid.Visibility = MatrixOverlayGrid.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                }
+            }
+            else if (actualKey == _konamiCode[0])
+            {
+                _konamiIndex = 1;
+            }
+            else
+            {
+                _konamiIndex = 0;
             }
         }
 
@@ -189,7 +281,7 @@ namespace Eternal.Views
         {
             if (DataContext is ViewModels.MainViewModel vm)
             {
-                vm.AuthenticateWithPasswordCommand.Execute(OverlayPasswordBox.Password);
+                vm.UnlockWorkstation();
             }
         }
 
@@ -199,8 +291,16 @@ namespace Eternal.Views
             {
                 if (DataContext is ViewModels.MainViewModel vm)
                 {
-                    vm.AuthenticateWithPasswordCommand.Execute(OverlayPasswordBox.Password);
+                    vm.UnlockWorkstation();
                 }
+            }
+        }
+
+        private async void OverlayWindowsHelloButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ViewModels.MainViewModel vm)
+            {
+                await vm.TriggerWindowsHelloAsync();
             }
         }
 
@@ -223,6 +323,28 @@ namespace Eternal.Views
                 var netUserWin = new Helpers.NetUserInspectorWindow();
                 netUserWin.Owner = this;
                 netUserWin.ShowDialog();
+            }
+        }
+
+        private int _logoClickCount = 0;
+        private DateTime _lastLogoClick = DateTime.MinValue;
+
+        private void EternalLogo_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if ((DateTime.Now - _lastLogoClick).TotalSeconds > 1.5)
+            {
+                _logoClickCount = 0;
+            }
+
+            _lastLogoClick = DateTime.Now;
+            _logoClickCount++;
+
+            if (_logoClickCount >= 3)
+            {
+                _logoClickCount = 0;
+                var orbitalWin = new Helpers.OrbitalVisualizerWindow();
+                orbitalWin.Owner = this;
+                orbitalWin.ShowDialog();
             }
         }
     }

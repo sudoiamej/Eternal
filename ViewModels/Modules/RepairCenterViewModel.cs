@@ -72,6 +72,16 @@ namespace Eternal.ViewModels.Modules
 
             Problems.Add(new PCProblem
             {
+                Id = "windows_update_stuck",
+                Title = "Windows Update is stuck or failing",
+                Description = "Stops update services, purges SoftwareDistribution & Catroot2 caches, and resets Windows Update.",
+                Symptom = "Update errors 0x80070002, 0x80240020, or downloads stuck at 0%.",
+                Category = "System",
+                FixCommand = new AsyncRelayCommand(async () => await RunFix("windows_update_stuck"))
+            });
+
+            Problems.Add(new PCProblem
+            {
                 Id = "print_stuck",
                 Title = "I can't print anything",
                 Description = "Clears the print spooler and restarts the print service.",
@@ -127,6 +137,9 @@ namespace Eternal.ViewModels.Modules
                     case "apps_crashing":
                         await _toolkitService.RunSfcScanAsync();
                         success = await _toolkitService.RunDismRepairAsync();
+                        break;
+                    case "windows_update_stuck":
+                        success = await _toolkitService.ResetWindowsUpdateAsync();
                         break;
                     case "print_stuck":
                         success = await RestartService("Spooler");

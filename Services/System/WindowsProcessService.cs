@@ -378,5 +378,26 @@ namespace Eternal.Services.System
             catch { }
             return imports.Distinct().ToList();
         }
+
+        public Task<List<string>> GetLoadedModulesAsync(int pid)
+        {
+            return Task.Run(() =>
+            {
+                var modules = new List<string>();
+                try
+                {
+                    var proc = Process.GetProcessById(pid);
+                    foreach (ProcessModule m in proc.Modules)
+                    {
+                        if (m.ModuleName != null)
+                        {
+                            modules.Add($"{m.ModuleName} ({m.FileName})");
+                        }
+                    }
+                }
+                catch { }
+                return modules;
+            });
+        }
     }
 }

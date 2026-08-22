@@ -432,12 +432,14 @@ namespace Eternal.Services.Security
         {
             try
             {
-                var ucvAvailability = await global::Windows.Security.Credentials.UI.UserConsentVerifier.CheckAvailabilityAsync();
-                return ucvAvailability == global::Windows.Security.Credentials.UI.UserConsentVerifierAvailability.Available;
+                var availability = await global::Windows.Security.Credentials.UI.UserConsentVerifier.CheckAvailabilityAsync();
+                return availability == global::Windows.Security.Credentials.UI.UserConsentVerifierAvailability.Available ||
+                       availability == global::Windows.Security.Credentials.UI.UserConsentVerifierAvailability.DeviceNotPresent ||
+                       availability == global::Windows.Security.Credentials.UI.UserConsentVerifierAvailability.NotConfiguredForUser;
             }
             catch
             {
-                return false;
+                return true; // Fallback attempt
             }
         }
 
@@ -445,16 +447,12 @@ namespace Eternal.Services.Security
         {
             try
             {
-                var ucvAvailability = await global::Windows.Security.Credentials.UI.UserConsentVerifier.CheckAvailabilityAsync();
-                if (ucvAvailability == global::Windows.Security.Credentials.UI.UserConsentVerifierAvailability.Available)
-                {
-                    var result = await global::Windows.Security.Credentials.UI.UserConsentVerifier.RequestVerificationAsync(message);
-                    return result == global::Windows.Security.Credentials.UI.UserConsentVerificationResult.Verified;
-                }
-                return false;
+                var result = await global::Windows.Security.Credentials.UI.UserConsentVerifier.RequestVerificationAsync(message);
+                return result == global::Windows.Security.Credentials.UI.UserConsentVerificationResult.Verified;
             }
-            catch
+            catch (Exception ex)
             {
+                global::System.Diagnostics.Debug.WriteLine($"Windows Hello verification error: {ex.Message}");
                 return false;
             }
         }

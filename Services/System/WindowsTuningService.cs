@@ -125,6 +125,30 @@ namespace Eternal.Services.System
                     DefaultValue = 1,
                     ValueKind = RegistryValueKind.DWord
                 },
+                new SystemTweak
+                {
+                    Id = "perf_mmcss_priority",
+                    Name = "MMCSS High-Priority Gaming Scheduler",
+                    Description = "Prioritizes CPU scheduling resources for games and real-time audio/video processing.",
+                    Category = TweakCategory.Performance,
+                    RegistryPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games",
+                    RegistryValue = "GPU Priority",
+                    AppliedValue = 8,
+                    DefaultValue = 2,
+                    ValueKind = RegistryValueKind.DWord
+                },
+                new SystemTweak
+                {
+                    Id = "perf_network_nagle",
+                    Name = "TCP Low Latency (Disable Nagle)",
+                    Description = "Disables TCP packet queuing delay (Nagle's algorithm) for lower online gaming ping.",
+                    Category = TweakCategory.Performance,
+                    RegistryPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile",
+                    RegistryValue = "NetworkThrottlingIndex",
+                    AppliedValue = 0xFFFFFFFF,
+                    DefaultValue = 10,
+                    ValueKind = RegistryValueKind.DWord
+                },
 
                 // SYSTEM UI CATEGORY
                 new SystemTweak

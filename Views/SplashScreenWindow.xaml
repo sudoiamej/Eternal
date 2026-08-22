@@ -91,25 +91,13 @@
 
                 <TextBlock Text="ETERNAL" FontSize="28" FontWeight="Black" Foreground="#FFFFFF" HorizontalAlignment="Center"/>
                 <TextBlock Text="DIAGNOSTICS WORKSTATION" FontSize="8" FontWeight="Bold" Foreground="#A2A2A9" HorizontalAlignment="Center" Margin="0,8,0,0"/>
-                <TextBlock x:Name="UserGreetingTextBlock" Text="Hello!" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" Margin="0,12,0,0"/>
             </StackPanel>
 
-            <!-- Progress & Animated Status Text -->
+            <!-- Progress Bar -->
             <StackPanel Grid.Row="1" Margin="0,0,0,10">
-                <Border Height="3" Background="#12121C" CornerRadius="1.5" Margin="0,0,0,12" ClipToBounds="True">
+                <Border Height="3" Background="#12121C" CornerRadius="1.5" Margin="0,0,0,4" ClipToBounds="True">
                     <ProgressBar Height="3" Background="Transparent" Foreground="{DynamicResource AccentBrush}" BorderThickness="0" IsIndeterminate="True"/>
                 </Border>
-                <TextBlock Text="INITIALIZING SECURE ENGINE..." FontSize="8" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center">
-                    <TextBlock.Triggers>
-                        <EventTrigger RoutedEvent="Loaded">
-                            <BeginStoryboard>
-                                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
-                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.4" To="1" Duration="0:0:0.8"/>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </TextBlock.Triggers>
-                </TextBlock>
             </StackPanel>
         </Grid>
     </Border>

@@ -6,23 +6,35 @@
 
 ## 🚀 Key Features
 
-### 🛡️ Strict Workstation Identity & Multi-Tier Auth (NEW in v3.5.0)
-* **Embedded AMOLED Strict Login Overlay:** Full-bleed workstation security gateway with hardware-accelerated entrance animations. Zero bypasses.
-* **Multi-Factor / Multi-Tier Authentication:** Native Windows Hello (PIN, Fingerprint, Facial Recognition) via `UserConsentVerifier` and Win32 `LogonUser` credential validation (`advapi32.dll`). Seamless support for blank-password local accounts and domain credentials.
-* **3-Tier LocalGroup RBAC System:** Automatic runtime audit (`WindowsPrincipal`) granting full features to Administrators, standard diagnostic controls to Standard Users, and read-only diagnostics to Guests.
+### 🔒 Strict Authentication & 3-Stage Cinematic Boot Sequence
+* **Stage 1 - Strict Identity Verification:** On application startup, `LegacyMainWindow` opens immediately displaying the AMOLED Strict Login screen. Authenticates identity via native Windows Hello (PIN, Fingerprint, Facial Recognition) or Windows Password. Zero emergency bypasses or backdoors.
+* **Stage 2 - Integrated Telemetry Initializer Splash:** Upon successful login, the screen transitions smoothly inside the *same window* to the post-auth telemetry splash initializer featuring a glowing pulsing logo, `"Hello, {Username}!"` greeting, step-by-step diagnostic text, and a smooth 0% $\rightarrow$ 100% progress bar.
+* **Stage 3 - Workstation Dashboard Entrance:** Once progress reaches 100%, the initialization overlay smoothly fades out as the main workstation dashboard emerges over a 1s smooth fade-in transition.
 
 ### 🕵️ 5-Click User Profile "Net User" Telemetry Inspector (NEW in v3.5.0)
 * **Interactive Profile Easter Egg:** Rapidly clicking the upper-right `"Hello, {Username}!"` user profile badge **5 times** opens the custom AMOLED **`NetUserInspectorWindow`** subwindow.
 * **SAM Database Telemetry:** Displays Account Active status, Full Name, Password Age, Password Expiration, Password Required, Last Logon Timestamp, and Local Group Membership pills (`*Administrators`, `*Users`).
 * **Raw CLI Output & Clipboard Utility:** View raw `net user` terminal stdout with an instant **Copy Raw Telemetry** action button.
 
-### ⚡ Streamlined Calibration & Ergonomics (NEW in v3.5.0)
-* **First-Run Hardware Baseline Scan:** Runs an interactive calibration wizard on new installations. Once calibration succeeds, the splash screen exits directly to the dashboard.
-* **Fluid Hardware-Accelerated UI Animations:** XAML `Storyboard` entrance animations with `CubicEase` (`EasingMode.EaseOut`) curves for liquid-smooth transitions.
-* **Header Ergonomics & Quick-Access:** Dedicated upper-right quick-action buttons for Settings (`Gear`) and Eternal Console (`Terminal`), with auto-saving collapsible sidebar preferences.
+### 🎮 Diagnostic Easter Eggs & Secret Shortcuts (NEW in v3.5.0)
+* **🕹️ Konami Code (`↑ ↑ ↓ ↓ ← → ← → B A`):** Typing the Konami Code anywhere in the application toggles **Cyber Matrix Vector HUD Mode**, rendering green matrix styling and revealing low-level CPU vector capabilities (AVX2, AVX-512, AES-NI, RDRAND, SHA-NI).
+* **🌀 Logo Triple-Click:** Triple-clicking the top-left **ETERNAL** logo opens the **`OrbitalVisualizerWindow`** subwindow, rendering real-time CPU cores as spinning neon particle rings scaled dynamically to core load.
+* **🚨 Safe BSOD Crash Simulator Drill (`Ctrl + Shift + Alt + B`):** Hotkey shortcut launching **`BsodSimulatorWindow`**, an interactive WinDbg crash dump triage drill analyzing BugCheck `0x000000D1` and isolating failing driver `.sys` modules safely.
 
-### 🛡️ System Hardening & Threat Intelligence
-* **Anti-Reverse Engineering & VM Detection (RASP):** Execution timing audits and WMI baseboard/BIOS/GPU sweeps dynamically prevent execution in hypervisor tracing sandboxes.
+### ⚡ Next-Gen Parallel PC Intelligence Scanner & Health Index (NEW in v3.5.0)
+* **10x Faster Multi-Threaded Engine:** Replaced sequential scan loops with concurrent background tasks (`Task.WhenAll`). Reduces full system diagnostic scan time from **5–8s down to ~0.5–0.9s**.
+* **Windows Overall Health Rating Engine (0–100 Scale):** Real-time diagnostic workstation index assigning grades (`A+ Elite Workstation`, `A`, `B`, `C`, `D`).
+* **Process Loaded DLL Module Inspector:** Enumerate active `.dll` binaries, memory maps, and disk origins per process PID in Process Intelligence.
+* **Pending Windows Reboot Audit:** Detects pending OS reboot flags (`RebootPending`, `RebootRequired`) caused by Windows Updates or component installations.
+* **Exact Reclaimable Capacity Calculation:** Recursively calculates exact MB available for immediate cleanup across `%TEMP%`, `C:\Windows\Temp`, and crash minidumps (`C:\Windows\Minidump`).
+* **Dynamic Multi-Subsystem Audits:** Simultaneously evaluates partition health, Defender real-time status, unsigned running processes, BIOS firmware age, memory pressure, ping roundtrip latency, and generic driver providers.
+
+### 🛡️ BIOS/UEFI Integrity Audit (Firmware Security)
+Firmware-level security audit protecting against bootkits and unauthorized key injections.
+- **Secure Boot State Verification:** Audits `UEFISecureBootEnabled` enforcement for EFI bootloader signatures.
+- **UEFI DBX Revocation List Audit:** Validates DBX revocation database freshness to defend against BlackLotus, Baton Drop, and LogoFAIL bootkit attack vectors.
+- **Firmware SetupMode Audit:** Verifies `SetupMode == 0` (User Mode) preventing unauthorized Platform Key (PK) or KEK injection.
+- **Bootkit Risk Score:** Calculates real-time firmware risk status (`PASS / SECURE`, `WARNING`, `CRITICAL_RISK`).
 * **Process Sockets Port Mapper:** Instantly correlates running PIDs with active TCP/UDP port states, local bindings, and remote connection endpoints.
 * **Vector Telemetry Graphing:** Hardware-accelerated line contours and area fills (`Polyline`/`Polygon`) visualize CPU, RAM, and Disk active history over time.
 
@@ -41,24 +53,20 @@ Advanced diagnostics and system rescue tools:
 
 ### 🛡️ Guardian Tuning (Debloater)
 Optimize Windows performance and privacy with a centralized registry tweak engine.
+- **Low Latency Gaming:** MMCSS High-Priority Multimedia Class Scheduler & TCP Low Latency (Disables Nagle's packet queuing algorithm).
 - **Privacy:** Disable OS/Edge Telemetry and Cortana.
 - **UI:** Restore Classic Context Menus and Instant Menu response.
 - **Safety:** Integrated System Restore Point trigger before any changes.
 
 ### 🩺 Eternal Doctor
 A problem-oriented repair center mapping common issues to automated fixes.
-- Resolve network connectivity and DNS conflicts.
-- Repair corrupted OS files (SFC/DISM).
-- **DISM /RestoreHealth Source Repairs:** Repair system health using an active or offline WIM/ESD image edition as the local repair source context.
+- **Windows Update Soft-Reset:** Stops WUAUSERV/BITS, purges `%SystemRoot%\SoftwareDistribution` & `Catroot2` caches, and resets Windows Update components safely.
+- **Network Stack Auto-Repair:** Flushes DNS, resets Winsock catalog (`netsh winsock reset`), and resets IP stack settings.
+- Resolve network connectivity, DNS conflicts, and corrupted OS files (SFC/DISM).
 
-### 💻 Eternal Console
-Integrated PowerShell environment with built-in diagnostic macros for rapid system audits.
-
-### 🔍 Boot Architecture
-Forensic enumeration of BCD (Boot Configuration Data) records, revealing hardware identifiers and boot paths.
-
-### 🛠️ PE Mode Specialization
-Automatically detects **Windows PE** environments to provide a streamlined recovery UI, including **Offline Registry Mounting** and dynamic drive detection for systems where Windows is not on the C: drive.
+### 🛠️ PE Mode Specialization & Bootloader Repair
+Automatically detects **Windows PE** environments to provide a streamlined recovery UI, including **Offline Registry Mounting** and dynamic drive detection.
+- **Automated Offline BCD Repair:** Executes `bcdboot` macros to recreate damaged boot files directly onto target offline drives (`/f ALL`).
 - **Safe Rendering Fallback:** Automatically forces software-only rendering (`RenderMode.SoftwareOnly`) to prevent UI startup crashes on barebones display drivers inside WinPE.
 - **Self-Contained Single-File Build:** Pre-configured to build as a standalone executable containing the .NET runtime so it can run immediately in any custom WinPE image.
 - **How to Publish for WinPE:** Run `dotnet publish -c Release -r win-x64 --self-contained true` to produce the ready-to-run binary.
