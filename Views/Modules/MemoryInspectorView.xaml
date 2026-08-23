@@ -1,0 +1,183 @@
+<UserControl x:Class="Eternal.Views.Modules.MemoryInspectorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#0A0A10" BorderBrush="#1C1C28" BorderThickness="0,0,0,1" Padding="16,12">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <fa:ImageAwesome Icon="Microchip" Width="16" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <StackPanel>
+                        <TextBlock Text="ETERNAL PROCESS MEMORY &amp; DLL MODULE INSPECTOR" FontSize="14" FontWeight="Black" Foreground="White"/>
+                        <TextBlock Text="{Binding InspectorSummary}" FontSize="10" Foreground="#00E5FF"/>
+                    </StackPanel>
+                </StackPanel>
+                <Button Command="{Binding LoadProcessesCommand}" Style="{StaticResource StandardButton}" Height="32" Padding="14,0" HorizontalAlignment="Right">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Refresh" Width="11" Foreground="White" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Refresh Processes" FontSize="11" FontWeight="Bold" Foreground="White"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Split View: Left Process List, Right Loaded DLL Modules -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Process Selector Column -->
+            <Border Grid.Column="0" Background="#060609" BorderBrush="#161622" BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0" Padding="10" Background="#0A0A10" BorderBrush="#161622" BorderThickness="0,0,0,1">
+                        <TextBlock Text="RUNNING PROCESSES" FontSize="9" FontWeight="Black" Foreground="#888896"/>
+                    </Border>
+                    <ListView Grid.Row="1" ItemsSource="{Binding Processes}" SelectedItem="{Binding SelectedProcess}" Background="Transparent" BorderThickness="0" Foreground="White">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Margin" Value="4,2"/>
+                                <Setter Property="Padding" Value="8,6"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#0F1B2A"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#14283E"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                        <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Pid, StringFormat='PID: {0}'}" FontSize="9" Foreground="#666675"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="{Binding WorkingSetFormatted}" FontSize="10" FontFamily="Consolas" Foreground="#00E5FF" VerticalAlignment="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
+
+            <!-- Right Loaded Modules Grid Column -->
+            <Grid Grid.Column="1" Background="#030305">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Search Bar -->
+                <Border Grid.Row="0" Background="#0A0A10" BorderBrush="#1C1C28" BorderThickness="0,0,0,1" Padding="12,8">
+                    <Border Background="#12121C" BorderBrush="#262638" BorderThickness="1" CornerRadius="6" Padding="10,0" Height="30" HorizontalAlignment="Left" Width="300">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <fa:ImageAwesome Grid.Column="0" Icon="Search" Width="11" Foreground="#666675" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="11" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </Border>
+
+                <ListView Grid.Row="1" ItemsSource="{Binding FilteredModules}" Background="Transparent" BorderThickness="0" Foreground="White">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Margin" Value="6,2"/>
+                            <Setter Property="Padding" Value="10,8"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="1" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                            <GridViewRowPresenter Columns="{TemplateBinding GridView.ColumnCollection}" Content="{TemplateBinding Content}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="#0F1B2A"/>
+                                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="#00E5FF"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="#14283E"/>
+                                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="#00F0FF"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Module Name" Width="180">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ModuleName}" FontWeight="Bold" Foreground="#00E5FF"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+
+                            <GridViewColumn Header="Base Address" Width="120">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding BaseAddress}" FontFamily="Consolas" Foreground="#F59E0B"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+
+                            <GridViewColumn Header="Module Size" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding MemorySizeFormatted}" FontFamily="Consolas" Foreground="#22C55E"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+
+                            <GridViewColumn Header="File Path" Width="240">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding FilePath}" FontSize="10" FontFamily="Consolas" Foreground="#A0A0B2" TextTrimming="CharacterEllipsis"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Background="#0A0A10" BorderBrush="#1C1C28" BorderThickness="0,1,0,0" Padding="16,6">
+            <TextBlock Text="{Binding StatusText}" FontSize="10" Foreground="#888896"/>
+        </Border>
+    </Grid>
+</UserControl>

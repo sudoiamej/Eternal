@@ -28,6 +28,7 @@
             <helpers:ProportionalHeightConverter x:Key="ProportionalHeightConverter"/>
             <helpers:EqualityConverter x:Key="EqualityConverter"/>
             <helpers:SpeedTestProgressWidthConverter x:Key="SpeedTestProgressWidthConverter"/>
+            <helpers:NullToBooleanConverter x:Key="NullToBoolConverter"/>
 
             <Style TargetType="ScrollViewer">
                 <Setter Property="helpers:TrackpadScrollHelper.EnableTrackpadScrolling" Value="True"/>

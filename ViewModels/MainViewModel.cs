@@ -96,6 +96,28 @@ namespace Eternal.ViewModels
         [ObservableProperty] private bool _isPasswordAuthEnabled = true;
         [ObservableProperty] private bool _isWindowsHelloAuthEnabled = true;
         [ObservableProperty] private bool _hasBlankPassword = false;
+        [ObservableProperty] private string _userFullName = "";
+        [ObservableProperty] private System.Windows.Media.ImageSource? _userProfileImage = null;
+        [ObservableProperty] private bool _hasUserProfileImage = false;
+        [ObservableProperty] private bool _wasLoggedOutDueToInactivity = false;
+        [ObservableProperty] private string _inactivityNoticeMessage = "";
+        [ObservableProperty] private bool _isCapsLockOn = false;
+        [ObservableProperty] private bool _isPasswordRevealed = false;
+        [ObservableProperty] private string _revealedPasswordText = "";
+        [ObservableProperty] private string _securityAuditHudText = "Security: Strict SAM Validation | Audit Active";
+        [ObservableProperty] private string _splashTelemetryTicker = "[+] Verifying CPU AVX2 & Kernel Vector Capabilities...";
+
+        // macOS-Style Control Center State
+        [ObservableProperty] private bool _isControlCenterEnabled = false; // Feature flag switch (Default: Disabled)
+        [ObservableProperty] private bool _isControlCenterVisible = false;
+        [ObservableProperty] private bool _isWifiEnabled = true;
+        [ObservableProperty] private string _wifiSsid = "Wi-Fi: Connected";
+        [ObservableProperty] private bool _isBluetoothEnabled = true;
+        [ObservableProperty] private string _bluetoothStatus = "Bluetooth: Active";
+        [ObservableProperty] private double _masterVolumeLevel = 80.0;
+        [ObservableProperty] private bool _isDoNotDisturbActive = false;
+        [ObservableProperty] private bool _isNightLightActive = false;
+        [ObservableProperty] private string _selectedPowerPreset = "Balanced";
 
         [ObservableProperty] private bool _isPostAuthSplashVisible = false;
         [ObservableProperty] private double _postAuthSplashOpacity = 0.0;
@@ -103,7 +125,7 @@ namespace Eternal.ViewModels
         [ObservableProperty] private string _postAuthSplashStatusText = "Initializing Workstation Intelligence...";
         [ObservableProperty] private string _postAuthSplashTip = "Tip: Press Ctrl+K anytime to open the instant Command Palette.";
 
-        public string CurrentUserGreeting => $"Hello, {Environment.UserName}!";
+        public string CurrentUserGreeting => $"Hello, {(string.IsNullOrWhiteSpace(UserFullName) ? Environment.UserName : UserFullName)}!";
         public string CurrentUsernameOnly => Environment.UserName;
 
         partial void OnNavSortOptionChanged(NavigationSortOption value) => SortNavigation();
@@ -183,7 +205,7 @@ namespace Eternal.ViewModels
             Title = "Eternal System Intelligence";
             LoginUsername = Environment.UserName;
             _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
-            _loggingService.Log($"Eternal Intelligence Suite Version 3.5.0 (Stable)");
+            _loggingService.Log($"Eternal Intelligence Suite Version 3.5.5 (BETA)");
 
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
             IsSidebarExpanded = _settingsService.Current.IsSidebarExpanded;
@@ -325,11 +347,18 @@ namespace Eternal.ViewModels
                 new NavigationItem("Security", "Shield", "Security", 1, 1, 6),
                 new NavigationItem("Drivers", "ListAlt", "Drivers", 1, 2, 7),
                 new NavigationItem("Environment", "Code", "Environment", 1, 1, 8),
-                new NavigationItem("File Forensics", "Eye", "Forensics", 1, 1, 9)
+                new NavigationItem("File Forensics", "Eye", "Forensics", 1, 1, 9),
+                new NavigationItem("Network Packet Monitor", "Globe", "NetworkMonitor", 1, 1, 10),
+                new NavigationItem("Software Manager", "Laptop", "AppManager", 1, 1, 11),
+                new NavigationItem("Memory & DLL Inspector", "Microchip", "MemoryInspector", 1, 1, 12),
+                new NavigationItem("Stealth Port Scanner", "Shield", "PortScanner", 1, 1, 13),
+                new NavigationItem("Ring-0 Kernel Drivers", "Microchip", "DriverKernel", 1, 1, 14),
+                new NavigationItem("Disk Sector Inspector", "HddOutline", "DiskSector", 1, 1, 15)
             };
             var tempSupport = new List<NavigationItem>
             {
                 new NavigationItem("Eternal Console", "Terminal", "Console", 2, 2, 0),
+                new NavigationItem("File Explorer", "FolderOpen", "Explorer", 1, 1, 1),
                 new NavigationItem("Time Machine", "ClockOutline", "Snapshots", 1, 1, 2),
                 new NavigationItem("DISM Imaging", "Archive", "DismImaging", 1, 2, 3),
                 new NavigationItem("Windows Update", "Refresh", "WindowsUpdate", 0, 0, 4),
@@ -484,42 +513,54 @@ namespace Eternal.ViewModels
         [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool CloseHandle(IntPtr handle);
 
-        [ObservableProperty] private bool _isSplashActive = false;
-        [ObservableProperty] private double _splashProgress = 0.0;
-        [ObservableProperty] private string _splashStatusText = "Verifying security identity tokens...";
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern short GetKeyState(int keyCode);
 
-        public bool IsLoginOverlayVisible => !IsAuthenticated && !IsSplashActive;
-
-        partial void OnIsAuthenticatedChanged(bool value) => OnPropertyChanged(nameof(IsLoginOverlayVisible));
-        partial void OnIsSplashActiveChanged(bool value) => OnPropertyChanged(nameof(IsLoginOverlayVisible));
+        public void CheckCapsLockState()
+        {
+            try
+            {
+                IsCapsLockOn = (GetKeyState(0x14) & 0x0001) != 0;
+            }
+            catch { }
+        }
 
         private async Task StartPostAuthSplashSequenceAsync()
         {
-            IsSplashActive = true;
-            SplashProgress = 0.0;
+            IsPostAuthSplashVisible = true;
+            PostAuthSplashProgress = 0.0;
 
-            // Step 1: 0% -> 30% (450ms)
-            SplashStatusText = $"Hello, {Environment.UserName}! Verifying security identity tokens...";
-            SplashProgress = 30.0;
+            string displayName = string.IsNullOrWhiteSpace(UserFullName) ? Environment.UserName : UserFullName;
+
+            // Step 1: 0% -> 25% (400ms)
+            PostAuthSplashStatusText = $"Hello, {displayName}!";
+            SplashTelemetryTicker = "[+] Initializing Workstation Security Identity & SAM Tokens...";
+            PostAuthSplashTip = "Tip: Press Ctrl+K anytime to open the instant Command Palette.";
+            PostAuthSplashProgress = 25.0;
+            await Task.Delay(400);
+
+            // Step 2: 25% -> 55% (450ms)
+            PostAuthSplashStatusText = "Auditing hardware sensors & memory telemetry...";
+            SplashTelemetryTicker = "[+] Auditing CPU AVX2 Vector Instructions & System Memory Pools...";
+            PostAuthSplashTip = "Tip: Click your name 5 times to open the SAM Telemetry Inspector.";
+            PostAuthSplashProgress = 55.0;
             await Task.Delay(450);
 
-            // Step 2: 30% -> 65% (550ms)
-            SplashStatusText = "Auditing hardware sensors & memory telemetry...";
-            SplashProgress = 65.0;
-            await Task.Delay(550);
-
-            // Step 3: 65% -> 95% (450ms)
-            SplashStatusText = "Starting Workstation Diagnostics Engine...";
-            SplashProgress = 95.0;
+            // Step 3: 55% -> 85% (450ms)
+            PostAuthSplashStatusText = "Starting Workstation Diagnostics Engine...";
+            SplashTelemetryTicker = "[+] Querying Storage NVMe S.M.A.R.T. Health & System Drivers...";
+            PostAuthSplashTip = "Tip: Press F11 anytime to toggle Fullscreen Kiosk Mode.";
+            PostAuthSplashProgress = 85.0;
             await Task.Delay(450);
 
-            // Step 4: 95% -> 100% (350ms)
-            SplashStatusText = "Workstation Ready. Initializing dashboard...";
-            SplashProgress = 100.0;
+            // Step 4: 85% -> 100% (350ms)
+            PostAuthSplashStatusText = "Workstation Ready. Initializing dashboard...";
+            SplashTelemetryTicker = "[+] Workstation Ready. Mounting Dashboard UI...";
+            PostAuthSplashTip = "Tip: Configurable Inactivity Auto-Lock timer is available in Settings.";
+            PostAuthSplashProgress = 100.0;
             await Task.Delay(350);
 
-            // Step 5: Complete transition to Main Dashboard
-            IsSplashActive = false;
+            IsPostAuthSplashVisible = false;
             IsAuthenticated = true;
         }
 
@@ -554,6 +595,87 @@ namespace Eternal.ViewModels
             AuthStatusColor = "#F59E0B";
             AuthStatusMessage = "Windows Hello PIN skipped or canceled. Click ENTER WORKSTATION below.";
         }
+
+        partial void OnMasterVolumeLevelChanged(double value)
+        {
+            Helpers.CoreAudioHelper.SetMasterVolume((float)value);
+        }
+
+        [RelayCommand]
+        public void ToggleControlCenterFeature()
+        {
+            IsControlCenterEnabled = !IsControlCenterEnabled;
+        }
+
+        [RelayCommand]
+        public void ToggleControlCenter()
+        {
+            IsControlCenterVisible = !IsControlCenterVisible;
+            if (IsControlCenterVisible)
+            {
+                MasterVolumeLevel = Helpers.CoreAudioHelper.GetMasterVolume();
+            }
+        }
+
+        [RelayCommand]
+        public void ToggleWifi()
+        {
+            IsWifiEnabled = !IsWifiEnabled;
+            WifiSsid = IsWifiEnabled ? "Wi-Fi: Connected" : "Wi-Fi: Disabled";
+            Helpers.ControlCenterSystemHelper.SetWifiState(IsWifiEnabled);
+        }
+
+        [RelayCommand]
+        public void ToggleBluetooth()
+        {
+            IsBluetoothEnabled = !IsBluetoothEnabled;
+            BluetoothStatus = IsBluetoothEnabled ? "Bluetooth: Active" : "Bluetooth: Off";
+            Helpers.ControlCenterSystemHelper.SetBluetoothState(IsBluetoothEnabled);
+        }
+
+        [RelayCommand]
+        public void ToggleDoNotDisturb()
+        {
+            IsDoNotDisturbActive = !IsDoNotDisturbActive;
+            Helpers.ControlCenterSystemHelper.SetDoNotDisturbState(IsDoNotDisturbActive);
+        }
+
+        [RelayCommand]
+        public void ToggleNightLight()
+        {
+            IsNightLightActive = !IsNightLightActive;
+            Helpers.ControlCenterSystemHelper.SetNightLightState(IsNightLightActive);
+        }
+
+        [RelayCommand]
+        public void SelectPowerPreset(string preset)
+        {
+            SelectedPowerPreset = preset;
+            Helpers.ControlCenterSystemHelper.SetPowerPreset(preset);
+        }
+
+        [RelayCommand]
+        public void ExecuteControlCenterPowerAction(string action)
+        {
+            IsControlCenterVisible = false;
+            switch (action)
+            {
+                case "Lock":
+                    PerformLockWorkstation(dueToInactivity: false);
+                    break;
+                case "Sleep":
+                    try { System.Windows.Forms.Application.SetSuspendState(System.Windows.Forms.PowerState.Suspend, true, true); } catch { }
+                    break;
+                case "Restart":
+                    try { System.Diagnostics.Process.Start("shutdown.exe", "/r /t 0"); } catch { }
+                    break;
+                case "Shutdown":
+                    try { System.Diagnostics.Process.Start("shutdown.exe", "/s /t 0"); } catch { }
+                    break;
+            }
+        }
+
+        public bool IsLoginOverlayVisible => !IsAuthenticated && !IsPostAuthSplashVisible;
 
         private string _loginUsername = Environment.UserName;
         public string LoginUsername
@@ -643,6 +765,8 @@ namespace Eternal.ViewModels
         {
             if (IsPeMode) return;
 
+            LoadUserProfileDetails();
+
             bool isPasswordless = false;
             try
             {
@@ -713,6 +837,185 @@ namespace Eternal.ViewModels
             }
         }
 
+        private void LoadUserProfileDetails()
+        {
+            try
+            {
+                string samFullName = GetSamFullName();
+                UserFullName = string.IsNullOrWhiteSpace(samFullName) ? Environment.UserName : samFullName;
+                OnPropertyChanged(nameof(CurrentUserGreeting));
+
+                var img = GetWindowsUserProfilePicture();
+                if (img != null)
+                {
+                    UserProfileImage = img;
+                    HasUserProfileImage = true;
+                }
+                else
+                {
+                    HasUserProfileImage = false;
+                }
+            }
+            catch
+            {
+                UserFullName = Environment.UserName;
+                HasUserProfileImage = false;
+            }
+        }
+
+        private string GetSamFullName()
+        {
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "net.exe",
+                    Arguments = $"user \"{Environment.UserName}\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                };
+                using var proc = System.Diagnostics.Process.Start(psi);
+                if (proc != null)
+                {
+                    string output = proc.StandardOutput.ReadToEnd();
+                    proc.WaitForExit();
+
+                    var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var line in lines)
+                    {
+                        if (line.StartsWith("Full Name", StringComparison.OrdinalIgnoreCase))
+                        {
+                            string val = line.Substring("Full Name".Length).TrimStart(':', ' ');
+                            if (!string.IsNullOrWhiteSpace(val))
+                            {
+                                return val;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return Environment.UserName;
+        }
+
+        [System.Runtime.InteropServices.DllImport("shell32.dll", EntryPoint = "#261", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        private static extern int GetUserTilePath(
+            string username,
+            int whatever,
+            System.Text.StringBuilder path,
+            int pathLen);
+
+        private System.Windows.Media.Imaging.BitmapImage? GetWindowsUserProfilePicture()
+        {
+            try
+            {
+                // 1. Win32 Shell API #261 (GetUserTilePath) - Resolves MSA & Local Account Pictures
+                var sb = new System.Text.StringBuilder(1024);
+                int res = GetUserTilePath(Environment.UserName, 0, sb, sb.Capacity);
+                if (res == 0 && sb.Length > 0)
+                {
+                    string tilePath = sb.ToString();
+                    if (System.IO.File.Exists(tilePath))
+                    {
+                        var bmp = LoadBitmapFromFile(tilePath);
+                        if (bmp != null) return bmp;
+                    }
+                }
+
+                // 2. Registry SID Lookup: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AccountPicture\Users\<SID>
+                try
+                {
+                    var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+                    string sid = identity.User?.Value ?? "";
+                    if (!string.IsNullOrEmpty(sid))
+                    {
+                        using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey($@"SOFTWARE\Microsoft\Windows\CurrentVersion\AccountPicture\Users\{sid}");
+                        if (key != null)
+                        {
+                            foreach (string valName in key.GetValueNames())
+                            {
+                                string? picPath = key.GetValue(valName)?.ToString();
+                                if (!string.IsNullOrEmpty(picPath) && System.IO.File.Exists(picPath))
+                                {
+                                    var bmp = LoadBitmapFromFile(picPath);
+                                    if (bmp != null) return bmp;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                // 3. %APPDATA%\Microsoft\Windows\AccountPictures
+                string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string accountPicsDir = System.IO.Path.Combine(appDataPath, @"Microsoft\Windows\AccountPictures");
+                if (System.IO.Directory.Exists(accountPicsDir))
+                {
+                    var files = System.IO.Directory.GetFiles(accountPicsDir, "*.*");
+                    foreach (var f in files)
+                    {
+                        var bmp = LoadBitmapFromFile(f);
+                        if (bmp != null) return bmp;
+                    }
+                }
+
+                // 4. %PUBLIC%\AccountPictures
+                string pubPath = Environment.GetEnvironmentVariable("PUBLIC") ?? @"C:\Users\Public";
+                string pubPicsDir = System.IO.Path.Combine(pubPath, "AccountPictures");
+                if (System.IO.Directory.Exists(pubPicsDir))
+                {
+                    var files = System.IO.Directory.GetFiles(pubPicsDir, "*.*", System.IO.SearchOption.AllDirectories);
+                    foreach (var f in files)
+                    {
+                        var bmp = LoadBitmapFromFile(f);
+                        if (bmp != null) return bmp;
+                    }
+                }
+
+                // 5. System Fallback: %ProgramData%\Microsoft\User Account Pictures
+                string progDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                string commonPicsDir = System.IO.Path.Combine(progDataPath, @"Microsoft\User Account Pictures");
+                if (System.IO.Directory.Exists(commonPicsDir))
+                {
+                    string defaultPic = System.IO.Path.Combine(commonPicsDir, "user-192.png");
+                    if (!System.IO.File.Exists(defaultPic)) defaultPic = System.IO.Path.Combine(commonPicsDir, "user.png");
+
+                    if (System.IO.File.Exists(defaultPic))
+                    {
+                        var bmp = LoadBitmapFromFile(defaultPic);
+                        if (bmp != null) return bmp;
+                    }
+                }
+            }
+            catch { }
+
+            return null;
+        }
+
+        private System.Windows.Media.Imaging.BitmapImage? LoadBitmapFromFile(string filePath)
+        {
+            try
+            {
+                if (!System.IO.File.Exists(filePath)) return null;
+                string ext = System.IO.Path.GetExtension(filePath).ToLower();
+                if (ext != ".png" && ext != ".jpg" && ext != ".jpeg" && ext != ".bmp") return null;
+
+                var bmp = new System.Windows.Media.Imaging.BitmapImage();
+                bmp.BeginInit();
+                bmp.UriSource = new Uri(filePath, UriKind.Absolute);
+                bmp.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+                bmp.EndInit();
+                bmp.Freeze();
+                return bmp;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public bool ValidateUserPassword(string username, string password)
         {
             if (string.IsNullOrWhiteSpace(username)) username = Environment.UserName;
@@ -760,6 +1063,63 @@ namespace Eternal.ViewModels
                 AuthStatusColor = "#EF4444";
                 AuthStatusMessage = "Invalid Windows Password / PIN. Access Denied.";
             }
+        }
+
+        [RelayCommand]
+        public async Task LockWorkstationAsync()
+        {
+            await PerformLockWorkstationAsync(dueToInactivity: false);
+        }
+
+        public async Task PerformLockWorkstationAsync(bool dueToInactivity = false)
+        {
+            if (!IsAuthenticated && !IsBlackoutActive) return;
+
+            IsControlCenterVisible = false;
+
+            // 1. Activate Full Blackout Buffer Overlay to cleanly cover dashboard (Fade Out Dashboard)
+            IsBlackoutActive = true;
+            LoginOverlayOpacity = 0.0;
+
+            // 2. 1-Second Buffer Pause (clean dark AMOLED transition state)
+            await Task.Delay(1000);
+
+            // 3. Set Lockscreen State
+            IsAuthenticated = false;
+            IsPostAuthSplashVisible = false;
+
+            if (dueToInactivity)
+            {
+                WasLoggedOutDueToInactivity = true;
+                int mins = Settings.InactivityTimeoutMinutes;
+                InactivityNoticeMessage = $"Session locked automatically due to {mins} minute(s) of inactivity.";
+                AuthStatusColor = "#F59E0B";
+                AuthStatusMessage = InactivityNoticeMessage;
+            }
+            else
+            {
+                WasLoggedOutDueToInactivity = false;
+                InactivityNoticeMessage = "";
+                AuthStatusColor = "#888896";
+                AuthStatusMessage = "Workstation locked by user. Authenticate to resume.";
+            }
+
+            _ = AuditAuthEnvironmentAsync();
+
+            // 4. Smooth Fade-In Lockscreen Overlay (0.0 -> 1.0 over 300ms)
+            for (int i = 1; i <= 10; i++)
+            {
+                LoginOverlayOpacity = i / 10.0;
+                await Task.Delay(30);
+            }
+
+            // 5. Remove Blackout Buffer Overlay
+            IsBlackoutActive = false;
+        }
+
+        public void PerformLockWorkstation(bool dueToInactivity = false)
+        {
+            _ = PerformLockWorkstationAsync(dueToInactivity);
         }
 
         public void UnlockWorkstation()
@@ -1195,6 +1555,27 @@ namespace Eternal.ViewModels
                     var dispVm = sp.GetRequiredService<DisplayViewModel>();
                     CurrentView = dispVm;
                     await dispVm.LoadCommand.ExecuteAsync(null);
+                    break;
+                case "Explorer":
+                    CurrentView = sp.GetRequiredService<ExplorerViewModel>();
+                    break;
+                case "NetworkMonitor":
+                    CurrentView = sp.GetRequiredService<NetworkMonitorViewModel>();
+                    break;
+                case "AppManager":
+                    CurrentView = sp.GetRequiredService<AppManagerViewModel>();
+                    break;
+                case "MemoryInspector":
+                    CurrentView = sp.GetRequiredService<MemoryInspectorViewModel>();
+                    break;
+                case "PortScanner":
+                    CurrentView = sp.GetRequiredService<PortScannerViewModel>();
+                    break;
+                case "DriverKernel":
+                    CurrentView = sp.GetRequiredService<DriverKernelViewModel>();
+                    break;
+                case "DiskSector":
+                    CurrentView = sp.GetRequiredService<DiskSectorViewModel>();
                     break;
                 case "UnsafeMode":
                     // Trigger authorization window before navigating to testing view

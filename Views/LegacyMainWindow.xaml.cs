@@ -39,11 +39,15 @@ namespace Eternal.Views
         /// </summary>
         public bool IsSwappingUI { get; set; } = false;
 
+        private System.Windows.Threading.DispatcherTimer? _inactivityTimer;
+        private DateTime _lastUserActivityTime = DateTime.Now;
+
         public LegacyMainWindow()
         {
             InitializeComponent();
             this.Closing += MainWindow_Closing;
             InitializeTray();
+            InitializeInactivityTimer();
             
             // Adjust window dimensions dynamically to fit under 100% and 125% DPI scale boundaries
             AdjustWindowSizeToWorkingArea();
@@ -268,6 +272,95 @@ namespace Eternal.Views
             }
         }
 
+        private void InitializeInactivityTimer()
+        {
+            _inactivityTimer = new System.Windows.Threading.DispatcherTimer();
+            _inactivityTimer.Interval = TimeSpan.FromSeconds(15);
+            _inactivityTimer.Tick += InactivityTimer_Tick;
+            _inactivityTimer.Start();
+
+            this.PreviewMouseMove += ResetUserActivity;
+            this.PreviewKeyDown += ResetUserActivity;
+            this.PreviewMouseDown += ResetUserActivity;
+        }
+
+        private void ResetUserActivity(object sender, EventArgs e)
+        {
+            _lastUserActivityTime = DateTime.Now;
+            if (DataContext is ViewModels.MainViewModel vm && !vm.IsAuthenticated)
+            {
+                vm.CheckCapsLockState();
+            }
+        }
+
+        private bool _isSyncingPassword = false;
+
+        private void PasswordEyeToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ViewModels.MainViewModel vm)
+            {
+                vm.IsPasswordRevealed = !vm.IsPasswordRevealed;
+                if (vm.IsPasswordRevealed)
+                {
+                    RevealedPasswordTextBox.Focus();
+                    RevealedPasswordTextBox.SelectionStart = RevealedPasswordTextBox.Text.Length;
+                }
+                else
+                {
+                    OverlayPasswordBox.Focus();
+                }
+            }
+        }
+
+        private void OverlayPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (_isSyncingPassword) return;
+            _isSyncingPassword = true;
+            if (DataContext is ViewModels.MainViewModel vm)
+            {
+                vm.RevealedPasswordText = OverlayPasswordBox.Password;
+            }
+            _isSyncingPassword = false;
+        }
+
+        private void RevealedPasswordTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (_isSyncingPassword) return;
+            _isSyncingPassword = true;
+            OverlayPasswordBox.Password = RevealedPasswordTextBox.Text;
+            _isSyncingPassword = false;
+        }
+
+        private async void RevealedPasswordTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                if (DataContext is ViewModels.MainViewModel vm)
+                {
+                    string pwd = RevealedPasswordTextBox.Text;
+                    await vm.AuthenticateWithPasswordAsync(pwd);
+                }
+            }
+        }
+
+        private void InactivityTimer_Tick(object? sender, EventArgs e)
+        {
+            if (DataContext is ViewModels.MainViewModel vm)
+            {
+                if (!vm.IsAuthenticated || vm.IsPeMode) return;
+
+                int timeoutMins = vm.Settings.InactivityTimeoutMinutes;
+                if (timeoutMins <= 0) return;
+
+                var idleDuration = DateTime.Now - _lastUserActivityTime;
+                if (idleDuration.TotalMinutes >= timeoutMins)
+                {
+                    _lastUserActivityTime = DateTime.Now;
+                    vm.PerformLockWorkstation(dueToInactivity: true);
+                }
+            }
+        }
+
         private void CleanupTray()
         {
             if (_notifyIcon != null)
@@ -325,6 +418,21 @@ namespace Eternal.Views
                 var netUserWin = new Helpers.NetUserInspectorWindow();
                 netUserWin.Owner = this;
                 netUserWin.ShowDialog();
+            }
+            else
+            {
+                if (DataContext is ViewModels.MainViewModel vm)
+                {
+                    vm.ToggleControlCenter();
+                }
+            }
+        }
+
+        private void ControlCenterBackdrop_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (DataContext is ViewModels.MainViewModel vm)
+            {
+                vm.IsControlCenterVisible = false;
             }
         }
 

@@ -38,11 +38,11 @@
                         <StackPanel>
                             <Grid Margin="0,0,0,14">
                                 <TextBlock Text="Version" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                                <TextBlock Text="3.5.0 (Stable)" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                <TextBlock Text="3.5.5 (BETA)" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Grid>
                             <Grid Margin="0,0,0,14">
                                 <TextBlock Text="Milestone" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                                <TextBlock Text="Release Candidate 2" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                <TextBlock Text="BETA" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Grid>
                             <Grid Margin="0,0,0,14">
                                 <TextBlock Text="Branch" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
@@ -50,7 +50,7 @@
                             </Grid>
                             <Grid>
                                 <TextBlock Text="Build Date" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                                <TextBlock x:Name="BuildDateText" Text="2026-06-03" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                <TextBlock x:Name="BuildDateText" Text="2026-08-22" Foreground="White" FontWeight="Bold" HorizontalAlignment="Right"/>
                             </Grid>
                         </StackPanel>
                     </Border>

@@ -210,6 +210,20 @@
 
                                             <Grid Margin="0,0,0,15">
                                                 <StackPanel>
+                                                    <TextBlock Text="Inactivity Auto-Lock Timeout" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                    <TextBlock Text="Automatically lock workstation session after period of user inactivity." FontSize="10" Foreground="#888896"/>
+                                                </StackPanel>
+                                                <ComboBox SelectedValue="{Binding SelectedInactivityTimeoutMinutes}" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center" Background="#161622" Foreground="White" BorderBrush="#333348">
+                                                    <system:Int32>0</system:Int32>
+                                                    <system:Int32>5</system:Int32>
+                                                    <system:Int32>15</system:Int32>
+                                                    <system:Int32>30</system:Int32>
+                                                    <system:Int32>60</system:Int32>
+                                                </ComboBox>
+                                            </Grid>
+
+                                            <Grid Margin="0,0,0,15">
+                                                <StackPanel>
                                                     <TextBlock Text="Telemetry Polling Profile" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
                                                     <TextBlock Text="Optimize hardware sensor sampling rate for accuracy vs power consumption." FontSize="10" Foreground="#888896"/>
                                                 </StackPanel>

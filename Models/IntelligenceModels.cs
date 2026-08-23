@@ -156,7 +156,7 @@ namespace Eternal.Models
     {
         public bool IsFirstRun { get; set; } = true;
         public DashboardLayoutMode DashboardLayoutMode { get; set; } = DashboardLayoutMode.Grid;
-        public string AppVersion { get; set; } = "3.0.0";
+        public string AppVersion { get; set; } = "3.5.5";
         public bool UseLegacyUI { get => false; set { } }
         public bool UseNeumorphicUI { get; set; } = false;
         public string NewUiGradiency { get; set; } = "Deep Space";
@@ -181,6 +181,7 @@ namespace Eternal.Models
         // Security & Environment
         public bool IsStartupLockEnabled { get; set; } = false;
         public bool UseWindowsHelloPin { get; set; } = true;
+        public int InactivityTimeoutMinutes { get; set; } = 15;
         public int FailedAttemptsCount { get; set; } = 0;
         public int CurrentLockoutMinutes { get; set; } = 0;
         public DateTime? LockoutEnd { get; set; }

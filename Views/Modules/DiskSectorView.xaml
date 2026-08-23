@@ -1,0 +1,82 @@
+<UserControl x:Class="Eternal.Views.Modules.DiskSectorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#0A0A10" BorderBrush="#1C1C28" BorderThickness="0,0,0,1" Padding="16,12">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <fa:ImageAwesome Icon="HddOutline" Width="16" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <StackPanel>
+                        <TextBlock Text="ETERNAL BARE-METAL DISK SECTOR INSPECTOR" FontSize="14" FontWeight="Black" Foreground="White"/>
+                        <TextBlock Text="{Binding BootSignatureStatus}" FontSize="10" Foreground="#00E5FF"/>
+                    </StackPanel>
+                </StackPanel>
+                <Button Command="{Binding ReadSectorZeroCommand}" Style="{StaticResource StandardButton}" Height="32" Padding="14,0" HorizontalAlignment="Right">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Refresh" Width="11" Foreground="White" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Read Sector 0" FontSize="11" FontWeight="Bold" Foreground="White"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Drive Path Bar -->
+        <Border Grid.Row="1" Background="#060609" BorderBrush="#161622" BorderThickness="0,0,0,1" Padding="16,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Target Drive:" FontSize="11" FontWeight="Bold" Foreground="#888896" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Border Background="#12121C" BorderBrush="#262638" BorderThickness="1" CornerRadius="6" Padding="10,0" Height="30" Width="220">
+                    <TextBox Text="{Binding DrivePath, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderThickness="0" Foreground="#00E5FF" FontFamily="Consolas" FontSize="11" VerticalAlignment="Center"/>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- ListView Hex Grid -->
+        <ListView Grid.Row="2" ItemsSource="{Binding SectorRows}" Background="#030305" BorderThickness="0" Foreground="White" FontFamily="Consolas" FontSize="11">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Offset" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Offset}" Foreground="#F59E0B" FontFamily="Consolas"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Sector 0 Bytes (512 Bytes Raw)" Width="460">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding HexBytes}" Foreground="#00E5FF" FontFamily="Consolas"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="ASCII Text" Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding AsciiString}" Foreground="#22C55E" FontFamily="Consolas"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="3" Background="#0A0A10" BorderBrush="#1C1C28" BorderThickness="0,1,0,0" Padding="16,6">
+            <TextBlock Text="{Binding StatusText}" FontSize="10" Foreground="#888896"/>
+        </Border>
+    </Grid>
+</UserControl>

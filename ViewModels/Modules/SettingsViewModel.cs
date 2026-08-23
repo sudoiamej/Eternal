@@ -18,7 +18,7 @@ namespace Eternal.ViewModels.Modules
         private readonly IUpdateService _updateService;
 
         [ObservableProperty] private AppSettings _settings;
-        [ObservableProperty] private string _appVersion = "3.5.0 (Stable)";
+        [ObservableProperty] private string _appVersion = "3.5.5 (BETA)";
         [ObservableProperty] private string _lastScanTime = "N/A";
         [ObservableProperty] private string _machineId = "Unknown";
 
@@ -34,6 +34,20 @@ namespace Eternal.ViewModels.Modules
                 var aboutWin = new Eternal.Views.Helpers.AboutVersionWindow();
                 aboutWin.Owner = System.Windows.Application.Current.MainWindow;
                 aboutWin.ShowDialog();
+            }
+        }
+
+        public int SelectedInactivityTimeoutMinutes
+        {
+            get => Settings.InactivityTimeoutMinutes;
+            set
+            {
+                if (Settings.InactivityTimeoutMinutes != value)
+                {
+                    Settings.InactivityTimeoutMinutes = value;
+                    OnPropertyChanged();
+                    _settingsService.Save();
+                }
             }
         }
 

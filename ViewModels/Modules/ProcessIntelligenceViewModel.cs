@@ -182,5 +182,68 @@ namespace Eternal.ViewModels.Modules
             detailWin.Owner = System.Windows.Application.Current.MainWindow;
             detailWin.ShowDialog();
         }
+
+        [System.Runtime.InteropServices.DllImport("ntdll.dll", SetLastError = true, CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        private static extern int NtSuspendProcess(IntPtr processHandle);
+
+        [System.Runtime.InteropServices.DllImport("ntdll.dll", SetLastError = true, CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        private static extern int NtResumeProcess(IntPtr processHandle);
+
+        [RelayCommand]
+        public async Task SuspendProcessAsync(ProcessDetail? process)
+        {
+            if (process == null) return;
+            await Task.Run(() =>
+            {
+                try
+                {
+                    using var p = System.Diagnostics.Process.GetProcessById(process.PID);
+                    NtSuspendProcess(p.Handle);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Suspend Error: {ex.Message}");
+                }
+            });
+            await LoadDataAsync();
+        }
+
+        [RelayCommand]
+        public async Task ResumeProcessAsync(ProcessDetail? process)
+        {
+            if (process == null) return;
+            await Task.Run(() =>
+            {
+                try
+                {
+                    using var p = System.Diagnostics.Process.GetProcessById(process.PID);
+                    NtResumeProcess(p.Handle);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Resume Error: {ex.Message}");
+                }
+            });
+            await LoadDataAsync();
+        }
+
+        [RelayCommand]
+        public async Task SetHighPriorityAsync(ProcessDetail? process)
+        {
+            if (process == null) return;
+            await Task.Run(() =>
+            {
+                try
+                {
+                    using var p = System.Diagnostics.Process.GetProcessById(process.PID);
+                    p.PriorityClass = System.Diagnostics.ProcessPriorityClass.High;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Priority Error: {ex.Message}");
+                }
+            });
+            await LoadDataAsync();
+        }
     }
 }

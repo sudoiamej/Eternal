@@ -103,7 +103,7 @@
         <!-- Footer Stats Bar -->
         <Grid Grid.Row="4" Margin="0,12,0,0">
             <StackPanel Orientation="Horizontal">
-                <fa:ImageAwesome Icon="ClockO" Width="10" Foreground="#7A7A88" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                <fa:ImageAwesome Icon="ClockOutline" Width="10" Foreground="#7A7A88" Margin="0,0,6,0" VerticalAlignment="Center"/>
                 <TextBlock Text="Execution Time: " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
                 <TextBlock Text="{Binding ExecutionTime}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11"/>
             </StackPanel>

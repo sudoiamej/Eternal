@@ -27,6 +27,16 @@ namespace Eternal.Views.Helpers
 
             try
             {
+                if (System.Windows.Application.Current.MainWindow?.DataContext is ViewModels.MainViewModel vm && vm.HasUserProfileImage && vm.UserProfileImage != null)
+                {
+                    UserAccountImageBrush.ImageSource = vm.UserProfileImage;
+                    UserAccountPictureEllipse.Visibility = Visibility.Visible;
+                }
+            }
+            catch { }
+
+            try
+            {
                 var psi = new ProcessStartInfo
                 {
                     FileName = "net",

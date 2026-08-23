@@ -44,10 +44,8 @@ namespace Eternal.ViewModels.Modules
         {
             long before = GC.GetTotalMemory(false);
             
-            // Force full collection and LOH compaction
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            // Force full collection, LOH compaction, and Win32 working set trim
+            Helpers.MemoryOptimizerHelper.OptimizeMemory();
             
             long after = GC.GetTotalMemory(true);
             

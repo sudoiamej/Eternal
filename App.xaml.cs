@@ -168,6 +168,13 @@ namespace Eternal
             services.AddSingleton<PerformanceViewModel>();
             services.AddSingleton<DriversViewModel>();
             services.AddSingleton<ServicesViewModel>();
+            services.AddSingleton<ExplorerViewModel>();
+            services.AddSingleton<NetworkMonitorViewModel>();
+            services.AddSingleton<AppManagerViewModel>();
+            services.AddSingleton<MemoryInspectorViewModel>();
+            services.AddSingleton<PortScannerViewModel>();
+            services.AddSingleton<DriverKernelViewModel>();
+            services.AddSingleton<DiskSectorViewModel>();
             services.AddSingleton<StorageViewModel>();
             services.AddSingleton<NetworkViewModel>();
             services.AddSingleton<ReportsViewModel>();

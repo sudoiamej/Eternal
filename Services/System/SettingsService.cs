@@ -53,41 +53,41 @@ namespace Eternal.Services.System
                         ObjectCreationHandling = ObjectCreationHandling.Replace
                     });
                     
-                    if (tempSettings == null || string.IsNullOrEmpty(tempSettings.AppVersion) || tempSettings.AppVersion != "3.0.0")
+                    if (tempSettings == null || string.IsNullOrEmpty(tempSettings.AppVersion) || tempSettings.AppVersion != "3.5.5")
                     {
                         // Clean app data directory contents to avoid schema conflict
                         string? folder = Path.GetDirectoryName(_filePath);
                         if (folder != null && Directory.Exists(folder))
                         {
-                            foreach (var file in Directory.GetFiles(folder))
+                            try
                             {
-                                try { File.Delete(file); } catch { }
+                                foreach (var file in Directory.GetFiles(folder))
+                                {
+                                    File.Delete(file);
+                                }
                             }
-                            foreach (var dir in Directory.GetDirectories(folder))
-                            {
-                                try { Directory.Delete(dir, true); } catch { }
-                            }
+                            catch { }
                         }
-                        
                         Current = new AppSettings();
-                        Current.AppVersion = "3.0.0";
+                        Current.AppVersion = "3.5.5";
                         Save();
-                        return;
                     }
-                    
-                    Current = tempSettings;
+                    else
+                    {
+                        Current = tempSettings;
+                    }
                 }
                 else
                 {
                     Current = new AppSettings();
-                    Current.AppVersion = "3.0.0";
+                    Current.AppVersion = "3.5.5";
                     Save();
                 }
             }
-            catch 
+            catch
             {
                 Current = new AppSettings();
-                Current.AppVersion = "3.0.0";
+                Current.AppVersion = "3.5.5";
             }
         }
     }

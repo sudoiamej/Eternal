@@ -108,6 +108,13 @@
         <DataTemplate DataType="{x:Type vmm:HomeGridDashboardViewModel}"><vmv:HomeGridDashboard/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:CategoryGridViewModel}"><vmv:CategoryGridView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:RegistryLexiconViewModel}"><vmv:RegistryLexiconView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:ExplorerViewModel}"><vmv:ExplorerView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:NetworkMonitorViewModel}"><vmv:NetworkMonitorView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:AppManagerViewModel}"><vmv:AppManagerView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:MemoryInspectorViewModel}"><vmv:MemoryInspectorView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:PortScannerViewModel}"><vmv:PortScannerView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:DriverKernelViewModel}"><vmv:DriverKernelView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vmm:DiskSectorViewModel}"><vmv:DiskSectorView/></DataTemplate>
         <DataTemplate DataType="{x:Type vmm:TestingViewModel}"><vmv:TestingView/></DataTemplate>
 
         <!-- Pure AMOLED Dynamic Navigation Rail Item Template -->
@@ -233,6 +240,10 @@
                             <Border Background="#1A0078D4" CornerRadius="4" Padding="6,2" Margin="8,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="SYSTEM INTELLIGENCE" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
                             </Border>
+
+                            <Border Background="#20F59E0B" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="4" Padding="5,1" Margin="6,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="BETA" FontSize="8" FontWeight="Black" Foreground="#F59E0B" VerticalAlignment="Center"/>
+                            </Border>
                                 
                                 <!-- VS Debugger Attached / Testing Mode Pill Badge -->
                                 <Border Visibility="{Binding IsVsDebuggerAttached, Converter={StaticResource VisibilityConverter}}" Background="#30EF4444" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
@@ -282,15 +293,29 @@
                         </Border>
 
                         <!-- User Greeting & Windows Role Badge (5-click Net User Inspector) -->
-                        <Border MouseLeftButtonDown="UserGreetingBadge_MouseLeftButtonDown" Cursor="Hand" IsEnabled="{Binding IsAuthenticated}" Background="#0C0C14" BorderBrush="#1F1F2E" BorderThickness="1" CornerRadius="8" Padding="10,4" Margin="0,0,10,0" VerticalAlignment="Center">
+                        <Border MouseLeftButtonDown="UserGreetingBadge_MouseLeftButtonDown" Cursor="Hand" IsEnabled="{Binding IsAuthenticated}" Background="#0C0C14" BorderBrush="#1F1F2E" BorderThickness="1" CornerRadius="8" Padding="6,4,10,4" Margin="0,0,10,0" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <fa:ImageAwesome Icon="UserCircle" Width="12" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <!-- Mini Circular Profile Avatar -->
+                                <Grid Width="22" Height="22" Margin="0,0,8,0" VerticalAlignment="Center">
+                                    <Ellipse Width="22" Height="22" Fill="#141420" Stroke="{DynamicResource AccentBrush}" StrokeThickness="1"/>
+                                    <fa:ImageAwesome Icon="UserCircle" Width="12" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <Ellipse Width="20" Height="20" Visibility="{Binding HasUserProfileImage, Converter={StaticResource VisibilityConverter}}">
+                                        <Ellipse.Fill>
+                                            <ImageBrush ImageSource="{Binding UserProfileImage}" Stretch="UniformToFill"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                </Grid>
                                 <TextBlock Text="{Binding CurrentUserGreeting}" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                 <Border Background="#1A0078D4" CornerRadius="4" Padding="5,1" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding UserRoleBadge}" FontSize="8" FontWeight="Black" Foreground="{DynamicResource AccentBrush}"/>
                                 </Border>
                             </StackPanel>
                         </Border>
+
+                        <!-- Lock / Logout Workstation Action Button -->
+                        <Button Command="{Binding LockWorkstationCommand}" IsEnabled="{Binding IsAuthenticated}" Style="{StaticResource FluentHeaderIconButton}" ToolTip="Lock Workstation / Logout" Margin="0,0,6,0">
+                            <fa:ImageAwesome Icon="Lock" Width="13" Foreground="#EF4444"/>
+                        </Button>
 
                         <!-- Settings Quick Access Button (Upper Right) -->
                         <Button Command="{Binding NavigateCommand}" CommandParameter="Settings" IsEnabled="{Binding IsAuthenticated}" Style="{StaticResource FluentHeaderIconButton}" ToolTip="Settings" Margin="0,0,6,0">
@@ -511,7 +536,7 @@
                                 <TextBlock Text="WORKSTATION ENGINE: ONLINE" FontSize="9" FontWeight="Bold" Foreground="#10B981" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>
-                        <TextBlock Text="v3.5.0 (Stable)" Foreground="#555562" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Text="v3.5.5 (BETA)" Foreground="#555562" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -540,6 +565,175 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
+        <!-- macOS-Style Cyberpunk Quick Settings Control Center Flyout Modal -->
+        <Grid Visibility="{Binding IsControlCenterVisible, Converter={StaticResource VisibilityConverter}}" Background="#80000000" Panel.ZIndex="350">
+            <!-- Background Backdrop Dismiss Click -->
+            <Border Background="Transparent" MouseLeftButtonDown="ControlCenterBackdrop_Click"/>
+
+            <Border Width="360" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,55,20,0" Background="#09090F" BorderBrush="#1F1F2E" BorderThickness="1.5" CornerRadius="14" Padding="18">
+                <Border.Effect>
+                    <DropShadowEffect Color="#00E5FF" BlurRadius="30" ShadowDepth="4" Opacity="0.3"/>
+                </Border.Effect>
+                <Grid>
+                    <!-- Main Content Panel (Blurred and Disabled when IsControlCenterEnabled is false) -->
+                    <StackPanel IsEnabled="{Binding IsControlCenterEnabled}">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsControlCenterEnabled}" Value="False">
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <BlurEffect Radius="14" KernelType="Gaussian"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                    <!-- Account & Identity Header Card -->
+                    <Border Background="#0E0E18" BorderBrush="#1A1A28" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <!-- Avatar -->
+                            <Grid Grid.Column="0" Width="42" Height="42" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <Ellipse Width="42" Height="42" Fill="#141420" Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.5"/>
+                                <fa:ImageAwesome Icon="UserCircle" Width="24" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Ellipse Width="40" Height="40" Visibility="{Binding HasUserProfileImage, Converter={StaticResource VisibilityConverter}}">
+                                    <Ellipse.Fill>
+                                        <ImageBrush ImageSource="{Binding UserProfileImage}" Stretch="UniformToFill"/>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                            </Grid>
+                            <!-- Name & Username -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding UserFullName}" FontSize="14" FontWeight="Black" Foreground="White"/>
+                                <TextBlock Text="{Binding CurrentUsernameOnly}" FontSize="10" FontWeight="SemiBold" Foreground="#888896"/>
+                            </StackPanel>
+                            <!-- Admin Role Badge -->
+                            <Border Grid.Column="2" Background="#1A0078D4" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding UserRoleBadge}" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Connectivity 2x2 Grid (Wi-Fi, Bluetooth, Do Not Disturb, Night Light) -->
+                    <UniformGrid Columns="2" Margin="0,0,0,14">
+                        <!-- Wi-Fi Toggle -->
+                        <Border Background="#0C0C14" BorderBrush="#1C1C2B" BorderThickness="1" CornerRadius="10" Margin="0,0,4,4" Padding="12,8" Height="52">
+                            <Button Command="{Binding ToggleWifiCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Wifi" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Wi-Fi" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
+                                        <TextBlock Text="{Binding WifiSsid}" FontSize="9" Foreground="#888896" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Button>
+                        </Border>
+
+                        <!-- Bluetooth Toggle -->
+                        <Border Background="#0C0C14" BorderBrush="#1C1C2B" BorderThickness="1" CornerRadius="10" Margin="4,0,0,4" Padding="12,8" Height="52">
+                            <Button Command="{Binding ToggleBluetoothCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="BluetoothB" Width="16" Height="16" Foreground="#3B82F6" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Bluetooth" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
+                                        <TextBlock Text="{Binding BluetoothStatus}" FontSize="9" Foreground="#888896" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Button>
+                        </Border>
+
+                        <!-- Do Not Disturb Toggle -->
+                        <Border Background="#0C0C14" BorderBrush="#1C1C2B" BorderThickness="1" CornerRadius="10" Margin="0,4,4,0" Padding="12,8" Height="52">
+                            <Button Command="{Binding ToggleDoNotDisturbCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="BellSlash" Width="16" Height="16" Foreground="#EC4899" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Do Not Disturb" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
+                                        <TextBlock Text="Focus Active" FontSize="9" Foreground="#888896"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Button>
+                        </Border>
+
+                        <!-- Night Light Toggle -->
+                        <Border Background="#0C0C14" BorderBrush="#1C1C2B" BorderThickness="1" CornerRadius="10" Margin="4,4,0,0" Padding="12,8" Height="52">
+                            <Button Command="{Binding ToggleNightLightCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="LightbulbOutline" Width="16" Height="16" Foreground="#F59E0B" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Night Light" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
+                                        <TextBlock Text="Warm Tint" FontSize="9" Foreground="#888896"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Button>
+                        </Border>
+                    </UniformGrid>
+
+                    <!-- Master System Volume Slider -->
+                    <Border Background="#0D0D14" BorderBrush="#191926" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,0,14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <fa:ImageAwesome Grid.Column="0" Icon="VolumeUp" Width="14" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <Slider Grid.Column="1" Value="{Binding MasterVolumeLevel, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="{Binding MasterVolumeLevel, StringFormat='{}{0:0}%'}" FontSize="10" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Performance Preset Pills -->
+                    <StackPanel Margin="0,0,0,14">
+                        <TextBlock Text="PERFORMANCE PROFILE PRESETS" FontSize="8" FontWeight="Black" Foreground="#888896" Margin="0,0,0,6"/>
+                        <UniformGrid Columns="3">
+                            <Button Command="{Binding SelectPowerPresetCommand}" CommandParameter="Eco" Style="{StaticResource StandardButton}" Height="28" Margin="0,0,3,0">
+                                <TextBlock Text="Eco Power" FontSize="9" FontWeight="Bold" Foreground="#10B981"/>
+                            </Button>
+                            <Button Command="{Binding SelectPowerPresetCommand}" CommandParameter="Balanced" Style="{StaticResource StandardButton}" Height="28" Margin="3,0,3,0">
+                                <TextBlock Text="Balanced" FontSize="9" FontWeight="Bold" Foreground="#00E5FF"/>
+                            </Button>
+                            <Button Command="{Binding SelectPowerPresetCommand}" CommandParameter="Gaming" Style="{StaticResource StandardButton}" Height="26" Margin="3,0,0,0">
+                                <TextBlock Text="Gaming Turbo" FontSize="9" FontWeight="Bold" Foreground="#EC4899"/>
+                            </Button>
+                        </UniformGrid>
+                    </StackPanel>
+
+                    <!-- Power Actions Grid (Lock, Sleep, Restart, Shutdown) -->
+                    <UniformGrid Columns="4">
+                        <Button Command="{Binding ExecuteControlCenterPowerActionCommand}" CommandParameter="Lock" Style="{StaticResource StandardButton}" Height="36" Margin="0,0,2,0" ToolTip="Lock Workstation">
+                            <fa:ImageAwesome Icon="Lock" Width="14" Height="14" Foreground="#EF4444"/>
+                        </Button>
+                        <Button Command="{Binding ExecuteControlCenterPowerActionCommand}" CommandParameter="Sleep" Style="{StaticResource StandardButton}" Height="36" Margin="2,0,2,0" ToolTip="Sleep Mode">
+                            <fa:ImageAwesome Icon="Bed" Width="14" Height="14" Foreground="#3B82F6"/>
+                        </Button>
+                        <Button Command="{Binding ExecuteControlCenterPowerActionCommand}" CommandParameter="Restart" Style="{StaticResource StandardButton}" Height="36" Margin="2,0,2,0" ToolTip="Restart System">
+                            <fa:ImageAwesome Icon="Refresh" Width="14" Height="14" Foreground="#F59E0B"/>
+                        </Button>
+                        <Button Command="{Binding ExecuteControlCenterPowerActionCommand}" CommandParameter="Shutdown" Style="{StaticResource StandardButton}" Height="36" Margin="2,0,0,0" ToolTip="Shut Down System">
+                            <fa:ImageAwesome Icon="PowerOff" Width="14" Height="14" Foreground="#EF4444"/>
+                        </Button>
+                    </UniformGrid>
+                </StackPanel>
+
+                <!-- Feature Disabled Overlay (Visible when IsControlCenterEnabled is false) -->
+                <Border Visibility="{Binding IsControlCenterEnabled, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Background="#E006060A" CornerRadius="12" Padding="20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <fa:ImageAwesome Icon="Lock" Width="28" Height="28" Foreground="#EF4444" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                        <TextBlock Text="FEATURE DISABLED" FontSize="14" FontWeight="Black" Foreground="#EF4444" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBlock Text="Quick Settings Control Center is disabled by Experimental Testing Flags." FontSize="10" Foreground="#888896" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+
         <!-- Command Palette Modal Overlay Host -->
         <ContentControl Panel.ZIndex="400" Content="{Binding CommandPaletteVm}" Visibility="{Binding CommandPaletteVm.IsOpen, Converter={StaticResource VisibilityConverter}}"/>
 
@@ -563,15 +757,19 @@
                 <!-- Hello [Username] -->
                 <TextBlock Text="{Binding CurrentUserGreeting}" Foreground="#FFFFFF" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
                 <TextBlock Text="{Binding PostAuthSplashStatusText}" Foreground="#888896" FontSize="12" FontWeight="Medium" HorizontalAlignment="Center" Margin="0,0,0,22"/>
-
                 <!-- Status Bar 0-100 Style -->
                 <Border Height="8" Background="#12121D" BorderBrush="#1F1F2E" BorderThickness="1" CornerRadius="4" Margin="0,0,0,8" ClipToBounds="True">
                     <ProgressBar Value="{Binding PostAuthSplashProgress}" Minimum="0" Maximum="100" Background="Transparent" Foreground="{DynamicResource AccentBrush}" BorderThickness="0"/>
                 </Border>
-                <Grid Margin="0,0,0,28">
+                <Grid Margin="0,0,0,14">
                     <TextBlock Text="INITIALIZATION PROGRESS" Foreground="#555566" FontSize="9" FontWeight="Bold" HorizontalAlignment="Left"/>
                     <TextBlock Text="{Binding PostAuthSplashProgress, StringFormat='{}{0:0}%'}" Foreground="{DynamicResource AccentBrush}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right"/>
                 </Grid>
+
+                <!-- Monospace Terminal Live Telemetry Ticker -->
+                <Border Background="#08080F" BorderBrush="#141420" BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,18">
+                    <TextBlock Text="{Binding SplashTelemetryTicker}" FontFamily="Consolas" FontSize="10" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                </Border>
 
                 <!-- Dynamic Workstation Tip Card -->
                 <Border Background="#0B0B12" BorderBrush="#1A1A28" BorderThickness="1" CornerRadius="10" Padding="16,12">
@@ -589,6 +787,23 @@
 
         <!-- Embedded Full-Bleed AMOLED Strict Login Overlay (Active when IsAuthenticated is False) -->
         <Grid Visibility="{Binding IsAuthenticated, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Opacity="{Binding LoginOverlayOpacity}" Panel.ZIndex="999" Background="#030305">
+            <!-- Ambient Cyberpunk Glowing Bokeh Aura Canvas Background -->
+            <Canvas IsHitTestVisible="False">
+                <Ellipse Width="350" Height="350" Fill="#0078D4" Canvas.Left="-50" Canvas.Top="-50" Opacity="0.08">
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="#00E5FF" BlurRadius="120" ShadowDepth="0"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+                <Ellipse Width="400" Height="400" Fill="#7F00FF" Canvas.Right="-80" Canvas.Bottom="-80" Opacity="0.06">
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="#7F00FF" BlurRadius="150" ShadowDepth="0"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+                <!-- Matrix Cyber Rain Text Canvas -->
+                <TextBlock Text="01010011 01010101 01000100 01001111 01001001 01000001 01001101 01000101 01001010" FontFamily="Consolas" FontSize="11" Foreground="#00F0FF" Opacity="0.04" Canvas.Left="40" Canvas.Top="80"/>
+                <TextBlock Text="ETERNAL SYSTEM INTELLIGENCE v3.5.5 // RING-0 KERNEL AUDIT ACTIVE // SAM STRICT IDENTITY VALIDATION" FontFamily="Consolas" FontSize="10" Foreground="#10B981" Opacity="0.05" Canvas.Right="40" Canvas.Bottom="120"/>
+            </Canvas>
+
             <StackPanel x:Name="LoginContainerPanel" Width="420" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" Opacity="1">
                 <StackPanel.RenderTransform>
                     <TransformGroup>
@@ -632,37 +847,143 @@
                         </Image.Effect>
                     </Image>
                     <TextBlock Text="ETERNAL" FontSize="28" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
-                    <TextBlock Text="STRICT WORKSTATION IDENTITY" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" Margin="0,4,0,0" Opacity="0.9"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
+                        <TextBlock Text="STRICT WORKSTATION IDENTITY" FontSize="9" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Opacity="0.9"/>
+                        <Border Background="#20F59E0B" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="3" Padding="5,1" Margin="6,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="v3.5.5 BETA" FontSize="7.5" FontWeight="Black" Foreground="#F59E0B" VerticalAlignment="Center"/>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- User Profile Identity Header (Circular Avatar + Full Name + Username Subheader) -->
+                <StackPanel HorizontalAlignment="Center" Margin="0,0,0,24">
+                    <!-- Circular User Profile Avatar Ring with Electric Cyber Neon Breathing Surround -->
+                    <Grid Width="106" Height="106" HorizontalAlignment="Center" Margin="0,0,0,14">
+                        <!-- Outer Diffuse Cyber Neon Halo (Cyan #00F0FF) -->
+                        <Ellipse x:Name="ProfileOuterNeon" Width="102" Height="102" Stroke="#00F0FF" StrokeThickness="1.5" Opacity="0.3" RenderTransformOrigin="0.5,0.5">
+                            <Ellipse.RenderTransform>
+                                <ScaleTransform x:Name="NeonScale" ScaleX="1.0" ScaleY="1.0"/>
+                            </Ellipse.RenderTransform>
+                            <Ellipse.Effect>
+                                <DropShadowEffect x:Name="ProfileOuterNeonEffect" Color="#00F0FF" BlurRadius="45" ShadowDepth="0" Opacity="1.0"/>
+                            </Ellipse.Effect>
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                            <DoubleAnimation Storyboard.TargetName="ProfileOuterNeon"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             From="0.25" To="0.9"
+                                                             Duration="0:0:2.2">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <SineEase EasingMode="EaseInOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="ProfileOuterNeonEffect"
+                                                             Storyboard.TargetProperty="BlurRadius"
+                                                             From="20" To="55"
+                                                             Duration="0:0:2.2">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <SineEase EasingMode="EaseInOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="NeonScale"
+                                                             Storyboard.TargetProperty="ScaleX"
+                                                             From="0.97" To="1.04"
+                                                             Duration="0:0:2.2">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <SineEase EasingMode="EaseInOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="NeonScale"
+                                                             Storyboard.TargetProperty="ScaleY"
+                                                             From="0.97" To="1.04"
+                                                             Duration="0:0:2.2">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <SineEase EasingMode="EaseInOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+
+                        <!-- Inner Electric Core Neon Ring -->
+                        <Ellipse x:Name="ProfileInnerNeon" Width="84" Height="84" Stroke="#00F0FF" StrokeThickness="2.5">
+                            <Ellipse.Effect>
+                                <DropShadowEffect x:Name="ProfileInnerNeonEffect" Color="#00E5FF" BlurRadius="25" ShadowDepth="0" Opacity="0.95"/>
+                            </Ellipse.Effect>
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                            <DoubleAnimation Storyboard.TargetName="ProfileInnerNeonEffect"
+                                                             Storyboard.TargetProperty="BlurRadius"
+                                                             From="12" To="32"
+                                                             Duration="0:0:2.2">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <SineEase EasingMode="EaseInOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+
+                        <Ellipse Width="78" Height="78" Fill="#0D0D14"/>
+                        <!-- Fallback User Icon -->
+                        <fa:ImageAwesome Icon="User" Width="36" Height="36" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <!-- Actual Windows Account Picture if Available -->
+                        <Ellipse Width="78" Height="78" Visibility="{Binding HasUserProfileImage, Converter={StaticResource VisibilityConverter}}">
+                            <Ellipse.Fill>
+                                <ImageBrush ImageSource="{Binding UserProfileImage}" Stretch="UniformToFill"/>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </Grid>
+
+                    <!-- SAM Full Name Header -->
+                    <TextBlock Text="{Binding UserFullName}" FontSize="22" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                    <!-- Username Subheader -->
+                    <TextBlock Text="{Binding CurrentUsernameOnly}" FontSize="12" FontWeight="SemiBold" Foreground="#888896" HorizontalAlignment="Center" Margin="0,3,0,0"/>
                 </StackPanel>
 
                 <!-- Auth Input Form -->
                 <StackPanel Margin="0,0,0,10">
-                    <!-- User Profile Field -->
-                    <StackPanel Margin="0,0,0,18">
-                        <TextBlock Text="WINDOWS USER PROFILE" Style="{StaticResource Caption}" FontSize="9" Foreground="#888896" Margin="0,0,0,8"/>
-                        <Border Background="#0D0D14" BorderBrush="#1F1F2E" BorderThickness="1" CornerRadius="8" Padding="14,10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <fa:ImageAwesome Grid.Column="0" Icon="User" Width="14" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                <TextBox Grid.Column="1" Text="{Binding LoginUsername, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
-                    </StackPanel>
-
                     <!-- Password Input Field -->
                     <StackPanel Margin="0,0,0,22" IsEnabled="{Binding IsPasswordAuthEnabled}" Visibility="{Binding IsPasswordAuthEnabled, Converter={StaticResource VisibilityConverter}}">
-                        <TextBlock Text="WINDOWS ACCOUNT PASSWORD / PIN" Style="{StaticResource Caption}" FontSize="9" Foreground="#888896" Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="WINDOWS ACCOUNT PASSWORD / PIN" Style="{StaticResource Caption}" FontSize="9" Foreground="#888896" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <!-- Caps Lock Live Warning Badge -->
+                            <Border Visibility="{Binding IsCapsLockOn, Converter={StaticResource VisibilityConverter}}" Background="#2B1A00" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="4" Padding="6,2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="ExclamationTriangle" Width="9" Foreground="#F59E0B" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Caps Lock is ON" FontSize="8" FontWeight="Bold" Foreground="#F59E0B" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
                         <Border Background="#0D0D14" BorderBrush="#1F1F2E" BorderThickness="1" CornerRadius="8" Padding="14,10">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <fa:ImageAwesome Grid.Column="0" Icon="Lock" Width="14" Foreground="#888896" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                <PasswordBox Grid.Column="1" x:Name="OverlayPasswordBox" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="14" KeyDown="OverlayPasswordBox_KeyDown" IsEnabled="{Binding IsPasswordAuthEnabled}"/>
+
+                                <!-- Masked Password Box -->
+                                <PasswordBox Grid.Column="1" x:Name="OverlayPasswordBox" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="14" KeyDown="OverlayPasswordBox_KeyDown" PasswordChanged="OverlayPasswordBox_PasswordChanged" IsEnabled="{Binding IsPasswordAuthEnabled}" Visibility="{Binding IsPasswordRevealed, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}"/>
+
+                                <!-- Revealed Password Text Box -->
+                                <TextBox Grid.Column="1" x:Name="RevealedPasswordTextBox" Text="{Binding RevealedPasswordText, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="14" KeyDown="RevealedPasswordTextBox_KeyDown" TextChanged="RevealedPasswordTextBox_TextChanged" IsEnabled="{Binding IsPasswordAuthEnabled}" Visibility="{Binding IsPasswordRevealed, Converter={StaticResource VisibilityConverter}}"/>
+
+                                <!-- Show/Hide Eye Toggle Button -->
+                                <Button Grid.Column="2" Click="PasswordEyeToggle_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center" Margin="8,0,0,0" ToolTip="Show/Hide Password">
+                                    <fa:ImageAwesome Icon="Eye" Width="14" Foreground="#888896"/>
+                                </Button>
                             </Grid>
                         </Border>
                     </StackPanel>
@@ -679,15 +1000,31 @@
                     <Button Click="OverlayWindowsHelloButton_Click" IsEnabled="{Binding IsWindowsHelloAuthEnabled}" Visibility="{Binding IsWindowsHelloAuthEnabled, Converter={StaticResource VisibilityConverter}}" Style="{StaticResource StandardButton}" Height="40" Cursor="Hand">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <fa:ImageAwesome Icon="Windows" Width="12" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Use Windows Hello PIN / Biometrics" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                            <TextBlock Text="Use Windows Hello" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
 
+                <!-- Inactivity Auto-Logout Notification Banner -->
+                <Border Visibility="{Binding WasLoggedOutDueToInactivity, Converter={StaticResource VisibilityConverter}}" Background="#2B1A00" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="8" Padding="12,8" Margin="0,14,0,0" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="ClockOutline" Width="12" Foreground="#F59E0B" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding InactivityNoticeMessage}" FontSize="10" FontWeight="Bold" Foreground="#F59E0B" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
                 <!-- Footer Status -->
-                <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0">
+                <StackPanel HorizontalAlignment="Center" Margin="0,16,0,0">
                     <TextBlock Text="{Binding AuthStatusMessage}" FontSize="10" Foreground="{Binding AuthStatusColor}" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
                 </StackPanel>
+
+                <!-- Security Audit HUD Badge -->
+                <Border Background="#08080E" BorderBrush="#161622" BorderThickness="1" CornerRadius="6" Padding="10,4" Margin="0,14,0,0" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Shield" Width="10" Foreground="{DynamicResource AccentBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding SecurityAuditHudText}" FontSize="9" FontWeight="SemiBold" Foreground="#666675" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </Grid>
 
