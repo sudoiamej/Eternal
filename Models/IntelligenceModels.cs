@@ -163,7 +163,7 @@ namespace Eternal.Models
         public string Theme { get; set; } = "Dark";
         public string ThemeAccentColor { get; set; } = "#7F00FF";
         public bool IsAutoUpdateEnabled { get; set; } = true;
-        public bool MinimizeToTray { get; set; } = true;
+        public bool MinimizeToTray { get; set; } = false;
         public bool IsAdvancedMode { get; set; } = false;
         public bool IsSidebarExpanded { get; set; } = true;
         public List<string> DisabledFeatures { get; set; } = new();

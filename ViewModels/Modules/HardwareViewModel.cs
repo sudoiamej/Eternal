@@ -11,6 +11,7 @@ namespace Eternal.ViewModels.Modules
     public partial class HardwareViewModel : BaseViewModel
     {
         private readonly IHardwareService _hardwareService;
+        private readonly Eternal.Services.Security.IFactoryCodeService _factoryCodeService;
 
         [ObservableProperty] private CpuInfo? _cpu;
         [ObservableProperty] private GpuInfo? _gpu;
@@ -18,13 +19,15 @@ namespace Eternal.ViewModels.Modules
         [ObservableProperty] private List<DiskInfo> _disks = new();
         [ObservableProperty] private MotherboardInfo? _motherboard;
         [ObservableProperty] private List<SystemSummaryItem> _detailedInfo = new();
+        [ObservableProperty] private List<Eternal.Services.Security.HardwareDeltaItem> _hardwareDeltas = new();
         [ObservableProperty] private bool _hasError;
         [ObservableProperty] private string? _errorMessage;
         [ObservableProperty] private string? _errorDetails;
 
-        public HardwareViewModel(IHardwareService hardwareService)
+        public HardwareViewModel(IHardwareService hardwareService, Eternal.Services.Security.IFactoryCodeService factoryCodeService)
         {
             _hardwareService = hardwareService;
+            _factoryCodeService = factoryCodeService;
             LoadDataCommand = new CommunityToolkit.Mvvm.Input.AsyncRelayCommand(LoadDataAsync);
         }
 
@@ -78,6 +81,7 @@ namespace Eternal.ViewModels.Modules
                 Disks = await diskTask;
                 Motherboard = await mbTask;
                 DetailedInfo = await detailedTask;
+                HardwareDeltas = _factoryCodeService.GetHardwareDeltas();
             }
             catch (System.Exception ex)
             {

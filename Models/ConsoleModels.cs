@@ -23,6 +23,13 @@ namespace Eternal.Models
         [ObservableProperty] private string _icon;
         [ObservableProperty] private string _currentInput = string.Empty;
         [ObservableProperty] private bool _isBusy;
+        [ObservableProperty] private bool _isTyping;
+        [ObservableProperty] private bool _isExecuting;
+
+        partial void OnCurrentInputChanged(string value)
+        {
+            IsTyping = !string.IsNullOrEmpty(value);
+        }
         
         public ObservableCollection<string> OutputLines { get; } = new ObservableCollection<string>();
 
@@ -31,8 +38,6 @@ namespace Eternal.Models
             _consoleService = consoleService;
             _title = title;
             _icon = icon;
-
-            OutputLines.Add($"[SYSTEM] Initializing {title} session environment...");
 
             _consoleService.OutputReceived += OnOutputReceived;
             _consoleService.Exited += OnConsoleExited;
@@ -56,17 +61,15 @@ namespace Eternal.Models
             });
         }
 
-        public async Task StartAsync(string executable)
+        public async Task StartAsync(string executable, string arguments = "")
         {
             IsBusy = true;
-            await _consoleService.StartAsync(executable, Title);
+            await _consoleService.StartAsync(executable, Title, arguments);
             IsBusy = false;
         }
 
         public async Task SendCommandAsync(string cmd)
         {
-            if (string.IsNullOrWhiteSpace(cmd)) return;
-            OutputLines.Add($"> {cmd}");
             await _consoleService.SendCommandAsync(cmd);
         }
 

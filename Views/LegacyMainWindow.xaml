@@ -244,6 +244,21 @@
                             <Border Background="#20F59E0B" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="4" Padding="5,1" Margin="6,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="BETA" FontSize="8" FontWeight="Black" Foreground="#F59E0B" VerticalAlignment="Center"/>
                             </Border>
+
+                            <!-- Window Title Security Hierarchy Level Badge ([Full Access] / [Limited Access] / [Guest Scoped]) -->
+                            <Border Background="#1510B981" BorderBrush="#10B981" BorderThickness="1" CornerRadius="4" Padding="5,1" Margin="6,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding HierarchyBadgeText}" FontSize="8" FontWeight="Black" Foreground="#10B981" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <!-- On-Demand UAC Elevation Pill (Visible when non-admin) -->
+                            <Button Command="{Binding ElevateToAdminCommand}" Visibility="{Binding IsAdminUser, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Margin="8,0,0,0" VerticalAlignment="Center" Cursor="Hand" ToolTip="Click to elevate process to Administrator for Ring-0 features">
+                                <Border Background="#20EF4444" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="4" Padding="6,2">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <fa:ImageAwesome Icon="Lock" Width="9" Foreground="#EF4444" Margin="0,0,4,0"/>
+                                        <TextBlock Text="ELEVATE TO FULL ACCESS" FontSize="8" FontWeight="Black" Foreground="#EF4444"/>
+                                    </StackPanel>
+                                </Border>
+                            </Button>
                                 
                                 <!-- VS Debugger Attached / Testing Mode Pill Badge -->
                                 <Border Visibility="{Binding IsVsDebuggerAttached, Converter={StaticResource VisibilityConverter}}" Background="#30EF4444" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
@@ -496,31 +511,43 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Left: Telemetry Metrics -->
+                    <!-- Left: Telemetry Metrics (Router Style Interactive Links) -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- System Uptime -->
-                        <fa:ImageAwesome Icon="History" Foreground="#666675" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Uptime:" Foreground="#666675" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="{Binding Uptime}" Foreground="#CCCCCC" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                        <!-- System Uptime Router Link -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Dashboard" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Cursor="Hand" ToolTip="Click to view System Overview">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="History" Foreground="#666675" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Uptime:" Foreground="#666675" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                <TextBlock Text="{Binding Uptime}" Foreground="#CCCCCC" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                            </StackPanel>
+                        </Button>
 
-                        <!-- CPU Load Bar -->
-                        <fa:ImageAwesome Icon="Microchip" Foreground="{DynamicResource AccentBrush}" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="CPU:" Foreground="#666675" FontSize="10" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                        <Border Width="60" Height="6" Background="#161622" CornerRadius="3" VerticalAlignment="Center" Margin="0,0,6,0">
-                            <ProgressBar Value="{Binding CpuUsageValue}" Minimum="0" Maximum="100" Background="Transparent" Foreground="{DynamicResource AccentBrush}" BorderThickness="0"/>
-                        </Border>
-                        <TextBlock Text="{Binding CpuUsage}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                        <!-- CPU Load Bar Router Link -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Hardware" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Cursor="Hand" ToolTip="Click to view Hardware Telemetry">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="Microchip" Foreground="{DynamicResource AccentBrush}" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="CPU:" Foreground="#666675" FontSize="10" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <Border Width="60" Height="6" Background="#161622" CornerRadius="3" VerticalAlignment="Center" Margin="0,0,6,0">
+                                    <ProgressBar Value="{Binding CpuUsageValue}" Minimum="0" Maximum="100" Background="Transparent" Foreground="{DynamicResource AccentBrush}" BorderThickness="0"/>
+                                </Border>
+                                <TextBlock Text="{Binding CpuUsage}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                            </StackPanel>
+                        </Button>
 
-                        <!-- RAM Load Bar -->
-                        <fa:ImageAwesome Icon="Tasks" Foreground="#10B981" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="RAM:" Foreground="#666675" FontSize="10" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                        <Border Width="60" Height="6" Background="#161622" CornerRadius="3" VerticalAlignment="Center" Margin="0,0,6,0">
-                            <ProgressBar Value="{Binding RamUsageValue}" Minimum="0" Maximum="100" Background="Transparent" Foreground="#10B981" BorderThickness="0"/>
-                        </Border>
-                        <TextBlock Text="{Binding RamUsage}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                        <!-- RAM Load Bar Router Link -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Optimization" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Cursor="Hand" ToolTip="Click to view Memory &amp; System Optimization">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="Tasks" Foreground="#10B981" Width="10" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="RAM:" Foreground="#666675" FontSize="10" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <Border Width="60" Height="6" Background="#161622" CornerRadius="3" VerticalAlignment="Center" Margin="0,0,6,0">
+                                    <ProgressBar Value="{Binding RamUsageValue}" Minimum="0" Maximum="100" Background="Transparent" Foreground="#10B981" BorderThickness="0"/>
+                                </Border>
+                                <TextBlock Text="{Binding RamUsage}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
 
-                    <!-- Right: Engine & Security Status -->
+                    <!-- Right: Engine & Security Status (Router LED Link) -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                         <!-- VS Debugger Active / Testing Mode Footer Pill -->
                         <Border Visibility="{Binding IsVsDebuggerAttached, Converter={StaticResource VisibilityConverter}}" Background="#25EF4444" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="4" Padding="8,2" Margin="0,0,10,0">
@@ -530,12 +557,18 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="#1000FF99" BorderBrush="#1C00FF99" BorderThickness="1" CornerRadius="4" Padding="8,2" Margin="0,0,12,0">
-                            <StackPanel Orientation="Horizontal">
-                                <Ellipse Width="5" Height="5" Fill="#10B981" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="WORKSTATION ENGINE: ONLINE" FontSize="9" FontWeight="Bold" Foreground="#10B981" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
+                        <!-- Router Power/Engine LED Link -->
+                        <Button Command="{Binding ToggleControlCenterCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Cursor="Hand" ToolTip="Click to toggle Control Center Diagnostics">
+                            <Border Background="#1000FF99" BorderBrush="#1C00FF99" BorderThickness="1" CornerRadius="4" Padding="8,2" Margin="0,0,12,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid Width="7" Height="7" Margin="0,0,6,0" VerticalAlignment="Center">
+                                        <Ellipse Width="7" Height="7" Fill="#10B981"/>
+                                        <Ellipse Width="7" Height="7" Stroke="#00E5FF" StrokeThickness="1" Opacity="0.8"/>
+                                    </Grid>
+                                    <TextBlock Text="WORKSTATION ENGINE: ONLINE" FontSize="9" FontWeight="Bold" Foreground="#10B981" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Button>
                         <TextBlock Text="v3.5.5 (BETA)" Foreground="#555562" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
@@ -620,55 +653,72 @@
                         </Grid>
                     </Border>
 
-                    <!-- Connectivity 2x2 Grid (Wi-Fi, Bluetooth, Do Not Disturb, Night Light) -->
+                    <!-- Standard User Un-elevated Elevation Notice Banner -->
+                    <Border Visibility="{Binding IsAdminUser, Converter={StaticResource VisibilityConverter}, ConverterParameter=Inverse}" Background="#1F1500" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="8" Padding="10,6" Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="LIMITED PRIVILEGES ACTIVE" FontSize="9" FontWeight="Black" Foreground="#F59E0B"/>
+                                <TextBlock Text="High-risk tweaks are hidden in Standard User mode." FontSize="8" Foreground="#888896"/>
+                            </StackPanel>
+                            <Button Grid.Column="1" Command="{Binding ElevateToAdminCommand}" Style="{StaticResource StandardButton}" Padding="8,4" Height="24" Cursor="Hand">
+                                <TextBlock Text="ELEVATE" FontSize="8" FontWeight="Black" Foreground="#F59E0B"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- Diagnostics Quick Suite 2x2 Grid (Heap Healer, Sentinel Shield, Thermal Turbo, Network Flush) -->
                     <UniformGrid Columns="2" Margin="0,0,0,14">
-                        <!-- Wi-Fi Toggle -->
+                        <!-- Heap Healer (RAM Compactor) -->
                         <Border Background="#0C0C14" BorderBrush="#1C1C2B" BorderThickness="1" CornerRadius="10" Margin="0,0,4,4" Padding="12,8" Height="52">
-                            <Button Command="{Binding ToggleWifiCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
+                            <Button Command="{Binding TriggerHeapHealerCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <fa:ImageAwesome Icon="Wifi" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <fa:ImageAwesome Icon="Microchip" Width="16" Height="16" Foreground="#10B981" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Wi-Fi" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
-                                        <TextBlock Text="{Binding WifiSsid}" FontSize="9" Foreground="#888896" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="Heap Healer" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
+                                        <TextBlock Text="Compact RAM" FontSize="9" Foreground="#888896" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Button>
                         </Border>
 
-                        <!-- Bluetooth Toggle -->
+                        <!-- Sentinel Shield -->
                         <Border Background="#0C0C14" BorderBrush="#1C1C2B" BorderThickness="1" CornerRadius="10" Margin="4,0,0,4" Padding="12,8" Height="52">
-                            <Button Command="{Binding ToggleBluetoothCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
+                            <Button Command="{Binding ToggleSentinelShieldCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <fa:ImageAwesome Icon="BluetoothB" Width="16" Height="16" Foreground="#3B82F6" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <fa:ImageAwesome Icon="Shield" Width="16" Height="16" Foreground="#00E5FF" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Bluetooth" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
-                                        <TextBlock Text="{Binding BluetoothStatus}" FontSize="9" Foreground="#888896" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="Sentinel Shield" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
+                                        <TextBlock Text="{Binding SentinelStatusText}" FontSize="9" Foreground="#888896" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Button>
                         </Border>
 
-                        <!-- Do Not Disturb Toggle -->
-                        <Border Background="#0C0C14" BorderBrush="#1C1C2B" BorderThickness="1" CornerRadius="10" Margin="0,4,4,0" Padding="12,8" Height="52">
-                            <Button Command="{Binding ToggleDoNotDisturbCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
+                        <!-- Thermal Turbo (Hidden for Non-Admin Standard Users) -->
+                        <Border Visibility="{Binding IsAdminUser, Converter={StaticResource VisibilityConverter}}" Background="#0C0C14" BorderBrush="#1C1C2B" BorderThickness="1" CornerRadius="10" Margin="0,4,4,0" Padding="12,8" Height="52">
+                            <Button Command="{Binding ToggleThermalTurboCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <fa:ImageAwesome Icon="BellSlash" Width="16" Height="16" Foreground="#EC4899" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <fa:ImageAwesome Icon="Fire" Width="16" Height="16" Foreground="#EF4444" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Do Not Disturb" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
-                                        <TextBlock Text="Focus Active" FontSize="9" Foreground="#888896"/>
+                                        <TextBlock Text="Thermal Turbo" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
+                                        <TextBlock Text="{Binding ThermalTurboText}" FontSize="9" Foreground="#888896"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Button>
                         </Border>
 
-                        <!-- Night Light Toggle -->
+                        <!-- Network & DNS Flush -->
                         <Border Background="#0C0C14" BorderBrush="#1C1C2B" BorderThickness="1" CornerRadius="10" Margin="4,4,0,0" Padding="12,8" Height="52">
-                            <Button Command="{Binding ToggleNightLightCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
+                            <Button Command="{Binding FlushNetworkCacheCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <fa:ImageAwesome Icon="LightbulbOutline" Width="16" Height="16" Foreground="#F59E0B" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <fa:ImageAwesome Icon="Globe" Width="16" Height="16" Foreground="#F59E0B" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Night Light" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
-                                        <TextBlock Text="Warm Tint" FontSize="9" Foreground="#888896"/>
+                                        <TextBlock Text="Network Flush" FontSize="11" FontWeight="Bold" Foreground="White" Margin="0,0,0,2"/>
+                                        <TextBlock Text="Flush DNS Cache" FontSize="9" Foreground="#888896"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Button>
@@ -950,19 +1000,70 @@
                     <TextBlock Text="{Binding CurrentUsernameOnly}" FontSize="12" FontWeight="SemiBold" Foreground="#888896" HorizontalAlignment="Center" Margin="0,3,0,0"/>
                 </StackPanel>
 
+                <!-- Active User Account Selector Cards (Side-by-Side Row) -->
+                <StackPanel Margin="0,0,0,20" HorizontalAlignment="Center" Visibility="{Binding ActiveUserAccounts.Count, Converter={StaticResource VisibilityConverter}}">
+                    <TextBlock Text="WORKSTATION ACCOUNTS" FontSize="9" FontWeight="Black" Foreground="#888896" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                    <ItemsControl ItemsSource="{Binding ActiveUserAccounts}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.SelectUserAccountCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}" Margin="6,0" Cursor="Hand" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="UserCardBorder" Background="#0D0D14" BorderBrush="#1F1F2E" BorderThickness="1.5" CornerRadius="10" Padding="14,10" MinWidth="125">
+                                                <StackPanel HorizontalAlignment="Center">
+                                                    <Grid Margin="0,0,0,6" HorizontalAlignment="Center">
+                                                        <Ellipse Width="36" Height="36" Fill="#141422"/>
+                                                        <fa:ImageAwesome Icon="User" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    </Grid>
+                                                    <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="110"/>
+                                                    <TextBlock Text="{Binding RoleBadge}" FontSize="8" FontWeight="Black" Foreground="#888896" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="UserCardBorder" Property="Background" Value="#161626"/>
+                                                    <Setter TargetName="UserCardBorder" Property="BorderBrush" Value="#00E5FF"/>
+                                                </Trigger>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter TargetName="UserCardBorder" Property="Background" Value="#1E1E32"/>
+                                                    <Setter TargetName="UserCardBorder" Property="BorderBrush" Value="#00E5FF"/>
+                                                </DataTrigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
                 <!-- Auth Input Form -->
                 <StackPanel Margin="0,0,0,10">
                     <!-- Password Input Field -->
                     <StackPanel Margin="0,0,0,22" IsEnabled="{Binding IsPasswordAuthEnabled}" Visibility="{Binding IsPasswordAuthEnabled, Converter={StaticResource VisibilityConverter}}">
                         <Grid Margin="0,0,0,8">
-                            <TextBlock Text="WINDOWS ACCOUNT PASSWORD / PIN" Style="{StaticResource Caption}" FontSize="9" Foreground="#888896" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <!-- Caps Lock Live Warning Badge -->
-                            <Border Visibility="{Binding IsCapsLockOn, Converter={StaticResource VisibilityConverter}}" Background="#2B1A00" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="4" Padding="6,2" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:ImageAwesome Icon="ExclamationTriangle" Width="9" Foreground="#F59E0B" Margin="0,0,4,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Caps Lock is ON" FontSize="8" FontWeight="Bold" Foreground="#F59E0B" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <TextBlock Text="WINDOWS ACCOUNT PASSWORD / PIN" Style="{StaticResource Caption}" FontSize="9" Foreground="#888896" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <!-- Live Typing Indicator Pill -->
+                                <Border Visibility="{Binding IsPasswordRevealed, Converter={StaticResource VisibilityConverter}}" Background="#2000E5FF" BorderBrush="#00E5FF" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,6,0" VerticalAlignment="Center">
+                                    <TextBlock Text="INPUT ACTIVE" FontSize="8" FontWeight="Bold" Foreground="#00E5FF" VerticalAlignment="Center"/>
+                                </Border>
+                                <!-- Caps Lock Live Warning Badge -->
+                                <Border Visibility="{Binding IsCapsLockOn, Converter={StaticResource VisibilityConverter}}" Background="#2B1A00" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="ExclamationTriangle" Width="9" Foreground="#F59E0B" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Caps Lock is ON" FontSize="8" FontWeight="Bold" Foreground="#F59E0B" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
                         </Grid>
 
                         <Border Background="#0D0D14" BorderBrush="#1F1F2E" BorderThickness="1" CornerRadius="8" Padding="14,10">

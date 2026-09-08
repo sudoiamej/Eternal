@@ -48,6 +48,7 @@ namespace Eternal.Views
             this.Closing += MainWindow_Closing;
             InitializeTray();
             InitializeInactivityTimer();
+            InitializeLockscreenFocusGuardianTimer();
             
             // Adjust window dimensions dynamically to fit under 100% and 125% DPI scale boundaries
             AdjustWindowSizeToWorkingArea();
@@ -196,6 +197,24 @@ namespace Eternal.Views
             this.Show();
             this.WindowState = WindowState.Normal;
             this.Activate();
+        }
+        private void InitializeLockscreenFocusGuardianTimer()
+        {
+            var timer = new System.Windows.Threading.DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(1000);
+            timer.Tick += (s, e) =>
+            {
+                if (DataContext is MainViewModel vm && !vm.IsAuthenticated && !vm.IsVsDebuggerAttached)
+                {
+                    if (this.WindowState == WindowState.Minimized)
+                    {
+                        this.WindowState = WindowState.Normal;
+                    }
+                    this.Topmost = true;
+                    this.Activate();
+                }
+            };
+            timer.Start();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)

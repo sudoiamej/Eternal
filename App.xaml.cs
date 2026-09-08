@@ -147,6 +147,9 @@ namespace Eternal
             services.AddSingleton<IUserGroupService, WindowsUserGroupService>();
             services.AddSingleton<IFeatureIntegrityService, WindowsFeatureIntegrityService>();
             services.AddSingleton<IScalingService, WindowsScalingService>();
+            services.AddSingleton<ICliDetectionService, CliDetectionService>();
+            services.AddSingleton<IFactoryCodeService, FactoryCodeService>();
+            services.AddSingleton<ILockscreenAntiBypassService, LockscreenAntiBypassService>();
 
             // ViewModels - Core (Singleton)
             services.AddSingleton<MainViewModel>();

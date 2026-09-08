@@ -14,39 +14,56 @@ namespace Eternal.Services.System
 
         public bool IsRunning => _process != null && !_process.HasExited;
 
-        public Task StartAsync(string shell, string name)
+        public Task StartAsync(string shell, string name, string arguments = "", string? workingDirectory = null)
         {
             return Task.Run(() =>
             {
                 try
                 {
+                    string targetWorkDir = workingDirectory;
+                    if (string.IsNullOrEmpty(targetWorkDir) || !Directory.Exists(targetWorkDir))
+                    {
+                        targetWorkDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    }
+                    if (string.IsNullOrEmpty(targetWorkDir) || !Directory.Exists(targetWorkDir))
+                    {
+                        targetWorkDir = @"C:\";
+                    }
+
+                    string defaultArgs = arguments;
+                    if (string.IsNullOrEmpty(defaultArgs) && shell.Contains("powershell", StringComparison.OrdinalIgnoreCase))
+                    {
+                        defaultArgs = "-NoExit";
+                    }
+
                     _process = new Process
                     {
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = shell,
-                            Arguments = shell.Contains("powershell") ? "-NoExit -NoProfile" : "",
+                            Arguments = defaultArgs,
                             UseShellExecute = false,
                             RedirectStandardInput = true,
                             RedirectStandardOutput = true,
                             RedirectStandardError = true,
                             CreateNoWindow = true,
-                            StandardOutputEncoding = Encoding.Default,
-                            WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 3) // Typically C:\
+                            StandardOutputEncoding = Encoding.UTF8,
+                            StandardErrorEncoding = Encoding.UTF8,
+                            WorkingDirectory = targetWorkDir
                         },
                         EnableRaisingEvents = true
                     };
 
                     _process.OutputDataReceived += (s, e) => { 
                         if (e.Data != null) {
-                            Debug.WriteLine($"Console Process Output: {e.Data}");
+                            Debug.WriteLine($"Console Output: {e.Data}");
                             OutputReceived?.Invoke(this, e.Data); 
                         }
                     };
                     _process.ErrorDataReceived += (s, e) => { 
                         if (e.Data != null) {
-                            Debug.WriteLine($"Console Process Error: {e.Data}");
-                            OutputReceived?.Invoke(this, "[ERROR] " + e.Data); 
+                            Debug.WriteLine($"Console Error: {e.Data}");
+                            OutputReceived?.Invoke(this, e.Data); 
                         }
                     };
                     _process.Exited += (s, e) => Exited?.Invoke(this, EventArgs.Empty);

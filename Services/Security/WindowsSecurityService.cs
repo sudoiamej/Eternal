@@ -447,7 +447,31 @@ namespace Eternal.Services.Security
         {
             try
             {
+                // Guarantee Windows Hello credential prompt stays on top in the foreground
+                bool originalTopmost = false;
+                await global::System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    var win = global::System.Windows.Application.Current.MainWindow;
+                    if (win != null)
+                    {
+                        originalTopmost = win.Topmost;
+                        win.Topmost = false;
+                        win.Activate();
+                    }
+                });
+
                 var result = await global::Windows.Security.Credentials.UI.UserConsentVerifier.RequestVerificationAsync(message);
+
+                await global::System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    var win = global::System.Windows.Application.Current.MainWindow;
+                    if (win != null)
+                    {
+                        win.Topmost = originalTopmost;
+                        win.Activate();
+                    }
+                });
+
                 return result == global::Windows.Security.Credentials.UI.UserConsentVerificationResult.Verified;
             }
             catch (Exception ex)

@@ -8,7 +8,7 @@ namespace Eternal.Services.System
         event EventHandler<string> OutputReceived;
         event EventHandler Exited;
         bool IsRunning { get; }
-        Task StartAsync(string shell, string name);
+        Task StartAsync(string shell, string name, string arguments = "", string? workingDirectory = null);
         Task SendCommandAsync(string command);
         void Stop();
     }

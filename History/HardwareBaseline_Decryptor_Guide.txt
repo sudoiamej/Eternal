@@ -1,0 +1,110 @@
+================================================================================
+  ETERNAL SYSTEM INTELLIGENCE (v3.5.5 BETA)
+  FACTORY HARDWARE BASELINE STANDALONE DECRYPTION UTILITY SPECIFICATION & C# CODE
+================================================================================
+
+Target File:
+  %AppData%\Eternal\Factory\HardwareBaseline.dat
+
+Cryptographic Architecture:
+  Layer 1: Custom AES-256-GCM Cryptographic Engine
+           - Secret Seed: "Eternal_Factory_Master_Key_v3.5.5_Security_Vector"
+           - Key Derivation: PBKDF2 (Rfc2898DeriveBytes, 10,000 iterations, 32-byte salt)
+           - IV / Nonce: 12-byte random cryptographic nonce
+           - Auth Tag: 16-byte GCM authentication tag
+
+  Layer 2: Windows DPAPI (Data Protection API)
+           - Protection Scope: System.Security.Cryptography.ProtectedData.Unprotect
+           - Scope: DataProtectionScope.LocalMachine
+
+--------------------------------------------------------------------------------
+STANDALONE DECRYPTION C# CONSOLE APPLICATION (COPY-PASTEABLE TEMPLATE FOR OTHER PROJECTS)
+--------------------------------------------------------------------------------
+
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace StandaloneEternalDecryptor
+{
+    class Program
+    {
+        private static readonly byte[] MasterSeed = Encoding.UTF8.GetBytes("Eternal_Factory_Master_Key_v3.5.5_Security_Vector");
+        private static readonly byte[] Salt = Encoding.UTF8.GetBytes("Eternal_HW_Salt_26100");
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("==================================================");
+            Console.WriteLine(" ETERNAL HARDWARE BASELINE STANDALONE DECRYPTOR");
+            Console.WriteLine("==================================================");
+
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string dataPath = Path.Combine(appData, @"Eternal\Factory\HardwareBaseline.dat");
+
+            if (args.Length > 0 && File.Exists(args[0]))
+            {
+                dataPath = args[0];
+            }
+
+            if (!File.Exists(dataPath))
+            {
+                Console.WriteLine($"[ERROR] Target encrypted file not found: {dataPath}");
+                return;
+            }
+
+            try
+            {
+                byte[] rawCipher = File.ReadAllBytes(dataPath);
+                string jsonOutput = DecryptBaselineFile(rawCipher);
+                
+                Console.WriteLine("\n[SUCCESS] Decrypted Hardware Baseline Snapshot:\n");
+                Console.WriteLine(jsonOutput);
+
+                string outPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DecryptedHardwareBaseline.json");
+                File.WriteAllText(outPath, jsonOutput);
+                Console.WriteLine($"\n[INFO] Saved decrypted JSON to: {outPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n[FATAL] Decryption failed: {ex.Message}");
+            }
+        }
+
+        public static string DecryptBaselineFile(byte[] inputBuffer)
+        {
+            // Step 1: DPAPI Unprotect (Layer 2)
+            byte[] layer1Cipher;
+            try
+            {
+                layer1Cipher = ProtectedData.Unprotect(inputBuffer, null, DataProtectionScope.LocalMachine);
+            }
+            catch
+            {
+                // Fallback if DPAPI is unavailable (e.g. WinPE environment)
+                layer1Cipher = inputBuffer;
+            }
+
+            // Step 2: AES-256-GCM Custom Decryption (Layer 1)
+            using var pbkdf2 = new Rfc2898DeriveBytes(MasterSeed, Salt, 10000, HashAlgorithmName.SHA256);
+            byte[] key = pbkdf2.GetBytes(32);
+
+            using var ms = new MemoryStream(layer1Cipher);
+            using var reader = new BinaryReader(ms);
+
+            byte[] nonce = reader.ReadBytes(12);
+            byte[] tag = reader.ReadBytes(16);
+            int cipherLen = reader.ReadInt32();
+            byte[] cipherText = reader.ReadBytes(cipherLen);
+
+            byte[] plainBytes = new byte[cipherLen];
+
+            using var aesGcm = new AesGcm(key, 16);
+            aesGcm.Decrypt(nonce, cipherText, tag, plainBytes);
+
+            return Encoding.UTF8.GetString(plainBytes);
+        }
+    }
+}
+
+================================================================================

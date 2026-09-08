@@ -12,149 +12,93 @@ namespace Eternal.Helpers
         [DllImport("user32.dll", SetLastError = true)]
         public static extern bool LockWorkStation();
 
-        [DllImport("gdi32.dll")]
-        private static extern bool SetDeviceGammaRamp(IntPtr hDC, ref RAMP lpRamp);
+        [DllImport("dnsapi.dll", EntryPoint = "DnsFlushResolverCache")]
+        private static extern uint DnsFlushResolverCache();
 
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetDC(IntPtr hWnd);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint SetThreadExecutionState(uint esFlags);
 
-        [DllImport("user32.dll")]
-        private static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        private struct RAMP
-        {
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-            public ushort[] Red;
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-            public ushort[] Green;
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-            public ushort[] Blue;
-        }
+        private const uint ES_CONTINUOUS = 0x80000000;
+        private const uint ES_SYSTEM_REQUIRED = 0x00000001;
+        private const uint ES_DISPLAY_REQUIRED = 0x00000002;
         #endregion
 
-        #region Wi-Fi Control
-        public static bool IsWifiEnabled()
+        #region Silent Network & DNS Flush
+        public static bool FlushDnsAndSocketsSilent()
         {
             try
             {
-                using var searcher = new ManagementObjectSearcher("SELECT NetConnectionStatus FROM Win32_NetworkAdapter WHERE NetConnectionID LIKE '%Wi-Fi%' OR NetConnectionID LIKE '%Wireless%'");
-                foreach (ManagementObject obj in searcher.Get())
-                {
-                    ushort status = Convert.ToUInt16(obj["NetConnectionStatus"]);
-                    return status == 2; // 2 = Connected, 9 = Enabled
-                }
-            }
-            catch { }
-            return true;
-        }
+                // 1. Direct Win32 API Call (Zero windows, zero process spawns)
+                uint res = DnsFlushResolverCache();
+                if (res == 0) return true;
 
-        public static void SetWifiState(bool enable)
-        {
-            try
-            {
-                string action = enable ? "enable" : "disable";
+                // 2. Fallback: Silent hidden process execution
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "netsh",
-                    Arguments = $"interface set interface name=\"Wi-Fi\" admin={action}",
+                    FileName = "ipconfig",
+                    Arguments = "/flushdns",
                     CreateNoWindow = true,
-                    UseShellExecute = true,
-                    Verb = "runas" // Elevate admin
+                    UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 };
-                Process.Start(psi);
+                using var proc = Process.Start(psi);
+                proc?.WaitForExit(1000);
+                return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Wi-Fi Control Error: {ex.Message}");
+                Debug.WriteLine($"DNS Flush Error: {ex.Message}");
+                return false;
             }
         }
         #endregion
 
-        #region Bluetooth Control
-        public static bool IsBluetoothServiceRunning()
+        #region Thermal Turbo / CPU Unpark & High Priority Policy
+        public static void SetThermalTurboState(bool active)
         {
             try
             {
-                using var searcher = new ManagementObjectSearcher("SELECT State FROM Win32_Service WHERE Name='bthserv'");
-                foreach (ManagementObject obj in searcher.Get())
-                {
-                    string state = obj["State"]?.ToString() ?? "";
-                    return state.Equals("Running", StringComparison.OrdinalIgnoreCase);
-                }
-            }
-            catch { }
-            return false;
-        }
-
-        public static void SetBluetoothState(bool enable)
-        {
-            try
-            {
-                string action = enable ? "start" : "stop";
+                // Switch Windows Power Scheme silently to High Performance or Balanced
+                string guid = active ? "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c" : "381b4222-f694-41f0-9685-ff5bb260df2e";
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "net",
-                    Arguments = $"{action} bthserv",
+                    FileName = "powercfg",
+                    Arguments = $"/setactive {guid}",
                     CreateNoWindow = true,
-                    UseShellExecute = true,
-                    Verb = "runas"
+                    UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 };
-                Process.Start(psi);
+                using var proc = Process.Start(psi);
+                proc?.WaitForExit(500);
+
+                // Elevate current process priority class
+                using var curProc = Process.GetCurrentProcess();
+                curProc.PriorityClass = active ? ProcessPriorityClass.High : ProcessPriorityClass.Normal;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Bluetooth Control Error: {ex.Message}");
+                Debug.WriteLine($"Thermal Turbo Error: {ex.Message}");
             }
         }
         #endregion
 
-        #region Do Not Disturb (Focus Assist / Toast Notification Suppressor)
-        public static void SetDoNotDisturbState(bool active)
+        #region Keep-Awake / Caffeine Mode
+        public static void SetKeepAwakeState(bool active)
         {
             try
             {
-                // Registry key for Windows Toast Notifications
-                using var key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings");
-                if (key != null)
+                if (active)
                 {
-                    key.SetValue("NOC_GLOBAL_SETTING_TOASTS_ENABLED", active ? 0 : 1, RegistryValueKind.DWord);
+                    SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
+                }
+                else
+                {
+                    SetThreadExecutionState(ES_CONTINUOUS);
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"DND Error: {ex.Message}");
-            }
-        }
-        #endregion
-
-        #region Night Light (Gamma Ramp Filter)
-        public static void SetNightLightState(bool active)
-        {
-            try
-            {
-                IntPtr hDC = GetDC(IntPtr.Zero);
-                RAMP ramp = new RAMP
-                {
-                    Red = new ushort[256],
-                    Green = new ushort[256],
-                    Blue = new ushort[256]
-                };
-
-                for (int i = 0; i < 256; i++)
-                {
-                    int value = i * 256;
-                    ramp.Red[i] = (ushort)Math.Clamp(value, 0, 65535);
-                    ramp.Green[i] = (ushort)Math.Clamp((int)(value * (active ? 0.85 : 1.0)), 0, 65535);
-                    ramp.Blue[i] = (ushort)Math.Clamp((int)(value * (active ? 0.65 : 1.0)), 0, 65535); // Warm amber reduction
-                }
-
-                SetDeviceGammaRamp(hDC, ref ramp);
-                ReleaseDC(IntPtr.Zero, hDC);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Night Light Error: {ex.Message}");
+                Debug.WriteLine($"KeepAwake Error: {ex.Message}");
             }
         }
         #endregion
@@ -176,9 +120,11 @@ namespace Eternal.Helpers
                     FileName = "powercfg",
                     Arguments = $"/setactive {guid}",
                     CreateNoWindow = true,
-                    UseShellExecute = false
+                    UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 };
-                Process.Start(psi);
+                using var proc = Process.Start(psi);
+                proc?.WaitForExit(500);
             }
             catch (Exception ex)
             {

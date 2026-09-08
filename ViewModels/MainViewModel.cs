@@ -106,17 +106,18 @@ namespace Eternal.ViewModels
         [ObservableProperty] private string _revealedPasswordText = "";
         [ObservableProperty] private string _securityAuditHudText = "Security: Strict SAM Validation | Audit Active";
         [ObservableProperty] private string _splashTelemetryTicker = "[+] Verifying CPU AVX2 & Kernel Vector Capabilities...";
+        [ObservableProperty] private string _hierarchyBadgeText = "[Full Access]";
 
-        // macOS-Style Control Center State
-        [ObservableProperty] private bool _isControlCenterEnabled = false; // Feature flag switch (Default: Disabled)
+        // macOS-Style Control Center State (Diagnostics Suite)
+        [ObservableProperty] private bool _isControlCenterEnabled = true; // Enabled by default
         [ObservableProperty] private bool _isControlCenterVisible = false;
-        [ObservableProperty] private bool _isWifiEnabled = true;
-        [ObservableProperty] private string _wifiSsid = "Wi-Fi: Connected";
-        [ObservableProperty] private bool _isBluetoothEnabled = true;
-        [ObservableProperty] private string _bluetoothStatus = "Bluetooth: Active";
+        [ObservableProperty] private bool _isSentinelShieldActive = true;
+        [ObservableProperty] private string _sentinelStatusText = "Sentinel: Armed";
+        [ObservableProperty] private bool _isThermalTurboActive = false;
+        [ObservableProperty] private string _thermalTurboText = "Thermal: Eco";
+        [ObservableProperty] private string _networkFlushText = "Flush Network & DNS";
         [ObservableProperty] private double _masterVolumeLevel = 80.0;
-        [ObservableProperty] private bool _isDoNotDisturbActive = false;
-        [ObservableProperty] private bool _isNightLightActive = false;
+        [ObservableProperty] private double _telemetryRefreshIntervalMs = 1000.0;
         [ObservableProperty] private string _selectedPowerPreset = "Balanced";
 
         [ObservableProperty] private bool _isPostAuthSplashVisible = false;
@@ -126,7 +127,7 @@ namespace Eternal.ViewModels
         [ObservableProperty] private string _postAuthSplashTip = "Tip: Press Ctrl+K anytime to open the instant Command Palette.";
 
         public string CurrentUserGreeting => $"Hello, {(string.IsNullOrWhiteSpace(UserFullName) ? Environment.UserName : UserFullName)}!";
-        public string CurrentUsernameOnly => Environment.UserName;
+        public string CurrentUsernameOnly => string.IsNullOrWhiteSpace(LoginUsername) ? Environment.UserName : LoginUsername;
 
         partial void OnNavSortOptionChanged(NavigationSortOption value) => SortNavigation();
         
@@ -172,6 +173,11 @@ namespace Eternal.ViewModels
 
         public bool IsVsDebuggerAttached => System.Diagnostics.Debugger.IsAttached || Eternal.Helpers.AntiDebugHelper.IsDeveloperExceptionActive();
 
+        private readonly IFactoryCodeService _factoryCodeService;
+        private readonly ILockscreenAntiBypassService _antiBypassService;
+
+        public ObservableCollection<UserAccountTileModel> ActiveUserAccounts { get; } = new ObservableCollection<UserAccountTileModel>();
+
         public MainViewModel(
             ILoggingService loggingService, 
             IPerformanceService performanceService, 
@@ -182,6 +188,8 @@ namespace Eternal.ViewModels
             IEnvironmentService envService,
             IBatteryService batteryService,
             IScalingService scalingService,
+            IFactoryCodeService factoryCodeService,
+            ILockscreenAntiBypassService antiBypassService,
             ToastViewModel toastVm,
             CommandPaletteViewModel commandPaletteVm)
         {
@@ -194,6 +202,8 @@ namespace Eternal.ViewModels
             _envService = envService;
             _batteryService = batteryService;
             _scalingService = scalingService;
+            _factoryCodeService = factoryCodeService;
+            _antiBypassService = antiBypassService;
             ToastVm = toastVm;
             _commandPaletteVm = commandPaletteVm;
 
@@ -207,11 +217,14 @@ namespace Eternal.ViewModels
             _loggingService.Log("Eternal System Intelligence Initialized (DI Mode).");
             _loggingService.Log($"Eternal Intelligence Suite Version 3.5.5 (BETA)");
 
+            _antiBypassService.EnableLockscreenProtection();
+
             IsAdvancedMode = _settingsService.Current.IsAdvancedMode;
             IsSidebarExpanded = _settingsService.Current.IsSidebarExpanded;
             _settingsService.SettingsChanged += OnSettingsChanged;
 
             AuditUserPermissions();
+            PopulateActiveUserAccounts();
             IsPeMode = _envService.IsPeMode;
             if (IsPeMode)
             {
@@ -341,26 +354,26 @@ namespace Eternal.ViewModels
                 new NavigationItem("Processes", "Tasks", "Processes", 1, 1, 0),
                 new NavigationItem("Performance", "LineChart", "Performance", 0, 0, 1),
                 new NavigationItem("Sentinel Privacy", "EyeSlash", "Privacy", 1, 1, 2),
-                new NavigationItem("Services", "Server", "Services", 1, 1, 3),
-                new NavigationItem("User Accounts", "Users", "Users", 1, 1, 4),
+                new NavigationItem("Services", "Server", "Services", 2, 2, 3),
+                new NavigationItem("User Accounts", "Users", "Users", 2, 2, 4),
                 new NavigationItem("Network", "Globe", "Network", 0, 0, 5),
                 new NavigationItem("Security", "Shield", "Security", 1, 1, 6),
-                new NavigationItem("Drivers", "ListAlt", "Drivers", 1, 2, 7),
+                new NavigationItem("Drivers", "ListAlt", "Drivers", 2, 2, 7),
                 new NavigationItem("Environment", "Code", "Environment", 1, 1, 8),
                 new NavigationItem("File Forensics", "Eye", "Forensics", 1, 1, 9),
                 new NavigationItem("Network Packet Monitor", "Globe", "NetworkMonitor", 1, 1, 10),
                 new NavigationItem("Software Manager", "Laptop", "AppManager", 1, 1, 11),
-                new NavigationItem("Memory & DLL Inspector", "Microchip", "MemoryInspector", 1, 1, 12),
-                new NavigationItem("Stealth Port Scanner", "Shield", "PortScanner", 1, 1, 13),
-                new NavigationItem("Ring-0 Kernel Drivers", "Microchip", "DriverKernel", 1, 1, 14),
-                new NavigationItem("Disk Sector Inspector", "HddOutline", "DiskSector", 1, 1, 15)
+                new NavigationItem("Memory & DLL Inspector", "Microchip", "MemoryInspector", 2, 2, 12),
+                new NavigationItem("Stealth Port Scanner", "Shield", "PortScanner", 2, 2, 13),
+                new NavigationItem("Ring-0 Kernel Drivers", "Microchip", "DriverKernel", 2, 2, 14),
+                new NavigationItem("Disk Sector Inspector", "HddOutline", "DiskSector", 2, 2, 15)
             };
             var tempSupport = new List<NavigationItem>
             {
                 new NavigationItem("Eternal Console", "Terminal", "Console", 2, 2, 0),
                 new NavigationItem("File Explorer", "FolderOpen", "Explorer", 1, 1, 1),
-                new NavigationItem("Time Machine", "ClockOutline", "Snapshots", 1, 1, 2),
-                new NavigationItem("DISM Imaging", "Archive", "DismImaging", 1, 2, 3),
+                new NavigationItem("Time Machine", "ClockOutline", "Snapshots", 2, 2, 2),
+                new NavigationItem("DISM Imaging", "Archive", "DismImaging", 2, 2, 3),
                 new NavigationItem("Windows Update", "Refresh", "WindowsUpdate", 0, 0, 4),
                 new NavigationItem("System Logs", "Bars", "Logs", 0, 0, 5),
                 new NavigationItem("Help", "QuestionCircle", "Help", 0, 0, 6),
@@ -425,7 +438,11 @@ namespace Eternal.ViewModels
 
         private ObservableCollection<NavigationItem> FilterNav(List<NavigationItem> items, List<string> disabled)
         {
-            var filtered = items.Where(i => !disabled.Contains(i.ViewName) && Eternal.Helpers.OsHelper.IsBuildSupported(i.MinBuild, i.MaxBuild)).ToList();
+            var filtered = items.Where(i => 
+                !disabled.Contains(i.ViewName) && 
+                Eternal.Helpers.OsHelper.IsBuildSupported(i.MinBuild, i.MaxBuild) &&
+                IsNavigationAllowedForUserRole(i)
+            ).ToList();
             return new ObservableCollection<NavigationItem>(filtered);
         }
 
@@ -471,16 +488,32 @@ namespace Eternal.ViewModels
                 var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
                 var principal = new System.Security.Principal.WindowsPrincipal(identity);
 
-                if (principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator))
+                bool isElevatedAdmin = principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+                bool isAccountInAdminGroup = identity.Groups != null && identity.Groups.Any(g => g.Value == "S-1-5-32-544");
+
+                if (isElevatedAdmin)
                 {
                     UserRoleBadge = "ADMINISTRATOR";
+                    HierarchyBadgeText = "[Full Access]";
+                    Title = "Eternal System Intelligence [Full Access]";
                     IsAdminUser = true;
                     IsStandardUser = false;
+                    IsGuestUser = false;
+                }
+                else if (isAccountInAdminGroup)
+                {
+                    UserRoleBadge = "ADMINISTRATOR";
+                    HierarchyBadgeText = "[Limited Access]";
+                    Title = "Eternal System Intelligence [Limited Access]";
+                    IsAdminUser = false;
+                    IsStandardUser = true;
                     IsGuestUser = false;
                 }
                 else if (principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Guest))
                 {
                     UserRoleBadge = "GUEST USER";
+                    HierarchyBadgeText = "[Guest Scoped]";
+                    Title = "Eternal System Intelligence [Guest Scoped]";
                     IsAdminUser = false;
                     IsStandardUser = false;
                     IsGuestUser = true;
@@ -488,6 +521,8 @@ namespace Eternal.ViewModels
                 else
                 {
                     UserRoleBadge = "STANDARD USER";
+                    HierarchyBadgeText = "[Limited Access]";
+                    Title = "Eternal System Intelligence [Limited Access]";
                     IsAdminUser = false;
                     IsStandardUser = true;
                     IsGuestUser = false;
@@ -496,9 +531,52 @@ namespace Eternal.ViewModels
             catch
             {
                 UserRoleBadge = "STANDARD USER";
+                HierarchyBadgeText = "[Limited Access]";
+                Title = "Eternal System Intelligence [Limited Access]";
                 IsAdminUser = false;
                 IsStandardUser = true;
                 IsGuestUser = false;
+            }
+
+            InitializeNavigation();
+        }
+
+        private bool IsNavigationAllowedForUserRole(NavigationItem item)
+        {
+            if (item == null) return true;
+
+            // Guest User Scope: Only Safe View-Only Telemetry (DangerLevel 0)
+            if (IsGuestUser)
+            {
+                return item.DangerLevel == 0;
+            }
+
+            // Standard / Un-elevated Scope: Hide High-Risk Kernel/System Modifiers (DangerLevel >= 2)
+            if (!IsAdminUser && item.DangerLevel >= 2)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        [RelayCommand]
+        public void ElevateToAdmin()
+        {
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "Eternal.exe",
+                    UseShellExecute = true,
+                    Verb = "runas"
+                };
+                System.Diagnostics.Process.Start(psi);
+                System.Windows.Application.Current.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                _toastService.ShowWarning("Elevation request was canceled or failed.");
             }
         }
         [System.Runtime.InteropServices.DllImport("advapi32.dll", SetLastError = true, CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
@@ -618,33 +696,47 @@ namespace Eternal.ViewModels
         }
 
         [RelayCommand]
-        public void ToggleWifi()
+        public void TriggerHeapHealer()
         {
-            IsWifiEnabled = !IsWifiEnabled;
-            WifiSsid = IsWifiEnabled ? "Wi-Fi: Connected" : "Wi-Fi: Disabled";
-            Helpers.ControlCenterSystemHelper.SetWifiState(IsWifiEnabled);
+            long before = GC.GetTotalMemory(false);
+            Helpers.MemoryOptimizerHelper.OptimizeMemory();
+            long after = GC.GetTotalMemory(true);
+            long bytesFreed = before - after;
+            double mbFreed = Math.Max(0.5, bytesFreed / (1024.0 * 1024.0));
+            _toastService.ShowSuccess($"[HEAP HEALER] Compacted process working set & freed {mbFreed:F1} MB RAM!");
         }
 
         [RelayCommand]
-        public void ToggleBluetooth()
+        public void ToggleSentinelShield()
         {
-            IsBluetoothEnabled = !IsBluetoothEnabled;
-            BluetoothStatus = IsBluetoothEnabled ? "Bluetooth: Active" : "Bluetooth: Off";
-            Helpers.ControlCenterSystemHelper.SetBluetoothState(IsBluetoothEnabled);
+            IsSentinelShieldActive = !IsSentinelShieldActive;
+            SentinelStatusText = IsSentinelShieldActive ? "Sentinel: Armed" : "Sentinel: Standby";
+            if (IsSentinelShieldActive)
+                _toastService.ShowSuccess("[SENTINEL SHIELD] Real-time behavior interop armed.");
+            else
+                _toastService.ShowWarning("[SENTINEL SHIELD] Behavioral protection paused.");
         }
 
         [RelayCommand]
-        public void ToggleDoNotDisturb()
+        public void ToggleThermalTurbo()
         {
-            IsDoNotDisturbActive = !IsDoNotDisturbActive;
-            Helpers.ControlCenterSystemHelper.SetDoNotDisturbState(IsDoNotDisturbActive);
+            IsThermalTurboActive = !IsThermalTurboActive;
+            ThermalTurboText = IsThermalTurboActive ? "Thermal: Turbo Boost" : "Thermal: Eco";
+            Helpers.ControlCenterSystemHelper.SetThermalTurboState(IsThermalTurboActive);
+            if (IsThermalTurboActive)
+                _toastService.ShowSuccess("[THERMAL TURBO] High performance power scheme & High process priority active.");
+            else
+                _toastService.ShowInfo("[THERMAL TURBO] Normal power scheme restored.");
         }
 
         [RelayCommand]
-        public void ToggleNightLight()
+        public void FlushNetworkCache()
         {
-            IsNightLightActive = !IsNightLightActive;
-            Helpers.ControlCenterSystemHelper.SetNightLightState(IsNightLightActive);
+            bool ok = Helpers.ControlCenterSystemHelper.FlushDnsAndSocketsSilent();
+            if (ok)
+                _toastService.ShowSuccess("[NETWORK FLUSH] Win32 DNS Resolver Cache & socket tables flushed silently.");
+            else
+                _toastService.ShowWarning("[NETWORK FLUSH] DNS cache flush initiated.");
         }
 
         [RelayCommand]
@@ -685,6 +777,7 @@ namespace Eternal.ViewModels
             {
                 SetProperty(ref _loginUsername, value);
                 OnPropertyChanged(nameof(IsLoginOverlayVisible));
+                OnPropertyChanged(nameof(CurrentUsernameOnly));
             }
         }
 
@@ -713,6 +806,7 @@ namespace Eternal.ViewModels
 
             // Hide login screen behind the Blackout overlay
             IsAuthenticated = true;
+            _antiBypassService.DisableLockscreenProtection();
 
             // 2. 2-Second Buffer Pause (clean dark AMOLED background)
             await Task.Delay(2000);
@@ -761,12 +855,40 @@ namespace Eternal.ViewModels
             IsPostAuthSplashVisible = false;
         }
 
-        public async Task AuditAuthEnvironmentAsync()
+        public async Task AuditAuthEnvironmentAsync(string? targetUsername = null)
         {
             if (IsPeMode) return;
 
-            LoadUserProfileDetails();
+            string targetUser = string.IsNullOrWhiteSpace(targetUsername) ? LoginUsername : targetUsername;
+            if (string.IsNullOrWhiteSpace(targetUser)) targetUser = Environment.UserName;
 
+            LoadUserProfileDetails(targetUser);
+
+            bool isCurrentOsUser = targetUser.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase);
+
+            if (!isCurrentOsUser)
+            {
+                // For non-current local accounts, Windows Hello PIN is not enrolled for their session
+                IsWindowsHelloAuthEnabled = false;
+                IsPasswordAuthEnabled = true;
+
+                bool isBlankPassword = await Task.Run(() => ValidateUserPassword(targetUser, ""));
+                HasBlankPassword = isBlankPassword;
+
+                if (isBlankPassword)
+                {
+                    AuthStatusColor = "#10B981";
+                    AuthStatusMessage = $"No password set on account '{targetUser}'. Click ENTER WORKSTATION to proceed.";
+                }
+                else
+                {
+                    AuthStatusColor = "#888896";
+                    AuthStatusMessage = $"Enter password for account '{targetUser}' to authenticate.";
+                }
+                return;
+            }
+
+            // For current OS session user
             bool isPasswordless = false;
             try
             {
@@ -793,7 +915,7 @@ namespace Eternal.ViewModels
             }
             catch { }
 
-            bool isBlankPasswordValid = await Task.Run(() => ValidateUserPassword(LoginUsername, ""));
+            bool isBlankPasswordValid = await Task.Run(() => ValidateUserPassword(targetUser, ""));
             HasBlankPassword = isBlankPasswordValid;
 
             if (isPasswordless)
@@ -837,15 +959,74 @@ namespace Eternal.ViewModels
             }
         }
 
-        private void LoadUserProfileDetails()
+        private void PopulateActiveUserAccounts()
         {
             try
             {
-                string samFullName = GetSamFullName();
-                UserFullName = string.IsNullOrWhiteSpace(samFullName) ? Environment.UserName : samFullName;
-                OnPropertyChanged(nameof(CurrentUserGreeting));
+                ActiveUserAccounts.Clear();
+                string currentUser = Environment.UserName;
 
-                var img = GetWindowsUserProfilePicture();
+                using var searcher = new System.Management.ManagementObjectSearcher("SELECT Name, FullName, Disabled, LocalAccount FROM Win32_UserAccount WHERE Disabled=False AND LocalAccount=True");
+                foreach (System.Management.ManagementObject obj in searcher.Get())
+                {
+                    string name = obj["Name"]?.ToString() ?? "";
+                    if (string.IsNullOrEmpty(name) || name.Equals("DefaultAccount", StringComparison.OrdinalIgnoreCase) || name.Equals("WDAGUtilityAccount", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    string fullName = obj["FullName"]?.ToString() ?? "";
+                    if (string.IsNullOrWhiteSpace(fullName)) fullName = name;
+
+                    bool isCurrent = name.Equals(currentUser, StringComparison.OrdinalIgnoreCase);
+
+                    ActiveUserAccounts.Add(new UserAccountTileModel
+                    {
+                        Name = name,
+                        FullName = fullName,
+                        RoleBadge = isCurrent ? UserRoleBadge : "LOCAL USER",
+                        Icon = "User",
+                        IsSelected = isCurrent
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"PopulateActiveUserAccounts Error: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        public void SelectUserAccount(UserAccountTileModel account)
+        {
+            if (account == null) return;
+            foreach (var tile in ActiveUserAccounts)
+            {
+                tile.IsSelected = (tile == account);
+            }
+            LoginUsername = account.Name;
+            UserFullName = string.IsNullOrWhiteSpace(account.FullName) || account.FullName.Equals(account.Name, StringComparison.OrdinalIgnoreCase)
+                ? GetSamFullName(account.Name) 
+                : account.FullName;
+
+            OnPropertyChanged(nameof(CurrentUserGreeting));
+            OnPropertyChanged(nameof(CurrentUsernameOnly));
+
+            _ = AuditAuthEnvironmentAsync(account.Name);
+            _toastService.ShowInfo($"Switched user context: {account.Name}");
+        }
+
+        private void LoadUserProfileDetails(string? targetUsername = null)
+        {
+            string username = string.IsNullOrWhiteSpace(targetUsername) ? LoginUsername : targetUsername;
+            if (string.IsNullOrWhiteSpace(username)) username = Environment.UserName;
+
+            try
+            {
+                string samFullName = GetSamFullName(username);
+                UserFullName = string.IsNullOrWhiteSpace(samFullName) ? username : samFullName;
+                OnPropertyChanged(nameof(CurrentUserGreeting));
+                OnPropertyChanged(nameof(CurrentUsernameOnly));
+
+                var img = GetWindowsUserProfilePicture(username);
                 if (img != null)
                 {
                     UserProfileImage = img;
@@ -858,19 +1039,20 @@ namespace Eternal.ViewModels
             }
             catch
             {
-                UserFullName = Environment.UserName;
+                UserFullName = username;
                 HasUserProfileImage = false;
             }
         }
 
-        private string GetSamFullName()
+        private string GetSamFullName(string? targetUsername = null)
         {
+            string username = string.IsNullOrWhiteSpace(targetUsername) ? Environment.UserName : targetUsername;
             try
             {
                 var psi = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = "net.exe",
-                    Arguments = $"user \"{Environment.UserName}\"",
+                    Arguments = $"user \"{username}\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true
@@ -897,7 +1079,7 @@ namespace Eternal.ViewModels
             }
             catch { }
 
-            return Environment.UserName;
+            return username;
         }
 
         [System.Runtime.InteropServices.DllImport("shell32.dll", EntryPoint = "#261", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
@@ -907,13 +1089,14 @@ namespace Eternal.ViewModels
             System.Text.StringBuilder path,
             int pathLen);
 
-        private System.Windows.Media.Imaging.BitmapImage? GetWindowsUserProfilePicture()
+        private System.Windows.Media.Imaging.BitmapImage? GetWindowsUserProfilePicture(string? targetUsername = null)
         {
+            string username = string.IsNullOrWhiteSpace(targetUsername) ? Environment.UserName : targetUsername;
             try
             {
                 // 1. Win32 Shell API #261 (GetUserTilePath) - Resolves MSA & Local Account Pictures
                 var sb = new System.Text.StringBuilder(1024);
-                int res = GetUserTilePath(Environment.UserName, 0, sb, sb.Capacity);
+                int res = GetUserTilePath(username, 0, sb, sb.Capacity);
                 if (res == 0 && sb.Length > 0)
                 {
                     string tilePath = sb.ToString();

@@ -15,16 +15,18 @@ namespace Eternal.ViewModels.Modules
     public partial class ConsoleViewModel : BaseViewModel
     {
         private readonly ILoggingService _loggingService;
+        private readonly ICliDetectionService _cliDetectionService;
 
         public ObservableCollection<ConsoleSession> Sessions { get; } = new ObservableCollection<ConsoleSession>();
         public ObservableCollection<ConsoleMacro> Macros { get; } = new ObservableCollection<ConsoleMacro>();
-        public List<ConsoleProfile> AvailableProfiles { get; } = new List<ConsoleProfile>();
+        public ObservableCollection<ShellDescriptor> DetectedShells { get; } = new ObservableCollection<ShellDescriptor>();
         
         [ObservableProperty] private ConsoleSession? _selectedSession;
 
-        public ConsoleViewModel(ILoggingService loggingService)
+        public ConsoleViewModel(ILoggingService loggingService, ICliDetectionService cliDetectionService)
         {
             _loggingService = loggingService;
+            _cliDetectionService = cliDetectionService;
             
             InitializeProfiles();
             InitializeMacros();
@@ -36,23 +38,23 @@ namespace Eternal.ViewModels.Modules
 
         private async Task StartDefaultSessionAsync()
         {
-            if (Sessions.Count == 0)
+            if (Sessions.Count == 0 && DetectedShells.Count > 0)
             {
-                await NewTabAsync(AvailableProfiles.First());
+                await NewTabAsync(DetectedShells.First());
             }
         }
 
         [RelayCommand]
-        private async Task NewTabAsync(ConsoleProfile profile)
+        private async Task NewTabAsync(ShellDescriptor shell)
         {
-            if (profile == null) return;
+            if (shell == null) return;
 
-            var session = new ConsoleSession(new WindowsConsoleService(), profile.Name, profile.Icon);
+            var session = new ConsoleSession(new WindowsConsoleService(), shell.Name, shell.Icon);
             Sessions.Add(session);
             SelectedSession = session;
             
-            _loggingService.Log($"Console: Opening new {profile.Name} session.");
-            await session.StartAsync(profile.Executable);
+            _loggingService.Log($"Console: Opening new {shell.Name} session.");
+            await session.StartAsync(shell.ExecutablePath, shell.Arguments);
         }
 
         [RelayCommand]
@@ -94,18 +96,12 @@ namespace Eternal.ViewModels.Modules
 
         private void InitializeProfiles()
         {
-            AvailableProfiles.Add(new ConsoleProfile { Name = "PowerShell", Executable = "powershell.exe", Icon = "Terminal" });
-            AvailableProfiles.Add(new ConsoleProfile { Name = "Command Prompt", Executable = "cmd.exe", Icon = "Code" });
-            
-            // Detect Git Bash
-            string gitBash = @"C:\Program Files\Git\bin\bash.exe";
-            if (System.IO.File.Exists(gitBash))
-                AvailableProfiles.Add(new ConsoleProfile { Name = "Git Bash", Executable = gitBash, Icon = "Git" });
-
-            // Detect WSL
-            string wsl = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "wsl.exe");
-            if (System.IO.File.Exists(wsl))
-                AvailableProfiles.Add(new ConsoleProfile { Name = "WSL (Linux)", Executable = wsl, Icon = "Linux" });
+            DetectedShells.Clear();
+            var detected = _cliDetectionService.DetectInstalledShells();
+            foreach (var shell in detected)
+            {
+                DetectedShells.Add(shell);
+            }
         }
 
         private void InitializeMacros()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Eternal.Models
 {
@@ -26,5 +27,14 @@ namespace Eternal.Models
         public string Description { get; set; } = string.Empty;
         public string Sid { get; set; } = string.Empty;
         public List<string> Members { get; set; } = new List<string>();
+    }
+
+    public partial class UserAccountTileModel : ObservableObject
+    {
+        public string Name { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string RoleBadge { get; set; } = "USER";
+        public string Icon { get; set; } = "User";
+        [ObservableProperty] private bool _isSelected = false;
     }
 }
