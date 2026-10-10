@@ -17,7 +17,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                <Border Grid.Row="0" Style="{StaticResource LiquidGlassContainerStyle}" Margin="0,0,0,20">
                     <Grid>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="SELECT CAMERA" VerticalAlignment="Center" Style="{StaticResource Caption}" Margin="0,0,15,0"/>
@@ -33,7 +33,7 @@
                     </Grid>
                 </Border>
 
-                <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0" ClipToBounds="True">
+                <Border Grid.Row="1" Style="{StaticResource LiquidGlassContainerStyle}" Padding="0" ClipToBounds="True">
                     <Grid Background="Black">
                         <Image Source="{Binding CameraFeed}" Stretch="Uniform"/>
                         <Border Background="#AA000000" VerticalAlignment="Bottom" Padding="20">
@@ -57,7 +57,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 
-                <Border Grid.Row="0" Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                <Border Grid.Row="0" Style="{StaticResource LiquidGlassContainerStyle}" Margin="0,0,0,20">
                     <Grid>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="InfoCircle" Width="14" Foreground="{DynamicResource InfoBrush}" Margin="0,0,10,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
@@ -67,7 +67,7 @@
                     </Grid>
                 </Border>
 
-                <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0" Background="#050505">
+                <Border Grid.Row="1" Style="{StaticResource LiquidGlassContainerStyle}" Padding="0" Background="#050505">
                     <InkCanvas x:Name="TestCanvas" Background="Transparent" EditingMode="Ink">
                         <InkCanvas.DefaultDrawingAttributes>
                             <DrawingAttributes Color="#9B59B6" Width="2" Height="2" FitToCurve="True"/>
@@ -85,7 +85,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                <Border Grid.Row="0" Style="{StaticResource LiquidGlassContainerStyle}" Margin="0,0,0,20">
                     <StackPanel Orientation="Horizontal">
                         <StackPanel Margin="0,0,40,0">
                             <TextBlock Text="N-KEY ROLLOVER" Style="{StaticResource Caption}"/>
@@ -96,7 +96,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="20">
+                <Border Grid.Row="1" Style="{StaticResource LiquidGlassContainerStyle}" Padding="20">
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                         <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
                             <ItemsControl ItemsSource="{Binding KeyboardRows}" MinWidth="850">
@@ -134,7 +134,7 @@
 
         <!-- Speakers Template -->
         <DataTemplate x:Key="SpeakersTemplate">
-            <Border Style="{StaticResource StandardCard}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400">
+            <Border Style="{StaticResource LiquidGlassContainerStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400">
                 <StackPanel HorizontalAlignment="Center">
                     <fa:ImageAwesome Icon="VolumeUp" Width="64" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,30"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     <TextBlock Text="AUDIO CHANNEL TEST" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
@@ -146,7 +146,7 @@
 
         <!-- Monitor Template -->
         <DataTemplate x:Key="MonitorTemplate">
-            <Border Style="{StaticResource StandardCard}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="450">
+            <Border Style="{StaticResource LiquidGlassContainerStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="450">
                 <StackPanel HorizontalAlignment="Center">
                     <fa:ImageAwesome Icon="Television" Width="64" Foreground="{DynamicResource InfoBrush}" Margin="0,0,0,30"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                     <TextBlock Text="COLOR INTEGRITY TEST" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
@@ -166,7 +166,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Style="{StaticResource StandardCard}" Margin="0,0,0,20">
+                <Border Grid.Row="0" Style="{StaticResource LiquidGlassContainerStyle}" Margin="0,0,0,20">
                     <StackPanel Orientation="Horizontal">
                         <fa:ImageAwesome Icon="Usb" Width="16" Foreground="{DynamicResource WarningBrush}" Margin="0,0,15,0"><fa:ImageAwesome.Effect><DropShadowEffect Color="Transparent" BlurRadius="0" ShadowDepth="0" Opacity="0"/></fa:ImageAwesome.Effect></fa:ImageAwesome>
                         <TextBlock Text="USB EVENT TRACKER: Monitoring bus changes in real-time. Connect/Disconnect devices to verify ports." 
@@ -174,7 +174,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="1" Style="{StaticResource StandardCard}" Padding="0">
+                <Border Grid.Row="1" Style="{StaticResource LiquidGlassContainerStyle}" Padding="0">
                     <DataGrid ItemsSource="{Binding UsbHistory}" AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0"
                               VirtualizingStackPanel.IsVirtualizing="True"
                               VirtualizingStackPanel.VirtualizationMode="Recycling">
@@ -245,7 +245,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Master: Component List -->
-                <Border Grid.Column="0" Style="{StaticResource StandardCard}" Padding="10" Margin="0,0,20,0">
+                <Border Grid.Column="0" Style="{StaticResource LiquidGlassContainerStyle}" Padding="10" Margin="0,0,20,0">
                     <ListBox ItemsSource="{Binding Components}" SelectedItem="{Binding SelectedComponent}"
                              Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListBox.ItemContainerStyle>

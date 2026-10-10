@@ -794,63 +794,50 @@ namespace Eternal.ViewModels
         {
             if (IsPostAuthSplashVisible || IsBlackoutActive) return;
 
-            // Activate Full Blackout background overlay to prevent any dashboard flash during login fade-out
+            // 1. Smooth Fade-Out of Lockscreen (1.0 -> 0.0 over 200ms)
             IsBlackoutActive = true;
-
-            // 1. Smooth Fade-Out of Login Screen (1.0 -> 0.0 over 300ms)
             for (int i = 10; i >= 0; i--)
             {
                 LoginOverlayOpacity = i / 10.0;
-                await Task.Delay(30);
+                await Task.Delay(20);
             }
 
-            // Hide login screen behind the Blackout overlay
+            // 2. Display Opaque Holographic Welcome Screen FIRST before exposing dashboard
+            PostAuthSplashTip = _workstationTips[Random.Shared.Next(_workstationTips.Length)];
+            PostAuthSplashOpacity = 1.0;
+            IsPostAuthSplashVisible = true;
+
+            // Mark authenticated so lockscreen detaches, but solid Welcome Screen covers the window
             IsAuthenticated = true;
             _antiBypassService.DisableLockscreenProtection();
 
-            // 2. 2-Second Buffer Pause (clean dark AMOLED background)
-            await Task.Delay(2000);
-
-            // 3. Smooth Fade-In of Post-Auth Loading Overlay (0.0 -> 1.0 over 300ms)
-            PostAuthSplashTip = _workstationTips[Random.Shared.Next(_workstationTips.Length)];
-            IsPostAuthSplashVisible = true;
-            PostAuthSplashOpacity = 0.0;
-
-            for (int i = 1; i <= 10; i++)
-            {
-                PostAuthSplashOpacity = i / 10.0;
-                await Task.Delay(30);
-            }
-
-            // 4. Animate Status Bar 0-100% over 3.0 seconds exact
+            // 3. 5-Stage Holographic Telemetry Preloader (0% to 100%)
             string[] steps = new[]
             {
-                "Authenticating User Session & Cryptographic Token...",
-                "Allocating High-Performance Memory & Process Cache...",
-                "Initializing Telemetry Engines & Hardware Diagnostics...",
-                "Applying Custom Workstation Presets...",
-                "Workstation System Environment Ready."
+                "[1/5] Authenticating SAM Security Session & Cryptographic Token...",
+                "[2/5] Allocating High-Performance Memory Pools & Hardware Cache...",
+                "[3/5] Querying System Telemetry & NVMe S.M.A.R.T. Diagnostics...",
+                "[4/5] Applying Custom Security Hierarchy & User Workstation Scope...",
+                "[5/5] Warm-starting Zero-Wait Module Caches. Workstation Ready."
             };
 
-            for (int p = 0; p <= 100; p++)
+            for (int p = 0; p <= 100; p += 2)
             {
                 PostAuthSplashProgress = p;
                 int stepIdx = Math.Min(steps.Length - 1, p / 20);
                 PostAuthSplashStatusText = steps[stepIdx];
-                await Task.Delay(30);
+                SplashTelemetryTicker = steps[stepIdx];
+                await Task.Delay(22);
             }
 
-            await Task.Delay(150);
+            await Task.Delay(300);
 
-            // 5. Direct Cross-Fade from Loading Overlay into Dashboard:
-            // Remove blackout grid first so dashboard is exposed directly beneath the loading overlay
+            // 4. Reveal Dashboard for the first time by dissolving Welcome Screen
             IsBlackoutActive = false;
-
-            // Smoothly dissolve loading overlay directly into dashboard (400ms)
             for (int i = 10; i >= 0; i--)
             {
                 PostAuthSplashOpacity = i / 10.0;
-                await Task.Delay(40);
+                await Task.Delay(25);
             }
             IsPostAuthSplashVisible = false;
         }
@@ -1267,9 +1254,10 @@ namespace Eternal.ViewModels
             // 2. 1-Second Buffer Pause (clean dark AMOLED transition state)
             await Task.Delay(1000);
 
-            // 3. Set Lockscreen State
+            // 3. Set Lockscreen State & Compact Memory Footprint
             IsAuthenticated = false;
             IsPostAuthSplashVisible = false;
+            Helpers.MemoryOptimizerHelper.OptimizeMemory();
 
             if (dueToInactivity)
             {
@@ -1524,6 +1512,7 @@ namespace Eternal.ViewModels
         public void PauseBackgroundWork()
         {
             _performanceService.PausePolling();
+            Helpers.MemoryOptimizerHelper.OptimizeMemory();
         }
 
         public void ResumeBackgroundWork()

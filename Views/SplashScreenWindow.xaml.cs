@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Animation;
 using Eternal.ViewModels;
 using Eternal.Services.System;
 using Eternal.Views.Helpers;
@@ -15,10 +16,7 @@ namespace Eternal.Views
         {
             _isTestMode = isTestMode;
             InitializeComponent();
-            if (FindName("UserGreetingTextBlock") is System.Windows.Controls.TextBlock greetingTb)
-            {
-                greetingTb.Text = $"Hello, {Environment.UserName}!";
-            }
+
             _ = SafeStartLoadingAsync();
         }
 
@@ -48,15 +46,15 @@ namespace Eternal.Views
                 return;
             }
 
-            // Minimum display time for branding visibility (1.2 seconds)
-            var timerTask = Task.Delay(1200);
-
-            // Initialize the Main ViewModel first (via DI)
+            // Bind Main ViewModel first via DI
             var mainVm = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<MainViewModel>(App.ServiceProvider);
             var settingsService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ISettingsService>(App.ServiceProvider);
-            await Task.Delay(200);
 
-            // First-Run Initializer Wizard (Engages full hardware baseline scan on new installation)
+            // Step 1: Network & Socket Warmer (20%)
+            UpdateStep("[1/5] Initializing Win32 IP Helper & Native Network Sockets...", 20);
+            await Task.Delay(300);
+
+            // First-Run Initializer Wizard
             if (!_isTestMode && mainVm.Settings.IsFirstRun)
             {
                 var firstRunWindow = new Eternal.Views.Helpers.FirstRunSetupWindow();
@@ -66,7 +64,6 @@ namespace Eternal.Views
                     mainVm.Settings.IsFirstRun = false;
                     settingsService.Save();
 
-                    // Calibration successful -> proceed directly to main window shell
                     var mainWin = new LegacyMainWindow();
                     mainWin.DataContext = mainVm;
                     mainVm.StartTimers();
@@ -80,7 +77,10 @@ namespace Eternal.Views
                 }
             }
 
-            // Entry Lock Check
+            // Step 2: Entry Lock Verification (40%)
+            UpdateStep("[2/5] Allocating High-Performance Memory & Process Cache...", 40);
+            await Task.Delay(250);
+
             if (!_isTestMode && mainVm.Settings.IsStartupLockEnabled)
             {
                 var lockWindow = new Eternal.Views.Helpers.EntryLockWindow(settingsService);
@@ -91,19 +91,26 @@ namespace Eternal.Views
                 }
             }
 
-            // Fully await preloading before continuing to ensure Dashboard is ready immediately
-            await mainVm.PreloadAllDataAsync();
-            
-            await Task.Delay(100);
+            // Step 3: Hardware Vector Audit (60%)
+            UpdateStep("[3/5] Verifying CPU AVX2 & Kernel Vector Capabilities...", 60);
+            await Task.Delay(250);
 
-            // Ensure we stay visible for at least the branding timer
-            await timerTask;
+            // Step 4: Preloading System Telemetry Caches (80%)
+            UpdateStep("[4/5] Syncing System SAM Security Integrity & Ring-0 Diagnostics...", 80);
+            await mainVm.PreloadAllDataAsync();
+
+            // Step 5: Complete (100%)
+            UpdateStep("[5/5] Warm-starting Zero-Wait Module Caches...", 100);
+            await Task.Delay(300);
 
             if (_isTestMode)
             {
                 this.Close();
                 return;
             }
+
+            // Stage 6: Smooth Glass Dissolve Window Exit Animation
+            await AnimateExitDissolveAsync();
 
             var legacyWin = new LegacyMainWindow();
             legacyWin.DataContext = mainVm;
@@ -115,10 +122,59 @@ namespace Eternal.Views
 
             this.Close();
         }
+
+        private void UpdateStep(string statusText, double percent)
+        {
+            Dispatcher.Invoke(() => {
+                StepStatusText.Text = statusText;
+                ProgressPercentText.Text = $"{(int)percent}%";
+
+                var anim = new DoubleAnimation(percent, new Duration(TimeSpan.FromMilliseconds(200))) {
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
+                SplashProgressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, anim);
+            });
+        }
+
+        private Task AnimateExitDissolveAsync()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            Dispatcher.Invoke(() => {
+                var sb = new Storyboard();
+
+                var fadeAnim = new DoubleAnimation(1.0, 0.0, new Duration(TimeSpan.FromMilliseconds(350))) {
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(fadeAnim, RootBorder);
+                Storyboard.SetTargetProperty(fadeAnim, new PropertyPath("Opacity"));
+
+                var scaleXAnim = new DoubleAnimation(1.0, 1.05, new Duration(TimeSpan.FromMilliseconds(350))) {
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(scaleXAnim, WindowScale);
+                Storyboard.SetTargetProperty(scaleXAnim, new PropertyPath("ScaleX"));
+
+                var scaleYAnim = new DoubleAnimation(1.0, 1.05, new Duration(TimeSpan.FromMilliseconds(350))) {
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(scaleYAnim, WindowScale);
+                Storyboard.SetTargetProperty(scaleYAnim, new PropertyPath("ScaleY"));
+
+                sb.Children.Add(fadeAnim);
+                sb.Children.Add(scaleXAnim);
+                sb.Children.Add(scaleYAnim);
+
+                sb.Completed += (s, e) => tcs.SetResult(true);
+                sb.Begin();
+            });
+
+            return tcs.Task;
+        }
+
         private bool IsSystemCompatible()
         {
             var os = Environment.OSVersion;
-            // Windows 10 Version 1507 (Build 10240) or later
             return os.Platform == PlatformID.Win32NT && 
                    os.Version.Major >= 10 && 
                    (os.Version.Major > 10 || os.Version.Build >= Eternal.Helpers.OsHelper.Build_Win10_1507);

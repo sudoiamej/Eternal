@@ -27,7 +27,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Style="{StaticResource CarPlayAppTile}" 
+                        <Button Style="{StaticResource LiquidGlassButtonStyle}" 
                                 Width="180" Height="140" 
                                 Margin="10"
                                 Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 

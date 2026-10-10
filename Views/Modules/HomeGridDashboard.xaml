@@ -26,7 +26,7 @@
             <UniformGrid Columns="2" Rows="2" VerticalAlignment="Top">
                 
                 <!-- Card 1: System Diagnostics -->
-                <Border Margin="10" Background="#000000" BorderBrush="#1D1D22" BorderThickness="1" CornerRadius="8" Padding="20">
+                <Border Margin="10" Style="{StaticResource LiquidGlassContainerStyle}" Padding="20">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -47,7 +47,7 @@
                 </Border>
 
                 <!-- Card 2: Tuning & Repair -->
-                <Border Margin="10" Background="#000000" BorderBrush="#1D1D22" BorderThickness="1" CornerRadius="8" Padding="20">
+                <Border Margin="10" Style="{StaticResource LiquidGlassContainerStyle}" Padding="20">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -68,7 +68,7 @@
                 </Border>
 
                 <!-- Card 3: Active Monitoring -->
-                <Border Margin="10" Background="#000000" BorderBrush="#1D1D22" BorderThickness="1" CornerRadius="8" Padding="20">
+                <Border Margin="10" Style="{StaticResource LiquidGlassContainerStyle}" Padding="20">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -89,7 +89,7 @@
                 </Border>
 
                 <!-- Card 4: Support & Tools -->
-                <Border Margin="10" Background="#000000" BorderBrush="#1D1D22" BorderThickness="1" CornerRadius="8" Padding="20">
+                <Border Margin="10" Style="{StaticResource LiquidGlassContainerStyle}" Padding="20">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>

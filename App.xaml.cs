@@ -81,6 +81,14 @@ namespace Eternal
                 var splashScreen = new Views.SplashScreenWindow();
                 System.Windows.Application.Current.MainWindow = splashScreen;
                 splashScreen.Show();
+
+                // Trigger Background Telemetry Preloading Engine
+                _ = Task.Run(async () => {
+                    try {
+                        var preloader = ServiceProvider.GetService<ITelemetryPreloaderService>();
+                        if (preloader != null) await preloader.PreloadSystemTelemetryServicesAsync();
+                    } catch { }
+                });
             }
             catch (Exception ex)
             {
@@ -150,6 +158,9 @@ namespace Eternal
             services.AddSingleton<ICliDetectionService, CliDetectionService>();
             services.AddSingleton<IFactoryCodeService, FactoryCodeService>();
             services.AddSingleton<ILockscreenAntiBypassService, LockscreenAntiBypassService>();
+            services.AddSingleton<IRepairService, WindowsRepairService>();
+            services.AddSingleton<ITelemetryPreloaderService, TelemetryPreloaderService>();
+            services.AddSingleton<ISmartIdleEngine, SmartIdleEngine>();
 
             // ViewModels - Core (Singleton)
             services.AddSingleton<MainViewModel>();

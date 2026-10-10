@@ -15,64 +15,15 @@ namespace Eternal.Services.Network
         {
             return Task.Run(() =>
             {
-                var connections = new List<NetworkConnection>();
-                var processCache = Process.GetProcesses().ToDictionary(p => p.Id, p => p.ProcessName);
-
                 try
                 {
-                    var startInfo = new ProcessStartInfo
-                    {
-                        FileName = "netstat",
-                        Arguments = "-ano",
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-
-                    using var process = Process.Start(startInfo);
-                    if (process == null) return connections;
-
-                    using var reader = process.StandardOutput;
-                    
-                    while (!reader.EndOfStream)
-                    {
-                        string? line = reader.ReadLine()?.Trim();
-                        if (string.IsNullOrEmpty(line)) continue;
-
-                        if (!line.StartsWith("TCP", StringComparison.OrdinalIgnoreCase) && 
-                            !line.StartsWith("UDP", StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
-                        string[] parts = global::System.Text.RegularExpressions.Regex.Split(line, @"\s+");
-                        if (parts.Length >= 4)
-                        {
-                            try 
-                            {
-                                string protocol = parts[0];
-                                string local = parts[1];
-                                string remote = parts[2];
-                                string state = "UDP";
-                                int pidIndex = parts.Length - 1;
-
-                                if (parts.Length >= 5 && protocol.StartsWith("TCP", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    state = parts[3];
-                                }
-
-                                if (int.TryParse(parts[pidIndex], out int pid))
-                                {
-                                    processCache.TryGetValue(pid, out string? procName);
-                                    procName ??= "Unknown";
-                                    connections.Add(new NetworkConnection(protocol, local, remote, state, pid, procName));
-                                }
-                            } catch { }
-                        }
-                    }
+                    return NativeNetworkEngine.GetActiveConnectionsNative();
                 }
-                catch { }
-                return connections;
+                catch (Exception ex)
+                {
+                    global::System.Diagnostics.Debug.WriteLine($"Native Network Engine Error: {ex.Message}");
+                    return new List<NetworkConnection>();
+                }
             });
         }
 

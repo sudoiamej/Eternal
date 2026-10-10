@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="pack://application:,,,/Styles/Animations.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Styles/NeumorphicControls.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Styles/LegacyModernStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Styles/LiquidGlassTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
             <helpers:ValueToVisibilityConverter x:Key="VisibilityConverter"/>

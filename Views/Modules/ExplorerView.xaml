@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
 
         <!-- Row 0: Top Navigation & Address Bar -->
-        <Border Grid.Row="0" Background="#0A0A10" BorderBrush="#1C1C28" BorderThickness="0,0,0,1" Padding="14,10">
+        <Border Grid.Row="0" Style="{StaticResource LiquidGlassContainerStyle}" Margin="14,10,14,6" Padding="14,10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/> <!-- Navigation History Buttons -->
@@ -26,13 +26,13 @@
 
                 <!-- Navigation History Buttons -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,12,0">
-                    <Button Command="{Binding NavigateBackCommand}" Style="{StaticResource StandardButton}" Width="32" Height="32" Margin="0,0,4,0" ToolTip="Back">
+                    <Button Command="{Binding NavigateBackCommand}" Style="{StaticResource LiquidGlassButtonStyle}" Width="32" Height="32" Margin="0,0,4,0" ToolTip="Back">
                         <fa:ImageAwesome Icon="ArrowLeft" Width="11" Foreground="White"/>
                     </Button>
-                    <Button Command="{Binding NavigateForwardCommand}" Style="{StaticResource StandardButton}" Width="32" Height="32" Margin="0,0,4,0" ToolTip="Forward">
+                    <Button Command="{Binding NavigateForwardCommand}" Style="{StaticResource LiquidGlassButtonStyle}" Width="32" Height="32" Margin="0,0,4,0" ToolTip="Forward">
                         <fa:ImageAwesome Icon="ArrowRight" Width="11" Foreground="White"/>
                     </Button>
-                    <Button Command="{Binding NavigateUpCommand}" Style="{StaticResource StandardButton}" Width="32" Height="32" ToolTip="Up to Parent Folder">
+                    <Button Command="{Binding NavigateUpCommand}" Style="{StaticResource LiquidGlassButtonStyle}" Width="32" Height="32" ToolTip="Up to Parent Folder">
                         <fa:ImageAwesome Icon="ArrowUp" Width="11" Foreground="White"/>
                     </Button>
                 </StackPanel>
@@ -71,44 +71,44 @@
         </Border>
 
         <!-- Row 1: Action Toolbar -->
-        <Border Grid.Row="1" Background="#060609" BorderBrush="#161622" BorderThickness="0,0,0,1" Padding="14,6">
+        <Border Grid.Row="1" Style="{StaticResource LiquidGlassContainerStyle}" Margin="14,0,14,10" Padding="14,6">
             <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding OpenTerminalHereCommand}" Style="{StaticResource StandardButton}" Height="28" Padding="10,0" Margin="0,0,6,0">
+                <Button Command="{Binding OpenTerminalHereCommand}" Style="{StaticResource LiquidGlassButtonStyle}" Height="28" Padding="10,0" Margin="0,0,6,0">
                     <StackPanel Orientation="Horizontal">
                         <fa:ImageAwesome Icon="Terminal" Width="10" Foreground="{DynamicResource AccentBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
                         <TextBlock Text="Open Terminal Here" FontSize="10" FontWeight="Bold" Foreground="White"/>
                     </StackPanel>
                 </Button>
 
-                <Button Command="{Binding CopyPathCommand}" CommandParameter="{Binding SelectedItem}" Style="{StaticResource StandardButton}" Height="28" Padding="10,0" Margin="0,0,6,0">
+                <Button Command="{Binding CopyPathCommand}" CommandParameter="{Binding SelectedItem}" Style="{StaticResource LiquidGlassButtonStyle}" Height="28" Padding="10,0" Margin="0,0,6,0">
                     <StackPanel Orientation="Horizontal">
                         <fa:ImageAwesome Icon="Copy" Width="10" Foreground="White" Margin="0,0,6,0" VerticalAlignment="Center"/>
                         <TextBlock Text="Copy Path" FontSize="10" FontWeight="Bold" Foreground="White"/>
                     </StackPanel>
                 </Button>
 
-                <Button Command="{Binding InspectPropertiesCommand}" CommandParameter="{Binding SelectedItem}" IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToBoolConverter}}" Style="{StaticResource StandardButton}" Height="28" Padding="10,0" Margin="0,0,6,0">
+                <Button Command="{Binding InspectPropertiesCommand}" CommandParameter="{Binding SelectedItem}" IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToBoolConverter}}" Style="{StaticResource LiquidGlassButtonStyle}" Height="28" Padding="10,0" Margin="0,0,6,0">
                     <StackPanel Orientation="Horizontal">
                         <fa:ImageAwesome Icon="InfoCircle" Width="10" Foreground="{DynamicResource InfoBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
                         <TextBlock Text="File Properties &amp; Hashes" FontSize="10" FontWeight="Bold" Foreground="White"/>
                     </StackPanel>
                 </Button>
 
-                <Button Command="{Binding InspectHexCommand}" CommandParameter="{Binding SelectedItem}" IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToBoolConverter}}" Style="{StaticResource StandardButton}" Height="28" Padding="10,0" Margin="0,0,6,0">
+                <Button Command="{Binding InspectHexCommand}" CommandParameter="{Binding SelectedItem}" IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToBoolConverter}}" Style="{StaticResource LiquidGlassButtonStyle}" Height="28" Padding="10,0" Margin="0,0,6,0">
                     <StackPanel Orientation="Horizontal">
                         <fa:ImageAwesome Icon="Code" Width="10" Foreground="#EC4899" Margin="0,0,6,0" VerticalAlignment="Center"/>
                         <TextBlock Text="Hex Inspector" FontSize="10" FontWeight="Bold" Foreground="White"/>
                     </StackPanel>
                 </Button>
 
-                <Button Command="{Binding CompressToZipCommand}" CommandParameter="{Binding SelectedItem}" IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToBoolConverter}}" Style="{StaticResource StandardButton}" Height="28" Padding="10,0" Margin="0,0,6,0">
+                <Button Command="{Binding CompressToZipCommand}" CommandParameter="{Binding SelectedItem}" IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToBoolConverter}}" Style="{StaticResource LiquidGlassButtonStyle}" Height="28" Padding="10,0" Margin="0,0,6,0">
                     <StackPanel Orientation="Horizontal">
                         <fa:ImageAwesome Icon="FileArchiveOutline" Width="10" Foreground="#F59E0B" Margin="0,0,6,0" VerticalAlignment="Center"/>
                         <TextBlock Text="Compress Zip" FontSize="10" FontWeight="Bold" Foreground="White"/>
                     </StackPanel>
                 </Button>
 
-                <Button Command="{Binding ExtractZipCommand}" CommandParameter="{Binding SelectedItem}" IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToBoolConverter}}" Style="{StaticResource StandardButton}" Height="28" Padding="10,0">
+                <Button Command="{Binding ExtractZipCommand}" CommandParameter="{Binding SelectedItem}" IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToBoolConverter}}" Style="{StaticResource LiquidGlassButtonStyle}" Height="28" Padding="10,0">
                     <StackPanel Orientation="Horizontal">
                         <fa:ImageAwesome Icon="FolderOpen" Width="10" Foreground="#10B981" Margin="0,0,6,0" VerticalAlignment="Center"/>
                         <TextBlock Text="Extract Zip" FontSize="10" FontWeight="Bold" Foreground="White"/>
@@ -118,7 +118,7 @@
         </Border>
 
         <!-- Row 2: ListView File Items -->
-        <ListView Grid.Row="2" ItemsSource="{Binding FilteredItems}" SelectedItem="{Binding SelectedItem}" MouseDoubleClick="ListView_MouseDoubleClick" Background="#030305" BorderThickness="0" Foreground="White">
+        <ListView Grid.Row="2" ItemsSource="{Binding FilteredItems}" SelectedItem="{Binding SelectedItem}" MouseDoubleClick="ListView_MouseDoubleClick" Background="Transparent" BorderThickness="0" Foreground="White" Margin="14,0,14,10">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="Foreground" Value="#FFFFFF"/>

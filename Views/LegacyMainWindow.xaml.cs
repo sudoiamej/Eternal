@@ -50,6 +50,10 @@ namespace Eternal.Views
             InitializeInactivityTimer();
             InitializeLockscreenFocusGuardianTimer();
             
+            this.Loaded += (s, e) => {
+                Eternal.Helpers.GlassHelper.EnableAcrylicGlass(this);
+            };
+
             // Adjust window dimensions dynamically to fit under 100% and 125% DPI scale boundaries
             AdjustWindowSizeToWorkingArea();
 
