@@ -1,18 +1,12 @@
-# Eternal — GitHub Linguist Language Detection
+# Eternal — GitHub Linguist overrides
 
-# C# application
 *.cs linguist-language=C#
-
-# XAML interface
 *.xaml linguist-language=XAML
 
-# Native C engine
-NativeEngine/**/*.c linguist-language=C
-NativeEngine/**/*.h linguist-language=C
+*.c linguist-language=C
+*.h linguist-language=C
 
-# Native C++ engine
-NativeEngine/**/*.cpp linguist-language=C++
-NativeEngine/**/*.hpp linguist-language=C++
+*.cpp linguist-language=C++
+*.hpp linguist-language=C++
 
-# Rust Sentinel Guard
-NativeEngine/rust_sentinel_guard/src/**/*.rs linguist-language=Rust
+*.rs linguist-language=Rust
