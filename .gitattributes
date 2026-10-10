@@ -1,1 +1,8 @@
-*.exe filter=lfs diff=lfs merge=lfs -text
+# Force GitHub Linguist to detect and highlight C, C++, Rust, C# and XAML explicitly
+*.cs linguist-language=C#
+*.xaml linguist-language=XAML
+NativeEngine/*.c linguist-language=C
+NativeEngine/*.h linguist-language=C
+NativeEngine/*.cpp linguist-language=C++
+NativeEngine/*.hpp linguist-language=C++
+NativeEngine/rust_sentinel_guard/src/*.rs linguist-language=Rust
